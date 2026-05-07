@@ -1,76 +1,82 @@
 import Link from "next/link";
 
-const MODULES = [
+const COURSES = [
   {
     id: 1,
-    icon: "📐",
-    title: "资本基础",
-    titleEn: "Capital Foundations",
-    level: "L1",
-    lessonCount: 3,
-    description: "建立正确的金融思维框架，理解资本的本质与运作逻辑。",
-    lessons: [
-      "什么是资本？资金与价值的关系",
-      "财务报表解读：资产负债表、损益表、现金流量表",
-      "复利的力量：FV 公式与长期积累",
+    name: "资本道",
+    nameEn: "Capital Mastery Program",
+    tag: "旗舰课程",
+    tagColor: "#C9A84C",
+    desc: "完整的企业资本运作系统，帮你从根本上理解如何让企业具备融资、估值与上市条件。",
+    topics: [
+      "公司估值方法论与提升策略",
+      "PE 股权结构设计与股东协议",
+      "股权激励方案设计（ESOP）",
+      "资本杠杆运用与融资节奏规划",
+      "资本机制公司建立与治理架构",
     ],
-    free: true,
+    badge: "HRDF Claimable",
+    free: false,
+    cta: "了解详情",
   },
   {
     id: 2,
-    icon: "📊",
-    title: "估值方法论",
-    titleEn: "Valuation Methodology",
-    level: "L1",
-    lessonCount: 3,
-    description: "掌握主流企业估值方法，学会判断一家公司的合理市值。",
-    lessons: [
-      "市盈率（PE）、市净率（PB）与市销率（PS）",
-      "行业估值对比与溢价分析",
-      "DCF 折现现金流基础模型",
+    name: "启动资本",
+    nameEn: "Kickstart Capital",
+    tag: "实战训练",
+    tagColor: "#7A9A6C",
+    desc: "实战企业资本化，提供从零开始的落地操作指导，帮助企业完成资本化启动的第一步。",
+    topics: [
+      "企业资本化的实战操作流程",
+      "融资前的企业包装与梳理",
+      "投资人沟通与路演技巧",
+      "早期资金来源与策略选择",
     ],
+    badge: null,
     free: false,
+    cta: "了解详情",
   },
   {
     id: 3,
-    icon: "💼",
-    title: "资本结构与融资",
-    titleEn: "Capital Structure & Fundraising",
-    level: "L2",
-    lessonCount: 4,
-    description: "深入理解股权、债务与混合融资，制定最优资本配置策略。",
-    lessons: [
-      "股权融资 vs 债权融资：核心差异",
-      "加权平均资本成本（WACC）计算",
-      "融资轮次与股权稀释管理",
-      "资本结构优化案例实战",
+    name: "资本三维模式",
+    nameEn: "Capital 3D Model Workshop",
+    tag: "工作坊",
+    tagColor: "#6A7A9A",
+    desc: "深入企业估值最大化策略，拆解四大退出维度，以真实国际 IPO 案例为蓝本讲解资本全局。",
+    topics: [
+      "企业估值最大化核心策略",
+      "四大退出维度：关闭、出售、并购、IPO",
+      "真实国际 IPO 案例深度解析",
+      "如何让企业具备「可投性」",
     ],
+    badge: "线上 Zoom",
     free: false,
+    cta: "了解详情",
   },
   {
     id: 4,
-    icon: "🚀",
-    title: "企业增长与上市路径",
-    titleEn: "Growth & IPO Pathway",
-    level: "L3",
-    lessonCount: 3,
-    description: "从成长阶段规划到资本市场对接，系统掌握马来西亚上市流程。",
-    lessons: [
-      "ACE 市场 vs 主板：门槛与策略选择",
-      "IPO 前重组：股权、架构与财务梳理",
-      "上市后资本管理与投资者关系",
+    name: "AI 经济与工业 4.5",
+    nameEn: "AI Economy & Industry 4.5",
+    tag: "专题课程",
+    tagColor: "#9A6A7A",
+    desc: "聚焦人工智能经济与工业 4.5 时代背景下的企业转型机遇，帮助企业主把握新经济下的资本机会。",
+    topics: [
+      "AI 经济浪潮下的企业机遇",
+      "工业 4.5 转型路径与资本配置",
+      "数字化企业的估值逻辑",
+      "新经济下的融资与合作模式",
     ],
+    badge: null,
     free: false,
+    cta: "了解详情",
   },
 ];
 
-const FEATURES = [
-  { icon: "🗺️", label: "闯关式学习地图", desc: "游戏化关卡设计，循序渐进不迷路" },
-  { icon: "🏆", label: "等级成就系统", desc: "完成关卡解锁 L1→L2→L3 等级徽章" },
-  { icon: "📥", label: "课件 PDF 下载", desc: "每节课配套高质量讲义，随时复习" },
-  { icon: "🎙️", label: "直播答疑", desc: "导师定期直播，实时解答学员疑惑" },
-  { icon: "👥", label: "学员社群", desc: "与同行学员交流，共享资源与机会" },
-  { icon: "🔧", label: "配套计算工具", desc: "学到哪就用到哪，理论与实践同步" },
+const OUTCOMES = [
+  { icon: "📊", text: "掌握企业估值的核心方法，知道自己公司值多少钱" },
+  { icon: "🏛️", text: "设计合理的股权架构，避免股权纠纷与稀释风险" },
+  { icon: "💼", text: "制定融资策略，与投资人建立有效的沟通框架" },
+  { icon: "🚀", text: "规划清晰的资本退出路径，从并购到 IPO 逐步推进" },
 ];
 
 export default function CoursesPage() {
@@ -79,10 +85,15 @@ export default function CoursesPage() {
       {/* Nav */}
       <nav
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 h-16"
-        style={{ backgroundColor: "rgba(13,13,13,0.95)", borderBottom: "1px solid #1A1A1A" }}
+        style={{ backgroundColor: "rgba(13,13,13,0.95)", borderBottom: "1px solid #1A1A1A", backdropFilter: "blur(12px)" }}
       >
-        <Link href="/" className="text-xl font-bold" style={{ fontFamily: "var(--font-display)", color: "#C9A84C" }}>
-          资本道
+        <Link href="/" className="flex items-center gap-2">
+          <img
+            src="https://cdn1.npcdn.net/images/np_26751_1734661918.png"
+            alt="Capital Mastery 资本道"
+            style={{ height: 32, width: "auto", objectFit: "contain" }}
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+          />
         </Link>
         <div className="hidden md:flex items-center gap-6">
           {[
@@ -95,14 +106,14 @@ export default function CoursesPage() {
               key={item.href}
               href={item.href}
               className="text-sm"
-              style={{ color: item.href === "/courses" ? "#C9A84C" : "#A0A09A" }}
+              style={{ color: item.href === "/courses" ? "#C9A84C" : "#666660" }}
             >
               {item.label}
             </Link>
           ))}
         </div>
         <div className="flex items-center gap-3">
-          <Link href="/login" className="text-sm" style={{ color: "#A0A09A" }}>登录</Link>
+          <Link href="/login" className="text-sm" style={{ color: "#666660" }}>登录</Link>
           <Link
             href="/register"
             className="text-sm px-4 py-2 rounded-xl font-medium"
@@ -118,21 +129,21 @@ export default function CoursesPage() {
         <div className="max-w-3xl mx-auto">
           <div
             className="inline-block text-xs font-medium px-4 py-1.5 rounded-full mb-6"
-            style={{ backgroundColor: "rgba(201,168,76,0.12)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.25)" }}
+            style={{ backgroundColor: "rgba(201,168,76,0.1)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}
           >
-            4 模块 · 13 课节 · 系统进阶
+            4 大核心课程
           </div>
           <h1
             className="text-4xl md:text-5xl font-bold leading-tight mb-6"
-            style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}
+            style={{ fontFamily: "var(--font-display)" }}
           >
-            从零到上市，
+            企业资本运作
             <br />
-            <span style={{ color: "#C9A84C" }}>系统化资本教育</span>
+            <span style={{ color: "#C9A84C" }}>完整知识体系</span>
           </h1>
-          <p className="text-lg leading-relaxed mb-8" style={{ color: "#A0A09A" }}>
-            资本道课程体系专为马来西亚创业者与企业主设计。
-            从财务基础到 IPO 路径，每一步都有导师带领，每一关都有工具辅助。
+          <p className="text-base leading-relaxed mb-8" style={{ color: "#666660" }}>
+            由 Jeffry Yew（姚国雄）主导设计，融合 24 年商业发展与 12 年融资专业经验，
+            系统教授马来西亚中小企业主与创业者掌握资本运作的完整路径。
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
@@ -140,165 +151,124 @@ export default function CoursesPage() {
               className="px-8 py-3 rounded-xl text-sm font-semibold"
               style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}
             >
-              免费开始前 2 关 →
+              立即免费体验 →
             </Link>
-            <Link
-              href="/pricing"
+            <a
+              href="https://wa.me/60103210533"
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-8 py-3 rounded-xl text-sm font-medium"
               style={{ backgroundColor: "#1A1A1A", color: "#A0A09A" }}
             >
-              查看完整方案
-            </Link>
+              WhatsApp 咨询
+            </a>
           </div>
         </div>
       </section>
 
-      {/* Stats bar */}
+      {/* Learning outcomes */}
       <section className="px-4 pb-16">
-        <div
-          className="max-w-4xl mx-auto rounded-2xl p-6 grid grid-cols-2 md:grid-cols-4 gap-6"
-          style={{ backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}
-        >
-          {[
-            { value: "4", label: "课程模块" },
-            { value: "13+", label: "课程节数" },
-            { value: "3", label: "学习等级" },
-            { value: "1,000+", label: "已培训学员" },
-          ].map((s) => (
-            <div key={s.label} className="text-center">
-              <div className="text-3xl font-bold mb-1" style={{ color: "#C9A84C" }}>{s.value}</div>
-              <div className="text-xs" style={{ color: "#666660" }}>{s.label}</div>
+        <div className="max-w-4xl mx-auto">
+          <div
+            className="rounded-2xl p-8 grid grid-cols-1 sm:grid-cols-2 gap-4"
+            style={{ backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}
+          >
+            <div className="sm:col-span-2 mb-2">
+              <h2 className="font-bold text-sm" style={{ color: "#C9A84C" }}>学完之后，你将能够：</h2>
             </div>
-          ))}
+            {OUTCOMES.map((o) => (
+              <div key={o.text} className="flex items-start gap-3">
+                <span className="text-xl flex-shrink-0">{o.icon}</span>
+                <p className="text-sm leading-relaxed" style={{ color: "#888880" }}>{o.text}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Modules */}
+      {/* Courses */}
       <section className="py-4 pb-20 px-4">
         <div className="max-w-4xl mx-auto">
           <h2
             className="text-2xl font-bold text-center mb-10"
             style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}
           >
-            课程模块
+            课程列表
           </h2>
           <div className="space-y-5">
-            {MODULES.map((mod) => (
+            {COURSES.map((course) => (
               <div
-                key={mod.id}
-                className="rounded-2xl p-7"
-                style={{
-                  backgroundColor: "#0A0A0A",
-                  border: `1px solid ${mod.free ? "#C9A84C" : "#1A1A1A"}`,
-                  position: "relative",
-                }}
-              >
-                {mod.free && (
-                  <div
-                    className="absolute top-4 right-4 text-xs px-3 py-1 rounded-full font-semibold"
-                    style={{ backgroundColor: "rgba(201,168,76,0.15)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.3)" }}
-                  >
-                    免费体验
-                  </div>
-                )}
-                <div className="flex items-start gap-5">
-                  <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-                    style={{ backgroundColor: "#111111", border: "1px solid #1A1A1A" }}
-                  >
-                    {mod.icon}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <span className="text-xs font-medium px-2 py-0.5 rounded" style={{ backgroundColor: "#1A1A1A", color: "#C9A84C" }}>
-                        {mod.level}
-                      </span>
-                      <span className="text-xs" style={{ color: "#666660" }}>{mod.lessonCount} 课节</span>
-                      <span className="text-xs hidden sm:inline" style={{ color: "#444440" }}>/ {mod.titleEn}</span>
-                    </div>
-                    <h3 className="font-bold text-lg mb-2" style={{ color: "#F5F5F0" }}>
-                      模块 {mod.id}：{mod.title}
-                    </h3>
-                    <p className="text-sm mb-4" style={{ color: "#A0A09A" }}>{mod.description}</p>
-                    <ul className="space-y-1.5">
-                      {mod.lessons.map((lesson, i) => (
-                        <li key={i} className="flex items-start gap-2.5 text-sm" style={{ color: mod.free ? "#C0C0BC" : "#666660" }}>
-                          <span className="flex-shrink-0 mt-0.5" style={{ color: mod.free ? "#C9A84C" : "#333330" }}>
-                            {mod.free ? "▶" : "🔒"}
-                          </span>
-                          {lesson}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <p className="text-center text-xs mt-8" style={{ color: "#444440" }}>
-            * 免费会员可访问模块 1 全部内容，升级学生会员解锁全部模块
-          </p>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="py-16 px-4" style={{ backgroundColor: "#080808" }}>
-        <div className="max-w-5xl mx-auto">
-          <h2
-            className="text-2xl font-bold text-center mb-10"
-            style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}
-          >
-            学习体验
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {FEATURES.map((f) => (
-              <div
-                key={f.label}
-                className="rounded-2xl p-6 flex gap-4"
+                key={course.id}
+                className="rounded-2xl p-7 relative"
                 style={{ backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}
               >
-                <div className="text-2xl flex-shrink-0">{f.icon}</div>
-                <div>
-                  <h3 className="font-semibold text-sm mb-1" style={{ color: "#F5F5F0" }}>{f.label}</h3>
-                  <p className="text-xs leading-relaxed" style={{ color: "#A0A09A" }}>{f.desc}</p>
+                {/* Top accent */}
+                <div
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: "8%",
+                    right: "8%",
+                    height: "1px",
+                    background: `linear-gradient(90deg, transparent, ${course.tagColor}50, transparent)`,
+                  }}
+                />
+
+                <div className="flex flex-wrap items-start justify-between gap-3 mb-4">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span
+                      className="text-xs px-2.5 py-1 rounded-full font-medium"
+                      style={{ backgroundColor: `${course.tagColor}15`, color: course.tagColor, border: `1px solid ${course.tagColor}25` }}
+                    >
+                      {course.tag}
+                    </span>
+                    {course.badge && (
+                      <span
+                        className="text-xs px-2.5 py-1 rounded-full"
+                        style={{ backgroundColor: "#111111", color: "#555550", border: "1px solid #1A1A1A" }}
+                      >
+                        {course.badge}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs font-mono" style={{ color: "#333330" }}>
+                    {String(course.id).padStart(2, "0")}
+                  </div>
                 </div>
+
+                <div className="text-xs mb-0.5" style={{ color: "#444440" }}>{course.nameEn}</div>
+                <h3 className="font-bold text-lg mb-2" style={{ color: "#F5F5F0" }}>{course.name}</h3>
+                <p className="text-sm mb-5" style={{ color: "#666660" }}>{course.desc}</p>
+
+                <ul className="space-y-2">
+                  {course.topics.map((topic) => (
+                    <li key={topic} className="flex items-start gap-2.5 text-sm" style={{ color: "#888880" }}>
+                      <span className="flex-shrink-0 mt-0.5 text-xs" style={{ color: "#C9A84C" }}>✦</span>
+                      {topic}
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Learning path diagram */}
-      <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2
-            className="text-2xl font-bold mb-10"
-            style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}
+      {/* HRDF note */}
+      <section className="py-8 px-4" style={{ backgroundColor: "#080808" }}>
+        <div className="max-w-3xl mx-auto">
+          <div
+            className="rounded-2xl p-6 flex items-start gap-4"
+            style={{ backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}
           >
-            学习路径
-          </h2>
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-            {[
-              { level: "免费", color: "#666660", desc: "注册即可体验", icon: "🌱" },
-              { level: "L1 基础", color: "#C9A84C", desc: "模块 1–2", icon: "📗" },
-              { level: "L2 进阶", color: "#C9A84C", desc: "模块 3", icon: "📘" },
-              { level: "L3 精通", color: "#C9A84C", desc: "模块 4", icon: "📕" },
-            ].map((step, i) => (
-              <div key={step.level} className="flex items-center gap-4">
-                <div
-                  className="rounded-2xl px-6 py-5 text-center w-36"
-                  style={{ backgroundColor: "#0A0A0A", border: `1px solid ${step.color}33` }}
-                >
-                  <div className="text-3xl mb-2">{step.icon}</div>
-                  <div className="font-bold text-sm mb-1" style={{ color: step.color }}>{step.level}</div>
-                  <div className="text-xs" style={{ color: "#666660" }}>{step.desc}</div>
-                </div>
-                {i < 3 && (
-                  <div className="text-lg hidden md:block" style={{ color: "#333330" }}>→</div>
-                )}
-              </div>
-            ))}
+            <div className="text-2xl flex-shrink-0">🏛️</div>
+            <div>
+              <h3 className="font-semibold text-sm mb-1" style={{ color: "#E0E0DC" }}>HRDF Claimable</h3>
+              <p className="text-xs leading-relaxed" style={{ color: "#555550" }}>
+                部分课程支持 HRDF（人力资源发展基金）报销，马来西亚企业主可凭此减轻培训成本。
+                详情请联系 <a href="mailto:info@capitalmastery.net" style={{ color: "#C9A84C" }}>info@capitalmastery.net</a> 查询资格条件。
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -310,10 +280,10 @@ export default function CoursesPage() {
             className="text-3xl font-bold mb-4"
             style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}
           >
-            准备好开始你的资本之旅了吗？
+            准备好了吗？
           </h2>
-          <p className="mb-8 text-sm" style={{ color: "#A0A09A" }}>
-            免费注册即可解锁第一模块全部课程，无需信用卡。
+          <p className="mb-8 text-sm" style={{ color: "#666660" }}>
+            免费注册体验平台内容，或直接 WhatsApp 与我们的团队沟通你的需求。
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
@@ -321,23 +291,25 @@ export default function CoursesPage() {
               className="px-10 py-3 rounded-xl text-sm font-semibold"
               style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}
             >
-              免费注册，立即开始 →
+              免费注册开始 →
             </Link>
-            <Link
-              href="/pricing"
+            <a
+              href="https://wa.me/60103210533"
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-10 py-3 rounded-xl text-sm font-medium"
               style={{ backgroundColor: "#1A1A1A", color: "#A0A09A" }}
             >
-              查看完整套餐
-            </Link>
+              WhatsApp +6010-321 0533
+            </a>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #1A1A1A" }}>
-        <p className="text-xs" style={{ color: "#444440" }}>
-          © 2025 资本道 ZiBenDao. 保留所有权利。
+      <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #0E0E0C" }}>
+        <p className="text-xs" style={{ color: "#252523" }}>
+          © 2025 资本道 Capital Mastery · Craftspace Sdn Bhd (202201044683 / 1490380-V)
         </p>
       </footer>
     </div>

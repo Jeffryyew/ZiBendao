@@ -50,12 +50,25 @@ function Navbar({ t, locale }: { t: Dict["nav"]; locale: Locale }) {
         transition: "background-color 0.4s, border-color 0.4s",
       }}
     >
-      <div className="flex items-center gap-2">
-        <span className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)", color: "#C9A84C" }}>
+      <Link href="/" className="flex items-center gap-2">
+        <img
+          src="https://cdn1.npcdn.net/images/np_26751_1734661918.png"
+          alt="Capital Mastery 资本道"
+          style={{ height: 34, width: "auto", objectFit: "contain" }}
+          onError={(e) => {
+            const img = e.currentTarget as HTMLImageElement;
+            img.style.display = "none";
+            const fb = img.nextElementSibling as HTMLElement | null;
+            if (fb) fb.style.display = "inline";
+          }}
+        />
+        <span
+          className="text-2xl font-bold"
+          style={{ fontFamily: "var(--font-display)", color: "#C9A84C", display: "none" }}
+        >
           资本道
         </span>
-        <span className="text-sm hidden sm:block" style={{ color: "#2A2A28" }}>ZiBenDao</span>
-      </div>
+      </Link>
 
       <div className="hidden md:flex items-center gap-8">
         {[
@@ -711,11 +724,42 @@ function Footer({ t }: { t: Dict["footer"] }) {
     <footer className="px-6 py-16" style={{ borderTop: "1px solid #0E0E0C" }}>
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
         <div>
-          <div className="text-2xl font-bold mb-2" style={{ fontFamily: "var(--font-display)", color: "#C9A84C" }}>
+          <img
+            src="https://cdn1.npcdn.net/images/np_26751_1734661918.png"
+            alt="Capital Mastery 资本道"
+            style={{ height: 36, width: "auto", objectFit: "contain", marginBottom: 12 }}
+            onError={(e) => {
+              const img = e.currentTarget as HTMLImageElement;
+              img.style.display = "none";
+              const fb = img.nextElementSibling as HTMLElement | null;
+              if (fb) fb.style.display = "block";
+            }}
+          />
+          <div className="text-xl font-bold mb-3" style={{ fontFamily: "var(--font-display)", color: "#C9A84C", display: "none" }}>
             资本道
           </div>
-          <p className="text-xs leading-relaxed mb-5" style={{ color: "#333330" }}>{t.tagline}</p>
-          <p className="text-xs" style={{ color: "#252523" }}>吉隆坡，马来西亚 🇲🇾</p>
+          <p className="text-xs leading-relaxed mb-3" style={{ color: "#2E2E2C" }}>{t.tagline}</p>
+          <p className="text-xs mb-4" style={{ color: "#252523" }}>Petaling Jaya, Selangor, Malaysia 🇲🇾</p>
+          <div className="flex gap-2">
+            {[
+              { label: "FB", href: "https://www.facebook.com/capitalmastery.net" },
+              { label: "IG", href: "https://www.instagram.com/capitalmasterydotnet" },
+              { label: "TT", href: "https://www.tiktok.com/@capitalmasterydotnet" },
+            ].map((s) => (
+              <a
+                key={s.label}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: "#0A0A0A", color: "#333330", border: "1px solid #111110" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; (e.currentTarget as HTMLAnchorElement).style.borderColor = "#C9A84C30"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#333330"; (e.currentTarget as HTMLAnchorElement).style.borderColor = "#111110"; }}
+              >
+                {s.label}
+              </a>
+            ))}
+          </div>
         </div>
 
         <div>
@@ -738,21 +782,31 @@ function Footer({ t }: { t: Dict["footer"] }) {
         </div>
 
         <div>
-          <div className="text-xs font-semibold tracking-widest mb-4" style={{ color: "#333330" }}>账号</div>
+          <div className="text-xs font-semibold tracking-widest mb-4" style={{ color: "#333330" }}>联系</div>
           <div className="space-y-2">
-            {COL_B.map((item) => (
-              <div key={item.href}>
-                <Link
-                  href={item.href}
-                  className="text-sm transition-colors"
-                  style={{ color: "#2E2E2C" }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#2E2E2C"; }}
-                >
-                  {item.label}
-                </Link>
-              </div>
-            ))}
+            <a
+              href="mailto:info@capitalmastery.net"
+              className="block text-sm transition-colors"
+              style={{ color: "#2E2E2C" }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#2E2E2C"; }}
+            >
+              info@capitalmastery.net
+            </a>
+            <a
+              href="https://wa.me/60103210533"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block text-sm transition-colors"
+              style={{ color: "#2E2E2C" }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#2E2E2C"; }}
+            >
+              +6010-321 0533
+            </a>
+            <p className="text-xs leading-relaxed pt-1" style={{ color: "#1E1E1C" }}>
+              Leisure Commerce Square,<br />Petaling Jaya, Selangor
+            </p>
           </div>
         </div>
       </div>
@@ -762,7 +816,7 @@ function Footer({ t }: { t: Dict["footer"] }) {
         style={{ borderTop: "1px solid #0E0E0C", color: "#252523" }}
       >
         <span>{t.copyright}</span>
-        <span>Powered by ZiBenDao Capital</span>
+        <span>Craftspace Sdn Bhd (202201044683 / 1490380-V)</span>
       </div>
     </footer>
   );

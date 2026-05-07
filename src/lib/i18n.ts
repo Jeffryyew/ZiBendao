@@ -16,12 +16,12 @@ const dict = {
       badge: "金融教育 · 智能工具 · 资本咨询",
       title_1: "掌握资本之道，",
       title_2: "实现财务自由",
-      subtitle: "系统化金融课程、智能计算工具、专业资本咨询。\n从入门到精通，一步步建立你的财务知识体系。",
+      subtitle: "系统化资本运作课程、专业计算工具、一对一顾问咨询。\n帮你建立可靠、可投、可扩展的企业。",
       cta_primary: "立即免费开始",
       cta_secondary: "查看课程体系 →",
     },
     footer: {
-      tagline: "专业金融教育与资本咨询平台",
+      tagline: "掌握资本之道，创建可靠、可投、可扩展企业",
       copyright: "© 2025 资本道 ZiBenDao. 保留所有权利。",
     },
   },
@@ -43,7 +43,7 @@ const dict = {
       cta_secondary: "View Courses →",
     },
     footer: {
-      tagline: "Professional Financial Education & Capital Advisory Platform",
+      tagline: "Master Capital Strategy. Build Reliable, Investable, Scalable Enterprises.",
       copyright: "© 2025 ZiBenDao Capital. All rights reserved.",
     },
   },
