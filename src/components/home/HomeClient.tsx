@@ -18,9 +18,10 @@ export default function HomeClient({ t, locale }: Props) {
       <Navbar t={t.nav} locale={locale} />
       <HeroSection t={t.hero} />
       <StatsBar />
-      <FeaturesSection />
-      <RolesSection />
+      <WhatIsCapital />
+      <CapitalLearningJourney />
       <ToolsPreview />
+      <CorporateAdvisory />
       <CTASection />
       <Footer t={t.footer} />
     </div>
@@ -283,141 +284,29 @@ function StatsBar() {
   );
 }
 
-// ─── Features ─────────────────────────────────────────────────────────────────
+// ─── What Is Capital Transformation ──────────────────────────────────────────
 
-function FeaturesSection() {
-  const FEATURES = [
+function WhatIsCapital() {
+  const PILLARS = [
     {
-      icon: "📚",
-      tag: "教育",
-      title: "关卡式金融课程",
-      desc: "游戏化关卡设计，从基础理财到高级资本运作。完成一关才能进下一关，系统掌握不跳级。",
+      icon: "◈",
+      title: "为什么企业需要资本化？",
+      desc: "营业额高不代表企业有价值。资本化是将经营型企业，转化为可估值、可融资、可被投资的商业体。",
     },
     {
-      icon: "🧮",
-      tag: "工具",
-      title: "专业计算工具",
-      desc: "金融路线图、市值计算器、PAT & KPI 分析、报价系统。专业级工具，输出可视化报表与 PDF。",
+      icon: "◎",
+      title: "资本思维 vs 经营思维",
+      desc: "经营思维关注利润，资本思维关注估值。学习如何用资本逻辑重新设计你的企业结构与增长路径。",
     },
     {
-      icon: "🤝",
-      tag: "咨询",
-      title: "资本咨询服务",
-      desc: "专属顾问一对一服务，自动生成电子合约，文件签署全程数字化，高效且安全。",
+      icon: "◐",
+      title: "建立可投资的企业结构",
+      desc: "SPV 架构、股权设计、融资准备度——让企业在需要资本时，已经具备被投资的能力。",
     },
   ];
 
   const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-
-  return (
-    <section ref={ref} className="px-4 py-24 max-w-6xl mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.5 }}
-        className="text-center mb-16"
-      >
-        <div
-          className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4"
-          style={{ backgroundColor: "rgba(201,168,76,0.08)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.15)" }}
-        >
-          核心产品
-        </div>
-        <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ fontFamily: "var(--font-display)" }}>
-          三大核心模块
-        </h2>
-        <p className="text-sm" style={{ color: "#555550" }}>专为华人市场设计的金融成长生态</p>
-      </motion.div>
-
-      <div className="grid md:grid-cols-3 gap-5">
-        {FEATURES.map((f, i) => (
-          <FeatureCard key={f.title} feature={f} delay={i * 0.1} inView={inView} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function FeatureCard({
-  feature,
-  delay,
-  inView,
-}: {
-  feature: { icon: string; tag: string; title: string; desc: string };
-  delay: number;
-  inView: boolean;
-}) {
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 32 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.55, delay, ease: "easeOut" }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className="p-8 rounded-2xl cursor-default"
-      style={{
-        backgroundColor: "#070707",
-        border: hovered ? "1px solid rgba(201,168,76,0.25)" : "1px solid #111110",
-        boxShadow: hovered ? "0 0 32px rgba(201,168,76,0.06)" : "none",
-        transform: hovered ? "translateY(-4px)" : "translateY(0)",
-        transition: "transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease",
-      }}
-    >
-      <div
-        className="w-11 h-11 rounded-xl flex items-center justify-center text-2xl mb-5"
-        style={{
-          backgroundColor: hovered ? "rgba(201,168,76,0.12)" : "rgba(201,168,76,0.06)",
-          border: "1px solid rgba(201,168,76,0.12)",
-          transition: "background-color 0.2s",
-        }}
-      >
-        {feature.icon}
-      </div>
-      <div className="text-xs mb-2 font-medium" style={{ color: "#C9A84C" }}>{feature.tag}</div>
-      <h3 className="text-base font-semibold mb-3" style={{ color: "#E0E0DC" }}>{feature.title}</h3>
-      <p className="text-sm leading-relaxed" style={{ color: "#555550" }}>{feature.desc}</p>
-    </motion.div>
-  );
-}
-
-// ─── Roles ────────────────────────────────────────────────────────────────────
-
-function RolesSection() {
-  const ROLES = [
-    {
-      name: "免费会员",
-      badge: "FREE",
-      badgeColor: "#444440",
-      perks: ["体验前2-3个课程关卡", "1个基础计算工具", "注册即可使用"],
-      cta: "立即注册",
-      href: "/register",
-      featured: false,
-    },
-    {
-      name: "学生会员",
-      badge: "L1 → L3",
-      badgeColor: "#C9A84C",
-      perks: ["完整4模块课程体系", "全套4个计算工具", "成就徽章系统", "等级解锁进阶内容"],
-      cta: "查看定价",
-      href: "/pricing",
-      featured: true,
-    },
-    {
-      name: "企业客户",
-      badge: "CLIENT",
-      badgeColor: "#777770",
-      perks: ["专属顾问服务", "定制计算工具权限", "自动合约生成", "电子签名门户"],
-      cta: "联系我们",
-      href: "/about",
-      featured: false,
-    },
-  ];
-
-  const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const inView = useInView(ref, { once: true, margin: "-60px" });
 
   return (
     <section ref={ref} className="px-4 py-24" style={{ backgroundColor: "#050505" }}>
@@ -426,72 +315,303 @@ function RolesSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          className="mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ fontFamily: "var(--font-display)" }}>
-            适合你的方案
+          <div
+            className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4"
+            style={{ backgroundColor: "rgba(201,168,76,0.08)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.15)" }}
+          >
+            企业资本化
+          </div>
+          <h2 className="text-3xl md:text-4xl font-bold mb-3 max-w-xl" style={{ fontFamily: "var(--font-display)" }}>
+            什么是企业资本化？
           </h2>
-          <p className="text-sm" style={{ color: "#555550" }}>无论你是学习者还是企业，都有对应的解决方案</p>
+          <p className="text-sm max-w-lg leading-relaxed" style={{ color: "#555550" }}>
+            从经营企业到资本企业，不只是融资——而是重新定义你的企业价值。
+          </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-5">
-          {ROLES.map((role, i) => (
+        <div className="grid md:grid-cols-3 gap-px" style={{ backgroundColor: "#111110" }}>
+          {PILLARS.map((p, i) => (
             <motion.div
-              key={role.name}
-              initial={{ opacity: 0, y: 28 }}
+              key={p.title}
+              initial={{ opacity: 0, y: 24 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.55, delay: i * 0.1 }}
-              className="p-8 rounded-2xl flex flex-col relative overflow-hidden"
+              transition={{ duration: 0.5, delay: i * 0.12 }}
+              className="p-10"
+              style={{ backgroundColor: "#050505" }}
+            >
+              <div className="text-3xl mb-6" style={{ color: "#C9A84C", opacity: 0.6 }}>{p.icon}</div>
+              <h3 className="text-base font-semibold mb-3" style={{ color: "#D8D8D4" }}>{p.title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: "#4A4A46" }}>{p.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Capital Learning Journey ─────────────────────────────────────────────────
+
+function CapitalLearningJourney() {
+  const LEVELS = [
+    {
+      level: "Level 1",
+      name: "资本通",
+      nameEn: "Capital Beginner",
+      desc: "建立资本思维基础。理解为什么营业额高却没现金，学会区分经营思维与资本思维。",
+      topics: ["现金流 vs 利润", "企业估值入门", "资本 vs 债务"],
+      color: "#444440",
+      locked: false,
+    },
+    {
+      level: "Level 2",
+      name: "启动资本",
+      nameEn: "Capital Builder",
+      desc: "学习融资结构与 SPV 架构。掌握如何设计股权、估值企业，让企业具备融资能力。",
+      topics: ["SPV 架构设计", "股权稀释计算", "融资准备度评分"],
+      color: "#8A7040",
+      locked: false,
+    },
+    {
+      level: "Level 3",
+      name: "资本道",
+      nameEn: "Capital Strategist",
+      desc: "进阶资本策略。理解 IPO、REIT 路径，建立企业级资本操作体系与投资人沟通能力。",
+      topics: ["IPO 路径规划", "REIT 结构", "投资人关系管理"],
+      color: "#C9A84C",
+      locked: false,
+    },
+    {
+      level: "Level 4",
+      name: "企业资本咨询",
+      nameEn: "Capital Operator",
+      desc: "一对一专属顾问服务。由资本专家陪同完成融资、上市或企业重组的实际资本操作。",
+      topics: ["专属顾问匹配", "定制资本方案", "全程执行支持"],
+      color: "#F0D080",
+      locked: true,
+    },
+  ];
+
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+
+  return (
+    <section ref={ref} className="px-4 py-24 max-w-6xl mx-auto">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={inView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.5 }}
+        className="mb-16"
+      >
+        <div
+          className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4"
+          style={{ backgroundColor: "rgba(201,168,76,0.08)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.15)" }}
+        >
+          资本成长路径
+        </div>
+        <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ fontFamily: "var(--font-display)" }}>
+          Capital Learning Journey
+        </h2>
+        <p className="text-sm leading-relaxed" style={{ color: "#555550" }}>
+          从资本启蒙到企业操盘，系统化的四阶段成长体系
+        </p>
+      </motion.div>
+
+      <div className="space-y-3">
+        {LEVELS.map((lvl, i) => (
+          <LevelCard key={lvl.level} lvl={lvl} delay={i * 0.1} inView={inView} />
+        ))}
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={inView ? { opacity: 1 } : {}}
+        transition={{ duration: 0.5, delay: 0.5 }}
+        className="text-center mt-10"
+      >
+        <Link
+          href="/courses"
+          className="inline-block text-sm px-6 py-2.5 rounded-xl transition-colors"
+          style={{ color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)", backgroundColor: "rgba(201,168,76,0.04)" }}
+        >
+          查看完整课程体系 →
+        </Link>
+      </motion.div>
+    </section>
+  );
+}
+
+function LevelCard({
+  lvl,
+  delay,
+  inView,
+}: {
+  lvl: { level: string; name: string; nameEn: string; desc: string; topics: string[]; color: string; locked: boolean };
+  delay: number;
+  inView: boolean;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: -16 }}
+      animate={inView ? { opacity: 1, x: 0 } : {}}
+      transition={{ duration: 0.5, delay, ease: "easeOut" }}
+      onClick={() => setExpanded(!expanded)}
+      className="p-6 rounded-2xl cursor-pointer"
+      style={{
+        backgroundColor: expanded ? "#080808" : "#060606",
+        border: expanded ? `1px solid ${lvl.color}30` : "1px solid #111110",
+        transition: "all 0.2s ease",
+      }}
+    >
+      <div className="flex items-center gap-4">
+        {/* Level indicator */}
+        <div
+          className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-bold"
+          style={{ backgroundColor: `${lvl.color}12`, border: `1px solid ${lvl.color}25`, color: lvl.color }}
+        >
+          {lvl.level.replace("Level ", "L")}
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className="font-semibold" style={{ color: "#D8D8D4" }}>{lvl.name}</span>
+            <span className="text-xs" style={{ color: "#3A3A38" }}>{lvl.nameEn}</span>
+            {lvl.locked && (
+              <span className="text-xs px-2 py-0.5 rounded-full ml-1" style={{ backgroundColor: "#1A1A18", color: "#444440" }}>
+                咨询解锁
+              </span>
+            )}
+          </div>
+          <p className="text-sm" style={{ color: "#444440" }}>{lvl.desc}</p>
+        </div>
+
+        <div
+          className="text-sm flex-shrink-0 transition-transform"
+          style={{ color: lvl.color, transform: expanded ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.2s" }}
+        >
+          ›
+        </div>
+      </div>
+
+      {expanded && (
+        <div className="mt-4 pl-16 flex flex-wrap gap-2">
+          {lvl.topics.map((t) => (
+            <span
+              key={t}
+              className="text-xs px-3 py-1 rounded-full"
+              style={{ backgroundColor: `${lvl.color}0A`, color: lvl.color, border: `1px solid ${lvl.color}20` }}
+            >
+              {t}
+            </span>
+          ))}
+        </div>
+      )}
+    </motion.div>
+  );
+}
+
+// ─── Corporate Advisory ───────────────────────────────────────────────────────
+
+function CorporateAdvisory() {
+  const SERVICES = [
+    {
+      code: "SPV",
+      title: "SPV 架构设计",
+      desc: "为企业设计特殊目的载体架构，隔离风险、优化税务、吸引机构投资。",
+      tag: "融资结构",
+    },
+    {
+      code: "IPO",
+      title: "IPO 上市路径规划",
+      desc: "评估企业上市准备度，设计上市路径，协助完成合规、估值与投资人对接。",
+      tag: "资本市场",
+    },
+    {
+      code: "REIT",
+      title: "REIT 房产资本化",
+      desc: "将房地产资产证券化，通过 REIT 结构实现流动性，进入资本市场融资。",
+      tag: "资产证券化",
+    },
+    {
+      code: "EQ",
+      title: "股权架构优化",
+      desc: "重新设计创始人、投资人与员工持股结构，建立清晰可投的股权生态。",
+      tag: "股权设计",
+    },
+  ];
+
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+
+  return (
+    <section ref={ref} className="px-4 py-24" style={{ backgroundColor: "#050505" }}>
+      <div className="max-w-6xl mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6"
+        >
+          <div>
+            <div
+              className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4"
+              style={{ backgroundColor: "rgba(201,168,76,0.08)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.15)" }}
+            >
+              企业资本顾问
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ fontFamily: "var(--font-display)" }}>
+              Corporate Advisory
+            </h2>
+            <p className="text-sm leading-relaxed max-w-md" style={{ color: "#555550" }}>
+              不只是课程——我们提供真实资本操作的专业顾问服务
+            </p>
+          </div>
+          <Link
+            href="/about"
+            className="text-sm px-5 py-2.5 rounded-xl flex-shrink-0 transition-colors self-start"
+            style={{ color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)", backgroundColor: "rgba(201,168,76,0.04)" }}
+          >
+            联系顾问团队 →
+          </Link>
+        </motion.div>
+
+        <div className="grid sm:grid-cols-2 gap-3">
+          {SERVICES.map((svc, i) => (
+            <motion.div
+              key={svc.code}
+              initial={{ opacity: 0, y: 20 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.5, delay: i * 0.1 }}
+              className="p-7 rounded-2xl group cursor-default"
               style={{
-                backgroundColor: role.featured ? "#0A0A08" : "#070707",
-                border: `1px solid ${role.featured ? "#C9A84C28" : "#111110"}`,
-                boxShadow: role.featured ? "0 0 48px rgba(201,168,76,0.06)" : "none",
+                backgroundColor: "#070707",
+                border: "1px solid #0F0F0E",
+                transition: "border-color 0.2s, transform 0.2s",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLDivElement).style.borderColor = "rgba(201,168,76,0.18)";
+                (e.currentTarget as HTMLDivElement).style.transform = "translateY(-3px)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLDivElement).style.borderColor = "#0F0F0E";
+                (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
               }}
             >
-              {/* Top accent line */}
-              {role.featured && (
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: "10%",
-                    right: "10%",
-                    height: "1px",
-                    background: "linear-gradient(90deg, transparent, #C9A84C80, transparent)",
-                  }}
-                />
-              )}
-
-              <div className="flex items-center justify-between mb-7">
-                <h3 className="font-semibold" style={{ color: "#D0D0CC" }}>{role.name}</h3>
+              <div className="flex items-start justify-between mb-4">
                 <span
-                  className="text-xs px-3 py-1 rounded-full font-mono"
-                  style={{ backgroundColor: `${role.badgeColor}14`, color: role.badgeColor, border: `1px solid ${role.badgeColor}22` }}
+                  className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg"
+                  style={{ backgroundColor: "rgba(201,168,76,0.08)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.12)" }}
                 >
-                  {role.badge}
+                  {svc.code}
                 </span>
+                <span className="text-xs" style={{ color: "#2A2A28" }}>{svc.tag}</span>
               </div>
-
-              <ul className="space-y-2.5 mb-8 flex-1">
-                {role.perks.map((perk) => (
-                  <li key={perk} className="flex items-center gap-2 text-sm" style={{ color: "#555550" }}>
-                    <span style={{ color: "#C9A84C", fontSize: "10px" }}>✦</span>
-                    {perk}
-                  </li>
-                ))}
-              </ul>
-
-              <Link
-                href={role.href}
-                className="text-center py-3 rounded-xl text-sm font-medium transition-opacity hover:opacity-85"
-                style={{
-                  backgroundColor: role.featured ? "#C9A84C" : "transparent",
-                  color: role.featured ? "#0D0D0D" : "#555550",
-                  border: role.featured ? "none" : "1px solid #1A1A18",
-                }}
-              >
-                {role.cta}
-              </Link>
+              <h3 className="font-semibold mb-2" style={{ color: "#D0D0CC" }}>{svc.title}</h3>
+              <p className="text-sm leading-relaxed" style={{ color: "#444440" }}>{svc.desc}</p>
             </motion.div>
           ))}
         </div>
@@ -658,13 +778,19 @@ function CTASection() {
           }}
         />
 
+        <div
+          className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-6"
+          style={{ backgroundColor: "rgba(201,168,76,0.08)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.15)" }}
+        >
+          开始你的资本成长路径
+        </div>
         <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ fontFamily: "var(--font-display)" }}>
-          开始你的<span style={{ color: "#C9A84C" }}>资本之旅</span>
+          你的企业，<span style={{ color: "#C9A84C" }}>值得被资本看见</span>
         </h2>
         <p className="mb-10 text-sm leading-relaxed" style={{ color: "#555550" }}>
-          免费注册，体验前3关课程和基础工具。
+          从资本通到企业资本咨询，每一步都有系统、有工具、有顾问。
           <br />
-          随时升级，解锁完整课程与专业工具库。
+          免费开始，随时解锁下一个资本阶段。
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -673,14 +799,14 @@ function CTASection() {
             className="px-10 py-4 rounded-xl font-semibold text-sm transition-opacity hover:opacity-88 inline-block"
             style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}
           >
-            免费开始学习
+            开始资本之旅
           </Link>
           <Link
-            href="/pricing"
+            href="/about"
             className="px-10 py-4 rounded-xl font-semibold text-sm"
             style={{ backgroundColor: "transparent", color: "#555550", border: "1px solid #1A1A18" }}
           >
-            查看完整方案
+            企业咨询
           </Link>
         </div>
       </motion.div>
