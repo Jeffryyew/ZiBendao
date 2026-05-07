@@ -23,7 +23,7 @@ export default function LogoImg({ height = 34, className }: Props) {
 
   return (
     <img
-      src="https://cdn1.npcdn.net/images/np_26751_1734661918.png"
+      src="/logo.png"
       alt="Capital Mastery 资本道"
       height={height}
       style={{ height, width: "auto", objectFit: "contain" }}
