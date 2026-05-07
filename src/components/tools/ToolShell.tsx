@@ -37,6 +37,16 @@ export default function ToolShell({
             ← 返回工具
           </Link>
           <span style={{ color: "#2A2A2A" }}>·</span>
+          <Link
+            href="/"
+            className="flex items-center gap-1.5 text-sm transition-colors"
+            style={{ color: "#666660" }}
+            onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "#A0A09A")}
+            onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "#666660")}
+          >
+            ⌂ 主页
+          </Link>
+          <span style={{ color: "#2A2A2A" }}>·</span>
           <span className="text-sm font-medium flex-1 truncate" style={{ color: "#F5F5F0" }}>
             {icon} {title}
           </span>

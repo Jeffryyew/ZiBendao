@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { login } from "@/app/actions/auth";
+import BackNav from "@/components/BackNav";
 
 export default function LoginPage() {
   const [state, action, pending] = useActionState(login, undefined as { error?: string; success?: string } | undefined);
@@ -10,6 +11,9 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: "#0D0D0D" }}>
       <div className="w-full max-w-md">
+        <div className="flex justify-center mb-6">
+          <BackNav />
+        </div>
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/">

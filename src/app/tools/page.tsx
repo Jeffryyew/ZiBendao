@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackNav from "@/components/BackNav";
 
 const TOOLS = [
   {
@@ -55,6 +56,9 @@ export default function ToolsPage() {
       </nav>
 
       <div className="max-w-6xl mx-auto px-4 pt-28 pb-20">
+        <div className="mb-8 flex justify-center">
+          <BackNav />
+        </div>
         {/* Header */}
         <div className="text-center mb-16">
           <div

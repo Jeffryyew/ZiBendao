@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackNav from "@/components/BackNav";
 
 export default function PaymentSuccessPage() {
   return (
@@ -6,6 +7,9 @@ export default function PaymentSuccessPage() {
       className="min-h-screen flex flex-col items-center justify-center text-center px-4"
       style={{ backgroundColor: "#0D0D0D" }}
     >
+      <div className="mb-8">
+        <BackNav />
+      </div>
       <div
         className="w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-8"
         style={{ backgroundColor: "rgba(76,175,130,0.15)", border: "1px solid rgba(76,175,130,0.3)" }}

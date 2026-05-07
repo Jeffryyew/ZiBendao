@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { logout } from "@/app/actions/auth";
 
@@ -21,6 +21,7 @@ interface SidebarProps {
 
 export default function Sidebar({ navItems, userName, userEmail, roleLabel }: SidebarProps) {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
 
   const initials = userName
@@ -32,14 +33,35 @@ export default function Sidebar({ navItems, userName, userEmail, roleLabel }: Si
 
   const navContent = (
     <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="px-6 py-5 border-b" style={{ borderColor: "#1A1A1A" }}>
-        <Link href="/" onClick={() => setOpen(false)} className="flex items-baseline gap-2">
+      {/* Logo + back nav */}
+      <div className="px-4 py-4 border-b" style={{ borderColor: "#1A1A1A" }}>
+        <Link href="/" onClick={() => setOpen(false)} className="flex items-baseline gap-2 mb-3">
           <span className="text-xl font-bold" style={{ fontFamily: "var(--font-display)", color: "#C9A84C" }}>
             资本道
           </span>
           <span className="text-xs" style={{ color: "#444440" }}>ZiBenDao</span>
         </Link>
+        <div className="flex gap-2">
+          <button
+            onClick={() => { setOpen(false); router.back(); }}
+            className="flex-1 text-xs py-1.5 rounded-lg transition-all"
+            style={{ color: "#444440", backgroundColor: "#111111", border: "1px solid #1A1A1A" }}
+            onMouseEnter={(e) => { e.currentTarget.style.color = "#C9A84C"; e.currentTarget.style.borderColor = "rgba(201,168,76,0.25)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.color = "#444440"; e.currentTarget.style.borderColor = "#1A1A1A"; }}
+          >
+            ← 返回
+          </button>
+          <Link
+            href="/"
+            onClick={() => setOpen(false)}
+            className="flex-1 text-center text-xs py-1.5 rounded-lg transition-all"
+            style={{ color: "#444440", backgroundColor: "#111111", border: "1px solid #1A1A1A" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(201,168,76,0.25)"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#444440"; (e.currentTarget as HTMLAnchorElement).style.borderColor = "#1A1A1A"; }}
+          >
+            ⌂ 主页
+          </Link>
+        </div>
       </div>
 
       {/* Nav */}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import LogoImg from "@/components/LogoImg";
+import BackNav from "@/components/BackNav";
 
 const COURSES = [
   {
@@ -104,6 +105,7 @@ export default function CoursesPage() {
       {/* Hero */}
       <section className="pt-32 pb-16 px-4 text-center">
         <div className="max-w-3xl mx-auto">
+          <BackNav className="mb-8 justify-center" />
           <div
             className="inline-block text-xs font-medium px-4 py-1.5 rounded-full mb-6"
             style={{ backgroundColor: "rgba(201,168,76,0.1)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}

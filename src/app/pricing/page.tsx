@@ -1,4 +1,5 @@
 import Link from "next/link";
+import BackNav from "@/components/BackNav";
 import CheckoutButton from "./CheckoutButton";
 
 const PLANS = [
@@ -83,6 +84,9 @@ export default function PricingPage() {
       </nav>
 
       <div className="pt-28 pb-20 px-4">
+        <div className="max-w-2xl mx-auto mb-8 flex justify-center">
+          <BackNav />
+        </div>
         {/* Heading */}
         <div className="text-center max-w-2xl mx-auto mb-14">
           <h1
