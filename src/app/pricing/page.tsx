@@ -160,9 +160,7 @@ export default function PricingPage() {
         {/* FAQ note */}
         <p className="text-center text-xs mt-12" style={{ color: "#444440" }}>
           所有价格均以马来西亚令吉 (RM) 计价 · 付款由 Stripe 安全处理 · 如有疑问请
-          <a href="https://wa.me/60103210533" target="_blank" rel="noopener noreferrer" className="underline mx-1" style={{ color: "#666660" }}>WhatsApp 咨询</a>
-          或发邮件至
-          <a href="mailto:info@capitalmastery.net" className="underline mx-1" style={{ color: "#666660" }}>info@capitalmastery.net</a>
+          <Link href="/about" className="underline mx-1" style={{ color: "#666660" }}>联系我们</Link>
         </p>
       </div>
     </div>

@@ -21,19 +21,22 @@ const VALUES = [
 
 const PROGRAMS = [
   {
-    name: "资本道",
-    nameEn: "Capital Mastery Program",
-    desc: "完整的企业资本运作系统，涵盖公司估值、PE 股权结构设计、股权激励方案、资本杠杆运用与资本机制公司建立。",
+    stage: "阶段一",
+    name: "资本通",
+    nameEn: "Capital Gateway",
+    desc: "资本运作入门课程，建立正确的资本思维框架，认识企业资本化核心逻辑，适合刚接触资本运作的创业者。",
   },
   {
+    stage: "阶段二",
     name: "启动资本",
     nameEn: "Kickstart Capital",
-    desc: "实战企业资本化训练，提供落地操作指导，帮助企业从理论到实践完成资本化启动。",
+    desc: "实战进阶训练，系统学习如何启动企业资本化进程，完成融资前梳理、包装与投资人对接全流程。",
   },
   {
-    name: "资本三维模式",
-    nameEn: "Capital 3D Model Workshop",
-    desc: "深入企业估值最大化策略，拆解关闭、出售、并购、IPO 四大退出维度，引用真实国际 IPO 案例。",
+    stage: "阶段三",
+    name: "资本道",
+    nameEn: "Capital Mastery",
+    desc: "高阶资本运作系统，涵盖企业估值提升、PE 股权架构、资本杠杆运用，直至 IPO 路径完整规划。",
   },
 ];
 
@@ -227,7 +230,7 @@ export default function AboutPage() {
                   {String(i + 1).padStart(2, "0")}
                 </div>
                 <div>
-                  <div className="text-xs mb-0.5" style={{ color: "#444440" }}>{p.nameEn}</div>
+                  <div className="text-xs mb-0.5" style={{ color: "#C9A84C" }}>{p.stage} · {p.nameEn}</div>
                   <h3 className="font-semibold mb-1.5 text-sm" style={{ color: "#E0E0DC" }}>{p.name}</h3>
                   <p className="text-xs leading-relaxed" style={{ color: "#555550" }}>{p.desc}</p>
                 </div>
@@ -290,34 +293,23 @@ export default function AboutPage() {
               联系我们
             </h2>
             <p className="text-xs mb-8" style={{ color: "#444440" }}>
-              如需咨询课程、企业合作或一对一顾问服务，欢迎联系我们的团队。
+              如需咨询课程、企业合作或一对一顾问服务，欢迎通过社交媒体与我们联系。
             </p>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
-              {[
-                { icon: "📧", label: "邮箱", value: "info@capitalmastery.net", href: "mailto:info@capitalmastery.net" },
-                { icon: "📱", label: "WhatsApp / 电话", value: "+6010-321 0533", href: "https://wa.me/60103210533" },
-                { icon: "📍", label: "地址", value: "Leisure Commerce Square, Petaling Jaya, Selangor", href: null },
-              ].map((c) => (
-                <div key={c.label}>
-                  <div className="text-2xl mb-2">{c.icon}</div>
-                  <div className="text-xs mb-1" style={{ color: "#444440" }}>{c.label}</div>
-                  {c.href ? (
-                    <a href={c.href} className="text-xs font-medium" style={{ color: "#C9A84C" }} target="_blank" rel="noopener noreferrer">
-                      {c.value}
-                    </a>
-                  ) : (
-                    <div className="text-xs font-medium" style={{ color: "#888880" }}>{c.value}</div>
-                  )}
-                </div>
-              ))}
+
+            <div className="mb-8">
+              <div className="text-xs mb-3" style={{ color: "#444440" }}>📍 地址</div>
+              <div className="text-sm" style={{ color: "#888880" }}>
+                Leisure Commerce Square, Jalan PJS 8/9,<br />
+                46150 Petaling Jaya, Selangor, Malaysia
+              </div>
             </div>
 
             {/* Social */}
             <div className="flex gap-3 flex-wrap">
               {[
-                { label: "Facebook", href: "https://www.facebook.com/capitalmastery.net", icon: "f" },
-                { label: "Instagram", href: "https://www.instagram.com/capitalmasterydotnet", icon: "ig" },
-                { label: "TikTok", href: "https://www.tiktok.com/@capitalmasterydotnet", icon: "tt" },
+                { label: "Facebook", href: "https://www.facebook.com/capitalmastery.net" },
+                { label: "Instagram", href: "https://www.instagram.com/capitalmasterydotnet" },
+                { label: "TikTok", href: "https://www.tiktok.com/@capitalmasterydotnet" },
               ].map((s) => (
                 <a
                   key={s.label}

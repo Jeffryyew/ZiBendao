@@ -4,71 +4,54 @@ import LogoImg from "@/components/LogoImg";
 const COURSES = [
   {
     id: 1,
-    name: "资本道",
-    nameEn: "Capital Mastery Program",
-    tag: "旗舰课程",
-    tagColor: "#C9A84C",
-    desc: "完整的企业资本运作系统，帮你从根本上理解如何让企业具备融资、估值与上市条件。",
+    name: "资本通",
+    nameEn: "Capital Gateway",
+    stage: "阶段一",
+    tag: "入门基础",
+    tagColor: "#7A9A6C",
+    desc: "建立正确的资本思维框架，认识企业资本运作的核心逻辑，适合刚开始接触资本运作概念的创业者与企业主。",
     topics: [
-      "公司估值方法论与提升策略",
-      "PE 股权结构设计与股东协议",
-      "股权激励方案设计（ESOP）",
-      "资本杠杆运用与融资节奏规划",
-      "资本机制公司建立与治理架构",
+      "什么是资本运作？与融资的本质区别",
+      "企业生命周期与资本需求阶段",
+      "如何判断自己的企业是否具备资本化条件",
+      "资本运作的常见误区与正确认知",
     ],
-    badge: "HRDF Claimable",
-    free: false,
+    badge: null,
     cta: "了解详情",
   },
   {
     id: 2,
     name: "启动资本",
     nameEn: "Kickstart Capital",
-    tag: "实战训练",
-    tagColor: "#7A9A6C",
-    desc: "实战企业资本化，提供从零开始的落地操作指导，帮助企业完成资本化启动的第一步。",
+    stage: "阶段二",
+    tag: "实战进阶",
+    tagColor: "#6A7A9A",
+    desc: "从理论走向实践，系统学习如何启动企业资本化进程，完成融资前的梳理、包装与投资人对接。",
     topics: [
-      "企业资本化的实战操作流程",
-      "融资前的企业包装与梳理",
-      "投资人沟通与路演技巧",
-      "早期资金来源与策略选择",
+      "企业资本化启动的完整操作流程",
+      "融资前的企业包装与财务梳理",
+      "投资人沟通框架与路演技巧",
+      "股权结构设计与早期融资策略",
     ],
-    badge: null,
-    free: false,
+    badge: "HRDF Claimable",
     cta: "了解详情",
   },
   {
     id: 3,
-    name: "资本三维模式",
-    nameEn: "Capital 3D Model Workshop",
-    tag: "工作坊",
-    tagColor: "#6A7A9A",
-    desc: "深入企业估值最大化策略，拆解四大退出维度，以真实国际 IPO 案例为蓝本讲解资本全局。",
+    name: "资本道",
+    nameEn: "Capital Mastery",
+    stage: "阶段三",
+    tag: "高阶精通",
+    tagColor: "#C9A84C",
+    desc: "完整的企业资本运作高阶系统，涵盖企业估值提升、PE 股权架构设计、资本杠杆运用，直至 IPO 路径规划。",
     topics: [
-      "企业估值最大化核心策略",
-      "四大退出维度：关闭、出售、并购、IPO",
-      "真实国际 IPO 案例深度解析",
-      "如何让企业具备「可投性」",
+      "公司估值方法论与估值提升策略",
+      "PE 股权结构设计与股东协议",
+      "股权激励方案设计（ESOP）",
+      "资本杠杆运用与融资节奏规划",
+      "资本机制公司建立与 IPO 路径",
     ],
-    badge: "线上 Zoom",
-    free: false,
-    cta: "了解详情",
-  },
-  {
-    id: 4,
-    name: "AI 经济与工业 4.5",
-    nameEn: "AI Economy & Industry 4.5",
-    tag: "专题课程",
-    tagColor: "#9A6A7A",
-    desc: "聚焦人工智能经济与工业 4.5 时代背景下的企业转型机遇，帮助企业主把握新经济下的资本机会。",
-    topics: [
-      "AI 经济浪潮下的企业机遇",
-      "工业 4.5 转型路径与资本配置",
-      "数字化企业的估值逻辑",
-      "新经济下的融资与合作模式",
-    ],
-    badge: null,
-    free: false,
+    badge: "HRDF Claimable",
     cta: "了解详情",
   },
 ];
@@ -139,7 +122,7 @@ export default function CoursesPage() {
             由 Jeffry Yew（姚国雄）主导设计，融合 24 年商业发展与 12 年融资专业经验，
             系统教授马来西亚中小企业主与创业者掌握资本运作的完整路径。
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex justify-center">
             <Link
               href="/register"
               className="px-8 py-3 rounded-xl text-sm font-semibold"
@@ -147,15 +130,6 @@ export default function CoursesPage() {
             >
               立即免费体验 →
             </Link>
-            <a
-              href="https://wa.me/60103210533"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-8 py-3 rounded-xl text-sm font-medium"
-              style={{ backgroundColor: "#1A1A1A", color: "#A0A09A" }}
-            >
-              WhatsApp 咨询
-            </a>
           </div>
         </div>
       </section>
@@ -214,19 +188,22 @@ export default function CoursesPage() {
                       className="text-xs px-2.5 py-1 rounded-full font-medium"
                       style={{ backgroundColor: `${course.tagColor}15`, color: course.tagColor, border: `1px solid ${course.tagColor}25` }}
                     >
+                      {course.stage}
+                    </span>
+                    <span
+                      className="text-xs px-2.5 py-1 rounded-full"
+                      style={{ backgroundColor: "#111111", color: "#555550", border: "1px solid #1A1A1A" }}
+                    >
                       {course.tag}
                     </span>
                     {course.badge && (
                       <span
                         className="text-xs px-2.5 py-1 rounded-full"
-                        style={{ backgroundColor: "#111111", color: "#555550", border: "1px solid #1A1A1A" }}
+                        style={{ backgroundColor: "#111111", color: "#444440", border: "1px solid #1A1A1A" }}
                       >
                         {course.badge}
                       </span>
                     )}
-                  </div>
-                  <div className="text-xs font-mono" style={{ color: "#333330" }}>
-                    {String(course.id).padStart(2, "0")}
                   </div>
                 </div>
 
@@ -277,9 +254,9 @@ export default function CoursesPage() {
             准备好了吗？
           </h2>
           <p className="mb-8 text-sm" style={{ color: "#666660" }}>
-            免费注册体验平台内容，或直接 WhatsApp 与我们的团队沟通你的需求。
+            免费注册即可体验平台内容，随时升级解锁完整课程。
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+          <div className="flex justify-center">
             <Link
               href="/register"
               className="px-10 py-3 rounded-xl text-sm font-semibold"
@@ -287,15 +264,6 @@ export default function CoursesPage() {
             >
               免费注册开始 →
             </Link>
-            <a
-              href="https://wa.me/60103210533"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-10 py-3 rounded-xl text-sm font-medium"
-              style={{ backgroundColor: "#1A1A1A", color: "#A0A09A" }}
-            >
-              WhatsApp +6010-321 0533
-            </a>
           </div>
         </div>
       </section>

@@ -752,32 +752,12 @@ function Footer({ t }: { t: Dict["footer"] }) {
         </div>
 
         <div>
-          <div className="text-xs font-semibold tracking-widest mb-4" style={{ color: "#333330" }}>联系</div>
-          <div className="space-y-2">
-            <a
-              href="mailto:info@capitalmastery.net"
-              className="block text-sm transition-colors"
-              style={{ color: "#2E2E2C" }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#2E2E2C"; }}
-            >
-              info@capitalmastery.net
-            </a>
-            <a
-              href="https://wa.me/60103210533"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block text-sm transition-colors"
-              style={{ color: "#2E2E2C" }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#2E2E2C"; }}
-            >
-              +6010-321 0533
-            </a>
-            <p className="text-xs leading-relaxed pt-1" style={{ color: "#1E1E1C" }}>
-              Leisure Commerce Square,<br />Petaling Jaya, Selangor
-            </p>
-          </div>
+          <div className="text-xs font-semibold tracking-widest mb-4" style={{ color: "#333330" }}>地址</div>
+          <p className="text-xs leading-relaxed" style={{ color: "#2A2A28" }}>
+            Leisure Commerce Square,<br />
+            Jalan PJS 8/9, 46150<br />
+            Petaling Jaya, Selangor
+          </p>
         </div>
       </div>
 
