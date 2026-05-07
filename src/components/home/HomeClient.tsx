@@ -5,6 +5,7 @@ import { useRef, useEffect, useState } from "react";
 import Link from "next/link";
 import type { Dict, Locale } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import LogoImg from "@/components/LogoImg";
 
 interface Props {
   t: Dict;
@@ -50,25 +51,7 @@ function Navbar({ t, locale }: { t: Dict["nav"]; locale: Locale }) {
         transition: "background-color 0.4s, border-color 0.4s",
       }}
     >
-      <Link href="/" className="flex items-center gap-2">
-        <img
-          src="https://cdn1.npcdn.net/images/np_26751_1734661918.png"
-          alt="Capital Mastery 资本道"
-          style={{ height: 34, width: "auto", objectFit: "contain" }}
-          onError={(e) => {
-            const img = e.currentTarget as HTMLImageElement;
-            img.style.display = "none";
-            const fb = img.nextElementSibling as HTMLElement | null;
-            if (fb) fb.style.display = "inline";
-          }}
-        />
-        <span
-          className="text-2xl font-bold"
-          style={{ fontFamily: "var(--font-display)", color: "#C9A84C", display: "none" }}
-        >
-          资本道
-        </span>
-      </Link>
+      <Link href="/"><LogoImg height={34} /></Link>
 
       <div className="hidden md:flex items-center gap-8">
         {[
@@ -724,20 +707,7 @@ function Footer({ t }: { t: Dict["footer"] }) {
     <footer className="px-6 py-16" style={{ borderTop: "1px solid #0E0E0C" }}>
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
         <div>
-          <img
-            src="https://cdn1.npcdn.net/images/np_26751_1734661918.png"
-            alt="Capital Mastery 资本道"
-            style={{ height: 36, width: "auto", objectFit: "contain", marginBottom: 12 }}
-            onError={(e) => {
-              const img = e.currentTarget as HTMLImageElement;
-              img.style.display = "none";
-              const fb = img.nextElementSibling as HTMLElement | null;
-              if (fb) fb.style.display = "block";
-            }}
-          />
-          <div className="text-xl font-bold mb-3" style={{ fontFamily: "var(--font-display)", color: "#C9A84C", display: "none" }}>
-            资本道
-          </div>
+          <div className="mb-3"><LogoImg height={36} /></div>
           <p className="text-xs leading-relaxed mb-3" style={{ color: "#2E2E2C" }}>{t.tagline}</p>
           <p className="text-xs mb-4" style={{ color: "#252523" }}>Petaling Jaya, Selangor, Malaysia 🇲🇾</p>
           <div className="flex gap-2">

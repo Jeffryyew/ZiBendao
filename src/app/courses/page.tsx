@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LogoImg from "@/components/LogoImg";
 
 const COURSES = [
   {
@@ -87,14 +88,7 @@ export default function CoursesPage() {
         className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 h-16"
         style={{ backgroundColor: "rgba(13,13,13,0.95)", borderBottom: "1px solid #1A1A1A", backdropFilter: "blur(12px)" }}
       >
-        <Link href="/" className="flex items-center gap-2">
-          <img
-            src="https://cdn1.npcdn.net/images/np_26751_1734661918.png"
-            alt="Capital Mastery 资本道"
-            style={{ height: 32, width: "auto", objectFit: "contain" }}
-            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-          />
-        </Link>
+        <Link href="/"><LogoImg height={32} /></Link>
         <div className="hidden md:flex items-center gap-6">
           {[
             { label: "课程", href: "/courses" },
