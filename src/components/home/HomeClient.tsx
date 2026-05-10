@@ -700,7 +700,7 @@ function CapitalLearningJourney() {
     {
       level: "Level 1",
       name: "资本通",
-      nameEn: "Capital Beginner",
+      nameEn: "The Capital Map",
       desc: "建立资本思维基础。理解为什么营业额高却没现金，学会区分经营思维与资本思维。",
       topics: ["现金流 vs 利润", "企业估值入门", "资本 vs 债务"],
       xp: "+50 XP",
@@ -712,7 +712,7 @@ function CapitalLearningJourney() {
     {
       level: "Level 2",
       name: "启动资本",
-      nameEn: "Capital Builder",
+      nameEn: "The Capital Code",
       desc: "学习融资结构与 SPV 架构。掌握如何设计股权、估值企业，让企业具备融资能力。",
       topics: ["SPV 架构设计", "股权稀释计算", "融资准备度评分"],
       xp: "+80 XP",
@@ -724,7 +724,7 @@ function CapitalLearningJourney() {
     {
       level: "Level 3",
       name: "资本道",
-      nameEn: "Capital Strategist",
+      nameEn: "Capital Dao",
       desc: "进阶资本策略。理解 IPO、REIT 路径，建立企业级资本操作体系与投资人沟通能力。",
       topics: ["IPO 路径规划", "REIT 结构", "投资人关系管理"],
       xp: "+120 XP",
