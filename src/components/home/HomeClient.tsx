@@ -50,14 +50,43 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
     return () => { document.body.style.overflow = ""; };
   }, [menuOpen]);
 
-  const COURSE_ITEMS = locale === "zh"
-    ? ["资本启航", "资本通", "启动资本", "资本道"]
-    : ["Capital Start", "The Capital Map", "The Capital Code", "Capital Dao"];
+  type DropdownItem = { label: string; href: string; comingSoon?: boolean };
+  type NavLink = { label: string; href: string; dropdown?: DropdownItem[] };
 
-  const NAV_LINKS: { label: string; href: string; dropdown?: string[] }[] = [
+  const COURSE_ITEMS: DropdownItem[] = locale === "zh"
+    ? [
+        { label: "资本启航", href: "/courses" },
+        { label: "资本通", href: "/courses" },
+        { label: "启动资本", href: "/courses" },
+        { label: "资本道", href: "/courses" },
+      ]
+    : [
+        { label: "Capital Start", href: "/courses" },
+        { label: "The Capital Map", href: "/courses" },
+        { label: "The Capital Code", href: "/courses" },
+        { label: "Capital Dao", href: "/courses" },
+      ];
+
+  const TOOLS_ITEMS: DropdownItem[] = locale === "zh"
+    ? [
+        { label: "企业估值", href: "/tools/market-cap" },
+        { label: "融资计算", href: "/tools", comingSoon: true },
+        { label: "报价系统", href: "/tools/pricing-system" },
+        { label: "财务预测", href: "/tools/financial-roadmap" },
+        { label: "股权模拟", href: "/tools", comingSoon: true },
+      ]
+    : [
+        { label: "Valuation Engine", href: "/tools/market-cap" },
+        { label: "Funding Calculator", href: "/tools", comingSoon: true },
+        { label: "Quotation System", href: "/tools/pricing-system" },
+        { label: "Financial Forecast", href: "/tools/financial-roadmap" },
+        { label: "Equity Simulator", href: "/tools", comingSoon: true },
+      ];
+
+  const NAV_LINKS: NavLink[] = [
     { label: t.home, href: "/" },
     { label: t.courses, href: "/courses", dropdown: COURSE_ITEMS },
-    { label: t.tools, href: "/tools" },
+    { label: t.tools, href: "/tools", dropdown: TOOLS_ITEMS },
     { label: t.community, href: "/community" },
     { label: t.about, href: "/about" },
   ];
@@ -96,19 +125,30 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
                   <span style={{ fontSize: "9px", opacity: 0.5, marginLeft: 1 }}>▾</span>
                 </Link>
                 <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
-                  <div className="rounded-xl overflow-hidden" style={{ backgroundColor: "#0D0D0D", border: "1px solid #1A1A1A", boxShadow: "0 8px 32px rgba(0,0,0,0.6)", minWidth: 148 }}>
-                    {item.dropdown.map((name, i) => (
-                      <Link
-                        key={name}
-                        href="/courses"
-                        className="block px-4 py-2.5 text-xs transition-colors"
-                        style={{ color: "#888880", borderBottom: i < item.dropdown!.length - 1 ? "1px solid #111110" : "none" }}
-                        onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "rgba(201,168,76,0.05)"; }}
-                        onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#888880"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent"; }}
-                      >
-                        {name}
-                      </Link>
-                    ))}
+                  <div className="rounded-xl overflow-hidden" style={{ backgroundColor: "#0D0D0D", border: "1px solid #1A1A1A", boxShadow: "0 8px 32px rgba(0,0,0,0.6)", minWidth: 168 }}>
+                    {item.dropdown.map((sub, i) =>
+                      sub.comingSoon ? (
+                        <div
+                          key={sub.label}
+                          className="flex items-center justify-between px-4 py-2.5"
+                          style={{ borderBottom: i < item.dropdown!.length - 1 ? "1px solid #111110" : "none" }}
+                        >
+                          <span className="text-xs" style={{ color: "#3A3A38" }}>{sub.label}</span>
+                          <span className="text-xs px-1.5 py-0.5 rounded font-mono" style={{ backgroundColor: "rgba(201,168,76,0.07)", color: "#5A5030", fontSize: "9px" }}>Soon</span>
+                        </div>
+                      ) : (
+                        <Link
+                          key={sub.label}
+                          href={sub.href}
+                          className="block px-4 py-2.5 text-xs transition-colors"
+                          style={{ color: "#888880", borderBottom: i < item.dropdown!.length - 1 ? "1px solid #111110" : "none" }}
+                          onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "rgba(201,168,76,0.05)"; }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#888880"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent"; }}
+                        >
+                          {sub.label}
+                        </Link>
+                      )
+                    )}
                   </div>
                 </div>
               </div>
@@ -226,19 +266,30 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
                 </Link>
                 {item.dropdown && (
                   <div className="ml-4 mt-0.5 space-y-0.5">
-                    {item.dropdown.map((name) => (
-                      <Link
-                        key={name}
-                        href="/courses"
-                        onClick={() => setMenuOpen(false)}
-                        className="block py-2 px-4 rounded-lg text-xs transition-colors"
-                        style={{ color: "#555550" }}
-                        onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; }}
-                        onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#555550"; }}
-                      >
-                        ↳ {name}
-                      </Link>
-                    ))}
+                    {item.dropdown.map((sub) =>
+                      sub.comingSoon ? (
+                        <div
+                          key={sub.label}
+                          className="flex items-center gap-2 py-2 px-4 text-xs"
+                          style={{ color: "#333330" }}
+                        >
+                          <span>↳ {sub.label}</span>
+                          <span className="text-xs px-1.5 py-0.5 rounded font-mono" style={{ backgroundColor: "rgba(201,168,76,0.07)", color: "#5A5030", fontSize: "9px" }}>Soon</span>
+                        </div>
+                      ) : (
+                        <Link
+                          key={sub.label}
+                          href={sub.href}
+                          onClick={() => setMenuOpen(false)}
+                          className="block py-2 px-4 rounded-lg text-xs transition-colors"
+                          style={{ color: "#555550" }}
+                          onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; }}
+                          onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#555550"; }}
+                        >
+                          ↳ {sub.label}
+                        </Link>
+                      )
+                    )}
                   </div>
                 )}
               </div>

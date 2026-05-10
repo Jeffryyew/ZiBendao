@@ -11,17 +11,46 @@ interface SharedNavProps {
   isLoggedIn?: boolean;
 }
 
+type DropdownItem = { label: string; href: string; comingSoon?: boolean };
+type NavLink = { label: string; href: string; dropdown?: DropdownItem[] };
+
 export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavProps) {
   const isZh = locale === "zh";
 
-  const COURSE_ITEMS = isZh
-    ? ["资本启航", "资本通", "启动资本", "资本道"]
-    : ["Capital Start", "The Capital Map", "The Capital Code", "Capital Dao"];
+  const COURSE_ITEMS: DropdownItem[] = isZh
+    ? [
+        { label: "资本启航", href: "/courses" },
+        { label: "资本通", href: "/courses" },
+        { label: "启动资本", href: "/courses" },
+        { label: "资本道", href: "/courses" },
+      ]
+    : [
+        { label: "Capital Start", href: "/courses" },
+        { label: "The Capital Map", href: "/courses" },
+        { label: "The Capital Code", href: "/courses" },
+        { label: "Capital Dao", href: "/courses" },
+      ];
 
-  const links: { label: string; href: string; dropdown?: string[] }[] = [
+  const TOOLS_ITEMS: DropdownItem[] = isZh
+    ? [
+        { label: "企业估值", href: "/tools/market-cap" },
+        { label: "融资计算", href: "/tools", comingSoon: true },
+        { label: "报价系统", href: "/tools/pricing-system" },
+        { label: "财务预测", href: "/tools/financial-roadmap" },
+        { label: "股权模拟", href: "/tools", comingSoon: true },
+      ]
+    : [
+        { label: "Valuation Engine", href: "/tools/market-cap" },
+        { label: "Funding Calculator", href: "/tools", comingSoon: true },
+        { label: "Quotation System", href: "/tools/pricing-system" },
+        { label: "Financial Forecast", href: "/tools/financial-roadmap" },
+        { label: "Equity Simulator", href: "/tools", comingSoon: true },
+      ];
+
+  const links: NavLink[] = [
     { label: isZh ? "首页" : "Home", href: "/" },
     { label: isZh ? "资本课程" : "Courses", href: "/courses", dropdown: COURSE_ITEMS },
-    { label: isZh ? "资本工具" : "Tools", href: "/tools" },
+    { label: isZh ? "资本工具" : "Tools", href: "/tools", dropdown: TOOLS_ITEMS },
     { label: isZh ? "社群" : "Community", href: "/community" },
     { label: isZh ? "关于" : "About", href: "/about" },
   ];
@@ -56,19 +85,30 @@ export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavP
                 <span style={{ fontSize: "9px", opacity: 0.5, marginLeft: 1 }}>▾</span>
               </Link>
               <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
-                <div className="rounded-xl overflow-hidden" style={{ backgroundColor: "#0D0D0D", border: "1px solid #1A1A1A", boxShadow: "0 8px 32px rgba(0,0,0,0.6)", minWidth: 148 }}>
-                  {item.dropdown.map((name, i) => (
-                    <Link
-                      key={name}
-                      href="/courses"
-                      className="block px-4 py-2.5 text-xs transition-colors"
-                      style={{ color: "#888880", borderBottom: i < item.dropdown!.length - 1 ? "1px solid #111110" : "none" }}
-                      onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "rgba(201,168,76,0.05)"; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#888880"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent"; }}
-                    >
-                      {name}
-                    </Link>
-                  ))}
+                <div className="rounded-xl overflow-hidden" style={{ backgroundColor: "#0D0D0D", border: "1px solid #1A1A1A", boxShadow: "0 8px 32px rgba(0,0,0,0.6)", minWidth: 168 }}>
+                  {item.dropdown.map((sub, i) =>
+                    sub.comingSoon ? (
+                      <div
+                        key={sub.label}
+                        className="flex items-center justify-between px-4 py-2.5"
+                        style={{ borderBottom: i < item.dropdown!.length - 1 ? "1px solid #111110" : "none" }}
+                      >
+                        <span className="text-xs" style={{ color: "#3A3A38" }}>{sub.label}</span>
+                        <span className="text-xs px-1.5 py-0.5 rounded font-mono" style={{ backgroundColor: "rgba(201,168,76,0.07)", color: "#5A5030", fontSize: "9px" }}>Soon</span>
+                      </div>
+                    ) : (
+                      <Link
+                        key={sub.label}
+                        href={sub.href}
+                        className="block px-4 py-2.5 text-xs transition-colors"
+                        style={{ color: "#888880", borderBottom: i < item.dropdown!.length - 1 ? "1px solid #111110" : "none" }}
+                        onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "rgba(201,168,76,0.05)"; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#888880"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent"; }}
+                      >
+                        {sub.label}
+                      </Link>
+                    )
+                  )}
                 </div>
               </div>
             </div>
