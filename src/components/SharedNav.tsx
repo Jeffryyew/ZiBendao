@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import LogoImg from "@/components/LogoImg";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
@@ -13,6 +14,120 @@ interface SharedNavProps {
 
 type DropdownItem = { label: string; href: string; comingSoon?: boolean };
 type NavLink = { label: string; href: string; dropdown?: DropdownItem[] };
+
+function DropdownMenu({
+  item,
+  isActive,
+}: {
+  item: NavLink;
+  isActive: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function onClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="text-sm flex items-center gap-1 transition-colors cursor-pointer bg-transparent border-0 p-0"
+        style={{ color: isActive || open ? "#C9A84C" : "#666660" }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#C9A84C"; }}
+        onMouseLeave={(e) => { if (!isActive && !open) (e.currentTarget as HTMLButtonElement).style.color = "#666660"; }}
+      >
+        {item.label}
+        <span
+          style={{
+            fontSize: "9px",
+            opacity: 0.5,
+            marginLeft: 1,
+            display: "inline-block",
+            transform: open ? "rotate(180deg)" : "none",
+            transition: "transform 150ms",
+          }}
+        >
+          ▾
+        </span>
+      </button>
+
+      {open && (
+        <div
+          className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50"
+          style={{ minWidth: 168 }}
+        >
+          <div
+            className="rounded-xl overflow-hidden"
+            style={{
+              backgroundColor: "#0D0D0D",
+              border: "1px solid #1A1A1A",
+              boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
+            }}
+          >
+            {item.dropdown!.map((sub, i) =>
+              sub.comingSoon ? (
+                <div
+                  key={sub.label}
+                  className="flex items-center justify-between px-4 py-2.5"
+                  style={{
+                    borderBottom:
+                      i < item.dropdown!.length - 1 ? "1px solid #111110" : "none",
+                  }}
+                >
+                  <span className="text-xs" style={{ color: "#3A3A38" }}>
+                    {sub.label}
+                  </span>
+                  <span
+                    className="text-xs px-1.5 py-0.5 rounded font-mono"
+                    style={{
+                      backgroundColor: "rgba(201,168,76,0.07)",
+                      color: "#5A5030",
+                      fontSize: "9px",
+                    }}
+                  >
+                    Soon
+                  </span>
+                </div>
+              ) : (
+                <Link
+                  key={sub.label}
+                  href={sub.href}
+                  onClick={() => setOpen(false)}
+                  className="block px-4 py-2.5 text-xs transition-colors"
+                  style={{
+                    color: "#888880",
+                    borderBottom:
+                      i < item.dropdown!.length - 1 ? "1px solid #111110" : "none",
+                  }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C";
+                    (e.currentTarget as HTMLAnchorElement).style.backgroundColor =
+                      "rgba(201,168,76,0.05)";
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLAnchorElement).style.color = "#888880";
+                    (e.currentTarget as HTMLAnchorElement).style.backgroundColor =
+                      "transparent";
+                  }}
+                >
+                  {sub.label}
+                </Link>
+              )
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavProps) {
   const isZh = locale === "zh";
@@ -87,53 +202,25 @@ export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavP
       <div className="hidden md:flex items-center gap-6">
         {links.map((item) =>
           item.dropdown ? (
-            <div key={item.href} className="relative group">
-              <Link
-                href={item.href}
-                className="text-sm flex items-center gap-1 transition-colors"
-                style={{ color: activeHref === item.href ? "#C9A84C" : "#666660" }}
-                onMouseEnter={(e) => { if (activeHref !== item.href) (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; }}
-                onMouseLeave={(e) => { if (activeHref !== item.href) (e.currentTarget as HTMLAnchorElement).style.color = "#666660"; }}
-              >
-                {item.label}
-                <span style={{ fontSize: "9px", opacity: 0.5, marginLeft: 1 }}>▾</span>
-              </Link>
-              <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
-                <div className="rounded-xl overflow-hidden" style={{ backgroundColor: "#0D0D0D", border: "1px solid #1A1A1A", boxShadow: "0 8px 32px rgba(0,0,0,0.6)", minWidth: 168 }}>
-                  {item.dropdown.map((sub, i) =>
-                    sub.comingSoon ? (
-                      <div
-                        key={sub.label}
-                        className="flex items-center justify-between px-4 py-2.5"
-                        style={{ borderBottom: i < item.dropdown!.length - 1 ? "1px solid #111110" : "none" }}
-                      >
-                        <span className="text-xs" style={{ color: "#3A3A38" }}>{sub.label}</span>
-                        <span className="text-xs px-1.5 py-0.5 rounded font-mono" style={{ backgroundColor: "rgba(201,168,76,0.07)", color: "#5A5030", fontSize: "9px" }}>Soon</span>
-                      </div>
-                    ) : (
-                      <Link
-                        key={sub.label}
-                        href={sub.href}
-                        className="block px-4 py-2.5 text-xs transition-colors"
-                        style={{ color: "#888880", borderBottom: i < item.dropdown!.length - 1 ? "1px solid #111110" : "none" }}
-                        onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "rgba(201,168,76,0.05)"; }}
-                        onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#888880"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent"; }}
-                      >
-                        {sub.label}
-                      </Link>
-                    )
-                  )}
-                </div>
-              </div>
-            </div>
+            <DropdownMenu
+              key={item.href}
+              item={item}
+              isActive={activeHref === item.href}
+            />
           ) : (
             <Link
               key={item.href}
               href={item.href}
               className="text-sm transition-colors"
               style={{ color: activeHref === item.href ? "#C9A84C" : "#666660" }}
-              onMouseEnter={(e) => { if (activeHref !== item.href) (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; }}
-              onMouseLeave={(e) => { if (activeHref !== item.href) (e.currentTarget as HTMLAnchorElement).style.color = "#666660"; }}
+              onMouseEnter={(e) => {
+                if (activeHref !== item.href)
+                  (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C";
+              }}
+              onMouseLeave={(e) => {
+                if (activeHref !== item.href)
+                  (e.currentTarget as HTMLAnchorElement).style.color = "#666660";
+              }}
             >
               {item.label}
             </Link>
