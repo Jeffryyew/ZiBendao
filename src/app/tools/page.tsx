@@ -1,3 +1,4 @@
+"use client";
 import Link from "next/link";
 import BackNav from "@/components/BackNav";
 
