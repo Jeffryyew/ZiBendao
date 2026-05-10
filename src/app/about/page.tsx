@@ -60,7 +60,6 @@ export default function AboutPage() {
           {[
             { label: "课程", href: "/courses" },
             { label: "工具", href: "/tools" },
-            { label: "定价", href: "/pricing" },
             { label: "关于", href: "/about" },
           ].map((item) => (
             <Link key={item.href} href={item.href} className="text-sm" style={{ color: "#666660" }}>

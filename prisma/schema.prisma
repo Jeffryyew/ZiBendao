@@ -8,9 +8,12 @@ datasource db {
 
 enum Role {
   SUPER_ADMIN
-  SUB_ADMIN
-  CLIENT
-  STUDENT
+  ADMIN
+  ZIBENTONG_GRAD
+  QIDONG_GRAD
+  ZIBENDAO_GRAD
+  ONLINE_STUDENT
+  ENTERPRISE_CLIENT
   FREE_MEMBER
 }
 
@@ -34,15 +37,18 @@ enum PayStatus {
 }
 
 model User {
-  id             String    @id @default(cuid())
-  email          String    @unique
-  name           String
-  hashedPassword String?
-  role           Role      @default(FREE_MEMBER)
-  studentLevel   Int?
-  isActive       Boolean   @default(true)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
+  id                String    @id @default(cuid())
+  email             String    @unique
+  name              String
+  hashedPassword    String?
+  role              Role      @default(FREE_MEMBER)
+  studentLevel      Int?
+  isActive          Boolean   @default(true)
+  emailVerified     DateTime?
+  verifyToken       String?   @unique
+  verifyTokenExpiry DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   accounts    Account[]
   sessions    Session[]

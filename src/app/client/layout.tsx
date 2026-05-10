@@ -11,7 +11,7 @@ const NAV_ITEMS: NavItem[] = [
 export default async function ClientLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   if (!session?.user) redirect("/login");
-  if (session.user.role !== "CLIENT") redirect("/dashboard");
+  if (session.user.role !== "ENTERPRISE_CLIENT") redirect("/dashboard");
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0D0D0D" }}>
@@ -19,7 +19,8 @@ export default async function ClientLayout({ children }: { children: React.React
         navItems={NAV_ITEMS}
         userName={session.user.name}
         userEmail={session.user.email}
-        roleLabel="咨询客户"
+        roleLabel="企业顾问客户"
+        accentColor="#6B8FD4"
       />
       <main className="md:ml-60 pt-14 md:pt-0 min-h-screen">
         {children}

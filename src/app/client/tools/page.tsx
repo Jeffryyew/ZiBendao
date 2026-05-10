@@ -28,7 +28,7 @@ export default async function ClientToolsPage() {
   });
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto px-4 py-8 md:py-10 space-y-6">
       <div>
         <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}>
           计算工具
@@ -65,7 +65,7 @@ export default async function ClientToolsPage() {
                   <span className="text-3xl">{icon}</span>
                   <span
                     className="text-xs px-2 py-0.5 rounded-full font-medium"
-                    style={{ backgroundColor: "rgba(201,168,76,0.15)", color: "#C9A84C" }}
+                    style={{ backgroundColor: "rgba(107,143,212,0.15)", color: "#6B8FD4" }}
                   >
                     已授权
                   </span>
@@ -80,7 +80,7 @@ export default async function ClientToolsPage() {
                 >
                   <span>授权日期：{new Date(grantedAt).toLocaleDateString("zh-CN")}</span>
                   <span
-                    className="group-hover:text-[#C9A84C] transition-colors"
+                    className="group-hover:text-[#6B8FD4] transition-colors"
                     style={{ color: "#555550" }}
                   >
                     进入工具 →

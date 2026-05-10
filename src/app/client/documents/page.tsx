@@ -25,7 +25,7 @@ export default async function ClientDocumentsPage() {
   });
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto px-4 py-8 md:py-10 space-y-6">
       <div>
         <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}>
           合约文件

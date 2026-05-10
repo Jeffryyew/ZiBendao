@@ -2,13 +2,14 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { NextResponse } from "next/server";
 import { sendContractEmail } from "@/lib/email";
+import { isAdmin } from "@/lib/roles";
 
 export async function POST(req: Request) {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const role = session.user.role;
-  if (role !== "SUPER_ADMIN" && role !== "SUB_ADMIN") {
+  const role = session.user.role as string;
+  if (!isAdmin(role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
@@ -18,7 +19,7 @@ export async function POST(req: Request) {
   }
 
   const client = await prisma.user.findFirst({
-    where: { id: body.clientId, role: "CLIENT" },
+    where: { id: body.clientId, role: "ENTERPRISE_CLIENT" },
   });
   if (!client) return NextResponse.json({ error: "Client not found" }, { status: 404 });
 
@@ -40,8 +41,8 @@ export async function GET(req: Request) {
   const session = await auth();
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const role = session.user.role;
-  if (role !== "SUPER_ADMIN" && role !== "SUB_ADMIN") {
+  const role = session.user.role as string;
+  if (!isAdmin(role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 

@@ -1,16 +1,12 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST ?? "smtp.gmail.com",
-  port: Number(process.env.SMTP_PORT ?? 587),
-  secure: process.env.SMTP_SECURE === "true",
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+function getResend() {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return null;
+  return new Resend(key);
+}
 
-const FROM = `"资本道 ZiBenDao" <${process.env.SMTP_FROM ?? process.env.SMTP_USER}>`;
+const FROM = process.env.RESEND_FROM ?? "资本道 ZiBenDao <noreply@zibendao.com>";
 const BASE_URL = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
 
 function wrap(body: string): string {
@@ -38,9 +34,28 @@ function btn(href: string, label: string): string {
   </div>`;
 }
 
+export async function sendVerificationEmail(to: string, name: string, token: string): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+  const link = `${BASE_URL}/verify-email?token=${token}`;
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: "请验证你的资本道账号邮箱",
+    html: wrap(`
+      <h2 style="color:#F5F5F0;font-size:20px;margin:0 0 16px;">你好，${name}！</h2>
+      <p style="color:#A0A09A;line-height:1.8;margin:0 0 16px;">感谢注册资本道。请点击下方按钮验证你的邮箱，链接 <strong style="color:#F5F5F0;">24小时内</strong>有效。</p>
+      ${btn(link, "验证我的邮箱")}
+      <p style="color:#555550;font-size:12px;text-align:center;">如果你没有注册资本道账号，请忽略此邮件。</p>
+      <p style="color:#333330;font-size:11px;text-align:center;margin-top:16px;word-break:break-all;">或复制链接：${link}</p>
+    `),
+  });
+}
+
 export async function sendWelcomeEmail(to: string, name: string): Promise<void> {
-  if (!process.env.SMTP_USER) return;
-  await transporter.sendMail({
+  const resend = getResend();
+  if (!resend) return;
+  await resend.emails.send({
     from: FROM,
     to,
     subject: "欢迎加入资本道 — 开启你的金融学习之旅",
@@ -65,8 +80,9 @@ export async function sendPaymentConfirmationEmail(
   amount: string,
   currency: string,
 ): Promise<void> {
-  if (!process.env.SMTP_USER) return;
-  await transporter.sendMail({
+  const resend = getResend();
+  if (!resend) return;
+  await resend.emails.send({
     from: FROM,
     to,
     subject: "付款成功 — 你已成为资本道学生会员 🎉",
@@ -101,8 +117,9 @@ export async function sendContractEmail(
   docTitle: string,
   docId: string,
 ): Promise<void> {
-  if (!process.env.SMTP_USER) return;
-  await transporter.sendMail({
+  const resend = getResend();
+  if (!resend) return;
+  await resend.emails.send({
     from: FROM,
     to,
     subject: `合约待签署 — ${docTitle}`,

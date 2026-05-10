@@ -12,14 +12,16 @@ const TYPE_LABEL: Record<string, string> = {
   EXERCISE: "练习",
 };
 
-export default async function ModuleDetailPage({ params }: { params: { moduleId: string } }) {
+export default async function ModuleDetailPage({ params }: { params: Promise<{ moduleId: string }> }) {
+  const { moduleId } = await params;
+
   const session = await auth();
   if (!session?.user) redirect("/login");
   const role = session.user.role;
-  if (role !== "SUPER_ADMIN" && role !== "SUB_ADMIN") redirect("/dashboard");
+  if (role !== "SUPER_ADMIN" && role !== "ADMIN") redirect("/dashboard");
 
   const mod = await prisma.module.findUnique({
-    where: { id: params.moduleId },
+    where: { id: moduleId },
     include: {
       lessons: { orderBy: { order: "asc" } },
     },
@@ -28,19 +30,21 @@ export default async function ModuleDetailPage({ params }: { params: { moduleId:
   if (!mod) notFound();
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto px-4 py-8 md:py-10 space-y-8">
       {/* Header */}
       <div>
-        <Link href="/admin/courses" className="text-xs" style={{ color: "#666660" }}>
+        <Link href="/admin/courses" className="text-xs" style={{ color: "#555550" }}>
           ← 返回模块列表
         </Link>
-        <h1 className="text-2xl font-bold mt-2" style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}>
-          {mod.title}
-        </h1>
-        <div className="flex items-center gap-3 mt-1">
-          <span className="text-sm" style={{ color: "#A0A09A" }}>{mod.description}</span>
+        <div className="flex items-start justify-between gap-4 mt-3">
+          <div>
+            <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
+              {mod.title}
+            </h1>
+            <p className="text-sm mt-0.5" style={{ color: "#666660" }}>{mod.description}</p>
+          </div>
           <span
-            className="text-xs px-2 py-0.5 rounded-full"
+            className="flex-shrink-0 text-xs px-2.5 py-1 rounded-full mt-1"
             style={{
               backgroundColor: mod.isPublished ? "rgba(76,175,130,0.15)" : "rgba(102,102,96,0.2)",
               color: mod.isPublished ? "#4CAF82" : "#666660",
@@ -53,7 +57,7 @@ export default async function ModuleDetailPage({ params }: { params: { moduleId:
 
       {/* Lessons list */}
       <div>
-        <h2 className="text-base font-semibold mb-4" style={{ color: "#F5F5F0" }}>
+        <h2 className="font-semibold text-sm tracking-wide mb-4" style={{ color: "#A0A09A" }}>
           课节列表（{mod.lessons.length} 课）
         </h2>
         <div className="space-y-2">
@@ -91,7 +95,7 @@ export default async function ModuleDetailPage({ params }: { params: { moduleId:
 
       {/* Add lesson */}
       <div>
-        <h2 className="text-base font-semibold mb-4" style={{ color: "#F5F5F0" }}>添加课节</h2>
+        <h2 className="font-semibold text-sm tracking-wide mb-4" style={{ color: "#A0A09A" }}>添加课节</h2>
         <NewLessonForm moduleId={mod.id} nextOrder={mod.lessons.length + 1} />
       </div>
     </div>

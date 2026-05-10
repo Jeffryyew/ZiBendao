@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Sidebar, { NavItem } from "@/components/Sidebar";
+import { getRoleLabel } from "@/lib/roles";
 
 const NAV_ITEMS: NavItem[] = [
   { label: "仪表板", href: "/admin", icon: "⊕" },
@@ -15,10 +16,8 @@ const NAV_ITEMS: NavItem[] = [
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   if (!session?.user) redirect("/login");
-  const role = session.user.role;
-  if (role !== "SUPER_ADMIN" && role !== "SUB_ADMIN") redirect("/dashboard");
-
-  const roleLabel = role === "SUPER_ADMIN" ? "超级管理员" : "副管理员";
+  const role = session.user.role as string;
+  if (role !== "SUPER_ADMIN" && role !== "ADMIN") redirect("/dashboard");
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#0D0D0D" }}>
@@ -26,7 +25,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         navItems={NAV_ITEMS}
         userName={session.user.name}
         userEmail={session.user.email}
-        roleLabel={roleLabel}
+        roleLabel={getRoleLabel(role)}
       />
       <main className="md:ml-60 pt-14 md:pt-0 min-h-screen">
         {children}

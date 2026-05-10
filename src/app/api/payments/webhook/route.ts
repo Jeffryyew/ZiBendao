@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     const [user] = await prisma.$transaction([
       prisma.user.update({
         where: { id: userId },
-        data: { role: "STUDENT", studentLevel: 1 },
+        data: { role: "ONLINE_STUDENT", studentLevel: 1 },
       }),
       prisma.payment.create({
         data: {

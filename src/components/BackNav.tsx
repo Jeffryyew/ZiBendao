@@ -12,7 +12,7 @@ export default function BackNav({ className }: Props) {
   return (
     <div className={`flex items-center gap-2 ${className ?? ""}`}>
       <button
-        onClick={() => router.back()}
+        onClick={() => window.history.length > 1 ? router.back() : router.push("/")}
         className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg transition-all"
         style={{ color: "#555550", backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}
         onMouseEnter={(e) => {

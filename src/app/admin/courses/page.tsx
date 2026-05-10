@@ -9,7 +9,7 @@ export default async function AdminCoursesPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
   const role = session.user.role;
-  if (role !== "SUPER_ADMIN" && role !== "SUB_ADMIN") redirect("/dashboard");
+  if (role !== "SUPER_ADMIN" && role !== "ADMIN") redirect("/dashboard");
 
   const modules = await prisma.module.findMany({
     include: { _count: { select: { lessons: true } } },
@@ -17,9 +17,9 @@ export default async function AdminCoursesPage() {
   });
 
   return (
-    <div className="p-6 max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto px-4 py-8 md:py-10 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}>
+        <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
           课程管理
         </h1>
         <p className="mt-1 text-sm" style={{ color: "#A0A09A" }}>
@@ -86,7 +86,7 @@ export default async function AdminCoursesPage() {
 
       {/* Create module form */}
       <div>
-        <h2 className="text-base font-semibold mb-4" style={{ color: "#F5F5F0" }}>添加模块</h2>
+        <h2 className="font-semibold text-sm tracking-wide mb-4" style={{ color: "#A0A09A" }}>添加模块</h2>
         <NewModuleForm nextOrder={modules.length + 1} />
       </div>
     </div>

@@ -32,11 +32,11 @@ export default function PaymentCancelPage() {
 
       <div className="flex flex-col sm:flex-row gap-3">
         <Link
-          href="/pricing"
+          href="/courses"
           className="px-8 py-3 rounded-xl font-semibold text-sm"
           style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}
         >
-          重新查看方案
+          查看课程
         </Link>
         <Link
           href="/"

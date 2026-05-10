@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { updateUserRole, toggleUserActive, grantToolAccess, revokeToolAccess } from "@/app/actions/admin";
+import { ROLE_OPTIONS, ROLE_COLOR } from "@/lib/roles";
 
 interface ToolRecord {
   id: string;
@@ -25,29 +26,14 @@ interface Props {
   tools: ToolRecord[];
 }
 
-const ROLE_OPTIONS = [
-  { value: "FREE_MEMBER", label: "免费会员" },
-  { value: "STUDENT", label: "学生" },
-  { value: "CLIENT", label: "咨询客户" },
-  { value: "SUB_ADMIN", label: "副管理员" },
-  { value: "SUPER_ADMIN", label: "超级管理员" },
-];
-
-const ROLE_COLOR: Record<string, string> = {
-  SUPER_ADMIN: "#EF4444",
-  SUB_ADMIN: "#F97316",
-  CLIENT: "#C9A84C",
-  STUDENT: "#4CAF82",
-  FREE_MEMBER: "#666660",
-};
-
 export default function UserTable({ users, tools }: Props) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [edits, setEdits] = useState<Record<string, { role: string; level: number }>>({});
   const [pending, startTransition] = useTransition();
 
-  function getEdit(user: UserRecord) {
-    return edits[user.id] ?? { role: user.role, studentLevel: user.studentLevel ?? 1 };
+  function getEditById(userId: string) {
+    const user = users.find((u) => u.id === userId)!;
+    return edits[userId] ?? { role: user.role, level: user.studentLevel ?? 1 };
   }
 
   function setRole(userId: string, role: string) {
@@ -58,15 +44,10 @@ export default function UserTable({ users, tools }: Props) {
     setEdits((e) => ({ ...e, [userId]: { ...getEditById(userId), level } }));
   }
 
-  function getEditById(userId: string) {
-    const user = users.find((u) => u.id === userId)!;
-    return edits[userId] ?? { role: user.role, level: user.studentLevel ?? 1 };
-  }
-
   function isDirty(user: UserRecord) {
     const e = edits[user.id];
     if (!e) return false;
-    return e.role !== user.role || (e.role === "STUDENT" && e.level !== (user.studentLevel ?? 1));
+    return e.role !== user.role || (e.role === "ONLINE_STUDENT" && e.level !== (user.studentLevel ?? 1));
   }
 
   function saveRole(user: UserRecord) {
@@ -105,6 +86,7 @@ export default function UserTable({ users, tools }: Props) {
         const dirty = isDirty(user);
         const isExpanded = expandedId === user.id;
         const grantedToolIds = new Set(user.toolAccess.map((a) => a.toolId));
+        const isClient = user.role === "ENTERPRISE_CLIENT";
 
         return (
           <div
@@ -146,17 +128,17 @@ export default function UserTable({ users, tools }: Props) {
                 ))}
               </select>
 
-              {/* Level input (only for STUDENT) */}
-              {edit.role === "STUDENT" && (
+              {/* Level input (only for ONLINE_STUDENT) */}
+              {edit.role === "ONLINE_STUDENT" && (
                 <select
                   value={edit.level}
                   onChange={(e) => setLevel(user.id, Number(e.target.value))}
                   className="rounded-lg px-2.5 py-1.5 text-xs outline-none w-20"
                   style={{ backgroundColor: "#0D0D0D", border: "1px solid #2A2A2A", color: "#F5F5F0" }}
                 >
-                  <option value={1}>L1</option>
-                  <option value={2}>L2</option>
-                  <option value={3}>L3</option>
+                  <option value={1}>第1阶</option>
+                  <option value={2}>第2阶</option>
+                  <option value={3}>第3阶</option>
                 </select>
               )}
 
@@ -183,8 +165,8 @@ export default function UserTable({ users, tools }: Props) {
                 {user.isActive ? "启用" : "禁用"}
               </button>
 
-              {/* Expand for CLIENT tool access */}
-              {user.role === "CLIENT" && tools.length > 0 && (
+              {/* Expand for ENTERPRISE_CLIENT tool access */}
+              {isClient && tools.length > 0 && (
                 <button
                   onClick={() => setExpandedId(isExpanded ? null : user.id)}
                   className="px-3 py-1.5 rounded-lg text-xs"
@@ -201,7 +183,7 @@ export default function UserTable({ users, tools }: Props) {
             </div>
 
             {/* Expanded tool access panel */}
-            {isExpanded && user.role === "CLIENT" && (
+            {isExpanded && isClient && (
               <div
                 className="px-5 pb-4 pt-2 border-t"
                 style={{ borderColor: "#1A1A1A" }}

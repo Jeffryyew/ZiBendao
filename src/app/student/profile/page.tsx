@@ -1,6 +1,7 @@
 import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getRoleLabel, isGraduate } from "@/lib/roles";
 
 const LEVEL_INFO = {
   1: { label: "L1", title: "入门学者", desc: "开始你的金融学习之旅", color: "#8B7355", max: 200 },
@@ -21,6 +22,8 @@ export default async function StudentProfilePage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
+  const role = session.user.role as string;
+  const grad = isGraduate(role);
   const level = session.user.studentLevel ?? 1;
   const levelInfo = LEVEL_INFO[level as keyof typeof LEVEL_INFO] ?? LEVEL_INFO[1];
 
@@ -88,16 +91,16 @@ export default async function StudentProfilePage() {
           </h1>
           <p className="text-sm mb-3" style={{ color: "#666660" }}>{session.user.email}</p>
 
-          {/* Level badge */}
+          {/* Role badge */}
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl" style={{
             backgroundColor: `${levelInfo.color}15`,
             border: `1px solid ${levelInfo.color}30`,
           }}>
             <span className="text-xs font-mono font-bold" style={{ color: levelInfo.color }}>
-              {levelInfo.label}
+              {grad ? "🎓" : levelInfo.label}
             </span>
             <span className="text-xs font-medium" style={{ color: levelInfo.color }}>
-              {levelInfo.title}
+              {grad ? getRoleLabel(role) : levelInfo.title}
             </span>
           </div>
 

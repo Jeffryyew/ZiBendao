@@ -1,6 +1,7 @@
 import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { isGraduate } from "@/lib/roles";
 
 interface Tool {
   slug: string;
@@ -55,7 +56,9 @@ export default async function StudentToolsPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const studentLevel = session.user.studentLevel ?? 1;
+  const role = session.user.role as string;
+  const grad = isGraduate(role);
+  const studentLevel = grad ? 99 : (session.user.studentLevel ?? 1);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 md:py-10">
@@ -78,18 +81,18 @@ export default async function StudentToolsPage() {
           className="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold font-mono flex-shrink-0"
           style={{ backgroundColor: "rgba(201,168,76,0.12)", color: "#C9A84C" }}
         >
-          L{studentLevel}
+          {grad ? "🎓" : `第${studentLevel}阶`}
         </div>
         <div className="flex-1">
           <span className="text-sm" style={{ color: "#A0A09A" }}>
-            你当前等级可使用&nbsp;
+            {grad ? "毕业生" : "当前阶段"}可使用&nbsp;
             <span style={{ color: "#F5F5F0" }}>
               {TOOLS.filter((t) => t.requiredLevel <= studentLevel).length} / {TOOLS.length}
             </span>
             &nbsp;个工具
           </span>
         </div>
-        {studentLevel < 3 && (
+        {!grad && studentLevel < 3 && (
           <Link
             href="/student/learn"
             className="text-xs px-3 py-1.5 rounded-lg"

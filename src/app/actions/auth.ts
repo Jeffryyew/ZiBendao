@@ -5,7 +5,8 @@ import { signIn, signOut } from "../../../auth";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { AuthError } from "next-auth";
-import { sendWelcomeEmail } from "@/lib/email";
+import { sendVerificationEmail, sendWelcomeEmail } from "@/lib/email";
+import { randomBytes } from "crypto";
 
 const RegisterSchema = z.object({
   name: z.string().min(2, "姓名至少2个字符"),
@@ -18,7 +19,7 @@ const LoginSchema = z.object({
   password: z.string().min(1, "请输入密码"),
 });
 
-type ActionResult = { error?: string; success?: string };
+type ActionResult = { error?: string; success?: string; unverified?: boolean };
 
 export async function register(_prev: ActionResult | undefined, formData: FormData): Promise<ActionResult> {
   const parsed = RegisterSchema.safeParse({
@@ -37,14 +38,37 @@ export async function register(_prev: ActionResult | undefined, formData: FormDa
   if (existing) return { error: "此邮箱已被注册" };
 
   const hashedPassword = await bcrypt.hash(password, 12);
+  const verifyToken = randomBytes(32).toString("hex");
+  const verifyTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
   await prisma.user.create({
-    data: { name, email, hashedPassword, role: "FREE_MEMBER" },
+    data: { name, email, hashedPassword, role: "FREE_MEMBER", verifyToken, verifyTokenExpiry },
   });
 
-  sendWelcomeEmail(email, name).catch(() => {});
+  sendVerificationEmail(email, name, verifyToken).catch(() => {});
 
-  return { success: "注册成功，请登录" };
+  return { success: "verification_sent" };
+}
+
+export async function resendVerification(_prev: ActionResult | undefined, formData: FormData): Promise<ActionResult> {
+  const email = (formData.get("email") as string)?.trim().toLowerCase();
+  if (!email) return { error: "请输入邮箱地址" };
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return { error: "此邮箱未注册" };
+  if (user.emailVerified) return { success: "already_verified" };
+
+  const verifyToken = randomBytes(32).toString("hex");
+  const verifyTokenExpiry = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { verifyToken, verifyTokenExpiry },
+  });
+
+  sendVerificationEmail(email, user.name, verifyToken).catch(() => {});
+
+  return { success: "verification_sent" };
 }
 
 export async function login(_prev: ActionResult | undefined, formData: FormData): Promise<ActionResult> {
@@ -55,6 +79,11 @@ export async function login(_prev: ActionResult | undefined, formData: FormData)
 
   if (!parsed.success) {
     return { error: parsed.error.issues[0].message };
+  }
+
+  const user = await prisma.user.findUnique({ where: { email: parsed.data.email } });
+  if (user && !user.emailVerified) {
+    return { error: "请先验证你的邮箱", unverified: true };
   }
 
   try {
@@ -80,4 +109,22 @@ export async function login(_prev: ActionResult | undefined, formData: FormData)
 
 export async function logout() {
   await signOut({ redirectTo: "/" });
+}
+
+export async function verifyEmailToken(token: string): Promise<{ success: boolean; error?: string }> {
+  const user = await prisma.user.findUnique({ where: { verifyToken: token } });
+
+  if (!user) return { success: false, error: "链接无效或已失效" };
+  if (!user.verifyTokenExpiry || user.verifyTokenExpiry < new Date()) {
+    return { success: false, error: "验证链接已过期，请重新发送" };
+  }
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { emailVerified: new Date(), verifyToken: null, verifyTokenExpiry: null },
+  });
+
+  sendWelcomeEmail(user.email, user.name).catch(() => {});
+
+  return { success: true };
 }

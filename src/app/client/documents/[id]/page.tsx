@@ -4,12 +4,13 @@ import { prisma } from "@/lib/prisma";
 import PrintButton from "./PrintButton";
 import Link from "next/link";
 
-export default async function DocumentViewPage({ params }: { params: { id: string } }) {
+export default async function DocumentViewPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await auth();
   if (!session?.user) redirect("/login");
 
   const doc = await prisma.document.findFirst({
-    where: { id: params.id, userId: session.user.id },
+    where: { id, userId: session.user.id },
   });
 
   if (!doc) notFound();
@@ -25,13 +26,13 @@ export default async function DocumentViewPage({ params }: { params: { id: strin
       {/* Header bar */}
       <div className="flex items-center justify-between print:hidden">
         <div>
-          <a
+          <Link
             href="/client/documents"
             className="text-xs mb-2 flex items-center gap-1 transition-colors"
             style={{ color: "#666660" }}
           >
             ← 返回文件列表
-          </a>
+          </Link>
           <h1 className="text-xl font-bold" style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}>
             {doc.title}
           </h1>

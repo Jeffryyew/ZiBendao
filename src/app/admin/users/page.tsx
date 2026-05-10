@@ -3,18 +3,19 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import UserTable from "./UserTable";
 import CreateClientDialog from "./CreateClientDialog";
+import { ROLE_LABEL } from "@/lib/roles";
 
 export default async function AdminUsersPage({
   searchParams,
 }: {
-  searchParams: { q?: string; role?: string };
+  searchParams: Promise<{ q?: string; role?: string }>;
 }) {
   const session = await auth();
   if (!session?.user) redirect("/login");
   const adminRole = session.user.role;
-  if (adminRole !== "SUPER_ADMIN" && adminRole !== "SUB_ADMIN") redirect("/dashboard");
+  if (adminRole !== "SUPER_ADMIN" && adminRole !== "ADMIN") redirect("/dashboard");
 
-  const { q, role } = searchParams;
+  const { q, role } = await searchParams;
 
   const users = await prisma.user.findMany({
     where: {
@@ -41,24 +42,16 @@ export default async function AdminUsersPage({
     orderBy: { requiredLevel: "asc" },
   });
 
-  const ROLE_LABEL: Record<string, string> = {
-    SUPER_ADMIN: "超级管理员",
-    SUB_ADMIN: "副管理员",
-    CLIENT: "咨询客户",
-    STUDENT: "学生",
-    FREE_MEMBER: "免费会员",
-  };
-
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto px-4 py-8 md:py-10 space-y-6">
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}>
+          <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
             用户管理
           </h1>
           <p className="mt-1 text-sm" style={{ color: "#A0A09A" }}>
-            共 {users.length} 位用户{q ? `（搜索: ${q}）` : ""}
+            共 {users.length} 位用户{q ? `（搜索: "${q}"）` : ""}
           </p>
         </div>
         <CreateClientDialog />

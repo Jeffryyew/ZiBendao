@@ -8,14 +8,14 @@ const STATUS_COLOR: Record<string, string> = { PENDING: "#C9A84C", SUCCESS: "#4C
 export default async function AdminPaymentsPage({
   searchParams,
 }: {
-  searchParams: { status?: string };
+  searchParams: Promise<{ status?: string }>;
 }) {
   const session = await auth();
   if (!session?.user) redirect("/login");
   const role = session.user.role;
-  if (role !== "SUPER_ADMIN" && role !== "SUB_ADMIN") redirect("/dashboard");
+  if (role !== "SUPER_ADMIN" && role !== "ADMIN") redirect("/dashboard");
 
-  const { status } = searchParams;
+  const { status } = await searchParams;
 
   const payments = await prisma.payment.findMany({
     where: status ? { status: status as never } : undefined,
@@ -28,9 +28,9 @@ export default async function AdminPaymentsPage({
     .reduce((sum, p) => sum + p.amount, 0);
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-6">
+    <div className="max-w-5xl mx-auto px-4 py-8 md:py-10 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}>
+        <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
           支付记录
         </h1>
         <p className="mt-1 text-sm" style={{ color: "#A0A09A" }}>
@@ -40,19 +40,20 @@ export default async function AdminPaymentsPage({
       </div>
 
       {/* Summary */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "总笔数", value: payments.length, color: "#F5F5F0" },
-          { label: "成功笔数", value: payments.filter((p) => p.status === "SUCCESS").length, color: "#4CAF82" },
-          { label: "成功金额", value: `MYR ${totalSuccess.toFixed(2)}`, color: "#C9A84C" },
+          { label: "总笔数",  value: String(payments.length),                                                    icon: "💳", color: "#F5F5F0" },
+          { label: "成功笔数", value: String(payments.filter((p) => p.status === "SUCCESS").length),              icon: "✓",  color: "#4CAF82" },
+          { label: "成功金额", value: `MYR ${totalSuccess.toFixed(0)}`,                                           icon: "💰", color: "#C9A84C" },
         ].map((s) => (
           <div
             key={s.label}
-            className="rounded-2xl p-5"
+            className="p-4 rounded-2xl text-center"
             style={{ backgroundColor: "#111111", border: "1px solid #1A1A1A" }}
           >
-            <div className="text-xs mb-2" style={{ color: "#666660" }}>{s.label}</div>
-            <div className="text-2xl font-bold" style={{ color: s.color }}>{s.value}</div>
+            <div className="text-lg mb-1">{s.icon}</div>
+            <div className="text-xl font-bold font-mono" style={{ color: s.color }}>{s.value}</div>
+            <div className="text-xs mt-1" style={{ color: "#555550" }}>{s.label}</div>
           </div>
         ))}
       </div>

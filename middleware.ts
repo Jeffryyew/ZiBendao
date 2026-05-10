@@ -4,13 +4,15 @@ import { NextResponse } from "next/server";
 
 const { auth } = NextAuth(authConfig);
 
+const ADMIN_ROLES = new Set(["SUPER_ADMIN", "ADMIN"]);
+const STUDENT_AREA_ROLES = new Set(["ZIBENTONG_GRAD", "QIDONG_GRAD", "ZIBENDAO_GRAD", "ONLINE_STUDENT"]);
+
 export default auth((req) => {
   const { pathname } = req.nextUrl;
   const user = req.auth?.user;
 
-  const isAuthApi = pathname.startsWith("/api/auth");
   const isPublic =
-    isAuthApi ||
+    pathname.startsWith("/api/auth") ||
     pathname === "/" ||
     pathname === "/login" ||
     pathname === "/register" ||
@@ -26,21 +28,21 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  const role = user.role;
+  const role = user.role as string;
 
-  if (pathname.startsWith("/admin") && role !== "SUPER_ADMIN" && role !== "SUB_ADMIN") {
+  if (pathname.startsWith("/admin") && !ADMIN_ROLES.has(role)) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
-  if (pathname.startsWith("/client") && role !== "CLIENT") {
+  if (pathname.startsWith("/client") && role !== "ENTERPRISE_CLIENT") {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
+
+  if (pathname.startsWith("/student") && !STUDENT_AREA_ROLES.has(role)) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   if (pathname.startsWith("/member") && role !== "FREE_MEMBER") {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
-  }
-
-  if (pathname.startsWith("/student") && role !== "STUDENT") {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 

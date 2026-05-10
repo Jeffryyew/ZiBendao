@@ -2,11 +2,18 @@ import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
+import { getRoleLabel, isGraduate, ROLE_COLOR } from "@/lib/roles";
+
+const GRAD_INFO: Record<string, { icon: string; course: string; color: string }> = {
+  ZIBENTONG_GRAD: { icon: "🏆", course: "资本通", color: "#C9A84C" },
+  QIDONG_GRAD: { icon: "🚀", course: "启动资本", color: "#A88C3A" },
+  ZIBENDAO_GRAD: { icon: "🎓", course: "资本道", color: "#F5E6C8" },
+};
 
 const LEVEL_INFO = {
-  1: { label: "L1", title: "入门学者", color: "#8B7355", nextLevel: "L2", xpNeeded: 200, modules: "财务基础" },
-  2: { label: "L2", title: "进阶分析师", color: "#C9A84C", nextLevel: "L3", xpNeeded: 400, modules: "投资入门" },
-  3: { label: "L3", title: "资本策略家", color: "#F5E6C8", nextLevel: null, xpNeeded: null, modules: "高级资本运作" },
+  1: { label: "第1阶", title: "入门学者", color: "#8B7355", nextLevel: "第2阶", xpNeeded: 200 },
+  2: { label: "第2阶", title: "进阶分析师", color: "#C9A84C", nextLevel: "第3阶", xpNeeded: 400 },
+  3: { label: "第3阶", title: "资本策略家", color: "#F5E6C8", nextLevel: null, xpNeeded: null },
 };
 
 const ACHIEVEMENTS = [
@@ -20,8 +27,12 @@ export default async function StudentDashboardPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
+  const role = session.user.role as string;
+  const grad = isGraduate(role);
+  const gradInfo = GRAD_INFO[role];
   const level = session.user.studentLevel ?? 1;
   const levelInfo = LEVEL_INFO[level as keyof typeof LEVEL_INFO] ?? LEVEL_INFO[1];
+  const firstName = session.user.name.split(" ")[0];
 
   let completedCount = 0;
   let totalXP = 0;
@@ -37,9 +48,11 @@ export default async function StudentDashboardPage() {
     // DB might not be seeded yet
   }
 
-  const xpToNext = levelInfo.xpNeeded;
-  const xpPercent = xpToNext ? Math.min((totalXP / xpToNext) * 100, 100) : 100;
-  const firstName = session.user.name.split(" ")[0];
+  const xpPercent = levelInfo.xpNeeded
+    ? Math.min((totalXP / levelInfo.xpNeeded) * 100, 100)
+    : 100;
+
+  const badgeColor = grad ? (gradInfo?.color ?? "#C9A84C") : levelInfo.color;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 md:py-10 space-y-8">
@@ -51,30 +64,56 @@ export default async function StudentDashboardPage() {
             {firstName} 👋
           </h1>
         </div>
-        {/* Level Badge */}
+
+        {/* Badge */}
         <div
           className="flex items-center gap-3 px-5 py-3 rounded-2xl self-start sm:self-auto"
           style={{
             background: "linear-gradient(135deg, #1A1A1A, #222218)",
-            border: `1px solid ${levelInfo.color}40`,
-            boxShadow: `0 0 20px ${levelInfo.color}15`,
+            border: `1px solid ${badgeColor}40`,
+            boxShadow: `0 0 20px ${badgeColor}15`,
           }}
         >
           <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center text-sm font-bold font-mono"
-            style={{ backgroundColor: `${levelInfo.color}20`, color: levelInfo.color }}
+            className="w-10 h-10 rounded-xl flex items-center justify-center text-lg"
+            style={{ backgroundColor: `${badgeColor}20`, color: badgeColor }}
           >
-            {levelInfo.label}
+            {grad ? gradInfo?.icon : levelInfo.label}
           </div>
           <div>
-            <div className="text-xs" style={{ color: "#A0A09A" }}>当前等级</div>
-            <div className="text-sm font-semibold" style={{ color: levelInfo.color }}>{levelInfo.title}</div>
+            <div className="text-xs" style={{ color: "#A0A09A" }}>
+              {grad ? "毕业证书" : "当前进度"}
+            </div>
+            <div className="text-sm font-semibold" style={{ color: badgeColor }}>
+              {getRoleLabel(role)}
+            </div>
           </div>
         </div>
       </div>
 
-      {/* XP Progress Bar */}
-      {xpToNext && (
+      {/* Graduate banner */}
+      {grad && (
+        <div
+          className="p-5 rounded-2xl flex items-center gap-4"
+          style={{
+            background: `linear-gradient(135deg, rgba(201,168,76,0.08), rgba(201,168,76,0.03))`,
+            border: "1px solid rgba(201,168,76,0.2)",
+          }}
+        >
+          <span className="text-3xl">{gradInfo?.icon}</span>
+          <div>
+            <div className="font-semibold text-sm" style={{ color: "#F5E6C8" }}>
+              恭喜完成 {gradInfo?.course} 课程！
+            </div>
+            <div className="text-xs mt-0.5" style={{ color: "#A0A09A" }}>
+              您已解锁全部计算工具及相关资源
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* XP Progress (only for ONLINE_STUDENT) */}
+      {!grad && levelInfo.xpNeeded && (
         <div
           className="p-5 rounded-2xl"
           style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}
@@ -85,7 +124,7 @@ export default async function StudentDashboardPage() {
               <span className="text-xs ml-2" style={{ color: "#666660" }}>升级进度</span>
             </div>
             <span className="text-sm font-mono" style={{ color: "#C9A84C" }}>
-              {totalXP} / {xpToNext} XP
+              {totalXP} / {levelInfo.xpNeeded} XP
             </span>
           </div>
           <div className="h-2.5 rounded-full overflow-hidden" style={{ backgroundColor: "#222222" }}>
@@ -98,7 +137,7 @@ export default async function StudentDashboardPage() {
             />
           </div>
           <p className="text-xs mt-2" style={{ color: "#555550" }}>
-            还需 {xpToNext - totalXP} XP 升级至 {levelInfo.nextLevel}
+            还需 {levelInfo.xpNeeded - totalXP} XP 升级
           </p>
         </div>
       )}
@@ -108,7 +147,7 @@ export default async function StudentDashboardPage() {
         {[
           { label: "已完成课程", value: completedCount.toString(), unit: "关", icon: "✓" },
           { label: "累计积分", value: totalXP.toString(), unit: "XP", icon: "⚡" },
-          { label: "当前等级", value: levelInfo.label, unit: "", icon: "🏅" },
+          { label: "当前身份", value: grad ? "毕业生" : `第${level}阶`, unit: "", icon: "🏅" },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -131,9 +170,8 @@ export default async function StudentDashboardPage() {
       <div className="grid sm:grid-cols-2 gap-3">
         <Link
           href="/student/learn"
-          className="group flex items-center gap-4 p-5 rounded-2xl transition-all"
+          className="flex items-center gap-4 p-5 rounded-2xl transition-all"
           style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}
-          onMouseEnter={undefined}
         >
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
@@ -142,15 +180,17 @@ export default async function StudentDashboardPage() {
             📚
           </div>
           <div className="flex-1 min-w-0">
-            <div className="font-semibold text-sm mb-0.5">继续学习</div>
-            <div className="text-xs" style={{ color: "#A0A09A" }}>当前模块：{levelInfo.modules}</div>
+            <div className="font-semibold text-sm mb-0.5">{grad ? "回顾课程" : "继续学习"}</div>
+            <div className="text-xs" style={{ color: "#A0A09A" }}>
+              {grad ? `${gradInfo?.course} 课程内容` : `当前进度：第${level}阶`}
+            </div>
           </div>
           <span style={{ color: "#C9A84C" }}>→</span>
         </Link>
 
         <Link
           href="/student/tools"
-          className="group flex items-center gap-4 p-5 rounded-2xl transition-all"
+          className="flex items-center gap-4 p-5 rounded-2xl transition-all"
           style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}
         >
           <div
@@ -162,8 +202,7 @@ export default async function StudentDashboardPage() {
           <div className="flex-1 min-w-0">
             <div className="font-semibold text-sm mb-0.5">计算工具</div>
             <div className="text-xs" style={{ color: "#A0A09A" }}>
-              {level >= 1 ? "金融路线图" : "升级解锁"}
-              {level >= 2 ? " · 报价系统" : ""}
+              {grad ? "完整工具访问权限" : "按阶段解锁"}
             </div>
           </div>
           <span style={{ color: "#C9A84C" }}>→</span>
@@ -175,7 +214,7 @@ export default async function StudentDashboardPage() {
         <h2 className="font-semibold text-base mb-4">成就徽章</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           {ACHIEVEMENTS.map((ach, i) => {
-            const unlocked = i === 0 && completedCount > 0;
+            const unlocked = (i === 0 && completedCount > 0) || grad;
             return (
               <div
                 key={ach.id}

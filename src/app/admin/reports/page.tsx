@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import ReportCharts from "./ReportCharts";
+import { ROLE_LABEL } from "@/lib/roles";
 
 function getLast6Months() {
   const months: { key: string; label: string }[] = [];
@@ -20,7 +21,7 @@ export default async function AdminReportsPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
   const role = session.user.role;
-  if (role !== "SUPER_ADMIN" && role !== "SUB_ADMIN") redirect("/dashboard");
+  if (role !== "SUPER_ADMIN" && role !== "ADMIN") redirect("/dashboard");
 
   const months = getLast6Months();
   const sixMonthsAgo = new Date();
@@ -80,14 +81,6 @@ export default async function AdminReportsPage() {
     },
   ];
 
-  const ROLE_LABEL: Record<string, string> = {
-    SUPER_ADMIN: "超级管理员",
-    SUB_ADMIN: "副管理员",
-    CLIENT: "咨询客户",
-    STUDENT: "学生会员",
-    FREE_MEMBER: "免费会员",
-  };
-
   const roleData = roleGroups.map((r) => ({
     label: ROLE_LABEL[r.role] ?? r.role,
     value: r._count,
@@ -96,9 +89,9 @@ export default async function AdminReportsPage() {
   const totalRevenue = successPayments.reduce((sum, p) => sum + p.amount, 0);
 
   return (
-    <div className="p-6 max-w-5xl mx-auto space-y-8">
+    <div className="max-w-5xl mx-auto px-4 py-8 md:py-10 space-y-8">
       <div>
-        <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}>
+        <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
           数据报表
         </h1>
         <p className="mt-1 text-sm" style={{ color: "#A0A09A" }}>
@@ -107,20 +100,21 @@ export default async function AdminReportsPage() {
       </div>
 
       {/* KPI Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: "总用户", value: allUsers, color: "#F5F5F0" },
-          { label: "本期付款", value: successPayments.length, color: "#4CAF82" },
-          { label: "本期收入", value: `MYR ${totalRevenue.toFixed(0)}`, color: "#C9A84C" },
-          { label: "工具授权", value: toolAccessCount, color: "#A0A09A" },
+          { label: "总用户",  value: String(allUsers),                    icon: "👥", color: "#F5F5F0" },
+          { label: "本期付款", value: String(successPayments.length),      icon: "✓",  color: "#4CAF82" },
+          { label: "本期收入", value: `MYR ${totalRevenue.toFixed(0)}`,    icon: "💰", color: "#C9A84C" },
+          { label: "工具授权", value: String(toolAccessCount),             icon: "🧮", color: "#A0A09A" },
         ].map((s) => (
           <div
             key={s.label}
-            className="rounded-2xl p-5"
+            className="p-4 rounded-2xl text-center"
             style={{ backgroundColor: "#111111", border: "1px solid #1A1A1A" }}
           >
-            <div className="text-xs mb-2" style={{ color: "#666660" }}>{s.label}</div>
-            <div className="text-2xl font-bold" style={{ color: s.color }}>{s.value}</div>
+            <div className="text-lg mb-1">{s.icon}</div>
+            <div className="text-xl font-bold font-mono" style={{ color: s.color }}>{s.value}</div>
+            <div className="text-xs mt-1" style={{ color: "#555550" }}>{s.label}</div>
           </div>
         ))}
       </div>

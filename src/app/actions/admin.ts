@@ -11,7 +11,7 @@ async function requireAdmin() {
   const session = await auth();
   if (!session?.user) throw new Error("Unauthorized");
   const role = session.user.role;
-  if (role !== "SUPER_ADMIN" && role !== "SUB_ADMIN") throw new Error("Forbidden");
+  if (role !== "SUPER_ADMIN" && role !== "ADMIN") throw new Error("Forbidden");
 }
 
 // ─── Users ───────────────────────────────────────────────
@@ -27,7 +27,7 @@ export async function updateUserRole(
       where: { id: userId },
       data: {
         role: role as never,
-        studentLevel: role === "STUDENT" ? (studentLevel ?? 1) : null,
+        studentLevel: role === "ONLINE_STUDENT" ? (studentLevel ?? 1) : null,
       },
     });
     revalidatePath("/admin/users");
@@ -59,7 +59,7 @@ export async function createClientUser(
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) return { error: "此邮箱已被注册" };
     const hashedPassword = await bcrypt.hash(password, 12);
-    await prisma.user.create({ data: { name, email, hashedPassword, role: "CLIENT" } });
+    await prisma.user.create({ data: { name, email, hashedPassword, role: "ENTERPRISE_CLIENT" } });
     revalidatePath("/admin/users");
     return {};
   } catch (e) {

@@ -191,11 +191,11 @@ export default async function MemberLearnPage() {
             升级为学生会员，访问全部课程、计算工具和成就系统，开始你的金融成长之旅。
           </p>
           <Link
-            href="/pricing"
+            href="/about"
             className="px-8 py-3 rounded-xl text-sm font-semibold"
             style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}
           >
-            立即升级 →
+            联系我们报名 →
           </Link>
           <p className="text-xs mt-3" style={{ color: "#444440" }}>
             随时取消 · 无隐藏费用
