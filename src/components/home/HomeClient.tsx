@@ -35,12 +35,24 @@ export default function HomeClient({ t, locale, isLoggedIn }: Props) {
 function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isLoggedIn?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 24);
     window.addEventListener("scroll", handler, { passive: true });
     return () => window.removeEventListener("scroll", handler);
   }, []);
+
+  useEffect(() => {
+    function onClickOutside(e: MouseEvent) {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+        setOpenDropdown(null);
+      }
+    }
+    if (openDropdown) document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [openDropdown]);
 
   // close menu on route change / resize
   useEffect(() => {
@@ -107,6 +119,7 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
   return (
     <>
       <motion.nav
+        ref={navRef}
         initial={{ y: -16, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
@@ -126,44 +139,47 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
         <div className="hidden md:flex items-center gap-8">
           {NAV_LINKS.map((item) =>
             item.dropdown ? (
-              <div key={item.href} className="relative group">
-                <Link
-                  href={item.href}
-                  className="text-sm transition-colors flex items-center gap-1"
-                  style={{ color: "#666660" }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#666660"; }}
+              <div key={item.href} className="relative">
+                <button
+                  onClick={() => setOpenDropdown(openDropdown === item.href ? null : item.href)}
+                  className="text-sm transition-colors flex items-center gap-1 bg-transparent border-0 p-0 cursor-pointer"
+                  style={{ color: openDropdown === item.href ? "#C9A84C" : "#666660" }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#C9A84C"; }}
+                  onMouseLeave={(e) => { if (openDropdown !== item.href) (e.currentTarget as HTMLButtonElement).style.color = "#666660"; }}
                 >
                   {item.label}
-                  <span style={{ fontSize: "9px", opacity: 0.5, marginLeft: 1 }}>▾</span>
-                </Link>
-                <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
-                  <div className="rounded-xl overflow-hidden" style={{ backgroundColor: "#0D0D0D", border: "1px solid #1A1A1A", boxShadow: "0 8px 32px rgba(0,0,0,0.6)", minWidth: 168 }}>
-                    {item.dropdown.map((sub, i) =>
-                      sub.comingSoon ? (
-                        <div
-                          key={sub.label}
-                          className="flex items-center justify-between px-4 py-2.5"
-                          style={{ borderBottom: i < item.dropdown!.length - 1 ? "1px solid #111110" : "none" }}
-                        >
-                          <span className="text-xs" style={{ color: "#3A3A38" }}>{sub.label}</span>
-                          <span className="text-xs px-1.5 py-0.5 rounded font-mono" style={{ backgroundColor: "rgba(201,168,76,0.07)", color: "#5A5030", fontSize: "9px" }}>Soon</span>
-                        </div>
-                      ) : (
-                        <Link
-                          key={sub.label}
-                          href={sub.href}
-                          className="block px-4 py-2.5 text-xs transition-colors"
-                          style={{ color: "#888880", borderBottom: i < item.dropdown!.length - 1 ? "1px solid #111110" : "none" }}
-                          onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "rgba(201,168,76,0.05)"; }}
-                          onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#888880"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent"; }}
-                        >
-                          {sub.label}
-                        </Link>
-                      )
-                    )}
+                  <span style={{ fontSize: "9px", opacity: 0.5, marginLeft: 1, display: "inline-block", transform: openDropdown === item.href ? "rotate(180deg)" : "none", transition: "transform 150ms" }}>▾</span>
+                </button>
+                {openDropdown === item.href && (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50" style={{ minWidth: 168 }}>
+                    <div className="rounded-xl overflow-hidden" style={{ backgroundColor: "#0D0D0D", border: "1px solid #1A1A1A", boxShadow: "0 8px 32px rgba(0,0,0,0.6)" }}>
+                      {item.dropdown.map((sub, i) =>
+                        sub.comingSoon ? (
+                          <div
+                            key={sub.label}
+                            className="flex items-center justify-between px-4 py-2.5"
+                            style={{ borderBottom: i < item.dropdown!.length - 1 ? "1px solid #111110" : "none" }}
+                          >
+                            <span className="text-xs" style={{ color: "#3A3A38" }}>{sub.label}</span>
+                            <span className="text-xs px-1.5 py-0.5 rounded font-mono" style={{ backgroundColor: "rgba(201,168,76,0.07)", color: "#5A5030", fontSize: "9px" }}>Soon</span>
+                          </div>
+                        ) : (
+                          <Link
+                            key={sub.label}
+                            href={sub.href}
+                            onClick={() => setOpenDropdown(null)}
+                            className="block px-4 py-2.5 text-xs transition-colors"
+                            style={{ color: "#888880", borderBottom: i < item.dropdown!.length - 1 ? "1px solid #111110" : "none" }}
+                            onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "rgba(201,168,76,0.05)"; }}
+                            onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#888880"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent"; }}
+                          >
+                            {sub.label}
+                          </Link>
+                        )
+                      )}
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             ) : (
               <Link
