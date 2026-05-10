@@ -21,7 +21,6 @@ export default function HomeClient({ t, locale, isLoggedIn }: Props) {
       <StatsBar />
       <WhatIsCapital />
       <CapitalLearningJourney />
-      <WhoIsItFor />
       <ToolsPreview />
       <CorporateAdvisory />
       <FounderSection />
@@ -1036,135 +1035,6 @@ function LevelCard({
   );
 }
 
-// ─── Who Is It For ────────────────────────────────────────────────────────────
-
-function WhoIsItFor() {
-  const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-
-  const AUDIENCES = [
-    {
-      icon: "🎓",
-      role: "资本通毕业生",
-      desc: "完成 Level 1 课程，具备资本思维基础，解锁全套金融工具",
-      color: "#C9A84C",
-      bg: "rgba(201,168,76,0.06)",
-      border: "rgba(201,168,76,0.15)",
-    },
-    {
-      icon: "🚀",
-      role: "启动资本毕业生",
-      desc: "完成 Level 2，掌握 SPV 架构与融资设计，企业具备融资能力",
-      color: "#A88C3A",
-      bg: "rgba(168,140,58,0.06)",
-      border: "rgba(168,140,58,0.15)",
-    },
-    {
-      icon: "🏆",
-      role: "资本道毕业生",
-      desc: "完成全部三阶，理解 IPO / REIT 路径，成为企业资本策略家",
-      color: "#F5E6C8",
-      bg: "rgba(245,230,200,0.04)",
-      border: "rgba(245,230,200,0.1)",
-    },
-    {
-      icon: "📚",
-      role: "线上课程学生",
-      desc: "正在学习的在籍学员，按阶段解锁课程与对应工具",
-      color: "#4CAF82",
-      bg: "rgba(76,175,130,0.06)",
-      border: "rgba(76,175,130,0.15)",
-    },
-    {
-      icon: "🏢",
-      role: "企业顾问客户",
-      desc: "签约咨询服务的企业主，获得定制工具与专属合约文件",
-      color: "#6B8FD4",
-      bg: "rgba(107,143,212,0.06)",
-      border: "rgba(107,143,212,0.15)",
-    },
-    {
-      icon: "✦",
-      role: "免费用户",
-      desc: "免费注册即可体验前3关课程内容及1个基础计算工具",
-      color: "#666660",
-      bg: "rgba(102,102,96,0.04)",
-      border: "rgba(102,102,96,0.12)",
-    },
-  ];
-
-  return (
-    <section ref={ref} className="px-4 py-24" style={{ backgroundColor: "#050505" }}>
-      <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-16"
-        >
-          <div
-            className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4"
-            style={{ backgroundColor: "rgba(201,168,76,0.08)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.15)" }}
-          >
-            会员体系
-          </div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ fontFamily: "var(--font-display)" }}>
-            适合哪些人？
-          </h2>
-          <p className="text-sm max-w-md mx-auto leading-relaxed" style={{ color: "#555550" }}>
-            从免费体验到企业级顾问，每一种身份都有专属的学习路径与工具权限
-          </p>
-        </motion.div>
-
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {AUDIENCES.map((a, i) => (
-            <motion.div
-              key={a.role}
-              initial={{ opacity: 0, y: 20 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.45, delay: i * 0.08 }}
-              className="rounded-2xl p-6"
-              style={{
-                backgroundColor: a.bg,
-                border: `1px solid ${a.border}`,
-              }}
-            >
-              <div className="flex items-center gap-3 mb-3">
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                  style={{ backgroundColor: "rgba(0,0,0,0.3)" }}
-                >
-                  {a.icon}
-                </div>
-                <span className="text-sm font-semibold" style={{ color: a.color }}>
-                  {a.role}
-                </span>
-              </div>
-              <p className="text-xs leading-relaxed" style={{ color: "#555550" }}>
-                {a.desc}
-              </p>
-            </motion.div>
-          ))}
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={inView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="text-center mt-10"
-        >
-          <Link
-            href="/register"
-            className="inline-block text-sm px-6 py-2.5 rounded-xl font-medium"
-            style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}
-          >
-            免费开始 →
-          </Link>
-        </motion.div>
-      </div>
-    </section>
-  );
-}
 
 // ─── Tools preview ────────────────────────────────────────────────────────────
 
@@ -1542,7 +1412,7 @@ function Footer({ t }: { t: Dict["footer"] }) {
   ];
   const COL_B = [
     { label: "登录", href: "/login" },
-    { label: "免费注册", href: "/register" },
+    { label: "注册", href: "/register" },
     { label: "联系我们", href: "/about" },
   ];
 

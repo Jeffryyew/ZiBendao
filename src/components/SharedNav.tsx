@@ -162,7 +162,7 @@ export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavP
               className="text-sm px-4 py-2 rounded-xl font-medium transition-opacity hover:opacity-85"
               style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}
             >
-              {isZh ? "免费注册" : "Get Started Free"}
+              {isZh ? "注册" : "Register"}
             </Link>
           </>
         )}
