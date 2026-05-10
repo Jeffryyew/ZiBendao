@@ -5,8 +5,10 @@ export type Locale = "zh" | "en";
 const dict = {
   zh: {
     nav: {
-      courses: "课程",
-      tools: "工具",
+      home: "首页",
+      courses: "资本课程",
+      tools: "资本工具",
+      community: "社群",
       about: "关于",
       login: "登录",
       register: "免费注册",
@@ -82,8 +84,10 @@ const dict = {
   },
   en: {
     nav: {
+      home: "Home",
       courses: "Courses",
       tools: "Tools",
+      community: "Community",
       about: "About",
       login: "Login",
       register: "Get Started Free",

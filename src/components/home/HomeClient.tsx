@@ -51,8 +51,10 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
   }, [menuOpen]);
 
   const NAV_LINKS = [
+    { label: t.home, href: "/" },
     { label: t.courses, href: "/courses" },
     { label: t.tools, href: "/tools" },
+    { label: t.community, href: "/community" },
     { label: t.about, href: "/about" },
   ];
 

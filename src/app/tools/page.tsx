@@ -1,6 +1,5 @@
 import Link from "next/link";
 import SharedNav from "@/components/SharedNav";
-import BackNav from "@/components/BackNav";
 import { getLocale } from "@/lib/i18n";
 
 const TOOLS = [
@@ -87,10 +86,6 @@ export default async function ToolsPage() {
       <SharedNav locale={locale} activeHref="/tools" />
 
       <div className="max-w-6xl mx-auto px-4 pt-28 pb-20">
-        <div className="mb-8 flex justify-center">
-          <BackNav />
-        </div>
-
         {/* Header */}
         <div className="text-center mb-16">
           <div

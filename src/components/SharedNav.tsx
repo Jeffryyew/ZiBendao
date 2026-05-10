@@ -13,8 +13,10 @@ export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavP
   const isZh = locale === "zh";
 
   const links = [
-    { label: isZh ? "课程" : "Courses", href: "/courses" },
-    { label: isZh ? "工具" : "Tools", href: "/tools" },
+    { label: isZh ? "首页" : "Home", href: "/" },
+    { label: isZh ? "资本课程" : "Courses", href: "/courses" },
+    { label: isZh ? "资本工具" : "Tools", href: "/tools" },
+    { label: isZh ? "社群" : "Community", href: "/community" },
     { label: isZh ? "关于" : "About", href: "/about" },
   ];
 
