@@ -47,11 +47,25 @@ export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavP
         { label: "Equity Simulator", href: "/tools", comingSoon: true },
       ];
 
+  const COMMUNITY_ITEMS: DropdownItem[] = isZh
+    ? [
+        { label: "Investor Friday", href: "/community" },
+        { label: "Asian Circle", href: "/community" },
+        { label: "活动", href: "/community" },
+        { label: "会员", href: "/community" },
+      ]
+    : [
+        { label: "Investor Friday", href: "/community" },
+        { label: "Asian Circle", href: "/community" },
+        { label: "Events", href: "/community" },
+        { label: "Members", href: "/community" },
+      ];
+
   const links: NavLink[] = [
     { label: isZh ? "首页" : "Home", href: "/" },
     { label: isZh ? "资本课程" : "Courses", href: "/courses", dropdown: COURSE_ITEMS },
     { label: isZh ? "资本工具" : "Tools", href: "/tools", dropdown: TOOLS_ITEMS },
-    { label: isZh ? "社群" : "Community", href: "/community" },
+    { label: isZh ? "社群" : "Community", href: "/community", dropdown: COMMUNITY_ITEMS },
     { label: isZh ? "关于" : "About", href: "/about" },
   ];
 

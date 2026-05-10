@@ -83,11 +83,25 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
         { label: "Equity Simulator", href: "/tools", comingSoon: true },
       ];
 
+  const COMMUNITY_ITEMS: DropdownItem[] = locale === "zh"
+    ? [
+        { label: "Investor Friday", href: "/community" },
+        { label: "Asian Circle", href: "/community" },
+        { label: "活动", href: "/community" },
+        { label: "会员", href: "/community" },
+      ]
+    : [
+        { label: "Investor Friday", href: "/community" },
+        { label: "Asian Circle", href: "/community" },
+        { label: "Events", href: "/community" },
+        { label: "Members", href: "/community" },
+      ];
+
   const NAV_LINKS: NavLink[] = [
     { label: t.home, href: "/" },
     { label: t.courses, href: "/courses", dropdown: COURSE_ITEMS },
     { label: t.tools, href: "/tools", dropdown: TOOLS_ITEMS },
-    { label: t.community, href: "/community" },
+    { label: t.community, href: "/community", dropdown: COMMUNITY_ITEMS },
     { label: t.about, href: "/about" },
   ];
 
