@@ -818,52 +818,68 @@ function WhatIsCapital() {
 function CapitalLearningJourney() {
   const LEVELS = [
     {
-      level: "Level 1",
+      stageLabel: "线上",
+      name: "资本启航",
+      nameEn: "Capital Start",
+      desc: "专为忙碌创业者设计的线上入门课程。随时随地建立资本思维基础，零门槛开启资本成长之旅。",
+      topics: ["资本思维框架", "估值核心概念", "资本化第一步"],
+      xp: "+30 XP",
+      duration: "随时开始",
+      badgeLabel: "Starter",
+      accent: "#8A6FD4",
+      bg: "linear-gradient(145deg, #0A0812 0%, #0E0B1C 100%)",
+      border: "rgba(138,111,212,0.22)",
+      topLine: "linear-gradient(90deg, transparent, rgba(138,111,212,0.7), transparent)",
+      glow: "rgba(138,111,212,0.12)",
+      locked: false,
+    },
+    {
+      stageLabel: "阶段一",
       name: "资本通",
       nameEn: "The Capital Map",
-      desc: "建立资本思维基础。理解为什么营业额高却没现金，学会区分经营思维与资本思维。",
+      desc: "建立资本思维框架，认识企业从经营到资本化的核心逻辑。线下深度课程，知行合一。",
       topics: ["现金流 vs 利润", "企业估值入门", "资本 vs 债务"],
       xp: "+50 XP",
       duration: "约 4 周",
-      badge: "Foundation",
-      color: "#444440",
+      badgeLabel: "Foundation",
+      accent: "#C9A84C",
+      bg: "linear-gradient(145deg, #0C0900 0%, #120E02 100%)",
+      border: "rgba(201,168,76,0.25)",
+      topLine: "linear-gradient(90deg, transparent, rgba(201,168,76,0.8), transparent)",
+      glow: "rgba(201,168,76,0.10)",
       locked: false,
     },
     {
-      level: "Level 2",
+      stageLabel: "阶段二",
       name: "启动资本",
       nameEn: "The Capital Code",
-      desc: "学习融资结构与 SPV 架构。掌握如何设计股权、估值企业，让企业具备融资能力。",
+      desc: "系统启动企业资本化进程。掌握 SPV 架构与融资结构，让企业具备被投资的真实能力。",
       topics: ["SPV 架构设计", "股权稀释计算", "融资准备度评分"],
       xp: "+80 XP",
       duration: "约 6 周",
-      badge: "Builder",
-      color: "#8A7040",
+      badgeLabel: "Builder",
+      accent: "#5A8FE0",
+      bg: "linear-gradient(145deg, #060810 0%, #080C18 100%)",
+      border: "rgba(90,143,224,0.22)",
+      topLine: "linear-gradient(90deg, transparent, rgba(90,143,224,0.6), rgba(201,168,76,0.25), transparent)",
+      glow: "rgba(90,143,224,0.10)",
       locked: false,
     },
     {
-      level: "Level 3",
+      stageLabel: "阶段三",
       name: "资本道",
       nameEn: "Capital Dao",
-      desc: "进阶资本策略。理解 IPO、REIT 路径，建立企业级资本操作体系与投资人沟通能力。",
+      desc: "进阶资本策略巅峰。理解 IPO、REIT 路径，建立企业级资本操作体系与投资人沟通能力。",
       topics: ["IPO 路径规划", "REIT 结构", "投资人关系管理"],
       xp: "+120 XP",
       duration: "约 8 周",
-      badge: "Strategist",
-      color: "#C9A84C",
+      badgeLabel: "Strategist",
+      accent: "#C9A84C",
+      bg: "linear-gradient(145deg, #0A0800 0%, #100C02 100%)",
+      border: "rgba(201,168,76,0.45)",
+      topLine: "linear-gradient(90deg, transparent, #9A7020, #C9A84C, #F5D878, #C9A84C, #9A7020, transparent)",
+      glow: "rgba(201,168,76,0.18)",
       locked: false,
-    },
-    {
-      level: "Level 4",
-      name: "企业资本咨询",
-      nameEn: "Capital Operator",
-      desc: "一对一专属顾问服务。由资本专家陪同完成融资、上市或企业重组的实际资本操作。",
-      topics: ["专属顾问匹配", "定制资本方案", "全程执行支持"],
-      xp: "+200 XP",
-      duration: "定制",
-      badge: "Operator",
-      color: "#F0D080",
-      locked: true,
     },
   ];
 
@@ -892,7 +908,7 @@ function CapitalLearningJourney() {
 
       <div className="space-y-3">
         {LEVELS.map((lvl, i) => (
-          <LevelCard key={lvl.level} lvl={lvl} delay={i * 0.1} inView={inView} />
+          <LevelCard key={lvl.name} lvl={lvl} delay={i * 0.1} inView={inView} />
         ))}
       </div>
 
@@ -917,7 +933,11 @@ function CapitalLearningJourney() {
 function LevelCard({
   lvl, delay, inView,
 }: {
-  lvl: { level: string; name: string; nameEn: string; desc: string; topics: string[]; xp: string; duration: string; badge: string; color: string; locked: boolean };
+  lvl: {
+    stageLabel: string; name: string; nameEn: string; desc: string;
+    topics: string[]; xp: string; duration: string; badgeLabel: string;
+    accent: string; bg: string; border: string; topLine: string; glow: string; locked: boolean;
+  };
   delay: number;
   inView: boolean;
 }) {
@@ -929,62 +949,87 @@ function LevelCard({
       animate={inView ? { opacity: 1, x: 0 } : {}}
       transition={{ duration: 0.5, delay, ease: "easeOut" }}
       onClick={() => setExpanded(!expanded)}
-      className="p-6 rounded-2xl cursor-pointer"
+      className="rounded-2xl cursor-pointer relative overflow-hidden"
       style={{
-        backgroundColor: expanded ? "#080808" : "#060606",
-        border: expanded ? `1px solid ${lvl.color}30` : "1px solid #111110",
-        transition: "all 0.2s ease",
+        background: lvl.bg,
+        border: `1px solid ${lvl.border}`,
+        boxShadow: expanded ? `0 0 32px ${lvl.glow}, inset 0 0 0 1px ${lvl.accent}08` : "none",
+        transition: "box-shadow 0.25s ease",
       }}
     >
-      <div className="flex items-center gap-4">
+      {/* Top accent line */}
+      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "1px", background: lvl.topLine }} />
+
+      {/* Ambient glow blob */}
+      <div style={{
+        position: "absolute", top: "-20%", right: "-5%", width: "38%", height: "140%",
+        background: `radial-gradient(ellipse at center, ${lvl.glow} 0%, transparent 70%)`,
+        pointerEvents: "none",
+      }} />
+
+      {/* Card body */}
+      <div className="p-6 flex items-center gap-4 relative z-10">
+        {/* Stage badge */}
         <div
-          className="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-bold"
-          style={{ backgroundColor: `${lvl.color}12`, border: `1px solid ${lvl.color}25`, color: lvl.color }}
+          className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-bold text-center leading-tight"
+          style={{
+            background: `linear-gradient(135deg, ${lvl.accent}22, ${lvl.accent}08)`,
+            border: `1px solid ${lvl.accent}30`,
+            color: lvl.accent,
+          }}
         >
-          {lvl.level.replace("Level ", "L")}
+          {lvl.stageLabel}
         </div>
+
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-0.5">
-            <span className="font-semibold" style={{ color: "#D8D8D4" }}>{lvl.name}</span>
+          <div className="flex items-center gap-2 flex-wrap mb-1">
+            <span className="font-semibold text-sm" style={{ color: "#D8D8D4" }}>{lvl.name}</span>
             <span className="text-xs" style={{ color: "#3A3A38" }}>{lvl.nameEn}</span>
-            {lvl.locked && (
-              <span className="text-xs px-2 py-0.5 rounded-full"
-                style={{ backgroundColor: "#1A1A18", color: "#444440" }}>
-                咨询解锁
-              </span>
-            )}
           </div>
-          <p className="text-xs" style={{ color: "#444440" }}>{lvl.desc}</p>
+          <p className="text-xs leading-relaxed" style={{ color: "#484844" }}>{lvl.desc}</p>
         </div>
-        <div className="flex-shrink-0 flex flex-col items-end gap-1">
-          <span className="text-xs font-mono px-2 py-0.5 rounded" style={{ backgroundColor: `${lvl.color}12`, color: lvl.color }}>{lvl.xp}</span>
-          <span className="text-xs" style={{ color: "#2A2A28" }}>{lvl.duration}</span>
+
+        <div className="flex-shrink-0 flex flex-col items-end gap-1.5 ml-2">
+          <span
+            className="text-xs font-mono px-2 py-0.5 rounded"
+            style={{
+              background: `linear-gradient(135deg, ${lvl.accent}20, ${lvl.accent}08)`,
+              color: lvl.accent,
+              border: `1px solid ${lvl.accent}25`,
+            }}
+          >
+            {lvl.xp}
+          </span>
+          <span className="text-xs whitespace-nowrap" style={{ color: "#2A2A28" }}>{lvl.duration}</span>
           <div
             className="text-sm"
-            style={{ color: lvl.color, transform: expanded ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.2s" }}
+            style={{ color: lvl.accent, transform: expanded ? "rotate(90deg)" : "rotate(0deg)", transition: "transform 0.2s" }}
           >
             ›
           </div>
         </div>
       </div>
+
+      {/* Expanded content */}
       {expanded && (
-        <div className="mt-4 pl-16">
-          <div className="flex flex-wrap gap-2 mb-2">
+        <div className="px-6 pb-6 pl-[88px] relative z-10">
+          <div className="flex flex-wrap gap-2 mb-3">
             {lvl.topics.map((topic) => (
               <span
                 key={topic}
                 className="text-xs px-3 py-1 rounded-full"
-                style={{ backgroundColor: `${lvl.color}0A`, color: lvl.color, border: `1px solid ${lvl.color}20` }}
+                style={{ background: `${lvl.accent}0C`, color: lvl.accent, border: `1px solid ${lvl.accent}22` }}
               >
                 {topic}
               </span>
             ))}
           </div>
-          <div className="flex items-center gap-1.5 mt-2">
-            <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: `${lvl.color}15`, color: lvl.color, border: `1px solid ${lvl.color}30` }}>
-              🏅 {lvl.badge} Badge
-            </span>
-          </div>
+          <span
+            className="text-xs px-2.5 py-1 rounded-full font-medium"
+            style={{ background: `${lvl.accent}14`, color: lvl.accent, border: `1px solid ${lvl.accent}30` }}
+          >
+            🏅 {lvl.badgeLabel} Badge
+          </span>
         </div>
       )}
     </motion.div>
