@@ -246,7 +246,7 @@ export default async function CoursesPage() {
 
             <div className="flex flex-wrap gap-3">
               <Link href="/register" className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold" style={{ backgroundColor: "#8A6FD4", color: "#FFFFFF", minWidth: "140px" }}>
-                {isEn ? "Enrol Now →" : "立即报名 →"}
+                {isEn ? "Unlock Capital →" : "解锁资本 →"}
               </Link>
               <Link href="/register" className="flex-1 text-center py-2.5 rounded-xl text-sm" style={{ backgroundColor: "#111111", color: "#8A6FD4", border: "1px solid rgba(138,111,212,0.25)", minWidth: "140px" }}>
                 {isEn ? "Free Trial" : "免费体验"}
@@ -303,7 +303,7 @@ export default async function CoursesPage() {
                   </div>
 
                   <Link href="/register" className="block w-full text-center py-2.5 rounded-xl text-sm font-semibold" style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}>
-                    {isEn ? "Enrol Now →" : "立即报名 →"}
+                    {isEn ? "Unlock Capital →" : "解锁资本 →"}
                   </Link>
                 </div>
               );
@@ -344,7 +344,7 @@ export default async function CoursesPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link href="/register" className="inline-block px-10 py-3 rounded-xl text-sm font-semibold" style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}>
-              {isEn ? "Enrol Now →" : "立即报名 →"}
+              {isEn ? "Unlock Capital →" : "解锁资本 →"}
             </Link>
             <Link href="/register" className="inline-block px-10 py-3 rounded-xl text-sm" style={{ backgroundColor: "#111111", color: "#888880", border: "1px solid #1A1A1A" }}>
               {isEn ? "Free Trial — Online Course" : "免费体验线上课程"}
