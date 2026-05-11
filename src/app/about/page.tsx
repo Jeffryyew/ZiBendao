@@ -125,51 +125,51 @@ export default async function AboutPage() {
   const d = isEn ? DATA.en : DATA.zh;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#0D0D0D", color: "#F5F5F0" }}>
+    <div className="min-h-screen" style={{ backgroundColor: "#F7F4EF", color: "#1C1814" }}>
       <SharedNav locale={locale} activeHref="/about" />
 
       {/* Hero */}
       <section className="pt-32 pb-16 px-4 text-center">
         <div className="max-w-3xl mx-auto">
-          <div className="inline-block text-xs font-medium px-4 py-1.5 rounded-full mb-6" style={{ backgroundColor: "rgba(201,168,76,0.1)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}>
+          <div className="inline-block text-xs font-medium px-4 py-1.5 rounded-full mb-6" style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.15)" }}>
             {d.hero.badge}
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6" style={{ fontFamily: "var(--font-display)" }}>
+          <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
             {d.hero.title}
             <br />
-            <span style={{ color: "#C9A84C" }}>{d.hero.title2}</span>
+            <span style={{ color: "#8B6514" }}>{d.hero.title2}</span>
           </h1>
-          <p className="text-base leading-relaxed" style={{ color: "#666660" }}>{d.hero.desc}</p>
+          <p className="text-base leading-relaxed" style={{ color: "#68625C" }}>{d.hero.desc}</p>
         </div>
       </section>
 
       {/* Founder */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="rounded-2xl p-8 md:p-12 grid md:grid-cols-3 gap-8 items-start" style={{ backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}>
+          <div className="rounded-2xl p-8 md:p-12 grid md:grid-cols-3 gap-8 items-start" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", boxShadow: "0 4px 24px rgba(28,24,20,0.06)" }}>
             <div className="flex flex-col items-center text-center">
-              <div className="w-24 h-24 rounded-2xl flex items-center justify-center text-5xl mb-4" style={{ backgroundColor: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.15)" }}>
+              <div className="w-24 h-24 rounded-2xl flex items-center justify-center text-5xl mb-4" style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.15)" }}>
                 👨‍💼
               </div>
-              <div className="text-xs mb-0.5" style={{ color: "#444440" }}>{d.founder.nameEn}</div>
-              <h3 className="font-bold text-lg mb-0.5" style={{ color: "#F5F5F0" }}>{d.founder.name}</h3>
-              <div className="text-xs mb-4" style={{ color: "#C9A84C" }}>{d.founder.role}</div>
+              <div className="text-xs mb-0.5" style={{ color: "#9A9490" }}>{d.founder.nameEn}</div>
+              <h3 className="font-bold text-lg mb-0.5" style={{ color: "#1C1814" }}>{d.founder.name}</h3>
+              <div className="text-xs mb-4" style={{ color: "#8B6514" }}>{d.founder.role}</div>
               <div className="flex flex-col gap-1.5 w-full">
                 {[d.founder.biz, d.founder.finance].map((s) => (
-                  <div key={s} className="text-xs px-3 py-1.5 rounded-lg" style={{ backgroundColor: "#111111", color: "#888880" }}>{s}</div>
+                  <div key={s} className="text-xs px-3 py-1.5 rounded-lg" style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}>{s}</div>
                 ))}
               </div>
             </div>
             <div className="md:col-span-2">
-              <div className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4" style={{ backgroundColor: "rgba(201,168,76,0.08)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.15)" }}>
+              <div className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4" style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.15)" }}>
                 {d.founder.bioLabel}
               </div>
-              <p className="text-sm leading-loose mb-6" style={{ color: "#888880" }}>{d.founder.bio}</p>
+              <p className="text-sm leading-loose mb-6" style={{ color: "#68625C" }}>{d.founder.bio}</p>
               <div className="grid grid-cols-2 gap-4">
                 {d.founder.stats.map((s) => (
-                  <div key={s.label} className="text-center p-4 rounded-xl" style={{ backgroundColor: "#111111" }}>
-                    <div className="text-2xl font-bold mb-1" style={{ color: "#C9A84C", fontFamily: "var(--font-display)" }}>{s.value}</div>
-                    <div className="text-xs" style={{ color: "#444440" }}>{s.label}</div>
+                  <div key={s.label} className="text-center p-4 rounded-xl" style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.12)" }}>
+                    <div className="text-2xl font-bold mb-1" style={{ color: "#8B6514", fontFamily: "var(--font-display)" }}>{s.value}</div>
+                    <div className="text-xs" style={{ color: "#9A9490" }}>{s.label}</div>
                   </div>
                 ))}
               </div>
@@ -179,13 +179,13 @@ export default async function AboutPage() {
       </section>
 
       {/* Mission */}
-      <section className="py-16 px-4">
-        <div className="max-w-4xl mx-auto rounded-2xl p-10 text-center" style={{ backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}>
+      <section className="py-16 px-4" style={{ backgroundColor: "#EEE9E0" }}>
+        <div className="max-w-4xl mx-auto rounded-2xl p-10 text-center" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
           <div className="text-3xl mb-4" style={{ color: "#C9A84C" }}>✦</div>
-          <h2 className="text-2xl font-bold mb-4" style={{ fontFamily: "var(--font-display)", color: "#C9A84C" }}>{d.mission.title}</h2>
-          <p className="text-sm leading-loose max-w-2xl mx-auto" style={{ color: "#888880" }}>
+          <h2 className="text-2xl font-bold mb-4" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>{d.mission.title}</h2>
+          <p className="text-sm leading-loose max-w-2xl mx-auto" style={{ color: "#68625C" }}>
             {d.mission.desc.split(d.mission.highlight).map((part, i, arr) => (
-              <span key={i}>{part}{i < arr.length - 1 && <strong style={{ color: "#C9A84C" }}>{d.mission.highlight}</strong>}</span>
+              <span key={i}>{part}{i < arr.length - 1 && <strong style={{ color: "#8B6514" }}>{d.mission.highlight}</strong>}</span>
             ))}
           </p>
         </div>
@@ -194,13 +194,13 @@ export default async function AboutPage() {
       {/* Values */}
       <section className="py-16 px-4">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}>{d.values.title}</h2>
+          <h2 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>{d.values.title}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {d.values.items.map((v) => (
-              <div key={v.title} className="rounded-2xl p-6" style={{ backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}>
+              <div key={v.title} className="rounded-2xl p-6" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
                 <div className="text-3xl mb-4">{v.icon}</div>
-                <h3 className="font-semibold mb-2 text-sm" style={{ color: "#E0E0DC" }}>{v.title}</h3>
-                <p className="text-xs leading-relaxed" style={{ color: "#555550" }}>{v.desc}</p>
+                <h3 className="font-semibold mb-2 text-sm" style={{ color: "#1C1814" }}>{v.title}</h3>
+                <p className="text-xs leading-relaxed" style={{ color: "#68625C" }}>{v.desc}</p>
               </div>
             ))}
           </div>
@@ -208,25 +208,25 @@ export default async function AboutPage() {
       </section>
 
       {/* Programs */}
-      <section className="py-16 px-4" style={{ backgroundColor: "#080808" }}>
+      <section className="py-16 px-4" style={{ backgroundColor: "#EEE9E0" }}>
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}>{d.programs.title}</h2>
+          <h2 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>{d.programs.title}</h2>
           <div className="space-y-4">
             {d.programs.items.map((p, i) => (
-              <div key={p.name} className="rounded-2xl p-6 flex gap-4 items-start" style={{ backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}>
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0" style={{ backgroundColor: "rgba(201,168,76,0.1)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.15)" }}>
+              <div key={p.name} className="rounded-2xl p-6 flex gap-4 items-start" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
+                <div className="w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0" style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.15)" }}>
                   {String(i + 1).padStart(2, "0")}
                 </div>
                 <div>
-                  <div className="text-xs mb-0.5" style={{ color: "#C9A84C" }}>{p.stage} · {p.nameEn}</div>
-                  <h3 className="font-semibold mb-1.5 text-sm" style={{ color: "#E0E0DC" }}>{p.name}</h3>
-                  <p className="text-xs leading-relaxed" style={{ color: "#555550" }}>{p.desc}</p>
+                  <div className="text-xs mb-0.5" style={{ color: "#8B6514" }}>{p.stage} · {p.nameEn}</div>
+                  <h3 className="font-semibold mb-1.5 text-sm" style={{ color: "#1C1814" }}>{p.name}</h3>
+                  <p className="text-xs leading-relaxed" style={{ color: "#68625C" }}>{p.desc}</p>
                 </div>
               </div>
             ))}
           </div>
           <div className="text-center mt-6">
-            <Link href="/courses" className="inline-block text-sm px-6 py-2.5 rounded-xl" style={{ color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)", backgroundColor: "rgba(201,168,76,0.04)" }}>
+            <Link href="/courses" className="inline-block text-sm px-6 py-2.5 rounded-xl" style={{ color: "#8B6514", border: "1px solid rgba(139,101,20,0.2)", backgroundColor: "#FBF4E4" }}>
               {d.programs.viewAll}
             </Link>
           </div>
@@ -236,15 +236,15 @@ export default async function AboutPage() {
       {/* Testimonials */}
       <section className="py-16 px-4">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}>{d.testimonials.title}</h2>
+          <h2 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>{d.testimonials.title}</h2>
           <div className="grid md:grid-cols-3 gap-5">
             {d.testimonials.items.map((t) => (
-              <div key={t.name} className="rounded-2xl p-6" style={{ backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}>
+              <div key={t.name} className="rounded-2xl p-6" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
                 <div className="text-lg mb-4" style={{ color: "#C9A84C" }}>❝</div>
-                <p className="text-sm leading-relaxed mb-5" style={{ color: "#777770" }}>{t.quote}</p>
+                <p className="text-sm leading-relaxed mb-5" style={{ color: "#68625C" }}>{t.quote}</p>
                 <div>
-                  <div className="font-semibold text-sm" style={{ color: "#E0E0DC" }}>{t.name}</div>
-                  <div className="text-xs" style={{ color: "#444440" }}>{t.company}</div>
+                  <div className="font-semibold text-sm" style={{ color: "#1C1814" }}>{t.name}</div>
+                  <div className="text-xs" style={{ color: "#9A9490" }}>{t.company}</div>
                 </div>
               </div>
             ))}
@@ -253,14 +253,14 @@ export default async function AboutPage() {
       </section>
 
       {/* Contact */}
-      <section className="py-16 px-4">
+      <section className="py-16 px-4" style={{ backgroundColor: "#EEE9E0" }}>
         <div className="max-w-3xl mx-auto">
-          <div className="rounded-2xl p-10" style={{ backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}>
-            <h2 className="text-2xl font-bold mb-2" style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}>{d.contact.title}</h2>
-            <p className="text-xs mb-8" style={{ color: "#444440" }}>{d.contact.desc}</p>
+          <div className="rounded-2xl p-10" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
+            <h2 className="text-2xl font-bold mb-2" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>{d.contact.title}</h2>
+            <p className="text-xs mb-8" style={{ color: "#9A9490" }}>{d.contact.desc}</p>
             <div className="mb-8">
-              <div className="text-xs mb-3" style={{ color: "#444440" }}>{d.contact.address_label}</div>
-              <div className="text-sm" style={{ color: "#888880" }}>
+              <div className="text-xs mb-3" style={{ color: "#9A9490" }}>{d.contact.address_label}</div>
+              <div className="text-sm" style={{ color: "#68625C" }}>
                 Leisure Commerce Square, Jalan PJS 8/9,<br />
                 46150 Petaling Jaya, Selangor, Malaysia
               </div>
@@ -271,7 +271,7 @@ export default async function AboutPage() {
                 { label: "Instagram", href: "https://www.instagram.com/capitalmasterydotnet" },
                 { label: "TikTok", href: "https://www.tiktok.com/@capitalmasterydotnet" },
               ].map((s) => (
-                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="text-xs px-4 py-2 rounded-lg font-medium" style={{ backgroundColor: "#111111", color: "#888880", border: "1px solid #1A1A1A" }}>
+                <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer" className="text-xs px-4 py-2 rounded-lg font-medium transition-colors" style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}>
                   {s.label}
                 </a>
               ))}
@@ -280,16 +280,8 @@ export default async function AboutPage() {
         </div>
       </section>
 
-      <section className="pb-16 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <p className="text-xs" style={{ color: "#252523" }}>
-            Craftspace Sdn Bhd (202201044683 / 1490380-V) — Trading as 资本道 Capital Mastery
-          </p>
-        </div>
-      </section>
-
-      <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #0E0E0C" }}>
-        <p className="text-xs" style={{ color: "#252523" }}>
+      <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #E0D9CE" }}>
+        <p className="text-xs" style={{ color: "#C0B8B0" }}>
           {isEn ? "© 2025 ZiBenDao Capital. All rights reserved." : "© 2025 资本道 Capital Mastery. 保留所有权利。"}
         </p>
       </footer>

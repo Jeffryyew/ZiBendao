@@ -9,7 +9,7 @@ export default async function VerifyEmailPage({
   const { token } = await searchParams;
 
   if (!token) {
-    return <Result icon="✕" color="#EF4444" title="链接无效" message="验证链接缺少必要参数。" showResend />;
+    return <Result icon="✕" color="#DC2626" title="链接无效" message="验证链接缺少必要参数。" showResend />;
   }
 
   const result = await verifyEmailToken(token);
@@ -18,7 +18,7 @@ export default async function VerifyEmailPage({
     return (
       <Result
         icon="✕"
-        color="#EF4444"
+        color="#DC2626"
         title="验证失败"
         message={result.error ?? "链接无效或已失效。"}
         showResend
@@ -29,7 +29,7 @@ export default async function VerifyEmailPage({
   return (
     <Result
       icon="✓"
-      color="#4CAF82"
+      color="#16A34A"
       title="邮箱验证成功！"
       message="你的账号已激活，现在可以登录使用资本道了。"
       cta={{ href: "/login", label: "立即登录" }}
@@ -53,13 +53,13 @@ function Result({
   showResend?: boolean;
 }) {
   return (
-    <div className="min-h-screen flex items-center justify-center px-6" style={{ backgroundColor: "#0A0A0A" }}>
+    <div className="min-h-screen flex items-center justify-center px-6" style={{ backgroundColor: "#F7F4EF" }}>
       <div className="w-full max-w-sm text-center space-y-6">
         <div
           className="w-20 h-20 rounded-full flex items-center justify-center mx-auto text-3xl"
           style={{
-            background: `linear-gradient(135deg, ${color}26, ${color}0d)`,
-            border: `2px solid ${color}4d`,
+            backgroundColor: `${color}12`,
+            border: `2px solid ${color}30`,
             color,
           }}
         >
@@ -67,19 +67,15 @@ function Result({
         </div>
 
         <div>
-          <h2 className="text-xl font-bold mb-2" style={{ color: "#F5F5F0" }}>{title}</h2>
-          <p className="text-sm" style={{ color: "#666660" }}>{message}</p>
+          <h2 className="text-xl font-bold mb-2" style={{ color: "#1C1814" }}>{title}</h2>
+          <p className="text-sm" style={{ color: "#68625C" }}>{message}</p>
         </div>
 
         {cta && (
           <Link
             href={cta.href}
-            className="block w-full py-3.5 rounded-xl font-semibold text-sm text-center"
-            style={{
-              background: "linear-gradient(135deg, #B8943A, #C9A84C, #D4B860)",
-              color: "#0D0D0D",
-              boxShadow: "0 2px 12px rgba(201,168,76,0.25)",
-            }}
+            className="block w-full py-3.5 rounded-xl font-semibold text-sm text-center transition-opacity hover:opacity-85"
+            style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
           >
             {cta.label}
           </Link>
@@ -89,13 +85,13 @@ function Result({
           <Link
             href="/verify-email/resend"
             className="block text-sm"
-            style={{ color: "#C9A84C" }}
+            style={{ color: "#8B6514" }}
           >
             重新发送验证邮件 →
           </Link>
         )}
 
-        <Link href="/" className="block text-sm" style={{ color: "#444440" }}>
+        <Link href="/" className="block text-sm" style={{ color: "#9A9490" }}>
           返回主页
         </Link>
       </div>

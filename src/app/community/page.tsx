@@ -20,6 +20,7 @@ const DATA = {
           label: "前往 Facebook →",
           href: "https://www.facebook.com/capitalmastery.net",
           color: "#4267B2",
+          colorLight: "#EEF2FB",
         },
         {
           icon: "📸",
@@ -28,6 +29,7 @@ const DATA = {
           label: "前往 Instagram →",
           href: "https://www.instagram.com/capitalmasterydotnet",
           color: "#E1306C",
+          colorLight: "#FDF0F4",
         },
         {
           icon: "🎵",
@@ -35,7 +37,8 @@ const DATA = {
           desc: "短视频形式拆解资本运作概念，轻松学习融资、估值与股权设计。",
           label: "前往 TikTok →",
           href: "https://www.tiktok.com/@capitalmasterydotnet",
-          color: "#69C9D0",
+          color: "#008B8B",
+          colorLight: "#EDF7F7",
         },
         {
           icon: "💬",
@@ -43,7 +46,8 @@ const DATA = {
           desc: "加入专属 WhatsApp 学习群，与同期学员交流进度、分享资源，顾问团队实时解答。",
           label: "联系我们加入 →",
           href: "mailto:info@capitalmastery.net",
-          color: "#25D366",
+          color: "#1A8C4E",
+          colorLight: "#EDFAF3",
         },
       ],
     },
@@ -64,7 +68,7 @@ const DATA = {
       title: "准备好加入了吗？",
       desc: "注册免费账户，即可进入学员专属社群，开启你的资本成长之旅。",
       primary: "注册 →",
-      secondary: "联系我们",
+      secondary: "联系顾问",
     },
   },
   en: {
@@ -84,6 +88,7 @@ const DATA = {
           label: "Visit Facebook →",
           href: "https://www.facebook.com/capitalmastery.net",
           color: "#4267B2",
+          colorLight: "#EEF2FB",
         },
         {
           icon: "📸",
@@ -92,6 +97,7 @@ const DATA = {
           label: "Visit Instagram →",
           href: "https://www.instagram.com/capitalmasterydotnet",
           color: "#E1306C",
+          colorLight: "#FDF0F4",
         },
         {
           icon: "🎵",
@@ -99,7 +105,8 @@ const DATA = {
           desc: "Short-form videos breaking down capital concepts — learn fundraising, valuation, and equity in minutes.",
           label: "Visit TikTok →",
           href: "https://www.tiktok.com/@capitalmasterydotnet",
-          color: "#69C9D0",
+          color: "#008B8B",
+          colorLight: "#EDF7F7",
         },
         {
           icon: "💬",
@@ -107,7 +114,8 @@ const DATA = {
           desc: "Join our exclusive WhatsApp group to exchange progress with fellow students and get real-time answers from our advisory team.",
           label: "Contact Us to Join →",
           href: "mailto:info@capitalmastery.net",
-          color: "#25D366",
+          color: "#1A8C4E",
+          colorLight: "#EDFAF3",
         },
       ],
     },
@@ -128,7 +136,7 @@ const DATA = {
       title: "Ready to Join?",
       desc: "Register a free account to access the student community and begin your capital growth journey.",
       primary: "Register →",
-      secondary: "Contact Us",
+      secondary: "Contact Advisor",
     },
   },
 };
@@ -139,24 +147,25 @@ export default async function CommunityPage() {
   const d = isEn ? DATA.en : DATA.zh;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#0D0D0D", color: "#F5F5F0" }}>
+    <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814", minHeight: "100vh" }}>
       <SharedNav locale={locale} activeHref="/community" />
 
       {/* Hero */}
       <section className="pt-32 pb-20 px-4 text-center">
         <div className="max-w-3xl mx-auto">
           <div
-            className="inline-block text-xs font-medium px-4 py-1.5 rounded-full mb-6"
-            style={{ backgroundColor: "rgba(201,168,76,0.1)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs mb-6"
+            style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.15)", color: "#8B6514" }}
           >
+            <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#C9A84C" }} />
             {d.hero.badge}
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6" style={{ fontFamily: "var(--font-display)" }}>
+          <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
             {d.hero.title}
             <br />
-            <span style={{ color: "#C9A84C" }}>{d.hero.title2}</span>
+            <span style={{ color: "#8B6514" }}>{d.hero.title2}</span>
           </h1>
-          <p className="text-base leading-relaxed max-w-xl mx-auto" style={{ color: "#666660" }}>
+          <p className="text-base leading-relaxed max-w-xl mx-auto" style={{ color: "#68625C" }}>
             {d.hero.desc}
           </p>
         </div>
@@ -165,32 +174,33 @@ export default async function CommunityPage() {
       {/* Community Channels */}
       <section className="px-4 pb-20">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: "var(--font-display)" }}>
+          <h2 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
             {d.channels.title}
           </h2>
-          <div className="grid sm:grid-cols-2 gap-4">
+          <div className="grid sm:grid-cols-2 gap-5">
             {d.channels.items.map((ch) => (
               <div
                 key={ch.name}
-                className="rounded-2xl p-7 flex flex-col"
-                style={{ backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}
+                className="rounded-2xl p-7 flex flex-col relative overflow-hidden"
+                style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
               >
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, transparent, ${ch.color}70, transparent)` }} />
                 <div className="flex items-center gap-3 mb-4">
                   <div
                     className="w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-                    style={{ backgroundColor: `${ch.color}15`, border: `1px solid ${ch.color}30` }}
+                    style={{ backgroundColor: ch.colorLight, border: `1px solid ${ch.color}25` }}
                   >
                     {ch.icon}
                   </div>
-                  <h3 className="font-semibold text-sm" style={{ color: "#E0E0DC" }}>{ch.name}</h3>
+                  <h3 className="font-semibold text-sm" style={{ color: "#1C1814" }}>{ch.name}</h3>
                 </div>
-                <p className="text-sm leading-relaxed mb-5 flex-1" style={{ color: "#555550" }}>{ch.desc}</p>
+                <p className="text-sm leading-relaxed mb-5 flex-1" style={{ color: "#68625C" }}>{ch.desc}</p>
                 <a
                   href={ch.href}
                   target={ch.href.startsWith("http") ? "_blank" : undefined}
                   rel="noopener noreferrer"
                   className="inline-block text-xs px-4 py-2 rounded-xl font-medium transition-opacity hover:opacity-80 self-start"
-                  style={{ backgroundColor: `${ch.color}18`, color: ch.color, border: `1px solid ${ch.color}30` }}
+                  style={{ backgroundColor: ch.colorLight, color: ch.color, border: `1px solid ${ch.color}30` }}
                 >
                   {ch.label}
                 </a>
@@ -201,17 +211,17 @@ export default async function CommunityPage() {
       </section>
 
       {/* Community Values */}
-      <section className="px-4 py-20" style={{ backgroundColor: "#080808" }}>
+      <section className="px-4 py-20" style={{ backgroundColor: "#EEE9E0" }}>
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: "var(--font-display)" }}>
+          <h2 className="text-2xl font-bold text-center mb-10" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
             {d.values.title}
           </h2>
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-3 gap-5">
             {d.values.items.map((v) => (
-              <div key={v.title} className="rounded-2xl p-7" style={{ backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}>
+              <div key={v.title} className="rounded-2xl p-7" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
                 <div className="text-3xl mb-4">{v.icon}</div>
-                <h3 className="font-semibold mb-2 text-sm" style={{ color: "#E0E0DC" }}>{v.title}</h3>
-                <p className="text-xs leading-relaxed" style={{ color: "#555550" }}>{v.desc}</p>
+                <h3 className="font-semibold mb-2 text-sm" style={{ color: "#1C1814" }}>{v.title}</h3>
+                <p className="text-xs leading-relaxed" style={{ color: "#68625C" }}>{v.desc}</p>
               </div>
             ))}
           </div>
@@ -221,21 +231,21 @@ export default async function CommunityPage() {
       {/* Upcoming Events */}
       <section className="px-4 py-20">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: "var(--font-display)" }}>
+          <h2 className="text-2xl font-bold mb-6" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
             {d.events.title}
           </h2>
           <div
             className="rounded-2xl p-12 flex flex-col items-center"
-            style={{ backgroundColor: "#0A0A0A", border: "1px dashed #1A1A1A" }}
+            style={{ backgroundColor: "#FFFFFF", border: "1px dashed #C0B8B0" }}
           >
             <div className="text-4xl mb-4">📅</div>
             <div
               className="text-xs font-mono px-3 py-1 rounded-full mb-4"
-              style={{ backgroundColor: "rgba(201,168,76,0.08)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.15)" }}
+              style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.2)" }}
             >
               {d.events.coming}
             </div>
-            <p className="text-sm leading-relaxed max-w-md" style={{ color: "#444440" }}>
+            <p className="text-sm leading-relaxed max-w-md" style={{ color: "#68625C" }}>
               {d.events.desc}
             </p>
           </div>
@@ -243,28 +253,24 @@ export default async function CommunityPage() {
       </section>
 
       {/* CTA */}
-      <section className="px-4 py-20" style={{ backgroundColor: "#080808" }}>
-        <div className="max-w-2xl mx-auto text-center p-12 rounded-3xl" style={{ background: "linear-gradient(145deg, #0A0A08, #0D0D0B)", border: "1px solid #1C1C1A" }}>
-          <div
-            aria-hidden
-            style={{ position: "absolute", top: 0, left: "15%", right: "15%", height: 1, background: "linear-gradient(90deg, transparent, #C9A84C40, transparent)", pointerEvents: "none" }}
-          />
-          <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ fontFamily: "var(--font-display)" }}>
+      <section className="px-4 py-20">
+        <div className="max-w-2xl mx-auto text-center py-16 px-10 rounded-3xl" style={{ backgroundColor: "#1C1814" }}>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ fontFamily: "var(--font-display)", color: "#F0EBE1" }}>
             {d.cta.title}
           </h2>
-          <p className="text-sm mb-8 leading-relaxed" style={{ color: "#555550" }}>{d.cta.desc}</p>
+          <p className="text-sm mb-8 leading-relaxed" style={{ color: "#9A9490" }}>{d.cta.desc}</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href="/register"
               className="px-8 py-3 rounded-xl font-semibold text-sm transition-opacity hover:opacity-88"
-              style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#0D0D0D" }}
+              style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
             >
               {d.cta.primary}
             </Link>
             <Link
               href="/about"
               className="px-8 py-3 rounded-xl font-semibold text-sm"
-              style={{ backgroundColor: "#141414", color: "#888880", border: "1px solid #1A1A1A" }}
+              style={{ backgroundColor: "transparent", color: "#9A9490", border: "1px solid #302B26" }}
             >
               {d.cta.secondary}
             </Link>
@@ -272,8 +278,8 @@ export default async function CommunityPage() {
         </div>
       </section>
 
-      <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #0E0E0C" }}>
-        <p className="text-xs" style={{ color: "#252523" }}>
+      <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #E0D9CE" }}>
+        <p className="text-xs" style={{ color: "#9A9490" }}>
           {isEn ? "© 2025 ZiBenDao Capital · Craftspace Sdn Bhd (202201044683 / 1490380-V)" : "© 2025 资本道 Capital Mastery · Craftspace Sdn Bhd (202201044683 / 1490380-V)"}
         </p>
       </footer>

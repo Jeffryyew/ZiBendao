@@ -7,7 +7,8 @@ const TOOLS = [
     slug: "financial-roadmap",
     icon: "🗺",
     level: "L1+",
-    accent: "#4CAF82",
+    accent: "#2D7D4F",
+    accentLight: "#EDFAF3",
     zh: {
       name: "Capital Roadmap",
       nameZh: "资本路线图",
@@ -25,7 +26,8 @@ const TOOLS = [
     slug: "pricing-system",
     icon: "💰",
     level: "L1+",
-    accent: "#6B8FD4",
+    accent: "#2D5FA8",
+    accentLight: "#EDF2FC",
     zh: {
       name: "Smart Quotation",
       nameZh: "智能报价系统",
@@ -43,7 +45,8 @@ const TOOLS = [
     slug: "market-cap",
     icon: "📊",
     level: "L2+",
-    accent: "#C9A84C",
+    accent: "#8B6514",
+    accentLight: "#FBF4E4",
     zh: {
       name: "Valuation Engine",
       nameZh: "企业估值引擎",
@@ -61,7 +64,8 @@ const TOOLS = [
     slug: "pat-kpi",
     icon: "📈",
     level: "L3+",
-    accent: "#A084D4",
+    accent: "#7C5FBF",
+    accentLight: "#F4F0FC",
     zh: {
       name: "KPI Intelligence",
       nameZh: "KPI 智能分析",
@@ -82,7 +86,7 @@ export default async function ToolsPage() {
   const isEn = locale === "en";
 
   return (
-    <div style={{ backgroundColor: "#0D0D0D", color: "#F5F5F0", minHeight: "100vh" }}>
+    <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814", minHeight: "100vh" }}>
       <SharedNav locale={locale} activeHref="/tools" />
 
       <div className="max-w-6xl mx-auto px-4 pt-28 pb-20">
@@ -90,15 +94,15 @@ export default async function ToolsPage() {
         <div className="text-center mb-16">
           <div
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs mb-6"
-            style={{ backgroundColor: "#1A1A1A", border: "1px solid #333333", color: "#C9A84C" }}
+            style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.15)", color: "#8B6514" }}
           >
             <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#C9A84C" }} />
             Capital Apps Ecosystem
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: "var(--font-display)" }}>
+          <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
             {isEn ? "Professional Capital Tools" : "专业资本工具"}
           </h1>
-          <p className="text-lg max-w-2xl mx-auto" style={{ color: "#A0A09A" }}>
+          <p className="text-lg max-w-2xl mx-auto" style={{ color: "#68625C" }}>
             {isEn
               ? "4 SaaS-grade professional tools covering wealth planning, enterprise valuation, and profit analysis. Export results as PDF / Excel with local data processing."
               : "4 款 SaaS 级专业工具，涵盖财富规划、企业估值、利润分析。结果支持导出 PDF / Excel，数据本地计算。"}
@@ -113,30 +117,30 @@ export default async function ToolsPage() {
               <div
                 key={tool.slug}
                 className="rounded-2xl p-7 flex flex-col relative overflow-hidden"
-                style={{ backgroundColor: "#0C0C0C", border: "1px solid #1A1A1A" }}
+                style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
               >
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg, transparent, ${tool.accent}60, transparent)` }} />
+                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, transparent, ${tool.accent}80, transparent)` }} />
 
                 <div className="flex items-start justify-between gap-3 mb-5">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style={{ backgroundColor: `${tool.accent}12`, border: `1px solid ${tool.accent}25` }}>
+                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style={{ backgroundColor: tool.accentLight, border: `1px solid ${tool.accent}25` }}>
                       {tool.icon}
                     </div>
                     <div>
-                      <div className="font-bold text-base" style={{ color: "#E8E8E4" }}>{t.name}</div>
-                      <div className="text-xs" style={{ color: "#555550" }}>{t.nameZh}</div>
+                      <div className="font-bold text-base" style={{ color: "#1C1814" }}>{t.name}</div>
+                      <div className="text-xs" style={{ color: "#9A9490" }}>{t.nameZh}</div>
                     </div>
                   </div>
-                  <span className="text-xs px-2.5 py-1 rounded-full font-mono flex-shrink-0" style={{ backgroundColor: `${tool.accent}12`, color: tool.accent, border: `1px solid ${tool.accent}25` }}>
+                  <span className="text-xs px-2.5 py-1 rounded-full font-mono flex-shrink-0" style={{ backgroundColor: tool.accentLight, color: tool.accent, border: `1px solid ${tool.accent}25` }}>
                     {tool.level}
                   </span>
                 </div>
 
-                <p className="text-sm leading-relaxed mb-5 flex-1" style={{ color: "#888880" }}>{t.desc}</p>
+                <p className="text-sm leading-relaxed mb-5 flex-1" style={{ color: "#68625C" }}>{t.desc}</p>
 
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mb-6">
                   {t.features.map((f) => (
-                    <div key={f} className="flex items-center gap-1.5 text-xs" style={{ color: "#555550" }}>
+                    <div key={f} className="flex items-center gap-1.5 text-xs" style={{ color: "#9A9490" }}>
                       <span style={{ color: tool.accent }}>✓</span>
                       {f}
                     </div>
@@ -145,8 +149,10 @@ export default async function ToolsPage() {
 
                 <Link
                   href="/register"
-                  className="block text-center py-2.5 rounded-xl text-sm font-medium"
-                  style={{ backgroundColor: "#141414", color: "#888880", border: "1px solid #242424" }}
+                  className="block text-center py-2.5 rounded-xl text-sm font-medium transition-colors"
+                  style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
+                  onMouseOver={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#EEE9E0"; }}
+                  onMouseOut={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#F7F4EF"; }}
                 >
                   {isEn ? "Register to Use →" : "注册即可使用 →"}
                 </Link>
@@ -156,20 +162,28 @@ export default async function ToolsPage() {
         </div>
 
         {/* CTA */}
-        <div className="text-center p-10 rounded-3xl" style={{ background: "linear-gradient(135deg, #0E0E0C, #161610)", border: "1px solid rgba(201,168,76,0.2)" }}>
-          <h2 className="text-2xl font-bold mb-3" style={{ fontFamily: "var(--font-display)" }}>
+        <div className="text-center py-16 px-10 rounded-3xl" style={{ backgroundColor: "#1C1814" }}>
+          <h2 className="text-2xl font-bold mb-3" style={{ fontFamily: "var(--font-display)", color: "#F0EBE1" }}>
             {isEn ? "Unlock All Tools Now" : "立即解锁全部工具"}
           </h2>
-          <p className="text-sm mb-6" style={{ color: "#A0A09A" }}>
+          <p className="text-sm mb-8" style={{ color: "#9A9490" }}>
             {isEn
               ? "Register to start using them. Contact us to activate enterprise advisory tools."
               : "注册即可开始使用，企业顾问工具可联系我们开通专属权限。"}
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Link href="/register" className="inline-block px-8 py-3 rounded-xl font-semibold text-sm" style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}>
+            <Link
+              href="/register"
+              className="inline-block px-8 py-3 rounded-xl font-semibold text-sm transition-opacity hover:opacity-88"
+              style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
+            >
               {isEn ? "Register →" : "注册 →"}
             </Link>
-            <Link href="/about" className="inline-block px-8 py-3 rounded-xl font-semibold text-sm" style={{ backgroundColor: "#141414", color: "#888880", border: "1px solid #242424" }}>
+            <Link
+              href="/about"
+              className="inline-block px-8 py-3 rounded-xl font-semibold text-sm"
+              style={{ backgroundColor: "transparent", color: "#9A9490", border: "1px solid #302B26" }}
+            >
               {isEn ? "Contact Advisor" : "联系顾问"}
             </Link>
           </div>

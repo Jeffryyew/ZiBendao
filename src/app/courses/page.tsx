@@ -2,8 +2,6 @@ import Link from "next/link";
 import SharedNav from "@/components/SharedNav";
 import { getLocale } from "@/lib/i18n";
 
-// ─── Bilingual course data ────────────────────────────────────────────────────
-
 const ONLINE_COURSE = {
   zh: {
     name: "资本启航",
@@ -64,7 +62,8 @@ const OFFLINE_COURSES = [
         "Understand common misconceptions about capital operations",
       ],
     },
-    tagColor: "#7A9A6C",
+    accent: "#2D7D4F",
+    accentLight: "#EDFAF3",
     badge: { zh: null, en: null },
   },
   {
@@ -93,7 +92,8 @@ const OFFLINE_COURSES = [
         "Design equity structures and early-stage fundraising strategies",
       ],
     },
-    tagColor: "#6A7A9A",
+    accent: "#2D5FA8",
+    accentLight: "#EDF2FC",
     badge: { zh: "HRDF Claimable", en: "HRDF Claimable" },
   },
   {
@@ -124,7 +124,8 @@ const OFFLINE_COURSES = [
         "Establish a capital-mechanism corporate structure",
       ],
     },
-    tagColor: "#C9A84C",
+    accent: "#8B6514",
+    accentLight: "#FBF4E4",
     badge: { zh: "HRDF Claimable", en: "HRDF Claimable" },
   },
 ];
@@ -144,17 +145,14 @@ const OUTCOMES = {
   ],
 };
 
-// ─── Page ──────────────────────────────────────────────────────────────────────
-
 export default async function CoursesPage() {
   const locale = await getLocale();
   const isEn = locale === "en";
-
   const onlineCourse = isEn ? ONLINE_COURSE.en : ONLINE_COURSE.zh;
   const outcomes = isEn ? OUTCOMES.en : OUTCOMES.zh;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#0D0D0D", color: "#F5F5F0" }}>
+    <div className="min-h-screen" style={{ backgroundColor: "#F7F4EF", color: "#1C1814" }}>
       <SharedNav locale={locale} activeHref="/courses" />
 
       {/* Hero */}
@@ -162,21 +160,25 @@ export default async function CoursesPage() {
         <div className="max-w-3xl mx-auto">
           <div
             className="inline-block text-xs font-medium px-4 py-1.5 rounded-full mb-6"
-            style={{ backgroundColor: "rgba(201,168,76,0.1)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}
+            style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.15)" }}
           >
             {isEn ? "3 Offline Programmes + 1 Online Course" : "3 阶段线下课程 + 1 线上课程"}
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6" style={{ fontFamily: "var(--font-display)" }}>
+          <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
             {isEn ? "Enterprise Capital" : "企业资本运作"}
             <br />
-            <span style={{ color: "#C9A84C" }}>{isEn ? "Complete Knowledge System" : "完整知识体系"}</span>
+            <span style={{ color: "#8B6514" }}>{isEn ? "Complete Knowledge System" : "完整知识体系"}</span>
           </h1>
-          <p className="text-base leading-relaxed mb-8" style={{ color: "#666660" }}>
+          <p className="text-base leading-relaxed mb-8" style={{ color: "#68625C" }}>
             {isEn
               ? "Designed by Jeffry Yew with 25 years of business development and 13 years of fundraising expertise, systematically teaching Malaysian SME owners to master capital operations."
               : "由 Jeffry Yew（姚国雄）主导设计，融合 25 年商业发展与 13 年融资专业经验，系统教授马来西亚中小企业主掌握资本运作的完整路径。"}
           </p>
-          <Link href="/register" className="inline-block px-8 py-3 rounded-xl text-sm font-semibold" style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}>
+          <Link
+            href="/register"
+            className="inline-block px-8 py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
+            style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
+          >
             {isEn ? "Get Started →" : "立即开始 →"}
           </Link>
         </div>
@@ -185,70 +187,78 @@ export default async function CoursesPage() {
       {/* Learning outcomes */}
       <section className="px-4 pb-16">
         <div className="max-w-4xl mx-auto">
-          <div className="rounded-2xl p-8 grid grid-cols-1 sm:grid-cols-2 gap-4" style={{ backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}>
+          <div className="rounded-2xl p-8 grid grid-cols-1 sm:grid-cols-2 gap-4" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
             <div className="sm:col-span-2 mb-2">
-              <h2 className="font-bold text-sm" style={{ color: "#C9A84C" }}>
+              <h2 className="font-bold text-sm" style={{ color: "#8B6514" }}>
                 {isEn ? "After completing, you will be able to:" : "学完之后，你将能够："}
               </h2>
             </div>
             {outcomes.map((o) => (
               <div key={o.text} className="flex items-start gap-3">
                 <span className="text-xl flex-shrink-0">{o.icon}</span>
-                <p className="text-sm leading-relaxed" style={{ color: "#888880" }}>{o.text}</p>
+                <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>{o.text}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Online Course ── */}
+      {/* Online Course */}
       <section className="px-4 pb-6">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-6">
-            <div className="h-px flex-1" style={{ backgroundColor: "#1A1A1A" }} />
-            <span className="text-xs font-medium px-3 py-1 rounded-full" style={{ backgroundColor: "rgba(138,111,212,0.1)", color: "#8A6FD4", border: "1px solid rgba(138,111,212,0.2)" }}>
+            <div className="h-px flex-1" style={{ backgroundColor: "#E0D9CE" }} />
+            <span className="text-xs font-medium px-3 py-1 rounded-full" style={{ backgroundColor: "#F4F0FC", color: "#7C5FBF", border: "1px solid rgba(124,95,191,0.2)" }}>
               {isEn ? "Online Course" : "线上课程 · Online"}
             </span>
-            <div className="h-px flex-1" style={{ backgroundColor: "#1A1A1A" }} />
+            <div className="h-px flex-1" style={{ backgroundColor: "#E0D9CE" }} />
           </div>
 
-          <div className="rounded-2xl p-7 relative overflow-hidden" style={{ backgroundColor: "#0A0A0A", border: "1px solid rgba(138,111,212,0.2)" }}>
-            <div style={{ position: "absolute", top: 0, left: "8%", right: "8%", height: "1px", background: "linear-gradient(90deg, transparent, rgba(138,111,212,0.5), transparent)" }} />
+          <div className="rounded-2xl p-7 relative overflow-hidden" style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(124,95,191,0.2)" }}>
+            <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #7C5FBF80, transparent)" }} />
 
             <div className="flex flex-wrap items-center gap-2 mb-4">
-              <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ backgroundColor: "rgba(138,111,212,0.12)", color: "#8A6FD4", border: "1px solid rgba(138,111,212,0.25)" }}>
+              <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ backgroundColor: "#F4F0FC", color: "#7C5FBF", border: "1px solid rgba(124,95,191,0.2)" }}>
                 {onlineCourse.stage}
               </span>
-              <span className="text-xs px-2.5 py-1 rounded-full" style={{ backgroundColor: "#111111", color: "#555550", border: "1px solid #1A1A1A" }}>
+              <span className="text-xs px-2.5 py-1 rounded-full" style={{ backgroundColor: "#F7F4EF", color: "#9A9490", border: "1px solid #E0D9CE" }}>
                 {onlineCourse.tag}
               </span>
-              <span className="text-xs px-2.5 py-1 rounded-full" style={{ backgroundColor: "rgba(138,111,212,0.08)", color: "#8A6FD4", border: "1px solid rgba(138,111,212,0.18)" }}>
+              <span className="text-xs px-2.5 py-1 rounded-full" style={{ backgroundColor: "#F4F0FC", color: "#7C5FBF", border: "1px solid rgba(124,95,191,0.2)" }}>
                 {onlineCourse.badgeLabel}
               </span>
             </div>
 
             <div className="mb-1">
-              <span className="text-xs" style={{ color: "#555550" }}>{onlineCourse.nameEn}</span>
-              <span className="text-xs ml-2" style={{ color: "#3A3A3A" }}>· {onlineCourse.subtitle}</span>
+              <span className="text-xs" style={{ color: "#9A9490" }}>{onlineCourse.nameEn}</span>
+              <span className="text-xs ml-2" style={{ color: "#C0B8B0" }}>· {onlineCourse.subtitle}</span>
             </div>
-            <h3 className="font-bold text-xl mb-0.5" style={{ color: "#F5F5F0" }}>{onlineCourse.name}</h3>
-            {!isEn && <p className="text-xs mb-1" style={{ color: "#555550" }}>{onlineCourse.subtitleZh}</p>}
-            <p className="text-sm mb-5 mt-3" style={{ color: "#666660" }}>{onlineCourse.desc}</p>
+            <h3 className="font-bold text-xl mb-0.5" style={{ color: "#1C1814" }}>{onlineCourse.name}</h3>
+            {!isEn && <p className="text-xs mb-1" style={{ color: "#9A9490" }}>{onlineCourse.subtitleZh}</p>}
+            <p className="text-sm mb-5 mt-3" style={{ color: "#68625C" }}>{onlineCourse.desc}</p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1.5 gap-x-4 mb-6">
               {onlineCourse.abilities.map((ability) => (
-                <div key={ability} className="flex items-start gap-2 text-xs" style={{ color: "#888880" }}>
-                  <span className="flex-shrink-0 mt-0.5" style={{ color: "#8A6FD4" }}>✦</span>
+                <div key={ability} className="flex items-start gap-2 text-xs" style={{ color: "#68625C" }}>
+                  <span className="flex-shrink-0 mt-0.5" style={{ color: "#7C5FBF" }}>✦</span>
                   {ability}
                 </div>
               ))}
             </div>
 
             <div className="flex flex-wrap gap-3">
-              <Link href="/register" className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold" style={{ backgroundColor: "#8A6FD4", color: "#FFFFFF", minWidth: "140px" }}>
+              <Link
+                href="/register"
+                className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold"
+                style={{ backgroundColor: "#7C5FBF", color: "#FFFFFF", minWidth: "140px" }}
+              >
                 {isEn ? "Unlock Capital →" : "解锁资本 →"}
               </Link>
-              <Link href="/register" className="flex-1 text-center py-2.5 rounded-xl text-sm" style={{ backgroundColor: "#111111", color: "#8A6FD4", border: "1px solid rgba(138,111,212,0.25)", minWidth: "140px" }}>
+              <Link
+                href="/register"
+                className="flex-1 text-center py-2.5 rounded-xl text-sm"
+                style={{ backgroundColor: "#F4F0FC", color: "#7C5FBF", border: "1px solid rgba(124,95,191,0.2)", minWidth: "140px" }}
+              >
                 {isEn ? "Free Trial" : "免费体验"}
               </Link>
             </div>
@@ -256,15 +266,15 @@ export default async function CoursesPage() {
         </div>
       </section>
 
-      {/* ── Offline Courses ── */}
+      {/* Offline Courses */}
       <section className="px-4 py-6 pb-20">
         <div className="max-w-4xl mx-auto">
           <div className="flex items-center gap-3 mb-6">
-            <div className="h-px flex-1" style={{ backgroundColor: "#1A1A1A" }} />
-            <span className="text-xs font-medium px-3 py-1 rounded-full" style={{ backgroundColor: "rgba(201,168,76,0.08)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}>
+            <div className="h-px flex-1" style={{ backgroundColor: "#E0D9CE" }} />
+            <span className="text-xs font-medium px-3 py-1 rounded-full" style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.2)" }}>
               {isEn ? "Offline Programmes" : "线下课程 · Offline Programmes"}
             </span>
-            <div className="h-px flex-1" style={{ backgroundColor: "#1A1A1A" }} />
+            <div className="h-px flex-1" style={{ backgroundColor: "#E0D9CE" }} />
           </div>
 
           <div className="space-y-5">
@@ -272,37 +282,41 @@ export default async function CoursesPage() {
               const c = isEn ? course.en : course.zh;
               const badge = isEn ? course.badge.en : course.badge.zh;
               return (
-                <div key={course.id} className="rounded-2xl p-7 relative" style={{ backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}>
-                  <div style={{ position: "absolute", top: 0, left: "8%", right: "8%", height: "1px", background: `linear-gradient(90deg, transparent, ${course.tagColor}50, transparent)` }} />
+                <div key={course.id} className="rounded-2xl p-7 relative overflow-hidden" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
+                  <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, transparent, ${course.accent}80, transparent)` }} />
 
                   <div className="flex flex-wrap items-center gap-2 mb-4">
-                    <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ backgroundColor: `${course.tagColor}15`, color: course.tagColor, border: `1px solid ${course.tagColor}25` }}>
+                    <span className="text-xs px-2.5 py-1 rounded-full font-medium" style={{ backgroundColor: course.accentLight, color: course.accent, border: `1px solid ${course.accent}25` }}>
                       {c.stage}
                     </span>
-                    <span className="text-xs px-2.5 py-1 rounded-full" style={{ backgroundColor: "#111111", color: "#555550", border: "1px solid #1A1A1A" }}>
+                    <span className="text-xs px-2.5 py-1 rounded-full" style={{ backgroundColor: "#F7F4EF", color: "#9A9490", border: "1px solid #E0D9CE" }}>
                       {c.tag}
                     </span>
                     {badge && (
-                      <span className="text-xs px-2.5 py-1 rounded-full" style={{ backgroundColor: "#111111", color: "#444440", border: "1px solid #1A1A1A" }}>
+                      <span className="text-xs px-2.5 py-1 rounded-full" style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.15)" }}>
                         {badge}
                       </span>
                     )}
                   </div>
 
-                  <div className="text-xs mb-0.5" style={{ color: "#444440" }}>{c.nameEn}</div>
-                  <h3 className="font-bold text-lg mb-2" style={{ color: "#F5F5F0" }}>{c.name}</h3>
-                  <p className="text-sm mb-5" style={{ color: "#666660" }}>{c.desc}</p>
+                  <div className="text-xs mb-0.5" style={{ color: "#9A9490" }}>{c.nameEn}</div>
+                  <h3 className="font-bold text-lg mb-2" style={{ color: "#1C1814" }}>{c.name}</h3>
+                  <p className="text-sm mb-5" style={{ color: "#68625C" }}>{c.desc}</p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1.5 gap-x-4 mb-6">
                     {c.abilities.map((ability) => (
-                      <div key={ability} className="flex items-start gap-2 text-xs" style={{ color: "#888880" }}>
-                        <span className="flex-shrink-0 mt-0.5" style={{ color: "#C9A84C" }}>✦</span>
+                      <div key={ability} className="flex items-start gap-2 text-xs" style={{ color: "#68625C" }}>
+                        <span className="flex-shrink-0 mt-0.5" style={{ color: course.accent }}>✦</span>
                         {ability}
                       </div>
                     ))}
                   </div>
 
-                  <Link href="/register" className="block w-full text-center py-2.5 rounded-xl text-sm font-semibold" style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}>
+                  <Link
+                    href="/register"
+                    className="block w-full text-center py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
+                    style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
+                  >
                     {isEn ? "Unlock Capital →" : "解锁资本 →"}
                   </Link>
                 </div>
@@ -313,17 +327,17 @@ export default async function CoursesPage() {
       </section>
 
       {/* HRDF note */}
-      <section className="py-8 px-4" style={{ backgroundColor: "#080808" }}>
+      <section className="py-8 px-4" style={{ backgroundColor: "#EEE9E0" }}>
         <div className="max-w-3xl mx-auto">
-          <div className="rounded-2xl p-6 flex items-start gap-4" style={{ backgroundColor: "#0A0A0A", border: "1px solid #1A1A1A" }}>
+          <div className="rounded-2xl p-6 flex items-start gap-4" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
             <div className="text-2xl flex-shrink-0">🏛️</div>
             <div>
-              <h3 className="font-semibold text-sm mb-1" style={{ color: "#E0E0DC" }}>HRDF Claimable</h3>
-              <p className="text-xs leading-relaxed" style={{ color: "#555550" }}>
+              <h3 className="font-semibold text-sm mb-1" style={{ color: "#1C1814" }}>HRDF Claimable</h3>
+              <p className="text-xs leading-relaxed" style={{ color: "#68625C" }}>
                 {isEn
                   ? "Selected offline programmes are eligible for HRDF (Human Resources Development Fund) reimbursement, helping Malaysian business owners reduce training costs. Contact us at "
                   : "部分线下课程支持 HRDF（人力资源发展基金）报销，马来西亚企业主可凭此减轻培训成本。详情请联系 "}
-                <a href="mailto:info@capitalmastery.net" style={{ color: "#C9A84C" }}>info@capitalmastery.net</a>
+                <a href="mailto:info@capitalmastery.net" style={{ color: "#8B6514" }}>info@capitalmastery.net</a>
                 {isEn ? " for eligibility details." : " 查询资格条件。"}
               </p>
             </div>
@@ -332,30 +346,37 @@ export default async function CoursesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 px-4 text-center">
-        <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}>
+      <section className="py-20 px-4" style={{ backgroundColor: "#1C1814" }}>
+        <div className="max-w-2xl mx-auto text-center">
+          <h2 className="text-3xl font-bold mb-4" style={{ fontFamily: "var(--font-display)", color: "#F0EBE1" }}>
             {isEn ? "Begin Your Capital Journey Here" : "从这里开始你的资本之旅"}
           </h2>
-          <p className="mb-8 text-sm" style={{ color: "#666660" }}>
+          <p className="mb-8 text-sm" style={{ color: "#9A9490" }}>
             {isEn
               ? "Try the online course anytime for free. Enrol in offline programmes to secure your seat."
               : "线上课程随时免费体验，线下课程立即报名锁定席位。"}
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Link href="/register" className="inline-block px-10 py-3 rounded-xl text-sm font-semibold" style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}>
+            <Link
+              href="/register"
+              className="inline-block px-10 py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
+              style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
+            >
               {isEn ? "Unlock Capital →" : "解锁资本 →"}
             </Link>
-            <Link href="/register" className="inline-block px-10 py-3 rounded-xl text-sm" style={{ backgroundColor: "#111111", color: "#888880", border: "1px solid #1A1A1A" }}>
+            <Link
+              href="/register"
+              className="inline-block px-10 py-3 rounded-xl text-sm"
+              style={{ backgroundColor: "transparent", color: "#9A9490", border: "1px solid #302B26" }}
+            >
               {isEn ? "Free Trial — Online Course" : "免费体验线上课程"}
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #0E0E0C" }}>
-        <p className="text-xs" style={{ color: "#252523" }}>
+      <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #E0D9CE", backgroundColor: "#F7F4EF" }}>
+        <p className="text-xs" style={{ color: "#C0B8B0" }}>
           {isEn ? "© 2025 ZiBenDao Capital · Craftspace Sdn Bhd (202201044683 / 1490380-V)" : "© 2025 资本道 Capital Mastery · Craftspace Sdn Bhd (202201044683 / 1490380-V)"}
         </p>
       </footer>

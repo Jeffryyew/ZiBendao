@@ -15,21 +15,13 @@ interface SharedNavProps {
 type DropdownItem = { label: string; href: string; comingSoon?: boolean };
 type NavLink = { label: string; href: string; dropdown?: DropdownItem[] };
 
-function DropdownMenu({
-  item,
-  isActive,
-}: {
-  item: NavLink;
-  isActive: boolean;
-}) {
+function DropdownMenu({ item, isActive }: { item: NavLink; isActive: boolean }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function onClickOutside(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     }
     if (open) document.addEventListener("mousedown", onClickOutside);
     return () => document.removeEventListener("mousedown", onClickOutside);
@@ -40,61 +32,26 @@ function DropdownMenu({
       <button
         onClick={() => setOpen((v) => !v)}
         className="text-sm flex items-center gap-1 transition-colors cursor-pointer bg-transparent border-0 p-0"
-        style={{ color: isActive || open ? "#C9A84C" : "#666660" }}
-        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#C9A84C"; }}
-        onMouseLeave={(e) => { if (!isActive && !open) (e.currentTarget as HTMLButtonElement).style.color = "#666660"; }}
+        style={{ color: isActive || open ? "#1C1814" : "#68625C" }}
+        onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#1C1814"; }}
+        onMouseLeave={(e) => { if (!isActive && !open) (e.currentTarget as HTMLButtonElement).style.color = "#68625C"; }}
       >
         {item.label}
-        <span
-          style={{
-            fontSize: "9px",
-            opacity: 0.5,
-            marginLeft: 1,
-            display: "inline-block",
-            transform: open ? "rotate(180deg)" : "none",
-            transition: "transform 150ms",
-          }}
-        >
-          ▾
-        </span>
+        <span style={{ fontSize: "9px", opacity: 0.4, marginLeft: 1, display: "inline-block", transform: open ? "rotate(180deg)" : "none", transition: "transform 150ms" }}>▾</span>
       </button>
 
       {open && (
-        <div
-          className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50"
-          style={{ minWidth: 168 }}
-        >
-          <div
-            className="rounded-xl overflow-hidden"
-            style={{
-              backgroundColor: "#0D0D0D",
-              border: "1px solid #1A1A1A",
-              boxShadow: "0 8px 32px rgba(0,0,0,0.6)",
-            }}
-          >
+        <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50" style={{ minWidth: 168 }}>
+          <div className="rounded-xl overflow-hidden" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", boxShadow: "0 8px 24px rgba(28,24,20,0.08)" }}>
             {item.dropdown!.map((sub, i) =>
               sub.comingSoon ? (
                 <div
                   key={sub.label}
                   className="flex items-center justify-between px-4 py-2.5"
-                  style={{
-                    borderBottom:
-                      i < item.dropdown!.length - 1 ? "1px solid #111110" : "none",
-                  }}
+                  style={{ borderBottom: i < item.dropdown!.length - 1 ? "1px solid #F0EBE1" : "none" }}
                 >
-                  <span className="text-xs" style={{ color: "#3A3A38" }}>
-                    {sub.label}
-                  </span>
-                  <span
-                    className="text-xs px-1.5 py-0.5 rounded font-mono"
-                    style={{
-                      backgroundColor: "rgba(201,168,76,0.07)",
-                      color: "#5A5030",
-                      fontSize: "9px",
-                    }}
-                  >
-                    Soon
-                  </span>
+                  <span className="text-xs" style={{ color: "#C0B8B0" }}>{sub.label}</span>
+                  <span className="text-xs px-1.5 py-0.5 rounded font-mono" style={{ backgroundColor: "#FBF4E4", color: "#C9A84C", fontSize: "9px" }}>Soon</span>
                 </div>
               ) : (
                 <Link
@@ -102,21 +59,9 @@ function DropdownMenu({
                   href={sub.href}
                   onClick={() => setOpen(false)}
                   className="block px-4 py-2.5 text-xs transition-colors"
-                  style={{
-                    color: "#888880",
-                    borderBottom:
-                      i < item.dropdown!.length - 1 ? "1px solid #111110" : "none",
-                  }}
-                  onMouseEnter={(e) => {
-                    (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C";
-                    (e.currentTarget as HTMLAnchorElement).style.backgroundColor =
-                      "rgba(201,168,76,0.05)";
-                  }}
-                  onMouseLeave={(e) => {
-                    (e.currentTarget as HTMLAnchorElement).style.color = "#888880";
-                    (e.currentTarget as HTMLAnchorElement).style.backgroundColor =
-                      "transparent";
-                  }}
+                  style={{ color: "#68625C", borderBottom: i < item.dropdown!.length - 1 ? "1px solid #F0EBE1" : "none" }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C1814"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#F7F4EF"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#68625C"; (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent"; }}
                 >
                   {sub.label}
                 </Link>
@@ -131,50 +76,25 @@ function DropdownMenu({
 
 export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavProps) {
   const isZh = locale === "zh";
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setScrolled(window.scrollY > 24);
+    window.addEventListener("scroll", handler, { passive: true });
+    return () => window.removeEventListener("scroll", handler);
+  }, []);
 
   const COURSE_ITEMS: DropdownItem[] = isZh
-    ? [
-        { label: "资本启航", href: "/courses" },
-        { label: "资本通", href: "/courses" },
-        { label: "启动资本", href: "/courses" },
-        { label: "资本道", href: "/courses" },
-      ]
-    : [
-        { label: "Capital Start", href: "/courses" },
-        { label: "The Capital Map", href: "/courses" },
-        { label: "The Capital Code", href: "/courses" },
-        { label: "Capital Dao", href: "/courses" },
-      ];
+    ? [{ label: "资本启航", href: "/courses" }, { label: "资本通", href: "/courses" }, { label: "启动资本", href: "/courses" }, { label: "资本道", href: "/courses" }]
+    : [{ label: "Capital Start", href: "/courses" }, { label: "The Capital Map", href: "/courses" }, { label: "The Capital Code", href: "/courses" }, { label: "Capital Dao", href: "/courses" }];
 
   const TOOLS_ITEMS: DropdownItem[] = isZh
-    ? [
-        { label: "企业估值", href: "/tools/market-cap" },
-        { label: "融资计算", href: "/tools", comingSoon: true },
-        { label: "报价系统", href: "/tools/pricing-system" },
-        { label: "财务预测", href: "/tools/financial-roadmap" },
-        { label: "股权模拟", href: "/tools", comingSoon: true },
-      ]
-    : [
-        { label: "Valuation Engine", href: "/tools/market-cap" },
-        { label: "Funding Calculator", href: "/tools", comingSoon: true },
-        { label: "Quotation System", href: "/tools/pricing-system" },
-        { label: "Financial Forecast", href: "/tools/financial-roadmap" },
-        { label: "Equity Simulator", href: "/tools", comingSoon: true },
-      ];
+    ? [{ label: "企业估值", href: "/tools/market-cap" }, { label: "融资计算", href: "/tools", comingSoon: true }, { label: "报价系统", href: "/tools/pricing-system" }, { label: "财务预测", href: "/tools/financial-roadmap" }, { label: "股权模拟", href: "/tools", comingSoon: true }]
+    : [{ label: "Valuation Engine", href: "/tools/market-cap" }, { label: "Funding Calculator", href: "/tools", comingSoon: true }, { label: "Quotation System", href: "/tools/pricing-system" }, { label: "Financial Forecast", href: "/tools/financial-roadmap" }, { label: "Equity Simulator", href: "/tools", comingSoon: true }];
 
   const COMMUNITY_ITEMS: DropdownItem[] = isZh
-    ? [
-        { label: "Investor Friday", href: "/community" },
-        { label: "Asian Circle", href: "/community" },
-        { label: "活动", href: "/community" },
-        { label: "会员", href: "/community" },
-      ]
-    : [
-        { label: "Investor Friday", href: "/community" },
-        { label: "Asian Circle", href: "/community" },
-        { label: "Events", href: "/community" },
-        { label: "Members", href: "/community" },
-      ];
+    ? [{ label: "Investor Friday", href: "/community" }, { label: "Asian Circle", href: "/community" }, { label: "活动", href: "/community" }, { label: "会员", href: "/community" }]
+    : [{ label: "Investor Friday", href: "/community" }, { label: "Asian Circle", href: "/community" }, { label: "Events", href: "/community" }, { label: "Members", href: "/community" }];
 
   const links: NavLink[] = [
     { label: isZh ? "首页" : "Home", href: "/" },
@@ -188,39 +108,26 @@ export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavP
     <nav
       className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 h-16"
       style={{
-        backgroundColor: "rgba(13,13,13,0.95)",
-        borderBottom: "1px solid #1A1A1A",
-        backdropFilter: "blur(12px)",
+        backgroundColor: scrolled ? "rgba(247,244,239,0.97)" : "rgba(247,244,239,0.85)",
+        borderBottom: scrolled ? "1px solid #E0D9CE" : "1px solid transparent",
+        backdropFilter: "blur(16px)",
+        transition: "background-color 0.3s, border-color 0.3s",
       }}
     >
-      {/* Logo */}
-      <Link href="/">
-        <LogoImg height={32} />
-      </Link>
+      <Link href="/"><LogoImg height={32} onLight /></Link>
 
-      {/* Desktop links */}
       <div className="hidden md:flex items-center gap-6">
         {links.map((item) =>
           item.dropdown ? (
-            <DropdownMenu
-              key={item.href}
-              item={item}
-              isActive={activeHref === item.href}
-            />
+            <DropdownMenu key={item.href} item={item} isActive={activeHref === item.href} />
           ) : (
             <Link
               key={item.href}
               href={item.href}
               className="text-sm transition-colors"
-              style={{ color: activeHref === item.href ? "#C9A84C" : "#666660" }}
-              onMouseEnter={(e) => {
-                if (activeHref !== item.href)
-                  (e.currentTarget as HTMLAnchorElement).style.color = "#C9A84C";
-              }}
-              onMouseLeave={(e) => {
-                if (activeHref !== item.href)
-                  (e.currentTarget as HTMLAnchorElement).style.color = "#666660";
-              }}
+              style={{ color: activeHref === item.href ? "#1C1814" : "#68625C" }}
+              onMouseEnter={(e) => { if (activeHref !== item.href) (e.currentTarget as HTMLAnchorElement).style.color = "#1C1814"; }}
+              onMouseLeave={(e) => { if (activeHref !== item.href) (e.currentTarget as HTMLAnchorElement).style.color = "#68625C"; }}
             >
               {item.label}
             </Link>
@@ -228,26 +135,28 @@ export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavP
         )}
       </div>
 
-      {/* Right: lang switcher + auth */}
       <div className="flex items-center gap-3">
         <LanguageSwitcher current={locale} />
         {isLoggedIn ? (
           <Link
             href="/dashboard"
             className="text-sm px-4 py-2 rounded-xl font-medium transition-opacity hover:opacity-85"
-            style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#0D0D0D" }}
+            style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
           >
             {isZh ? "进入平台 →" : "Dashboard →"}
           </Link>
         ) : (
           <>
-            <Link href="/login" className="hidden sm:block text-sm" style={{ color: "#666660" }}>
+            <Link href="/login" className="hidden sm:block text-sm transition-colors" style={{ color: "#68625C" }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C1814"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#68625C"; }}
+            >
               {isZh ? "登录" : "Login"}
             </Link>
             <Link
               href="/register"
               className="text-sm px-4 py-2 rounded-xl font-medium transition-opacity hover:opacity-85"
-              style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}
+              style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
             >
               {isZh ? "注册" : "Register"}
             </Link>
