@@ -63,7 +63,7 @@ const DATA = {
     cta: {
       title: "准备好加入了吗？",
       desc: "注册免费账户，即可进入学员专属社群，开启你的资本成长之旅。",
-      primary: "免费注册 →",
+      primary: "注册 →",
       secondary: "联系我们",
     },
   },
@@ -127,7 +127,7 @@ const DATA = {
     cta: {
       title: "Ready to Join?",
       desc: "Register a free account to access the student community and begin your capital growth journey.",
-      primary: "Register Free →",
+      primary: "Register →",
       secondary: "Contact Us",
     },
   },

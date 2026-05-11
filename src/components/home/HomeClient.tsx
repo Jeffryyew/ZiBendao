@@ -23,7 +23,7 @@ export default function HomeClient({ t, locale, isLoggedIn }: Props) {
       <CapitalLearningJourney />
       <ToolsPreview />
       <CorporateAdvisory />
-      <FounderSection />
+      <FounderSection locale={locale} />
       <CTASection isLoggedIn={isLoggedIn} />
       <Footer t={t.footer} />
     </div>
@@ -1245,7 +1245,7 @@ function CorporateAdvisory() {
 
 // ─── Founder ─────────────────────────────────────────────────────────────────
 
-function FounderSection() {
+function FounderSection({ locale }: { locale: Locale }) {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: "-60px" });
 
@@ -1303,7 +1303,7 @@ function FounderSection() {
               Jeffry Yew <span className="text-lg font-normal" style={{ color: "#444440" }}>· 姚国雄</span>
             </h2>
             <p className="text-sm mb-5" style={{ color: "#555550" }}>
-              帮助企业从经营模式，升级成资本模式
+              {locale === "en" ? "Transform Businesses Into Investable Enterprises" : "助力企业转型为值得投资的企业"}
             </p>
 
             <div className="flex flex-wrap gap-6 mb-6">
@@ -1402,13 +1402,6 @@ function CTASection({ isLoggedIn }: { isLoggedIn?: boolean }) {
                 style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#0D0D0D" }}
               >
                 开始资本之旅
-              </Link>
-              <Link
-                href="/about"
-                className="px-10 py-4 rounded-xl font-semibold text-sm"
-                style={{ backgroundColor: "transparent", color: "#555550", border: "1px solid #1A1A18" }}
-              >
-                企业咨询
               </Link>
             </>
           )}

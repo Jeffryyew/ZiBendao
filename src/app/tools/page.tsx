@@ -167,7 +167,7 @@ export default async function ToolsPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link href="/register" className="inline-block px-8 py-3 rounded-xl font-semibold text-sm" style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}>
-              {isEn ? "Register Free →" : "免费注册 →"}
+              {isEn ? "Register →" : "注册 →"}
             </Link>
             <Link href="/about" className="inline-block px-8 py-3 rounded-xl font-semibold text-sm" style={{ backgroundColor: "#141414", color: "#888880", border: "1px solid #242424" }}>
               {isEn ? "Contact Advisor" : "联系顾问"}

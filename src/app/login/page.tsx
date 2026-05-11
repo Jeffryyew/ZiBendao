@@ -293,7 +293,7 @@ export default function LoginPage() {
               onMouseEnter={(e) => (e.currentTarget.style.color = "#F5E6C8")}
               onMouseLeave={(e) => (e.currentTarget.style.color = "#C9A84C")}
             >
-              免费注册
+              注册
             </Link>
           </p>
 

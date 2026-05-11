@@ -381,7 +381,7 @@ export default function RegisterPage() {
                   注册中…
                 </span>
               ) : (
-                "免费注册"
+                "注册"
               )}
             </button>
           </form>
