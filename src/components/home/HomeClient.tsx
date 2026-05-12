@@ -21,7 +21,6 @@ export default function HomeClient({ t, locale, isLoggedIn }: Props) {
       <WhatIsCapital />
       <CapitalLearningJourney locale={locale} />
       <ToolsPreview />
-      <CorporateAdvisory />
       <FounderSection locale={locale} />
       <CTASection isLoggedIn={isLoggedIn} />
       <Footer t={t.footer} />
@@ -841,90 +840,6 @@ function ToolCard({
         →
       </span>
     </motion.div>
-  );
-}
-
-// ─── Corporate Advisory ───────────────────────────────────────────────────────
-
-function CorporateAdvisory() {
-  const SERVICES = [
-    { code: "SPV", title: "SPV 架构设计", desc: "为企业设计特殊目的载体架构，隔离风险、优化税务、吸引机构投资。", tag: "融资结构" },
-    { code: "IPO", title: "IPO 上市路径规划", desc: "评估企业上市准备度，设计上市路径，协助完成合规、估值与投资人对接。", tag: "资本市场" },
-    { code: "REIT", title: "REIT 房产资本化", desc: "将房地产资产证券化，通过 REIT 结构实现流动性，进入资本市场融资。", tag: "资产证券化" },
-    { code: "EQ", title: "股权架构优化", desc: "重新设计创始人、投资人与员工持股结构，建立清晰可投的股权生态。", tag: "股权设计" },
-  ];
-
-  const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-
-  return (
-    <section ref={ref} className="px-4 py-24" style={{ backgroundColor: "#EEE9E0" }}>
-      <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5 }}
-          className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6"
-        >
-          <div>
-            <div
-              className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4"
-              style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.15)" }}
-            >
-              企业资本顾问
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
-              Corporate Advisory
-            </h2>
-            <p className="text-sm leading-relaxed max-w-md" style={{ color: "#68625C" }}>
-              不只是课程——我们提供真实资本操作的专业顾问服务
-            </p>
-          </div>
-          <Link
-            href="/about"
-            className="text-sm px-5 py-2.5 rounded-xl flex-shrink-0 transition-colors self-start"
-            style={{ color: "#8B6514", border: "1px solid rgba(139,101,20,0.2)", backgroundColor: "#FBF4E4" }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#F5EDD4"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#FBF4E4"; }}
-          >
-            联系顾问团队 →
-          </Link>
-        </motion.div>
-
-        <div className="grid sm:grid-cols-2 gap-4">
-          {SERVICES.map((svc, i) => (
-            <motion.div
-              key={svc.code}
-              initial={{ opacity: 0, y: 20 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="p-7 rounded-2xl"
-              style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", transition: "box-shadow 0.2s, transform 0.2s" }}
-              onMouseEnter={(e) => {
-                (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 20px rgba(28,24,20,0.08)";
-                (e.currentTarget as HTMLDivElement).style.transform = "translateY(-3px)";
-              }}
-              onMouseLeave={(e) => {
-                (e.currentTarget as HTMLDivElement).style.boxShadow = "none";
-                (e.currentTarget as HTMLDivElement).style.transform = "translateY(0)";
-              }}
-            >
-              <div className="flex items-start justify-between mb-4">
-                <span
-                  className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg"
-                  style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.12)" }}
-                >
-                  {svc.code}
-                </span>
-                <span className="text-xs" style={{ color: "#C0B8B0" }}>{svc.tag}</span>
-              </div>
-              <h3 className="font-semibold mb-2" style={{ color: "#1C1814" }}>{svc.title}</h3>
-              <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>{svc.desc}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
   );
 }
 
