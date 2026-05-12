@@ -37,7 +37,6 @@ export default function LogoImg({ height = 34, className, onLight }: Props) {
         height,
         width: "auto",
         objectFit: "contain",
-        filter: onLight ? "brightness(0)" : "none",
       }}
       onError={() => setFailed(true)}
     />
