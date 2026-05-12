@@ -94,7 +94,6 @@ const OFFLINE_COURSES = [
     },
     accent: "#2D5FA8",
     accentLight: "#EDF2FC",
-    badge: { zh: "HRDF Claimable", en: "HRDF Claimable" },
   },
   {
     id: 3,
@@ -126,7 +125,6 @@ const OFFLINE_COURSES = [
     },
     accent: "#8B6514",
     accentLight: "#FBF4E4",
-    badge: { zh: "HRDF Claimable", en: "HRDF Claimable" },
   },
 ];
 
@@ -280,7 +278,6 @@ export default async function CoursesPage() {
           <div className="space-y-5">
             {OFFLINE_COURSES.map((course) => {
               const c = isEn ? course.en : course.zh;
-              const badge = isEn ? course.badge.en : course.badge.zh;
               return (
                 <div key={course.id} className="rounded-2xl p-7 relative overflow-hidden" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
                   <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, transparent, ${course.accent}80, transparent)` }} />
@@ -292,11 +289,6 @@ export default async function CoursesPage() {
                     <span className="text-xs px-2.5 py-1 rounded-full" style={{ backgroundColor: "#F7F4EF", color: "#9A9490", border: "1px solid #E0D9CE" }}>
                       {c.tag}
                     </span>
-                    {badge && (
-                      <span className="text-xs px-2.5 py-1 rounded-full" style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.15)" }}>
-                        {badge}
-                      </span>
-                    )}
                   </div>
 
                   <div className="text-xs mb-0.5" style={{ color: "#9A9490" }}>{c.nameEn}</div>
@@ -322,25 +314,6 @@ export default async function CoursesPage() {
                 </div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* HRDF note */}
-      <section className="py-8 px-4" style={{ backgroundColor: "#EEE9E0" }}>
-        <div className="max-w-3xl mx-auto">
-          <div className="rounded-2xl p-6 flex items-start gap-4" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
-            <div className="text-2xl flex-shrink-0">🏛️</div>
-            <div>
-              <h3 className="font-semibold text-sm mb-1" style={{ color: "#1C1814" }}>HRDF Claimable</h3>
-              <p className="text-xs leading-relaxed" style={{ color: "#68625C" }}>
-                {isEn
-                  ? "Selected offline programmes are eligible for HRDF (Human Resources Development Fund) reimbursement, helping Malaysian business owners reduce training costs. Contact us at "
-                  : "部分线下课程支持 HRDF（人力资源发展基金）报销，马来西亚企业主可凭此减轻培训成本。详情请联系 "}
-                <a href="mailto:info@capitalmastery.net" style={{ color: "#8B6514" }}>info@capitalmastery.net</a>
-                {isEn ? " for eligibility details." : " 查询资格条件。"}
-              </p>
-            </div>
           </div>
         </div>
       </section>
