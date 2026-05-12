@@ -21,7 +21,6 @@ export default function HomeClient({ t, locale, isLoggedIn }: Props) {
       <WhatIsCapital />
       <CapitalLearningJourney locale={locale} />
       <ToolsPreview />
-      <FounderSection locale={locale} />
       <CTASection isLoggedIn={isLoggedIn} />
       <Footer t={t.footer} />
     </div>
@@ -840,94 +839,6 @@ function ToolCard({
         →
       </span>
     </motion.div>
-  );
-}
-
-// ─── Founder ─────────────────────────────────────────────────────────────────
-
-function FounderSection({ locale }: { locale: Locale }) {
-  const ref = useRef<HTMLElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-60px" });
-
-  const STATS = [
-    { value: "25+", label: "年商业经验" },
-    { value: "13+", label: "年融资经验" },
-    { value: "4", label: "跨行业领域" },
-  ];
-
-  const DOMAINS = ["房地产", "科技", "零售", "企业融资", "资本架构"];
-
-  return (
-    <section ref={ref} className="px-4 py-24 max-w-6xl mx-auto">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={inView ? { opacity: 1, y: 0 } : {}}
-        transition={{ duration: 0.5 }}
-        className="rounded-3xl p-10 md:p-14 relative overflow-hidden"
-        style={{
-          backgroundColor: "#FFFFFF",
-          border: "1px solid #E0D9CE",
-          boxShadow: "0 4px 32px rgba(28,24,20,0.06)",
-        }}
-      >
-        {/* Top accent line */}
-        <div
-          aria-hidden
-          style={{
-            position: "absolute", top: 0, left: "10%", right: "10%", height: 2,
-            background: "linear-gradient(90deg, transparent, #C9A84C80, transparent)",
-          }}
-        />
-
-        <div className="flex flex-col md:flex-row gap-10 items-start">
-          <div className="flex-shrink-0">
-            <div
-              className="w-20 h-20 rounded-2xl flex items-center justify-center text-3xl"
-              style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.15)" }}
-            >
-              👔
-            </div>
-          </div>
-
-          <div className="flex-1">
-            <div
-              className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4"
-              style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.15)" }}
-            >
-              创始人
-            </div>
-
-            <h2 className="text-2xl md:text-3xl font-bold mb-1" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
-              Jeffry Yew <span className="text-lg font-normal" style={{ color: "#9A9490" }}>· 姚国雄</span>
-            </h2>
-            <p className="text-sm mb-5" style={{ color: "#68625C" }}>
-              {locale === "en" ? "Transform Businesses Into Investable Enterprises" : "助力企业转型为值得投资的企业"}
-            </p>
-
-            <div className="flex flex-wrap gap-6 mb-6">
-              {STATS.map((s) => (
-                <div key={s.label}>
-                  <div className="text-2xl font-bold" style={{ color: "#8B6514", fontFamily: "var(--font-display)" }}>{s.value}</div>
-                  <div className="text-xs" style={{ color: "#9A9490" }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {DOMAINS.map((d) => (
-                <span
-                  key={d}
-                  className="text-xs px-3 py-1 rounded-full"
-                  style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
-                >
-                  {d}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </motion.div>
-    </section>
   );
 }
 
