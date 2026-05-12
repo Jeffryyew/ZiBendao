@@ -18,7 +18,6 @@ export default function HomeClient({ t, locale, isLoggedIn }: Props) {
     <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814", minHeight: "100vh", overflowX: "hidden" }}>
       <Navbar t={t.nav} locale={locale} isLoggedIn={isLoggedIn} />
       <HeroSection t={t.hero} isLoggedIn={isLoggedIn} />
-      <StatsBar />
       <WhatIsCapital />
       <CapitalLearningJourney />
       <ToolsPreview />
@@ -450,77 +449,6 @@ function HeroSection({ t, isLoggedIn }: { t: Dict["hero"]; isLoggedIn?: boolean 
         </motion.div>
       </div>
     </section>
-  );
-}
-
-// ─── Stats bar ────────────────────────────────────────────────────────────────
-
-function AnimatedNumber({ target, suffix = "" }: { target: number; suffix?: string }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  const inView = useInView(ref, { once: true });
-
-  useEffect(() => {
-    if (!inView) return;
-    const duration = 1400;
-    const startTime = performance.now();
-    const tick = (now: number) => {
-      const p = Math.min((now - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setCount(Math.floor(eased * target));
-      if (p < 1) requestAnimationFrame(tick);
-      else setCount(target);
-    };
-    requestAnimationFrame(tick);
-  }, [inView, target]);
-
-  return <span ref={ref}>{count.toLocaleString()}{suffix}</span>;
-}
-
-function StatsBar() {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-40px" });
-
-  const STATS = [
-    { value: 1000, suffix: "+", label: "培训学员" },
-    { value: 13, suffix: "+", label: "课程节数" },
-    { value: 4, suffix: "", label: "专业工具" },
-    { value: 8, suffix: "", label: "会员角色" },
-  ];
-
-  return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 24 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.6 }}
-      className="px-4 pb-20"
-    >
-      <div
-        className="max-w-4xl mx-auto overflow-hidden rounded-2xl"
-        style={{ border: "1px solid #E0D9CE", backgroundColor: "#FFFFFF" }}
-      >
-        <div
-          className="grid grid-cols-2 md:grid-cols-4 divide-x divide-y md:divide-y-0"
-          style={{ "--tw-divide-color": "#E0D9CE" } as React.CSSProperties}
-        >
-          {STATS.map((s, i) => (
-            <motion.div
-              key={s.label}
-              initial={{ opacity: 0 }}
-              animate={inView ? { opacity: 1 } : {}}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="text-center py-8 px-4"
-            >
-              <div className="text-4xl font-bold mb-1" style={{ color: "#8B6514", fontFamily: "var(--font-display)" }}>
-                <AnimatedNumber target={s.value} suffix={s.suffix} />
-              </div>
-              <div className="text-xs" style={{ color: "#9A9490" }}>{s.label}</div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </motion.div>
   );
 }
 
