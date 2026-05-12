@@ -759,9 +759,9 @@ function ToolsPreview() {
           专业工具库
         </div>
         <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
-          四大计算工具
+          企业资本工具系统
         </h2>
-        <p className="text-sm" style={{ color: "#68625C" }}>每个工具均可导出 PDF / Excel，结果图表化呈现</p>
+        <p className="text-sm" style={{ color: "#68625C" }}>打造具备资本扩张能力的企业</p>
       </motion.div>
 
       <div className="grid sm:grid-cols-2 gap-3">
