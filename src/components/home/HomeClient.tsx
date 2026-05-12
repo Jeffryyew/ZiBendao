@@ -19,7 +19,7 @@ export default function HomeClient({ t, locale, isLoggedIn }: Props) {
       <Navbar t={t.nav} locale={locale} isLoggedIn={isLoggedIn} />
       <HeroSection t={t.hero} isLoggedIn={isLoggedIn} />
       <WhatIsCapital />
-      <CapitalLearningJourney />
+      <CapitalLearningJourney locale={locale} />
       <ToolsPreview />
       <CorporateAdvisory />
       <FounderSection locale={locale} />
@@ -524,7 +524,7 @@ function WhatIsCapital() {
 
 // ─── Capital Learning Journey ─────────────────────────────────────────────────
 
-function CapitalLearningJourney() {
+function CapitalLearningJourney({ locale }: { locale: string }) {
   const LEVELS = [
     {
       stageLabel: "线上",
@@ -594,7 +594,7 @@ function CapitalLearningJourney() {
           资本成长路径
         </div>
         <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
-          Capital Learning Journey
+          {locale === "en" ? "Capital Learning Journey" : "资本成长之路"}
         </h2>
         <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>
           从资本启蒙到企业操盘，系统化的四阶段成长体系
