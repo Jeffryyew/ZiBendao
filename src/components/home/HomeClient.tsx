@@ -364,277 +364,92 @@ function HeroSection({ t, isLoggedIn }: { t: Dict["hero"]; isLoggedIn?: boolean 
         />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto">
-        <div className="flex flex-col lg:flex-row items-center gap-14 lg:gap-16">
-          {/* Left: Text */}
-          <div className="flex-1 text-center lg:text-left">
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs mb-8"
-              style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.15)", color: "#8B6514" }}
+      <div className="relative z-10 max-w-4xl mx-auto text-center">
+        {/* Badge */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs mb-8"
+          style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.15)", color: "#8B6514" }}
+        >
+          <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", backgroundColor: "#C9A84C" }} />
+          {t.badge}
+        </motion.div>
+
+        {/* Title */}
+        <motion.h1
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.65, delay: 0.08, ease: "easeOut" }}
+          style={{
+            fontFamily: "var(--font-display)",
+            fontWeight: 800,
+            fontSize: "clamp(2.8rem, 5.5vw, 5rem)",
+            lineHeight: 1.08,
+            letterSpacing: "-0.02em",
+            marginBottom: "1.5rem",
+            color: "#1C1814",
+          }}
+        >
+          {t.title_1}
+          <br />
+          <span style={{ color: "#8B6514" }}>
+            {t.title_2}
+          </span>
+        </motion.h1>
+
+        {/* Subtitle */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.18, ease: "easeOut" }}
+          className="text-lg max-w-2xl mx-auto mb-10 leading-relaxed"
+          style={{ color: "#68625C" }}
+        >
+          {t.subtitle.split("\n").map((line, i) => (
+            <span key={i}>{line}{i === 0 && <br />}</span>
+          ))}
+        </motion.p>
+
+        {/* CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.26, ease: "easeOut" }}
+          className="flex flex-col sm:flex-row gap-3 justify-center"
+        >
+          {isLoggedIn ? (
+            <Link
+              href="/dashboard"
+              className="px-8 py-4 rounded-xl font-semibold text-base transition-opacity hover:opacity-85"
+              style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
             >
-              <span style={{ display: "inline-block", width: 6, height: 6, borderRadius: "50%", backgroundColor: "#C9A84C" }} />
-              {t.badge}
-            </motion.div>
-
-            {/* Title */}
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, delay: 0.08, ease: "easeOut" }}
-              style={{
-                fontFamily: "var(--font-display)",
-                fontWeight: 800,
-                fontSize: "clamp(2.8rem, 5.5vw, 5rem)",
-                lineHeight: 1.08,
-                letterSpacing: "-0.02em",
-                marginBottom: "1.5rem",
-                color: "#1C1814",
-              }}
-            >
-              {t.title_1}
-              <br />
-              <span style={{ color: "#8B6514" }}>
-                {t.title_2}
-              </span>
-            </motion.h1>
-
-            {/* Subtitle */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.18, ease: "easeOut" }}
-              className="text-lg max-w-lg mb-10 leading-relaxed"
-              style={{ color: "#68625C" }}
-            >
-              {t.subtitle.split("\n").map((line, i) => (
-                <span key={i}>{line}{i === 0 && <br />}</span>
-              ))}
-            </motion.p>
-
-            {/* CTAs */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.26, ease: "easeOut" }}
-              className="flex flex-col sm:flex-row gap-3 lg:justify-start justify-center"
-            >
-              {isLoggedIn ? (
-                <Link
-                  href="/dashboard"
-                  className="px-8 py-4 rounded-xl font-semibold text-base transition-opacity hover:opacity-85"
-                  style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
-                >
-                  进入平台 →
-                </Link>
-              ) : (
-                <>
-                  <Link
-                    href="/register"
-                    className="px-8 py-4 rounded-xl font-semibold text-base transition-opacity hover:opacity-88"
-                    style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
-                  >
-                    {t.cta_primary}
-                  </Link>
-                  <Link
-                    href="/tools"
-                    className="px-8 py-4 rounded-xl font-semibold text-base transition-all"
-                    style={{ backgroundColor: "transparent", color: "#68625C", border: "1px solid #E0D9CE" }}
-                    onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#B0A898"; (e.currentTarget as HTMLAnchorElement).style.color = "#1C1814"; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#E0D9CE"; (e.currentTarget as HTMLAnchorElement).style.color = "#68625C"; }}
-                  >
-                    {t.cta_secondary}
-                  </Link>
-                </>
-              )}
-            </motion.div>
-          </div>
-
-          {/* Right: Dashboard (desktop only) */}
-          <motion.div
-            initial={{ opacity: 0, x: 32 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-            className="hidden lg:block flex-shrink-0"
-            style={{ width: 360 }}
-          >
-            <CapitalDashboard />
-          </motion.div>
-        </div>
-
-        {/* Mobile dashboard cards */}
-        <div className="lg:hidden mt-12">
-          <MobileDashboardCards />
-        </div>
+              进入平台 →
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/register"
+                className="px-8 py-4 rounded-xl font-semibold text-base transition-opacity hover:opacity-88"
+                style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
+              >
+                {t.cta_primary}
+              </Link>
+              <Link
+                href="/tools"
+                className="px-8 py-4 rounded-xl font-semibold text-base transition-all"
+                style={{ backgroundColor: "transparent", color: "#68625C", border: "1px solid #E0D9CE" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#B0A898"; (e.currentTarget as HTMLAnchorElement).style.color = "#1C1814"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#E0D9CE"; (e.currentTarget as HTMLAnchorElement).style.color = "#68625C"; }}
+              >
+                {t.cta_secondary}
+              </Link>
+            </>
+          )}
+        </motion.div>
       </div>
     </section>
-  );
-}
-
-// ─── Capital Dashboard (desktop) ────────────────────────────────────────────
-
-function CapitalDashboard() {
-  const circumference = 2 * Math.PI * 38;
-  const score = 78;
-  const strokeDash = (score / 100) * circumference;
-
-  return (
-    <div
-      style={{
-        background: "#FFFFFF",
-        border: "1px solid #E0D9CE",
-        borderRadius: 20,
-        padding: "24px",
-        boxShadow: "0 4px 32px rgba(28,24,20,0.08)",
-      }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-5">
-        <div>
-          <div className="text-xs font-mono mb-0.5" style={{ color: "#C0B8B0" }}>CAPITAL OS · DASHBOARD</div>
-          <div className="text-sm font-semibold" style={{ color: "#1C1814" }}>Enterprise Profile</div>
-        </div>
-        <div
-          className="text-xs px-2.5 py-1 rounded-full font-mono"
-          style={{ backgroundColor: "rgba(45,125,79,0.1)", color: "#2D7D4F", border: "1px solid rgba(45,125,79,0.2)" }}
-        >
-          ● LIVE
-        </div>
-      </div>
-
-      {/* Score ring */}
-      <div className="flex items-center gap-5 mb-5">
-        <div className="relative flex-shrink-0" style={{ width: 96, height: 96 }}>
-          <svg width="96" height="96" viewBox="0 0 96 96" style={{ transform: "rotate(-90deg)" }}>
-            <circle cx="48" cy="48" r="38" fill="none" stroke="#EEE9E0" strokeWidth="7" />
-            <circle
-              cx="48" cy="48" r="38" fill="none"
-              stroke="url(#scoreGradLight)" strokeWidth="7"
-              strokeLinecap="round"
-              strokeDasharray={`${strokeDash} ${circumference - strokeDash}`}
-            />
-            <defs>
-              <linearGradient id="scoreGradLight" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor="#8B6514" />
-                <stop offset="50%" stopColor="#C9A84C" />
-                <stop offset="100%" stopColor="#F5D878" />
-              </linearGradient>
-            </defs>
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="text-2xl font-bold" style={{ color: "#8B6514", lineHeight: 1 }}>{score}</div>
-            <div className="text-xs" style={{ color: "#C0B8B0" }}>/100</div>
-          </div>
-        </div>
-        <div>
-          <div className="text-xs mb-1" style={{ color: "#9A9490" }}>Enterprise Score</div>
-          <div
-            className="text-sm font-semibold px-2.5 py-1 rounded-lg mb-2"
-            style={{ backgroundColor: "rgba(45,125,79,0.08)", color: "#2D7D4F", border: "1px solid rgba(45,125,79,0.15)", display: "inline-block" }}
-          >
-            Series A Ready
-          </div>
-          <div className="text-xs" style={{ color: "#C0B8B0" }}>Capital Readiness</div>
-        </div>
-      </div>
-
-      {/* Metrics */}
-      <div className="space-y-3 mb-5">
-        <div className="flex items-center justify-between">
-          <span className="text-xs" style={{ color: "#9A9490" }}>Valuation</span>
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold" style={{ color: "#1C1814" }}>RM 12.5M</span>
-            <span className="text-xs" style={{ color: "#2D7D4F" }}>↑ 18% YTD</span>
-          </div>
-        </div>
-
-        <div>
-          <div className="flex items-center justify-between mb-1.5">
-            <span className="text-xs" style={{ color: "#9A9490" }}>Investor Readiness</span>
-            <span className="text-xs font-mono" style={{ color: "#8B6514" }}>82%</span>
-          </div>
-          <div className="relative h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: "#EEE9E0" }}>
-            <div
-              style={{
-                position: "absolute", left: 0, top: 0, bottom: 0, width: "82%",
-                background: "linear-gradient(90deg, #8B6514, #C9A84C)",
-                borderRadius: "9999px",
-              }}
-            />
-          </div>
-          <div className="flex justify-between mt-1">
-            {["Foundation", "Growth", "Series A", "IPO"].map((label) => (
-              <span key={label} style={{ color: "#C0B8B0", fontSize: "9px" }}>{label}</span>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between">
-          <span className="text-xs" style={{ color: "#9A9490" }}>Cashflow Health</span>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full inline-block" style={{ backgroundColor: "#2D7D4F" }} />
-            <span className="text-xs font-medium" style={{ color: "#2D7D4F" }}>Good</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Next upgrade */}
-      <div
-        className="flex items-center justify-between p-3 rounded-xl"
-        style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.12)" }}
-      >
-        <div>
-          <div className="text-xs mb-0.5" style={{ color: "#9A9490" }}>Next Upgrade</div>
-          <div className="text-sm font-semibold" style={{ color: "#8B6514" }}>SPV Structuring →</div>
-        </div>
-        <div
-          className="text-xs px-2 py-1 rounded-lg"
-          style={{ backgroundColor: "#FFFFFF", color: "#8B6514", border: "1px solid rgba(139,101,20,0.12)" }}
-        >
-          +35 XP
-        </div>
-      </div>
-
-      <div className="mt-3 text-center">
-        <span className="text-xs font-mono" style={{ color: "#C0B8B0" }}>DEMO · Capital Simulation Lab</span>
-      </div>
-    </div>
-  );
-}
-
-// ─── Mobile Dashboard Cards ───────────────────────────────────────────────────
-
-function MobileDashboardCards() {
-  const CARDS = [
-    { label: "Enterprise Score", value: "78/100", sub: "Series A Ready", color: "#8B6514" },
-    { label: "Valuation", value: "RM 12.5M", sub: "↑ 18% YTD", color: "#2D7D4F" },
-    { label: "Investor Readiness", value: "82%", sub: "Growth Stage", color: "#8B6514" },
-    { label: "Cashflow", value: "Good", sub: "Healthy", color: "#2D7D4F" },
-  ];
-
-  return (
-    <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: "none" } as React.CSSProperties}>
-      {CARDS.map((card) => (
-        <div
-          key={card.label}
-          className="flex-shrink-0 p-4 rounded-xl"
-          style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", minWidth: 140 }}
-        >
-          <div className="text-xs mb-2" style={{ color: "#9A9490" }}>{card.label}</div>
-          <div className="text-lg font-bold mb-0.5" style={{ color: card.color }}>{card.value}</div>
-          <div className="text-xs" style={{ color: "#C0B8B0" }}>{card.sub}</div>
-        </div>
-      ))}
-      <div
-        className="flex-shrink-0 flex items-center justify-center px-4 rounded-xl"
-        style={{ border: "1px dashed #E0D9CE", minWidth: 100 }}
-      >
-        <span className="text-xs text-center" style={{ color: "#C0B8B0" }}>DEMO<br />Sim Lab</span>
-      </div>
-    </div>
   );
 }
 
