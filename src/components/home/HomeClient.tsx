@@ -20,7 +20,7 @@ export default function HomeClient({ t, locale, isLoggedIn }: Props) {
       <HeroSection t={t.hero} isLoggedIn={isLoggedIn} />
       <WhatIsCapital />
       <CapitalLearningJourney locale={locale} />
-      <ToolsPreview />
+      <ToolsPreview locale={locale} />
       <CTASection isLoggedIn={isLoggedIn} />
       <Footer t={t.footer} />
     </div>
@@ -76,18 +76,16 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
 
   const TOOLS_ITEMS: DropdownItem[] = locale === "zh"
     ? [
-        { label: "企业估值", href: "/tools/market-cap" },
-        { label: "融资计算", href: "/tools", comingSoon: true },
-        { label: "报价系统", href: "/tools/pricing-system" },
-        { label: "财务预测", href: "/tools/financial-roadmap" },
-        { label: "股权模拟", href: "/tools", comingSoon: true },
+        { label: "企业财务路线图", href: "/tools/financial-roadmap" },
+        { label: "智能报价系统", href: "/tools/pricing-system" },
+        { label: "企业估值系统", href: "/tools/market-cap" },
+        { label: "企业绩效系统", href: "/tools/pat-kpi" },
       ]
     : [
+        { label: "Financial Roadmap", href: "/tools/financial-roadmap" },
+        { label: "Smart Quotation System", href: "/tools/pricing-system" },
         { label: "Valuation Engine", href: "/tools/market-cap" },
-        { label: "Funding Calculator", href: "/tools", comingSoon: true },
-        { label: "Quotation System", href: "/tools/pricing-system" },
-        { label: "Financial Forecast", href: "/tools/financial-roadmap" },
-        { label: "Equity Simulator", href: "/tools", comingSoon: true },
+        { label: "Performance Intelligence", href: "/tools/pat-kpi" },
       ];
 
   const COMMUNITY_ITEMS: DropdownItem[] = locale === "zh"
@@ -732,13 +730,20 @@ function LevelCard({
 
 // ─── Tools preview ────────────────────────────────────────────────────────────
 
-function ToolsPreview() {
-  const TOOLS = [
-    { name: "金融路线图方程式", level: "L1+", icon: "📈", desc: "复利增长路径规划，年度目标可视化" },
-    { name: "产品服务报价系统", level: "L1+", icon: "💰", desc: "专业报价单生成，一键导出 PDF" },
-    { name: "市值 / 市盈率计算器", level: "L2+", icon: "📊", desc: "PE / PB / PS 估值，行业对比图表" },
-    { name: "PAT & KPI 计算器", level: "L3+", icon: "🎯", desc: "税后利润、ROE / ROA、KPI 进度" },
+function ToolsPreview({ locale }: { locale: Locale }) {
+  const TOOLS_ZH = [
+    { name: "企业财务路线图", desc: "复利增长路径规划，年度目标可视化" },
+    { name: "智能报价系统", desc: "专业报价单生成，一键导出 PDF" },
+    { name: "企业估值系统", desc: "PE / PB / PS 估值，行业对比图表" },
+    { name: "企业绩效系统", desc: "税后利润、ROE / ROA、KPI 进度" },
   ];
+  const TOOLS_EN = [
+    { name: "Financial Roadmap", desc: "Compound growth planning with annual target visualisation" },
+    { name: "Smart Quotation System", desc: "Professional quotation generator with one-click PDF export" },
+    { name: "Valuation Engine", desc: "PE / PB / PS valuation with industry comparison charts" },
+    { name: "Performance Intelligence", desc: "PAT, ROE / ROA, and KPI progress tracking" },
+  ];
+  const TOOLS = locale === "en" ? TOOLS_EN : TOOLS_ZH;
 
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
@@ -782,7 +787,7 @@ function ToolsPreview() {
           onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#F5EDD4"; }}
           onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#FBF4E4"; }}
         >
-          查看工具详情 →
+          企业升级入口 →
         </Link>
       </motion.div>
     </section>
@@ -792,7 +797,7 @@ function ToolsPreview() {
 function ToolCard({
   tool, delay, inView, i,
 }: {
-  tool: { name: string; level: string; icon: string; desc: string };
+  tool: { name: string; desc: string };
   delay: number;
   inView: boolean;
   i: number;
@@ -815,20 +820,9 @@ function ToolCard({
         transition: "transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease",
       }}
     >
-      <div
-        className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-xl"
-        style={{
-          backgroundColor: hovered ? "#FBF4E4" : "#F7F4EF",
-          border: "1px solid #E0D9CE",
-          transition: "background-color 0.18s",
-        }}
-      >
-        {tool.icon}
-      </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-0.5">
-          <span className="text-xs font-mono font-bold" style={{ color: "#8B6514" }}>{tool.level}</span>
-          <span className="text-sm font-medium" style={{ color: "#1C1814" }}>{tool.name}</span>
+        <div className="mb-0.5">
+          <span className="text-sm font-semibold" style={{ color: "#1C1814" }}>{tool.name}</span>
         </div>
         <div className="text-xs" style={{ color: "#9A9490" }}>{tool.desc}</div>
       </div>
@@ -875,7 +869,7 @@ function CTASection({ isLoggedIn }: { isLoggedIn?: boolean }) {
           你的企业，<span style={{ color: "#C9A84C" }}>值得被资本看见</span>
         </h2>
         <p className="mb-10 text-sm leading-relaxed" style={{ color: "#9A9490" }}>
-          从资本通到企业资本咨询，每一步都有系统、有工具、有顾问。
+          从资本通开始，每一步都有系统、有工具。
           <br />
           注册开始，随时解锁下一个资本阶段。
         </p>
@@ -909,8 +903,9 @@ function CTASection({ isLoggedIn }: { isLoggedIn?: boolean }) {
 function Footer({ t }: { t: Dict["footer"] }) {
   const COL_A = [
     { label: "课程体系", href: "/courses" },
-    { label: "计算工具", href: "/tools" },
+    { label: "资本系统", href: "/tools" },
     { label: "关于我们", href: "/about" },
+    { label: "社群", href: "/community" },
   ];
   const COL_B = [
     { label: "登录", href: "/login" },
@@ -924,31 +919,40 @@ function Footer({ t }: { t: Dict["footer"] }) {
         <div>
           <div className="mb-3"><LogoImg height={36} onLight /></div>
           <p className="text-xs leading-relaxed mb-3" style={{ color: "#68625C" }}>{t.tagline}</p>
-          <p className="text-xs mb-4" style={{ color: "#9A9490" }}>Petaling Jaya, Selangor, Malaysia 🇲🇾</p>
+
           <div className="flex gap-2">
             {[
-              { label: "FB", href: "https://www.facebook.com/capitalmastery.net" },
-              { label: "IG", href: "https://www.instagram.com/capitalmasterydotnet" },
-              { label: "TT", href: "https://www.tiktok.com/@capitalmasterydotnet" },
+              {
+                label: "Facebook", href: "https://www.facebook.com/capitalmastery.net",
+                icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>,
+              },
+              {
+                label: "Instagram", href: "https://www.instagram.com/capitalmasterydotnet",
+                icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>,
+              },
+              {
+                label: "TikTok", href: "https://www.tiktok.com/@capitalmasterydotnet",
+                icon: <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.17 8.17 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/></svg>,
+              },
             ].map((s) => (
               <a
                 key={s.label}
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs w-8 h-8 rounded-lg flex items-center justify-center"
+                aria-label={s.label}
+                className="w-8 h-8 rounded-lg flex items-center justify-center"
                 style={{ backgroundColor: "#FFFFFF", color: "#9A9490", border: "1px solid #E0D9CE" }}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#8B6514"; (e.currentTarget as HTMLAnchorElement).style.borderColor = "rgba(139,101,20,0.25)"; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#9A9490"; (e.currentTarget as HTMLAnchorElement).style.borderColor = "#E0D9CE"; }}
               >
-                {s.label}
+                {s.icon}
               </a>
             ))}
           </div>
         </div>
 
         <div>
-          <div className="text-xs font-semibold tracking-widest mb-4" style={{ color: "#C0B8B0" }}>平台</div>
           <div className="space-y-2">
             {COL_A.map((item) => (
               <div key={item.href}>
@@ -967,12 +971,6 @@ function Footer({ t }: { t: Dict["footer"] }) {
         </div>
 
         <div>
-          <div className="text-xs font-semibold tracking-widest mb-4" style={{ color: "#C0B8B0" }}>地址</div>
-          <p className="text-xs leading-relaxed" style={{ color: "#68625C" }}>
-            Leisure Commerce Square,<br />
-            Jalan PJS 8/9, 46150<br />
-            Petaling Jaya, Selangor
-          </p>
           <div className="mt-6 space-y-2">
             {COL_B.map((item) => (
               <div key={item.href}>
@@ -996,7 +994,6 @@ function Footer({ t }: { t: Dict["footer"] }) {
         style={{ borderTop: "1px solid #E0D9CE", color: "#C0B8B0" }}
       >
         <span>{t.copyright}</span>
-        <span>Craftspace Sdn Bhd (202201044683 / 1490380-V)</span>
       </div>
     </footer>
   );

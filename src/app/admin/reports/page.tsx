@@ -102,10 +102,10 @@ export default async function AdminReportsPage() {
       {/* KPI Summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: "总用户",  value: String(allUsers),                    icon: "👥", color: "#F5F5F0" },
+          { label: "总用户",  value: String(allUsers),                    icon: "用",  color: "#F5F5F0" },
           { label: "本期付款", value: String(successPayments.length),      icon: "✓",  color: "#4CAF82" },
-          { label: "本期收入", value: `MYR ${totalRevenue.toFixed(0)}`,    icon: "💰", color: "#C9A84C" },
-          { label: "工具授权", value: String(toolAccessCount),             icon: "🧮", color: "#A0A09A" },
+          { label: "本期收入", value: `MYR ${totalRevenue.toFixed(0)}`,    icon: "MYR", color: "#C9A84C" },
+          { label: "工具授权", value: String(toolAccessCount),             icon: "工",  color: "#A0A09A" },
         ].map((s) => (
           <div
             key={s.label}

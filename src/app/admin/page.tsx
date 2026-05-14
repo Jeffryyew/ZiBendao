@@ -51,7 +51,7 @@ export default async function AdminDashboardPage() {
         <div>
           <p className="text-sm mb-1" style={{ color: "#666660" }}>{greeting}，</p>
           <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
-            {firstName} 👋
+            {firstName}
           </h1>
         </div>
         <div
@@ -70,10 +70,10 @@ export default async function AdminDashboardPage() {
       {/* ── Summary Stats ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: "总用户", value: totalUsers,                                icon: "👥", href: "/admin/users" },
-          { label: "线上学生", value: roleCount["ONLINE_STUDENT"] ?? 0,        icon: "📚", href: "/admin/users" },
-          { label: "企业客户", value: roleCount["ENTERPRISE_CLIENT"] ?? 0,     icon: "🏢", href: "/admin/users" },
-          { label: "合约文件", value: totalDocuments,                           icon: "📋", href: "/admin/contracts" },
+          { label: "总用户", value: totalUsers,                                icon: "用户", href: "/admin/users" },
+          { label: "线上学生", value: roleCount["ONLINE_STUDENT"] ?? 0,        icon: "学生", href: "/admin/users" },
+          { label: "企业客户", value: roleCount["ENTERPRISE_CLIENT"] ?? 0,     icon: "客户", href: "/admin/users" },
+          { label: "合约文件", value: totalDocuments,                           icon: "合约", href: "/admin/contracts" },
         ].map((s) => (
           <Link
             key={s.label}
@@ -119,10 +119,10 @@ export default async function AdminDashboardPage() {
         <h2 className="font-semibold text-sm tracking-wide mb-4" style={{ color: "#A0A09A" }}>快捷操作</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {[
-            { href: "/admin/contracts/new", icon: "📋", title: "生成新合约", desc: "为客户创建咨询服务合约" },
-            { href: "/admin/users",         icon: "👥", title: "用户管理",   desc: "查看、编辑用户角色与权限" },
-            { href: "/admin/reports",       icon: "📊", title: "数据报告",   desc: "平台运营统计与分析" },
-            { href: "/admin/payments",      icon: "💳", title: "支付记录",   desc: "查看所有订单与支付状态" },
+            { href: "/admin/contracts/new", icon: "+", title: "生成新合约", desc: "为客户创建咨询服务合约" },
+            { href: "/admin/users",         icon: "◈", title: "用户管理",   desc: "查看、编辑用户角色与权限" },
+            { href: "/admin/reports",       icon: "▦", title: "数据报告",   desc: "平台运营统计与分析" },
+            { href: "/admin/payments",      icon: "¥", title: "支付记录",   desc: "查看所有订单与支付状态" },
           ].map((action) => (
             <Link
               key={action.href}
@@ -158,7 +158,7 @@ export default async function AdminDashboardPage() {
             className="rounded-2xl p-8 text-center"
             style={{ backgroundColor: "#0D0D0D", border: "1px dashed #1E1E1E" }}
           >
-            <div className="text-3xl mb-3">💳</div>
+            <div className="text-sm mb-3" style={{ color: "#555550" }}>暂无记录</div>
             <p className="text-sm" style={{ color: "#555550" }}>暂无支付记录</p>
           </div>
         ) : (

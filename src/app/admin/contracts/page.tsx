@@ -89,7 +89,7 @@ export default async function AdminContractsPage({
           className="rounded-2xl p-12 text-center"
           style={{ backgroundColor: "#0D0D0D", border: "1px dashed #1E1E1E" }}
         >
-          <div className="text-4xl mb-4">📄</div>
+          <div className="text-sm mb-4" style={{ color: "#555550" }}>暂无合约</div>
           <p className="text-sm mb-1" style={{ color: "#555550" }}>
             {status ? `暂无${STATUS_LABEL[status] ?? status}合约` : "暂无合约，点击右上角生成第一份。"}
           </p>
@@ -105,10 +105,10 @@ export default async function AdminContractsPage({
                 style={{ backgroundColor: "#111111", border: "1px solid #1A1A1A" }}
               >
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: "#1A1A1A" }}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-mono flex-shrink-0"
+                  style={{ backgroundColor: "#1A1A1A", color: "#666660" }}
                 >
-                  📋
+                  合约
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium truncate" style={{ color: "#F5F5F0" }}>

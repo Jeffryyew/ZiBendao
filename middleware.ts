@@ -17,10 +17,12 @@ export default auth((req) => {
     pathname === "/login" ||
     pathname === "/register" ||
     pathname === "/courses" ||
-    pathname === "/tools" ||
+    pathname.startsWith("/tools") ||
+    pathname === "/community" ||
     pathname === "/pricing" ||
     pathname === "/about" ||
-    pathname.startsWith("/payment");
+    pathname.startsWith("/payment") ||
+    pathname.startsWith("/login/otp");
 
   if (isPublic) return NextResponse.next();
 

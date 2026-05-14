@@ -5,9 +5,9 @@ import Link from "next/link";
 import { getRoleLabel, isGraduate, ROLE_COLOR } from "@/lib/roles";
 
 const GRAD_INFO: Record<string, { icon: string; course: string; color: string }> = {
-  ZIBENTONG_GRAD: { icon: "🏆", course: "资本通", color: "#C9A84C" },
-  QIDONG_GRAD: { icon: "🚀", course: "启动资本", color: "#A88C3A" },
-  ZIBENDAO_GRAD: { icon: "🎓", course: "资本道", color: "#F5E6C8" },
+  ZIBENTONG_GRAD: { icon: "优", course: "资本通", color: "#C9A84C" },
+  QIDONG_GRAD: { icon: "启", course: "启动资本", color: "#A88C3A" },
+  ZIBENDAO_GRAD: { icon: "道", course: "资本道", color: "#F5E6C8" },
 };
 
 const LEVEL_INFO = {
@@ -17,10 +17,10 @@ const LEVEL_INFO = {
 };
 
 const ACHIEVEMENTS = [
-  { id: "first-lesson", icon: "🎯", title: "第一步", desc: "完成第一关课程", xp: 50 },
-  { id: "module-1", icon: "💡", title: "财务启蒙", desc: "完成财务基础模块", xp: 100 },
-  { id: "streak-7", icon: "🔥", title: "连续7天", desc: "连续学习7天", xp: 75 },
-  { id: "tools-user", icon: "🧮", title: "工具达人", desc: "使用3种计算工具", xp: 50 },
+  { id: "first-lesson", icon: "①", title: "第一步", desc: "完成第一关课程", xp: 50 },
+  { id: "module-1", icon: "◈", title: "财务启蒙", desc: "完成财务基础模块", xp: 100 },
+  { id: "streak-7", icon: "→", title: "连续7天", desc: "连续学习7天", xp: 75 },
+  { id: "tools-user", icon: "✦", title: "工具达人", desc: "使用3种计算工具", xp: 50 },
 ];
 
 export default async function StudentDashboardPage() {
@@ -61,7 +61,7 @@ export default async function StudentDashboardPage() {
         <div className="flex-1">
           <p className="text-sm mb-0.5" style={{ color: "#A0A09A" }}>欢迎回来，</p>
           <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
-            {firstName} 👋
+            {firstName}
           </h1>
         </div>
 
@@ -146,8 +146,8 @@ export default async function StudentDashboardPage() {
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: "已完成课程", value: completedCount.toString(), unit: "关", icon: "✓" },
-          { label: "累计积分", value: totalXP.toString(), unit: "XP", icon: "⚡" },
-          { label: "当前身份", value: grad ? "毕业生" : `第${level}阶`, unit: "", icon: "🏅" },
+          { label: "累计积分", value: totalXP.toString(), unit: "XP", icon: "XP" },
+          { label: "当前身份", value: grad ? "毕业生" : `第${level}阶`, unit: "", icon: "◈" },
         ].map((stat) => (
           <div
             key={stat.label}
@@ -174,10 +174,10 @@ export default async function StudentDashboardPage() {
           style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}
         >
           <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-            style={{ backgroundColor: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.2)" }}
+            className="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0"
+            style={{ backgroundColor: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.2)", color: "#C9A84C" }}
           >
-            📚
+            课程
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-semibold text-sm mb-0.5">{grad ? "回顾课程" : "继续学习"}</div>
@@ -194,10 +194,10 @@ export default async function StudentDashboardPage() {
           style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}
         >
           <div
-            className="w-12 h-12 rounded-xl flex items-center justify-center text-xl flex-shrink-0"
-            style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A" }}
+            className="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold flex-shrink-0"
+            style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", color: "#808080" }}
           >
-            🧮
+            工具
           </div>
           <div className="flex-1 min-w-0">
             <div className="font-semibold text-sm mb-0.5">计算工具</div>

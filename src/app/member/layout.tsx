@@ -4,8 +4,9 @@ import Sidebar, { NavItem } from "@/components/Sidebar";
 
 const NAV_ITEMS: NavItem[] = [
   { label: "主页", href: "/member/dashboard", icon: "⊕" },
-  { label: "学习中心", href: "/member/learn", icon: "📚" },
-  { label: "了解课程", href: "/courses", icon: "⭐", highlight: true },
+  { label: "学习中心", href: "/member/learn" },
+  { label: "工具讲解", href: "/tools/guide" },
+  { label: "了解课程", href: "/courses", highlight: true },
 ];
 
 export default async function MemberLayout({ children }: { children: React.ReactNode }) {

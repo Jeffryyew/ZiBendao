@@ -85,7 +85,7 @@ export default async function StudentLearnPage() {
           className="rounded-2xl p-12 text-center"
           style={{ backgroundColor: "#0D0D0D", border: "1px dashed #1E1E1E" }}
         >
-          <div className="text-4xl mb-4">📚</div>
+          <div className="text-lg mb-4" style={{ color: "#555550" }}>课程准备中</div>
           <p className="text-sm mb-1" style={{ color: "#555550" }}>课程内容正在准备中</p>
           <p className="text-xs" style={{ color: "#333330" }}>管理员将陆续发布课程模块，请稍后回来查看</p>
         </div>
@@ -129,7 +129,7 @@ export default async function StudentLearnPage() {
                   </div>
                 </div>
                 {moduleLocked ? (
-                  <span style={{ color: "#2A2A28" }}>🔒</span>
+                  <span className="text-xs" style={{ color: "#2A2A28" }}>锁定</span>
                 ) : (
                   <span
                     className="text-xs px-2.5 py-1 rounded-full font-mono"
@@ -225,7 +225,7 @@ function LessonMap({
 
           const icon =
             status === "completed" ? "✓"
-            : status === "locked" ? "🔒"
+            : status === "locked" ? "×"
             : TYPE_ICON[lesson.type];
 
           const labelLeft = isLeft ? cx + NODE_RADIUS + 8 : undefined;

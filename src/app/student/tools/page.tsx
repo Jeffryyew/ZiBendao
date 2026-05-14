@@ -19,7 +19,7 @@ const TOOLS: Tool[] = [
     name: "金融路线图方程式",
     desc: "系统化规划你的财务目标与实现路径，生成个性化财富增长方案。",
     requiredLevel: 1,
-    icon: "🗺",
+    icon: "FV",
     color: "#C9A84C",
     features: ["目标财富计算", "时间规划", "投资回报预测", "PDF 导出"],
   },
@@ -28,7 +28,7 @@ const TOOLS: Tool[] = [
     name: "产品服务报价系统",
     desc: "专业级报价单生成器，支持多项目报价、税务计算和品牌定制。",
     requiredLevel: 2,
-    icon: "💰",
+    icon: "QT",
     color: "#A88B3C",
     features: ["多项目明细", "税务计算", "折扣管理", "PDF/Excel 导出"],
   },
@@ -37,7 +37,7 @@ const TOOLS: Tool[] = [
     name: "市值/市盈率计算器",
     desc: "深度企业估值分析工具，帮助你识别价值洼地，做出更理智的投资决策。",
     requiredLevel: 2,
-    icon: "📊",
+    icon: "PE",
     color: "#A88B3C",
     features: ["市值计算", "PE/PB 分析", "行业对比", "图表可视化"],
   },
@@ -46,7 +46,7 @@ const TOOLS: Tool[] = [
     name: "PAT & KPI 计算器",
     desc: "税后净利润与关键绩效指标综合分析，为企业经营决策提供数据支撑。",
     requiredLevel: 3,
-    icon: "📈",
+    icon: "KPI",
     color: "#7A6030",
     features: ["PAT 计算", "KPI 追踪", "趋势图表", "报告导出"],
   },
@@ -81,7 +81,7 @@ export default async function StudentToolsPage() {
           className="w-9 h-9 rounded-lg flex items-center justify-center text-sm font-bold font-mono flex-shrink-0"
           style={{ backgroundColor: "rgba(201,168,76,0.12)", color: "#C9A84C" }}
         >
-          {grad ? "🎓" : `第${studentLevel}阶`}
+          {grad ? "毕业" : `第${studentLevel}阶`}
         </div>
         <div className="flex-1">
           <span className="text-sm" style={{ color: "#A0A09A" }}>
@@ -127,7 +127,7 @@ export default async function StudentToolsPage() {
                       border: `1px solid ${accessible ? `${tool.color}30` : "#222222"}`,
                     }}
                   >
-                    {accessible ? tool.icon : "🔒"}
+                    {accessible ? tool.icon : "锁定"}
                   </div>
                   <span
                     className="text-xs px-2.5 py-1 rounded-full font-mono flex-shrink-0"
@@ -179,7 +179,7 @@ export default async function StudentToolsPage() {
                     className="flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm"
                     style={{ backgroundColor: "#181818", color: "#3A3A38", border: "1px solid #1E1E1E" }}
                   >
-                    🔒 需要 L{tool.requiredLevel} 解锁
+                    需要 L{tool.requiredLevel} 解锁
                   </div>
                 )}
               </div>

@@ -5,12 +5,12 @@ import { getRoleLabel } from "@/lib/roles";
 
 const NAV_ITEMS: NavItem[] = [
   { label: "仪表板", href: "/admin", icon: "⊕" },
-  { label: "用户管理", href: "/admin/users", icon: "👥" },
-  { label: "合约管理", href: "/admin/contracts", icon: "📄" },
-  { label: "课程管理", href: "/admin/courses", icon: "📚" },
-  { label: "工具管理", href: "/admin/tools", icon: "🧮" },
-  { label: "支付记录", href: "/admin/payments", icon: "💳" },
-  { label: "数据报表", href: "/admin/reports", icon: "📊" },
+  { label: "用户管理", href: "/admin/users" },
+  { label: "合约管理", href: "/admin/contracts" },
+  { label: "课程管理", href: "/admin/courses" },
+  { label: "工具管理", href: "/admin/tools" },
+  { label: "支付记录", href: "/admin/payments" },
+  { label: "数据报表", href: "/admin/reports" },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

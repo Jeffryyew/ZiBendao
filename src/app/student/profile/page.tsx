@@ -10,12 +10,12 @@ const LEVEL_INFO = {
 };
 
 const ACHIEVEMENTS = [
-  { id: "register", icon: "🌟", title: "欢迎加入", desc: "完成注册，开始学习之旅", unlocked: true },
-  { id: "first-lesson", icon: "🎯", title: "第一步", desc: "完成第一关课程" },
-  { id: "module-done", icon: "💡", title: "财务启蒙", desc: "完成财务基础模块" },
-  { id: "streak-7", icon: "🔥", title: "学习达人", desc: "连续学习7天" },
-  { id: "tools-3", icon: "🧮", title: "工具专家", desc: "使用3种计算工具" },
-  { id: "level-2", icon: "🏅", title: "进阶成就", desc: "升级至 L2 学生" },
+  { id: "register", icon: "✦", title: "欢迎加入", desc: "完成注册，开始学习之旅", unlocked: true },
+  { id: "first-lesson", icon: "①", title: "第一步", desc: "完成第一关课程" },
+  { id: "module-done", icon: "◈", title: "财务启蒙", desc: "完成财务基础模块" },
+  { id: "streak-7", icon: "→", title: "学习达人", desc: "连续学习7天" },
+  { id: "tools-3", icon: "✓", title: "工具专家", desc: "使用3种计算工具" },
+  { id: "level-2", icon: "▲", title: "进阶成就", desc: "升级至 L2 学生" },
 ];
 
 export default async function StudentProfilePage() {
@@ -97,7 +97,7 @@ export default async function StudentProfilePage() {
             border: `1px solid ${levelInfo.color}30`,
           }}>
             <span className="text-xs font-mono font-bold" style={{ color: levelInfo.color }}>
-              {grad ? "🎓" : levelInfo.label}
+              {grad ? "毕业" : levelInfo.label}
             </span>
             <span className="text-xs font-medium" style={{ color: levelInfo.color }}>
               {grad ? getRoleLabel(role) : levelInfo.title}
@@ -148,8 +148,8 @@ export default async function StudentProfilePage() {
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: "完成课程", value: completedCount, unit: "关", icon: "✓" },
-          { label: "累计积分", value: totalXP, unit: "XP", icon: "⚡" },
-          { label: "学习等级", value: level, unit: "", icon: "🏅" },
+          { label: "累计积分", value: totalXP, unit: "XP", icon: "XP" },
+          { label: "学习等级", value: level, unit: "", icon: "◈" },
         ].map((s) => (
           <div
             key={s.label}

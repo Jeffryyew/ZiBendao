@@ -8,7 +8,7 @@ import { logout } from "@/app/actions/auth";
 export interface NavItem {
   label: string;
   href: string;
-  icon: string;
+  icon?: string;
   highlight?: boolean;
 }
 
@@ -82,7 +82,7 @@ export default function Sidebar({
                 : "1px solid transparent",
             }}
           >
-            <span className="text-base w-5 text-center flex-shrink-0 leading-none">{item.icon}</span>
+            {item.icon && <span className="text-base w-5 text-center flex-shrink-0 leading-none">{item.icon}</span>}
             <span className="flex-1">{item.label}</span>
             {isActive && !item.highlight && (
               <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: accentColor }} />
@@ -193,7 +193,7 @@ export default function Sidebar({
             <>
               <span style={{ color: "#2A2A2A" }}>/</span>
               <span className="text-sm truncate" style={{ color: "#A0A09A" }}>
-                {activeItem.icon} {activeItem.label}
+                {activeItem.icon ? `${activeItem.icon} ` : ""}{activeItem.label}
               </span>
             </>
           )}
@@ -289,7 +289,7 @@ export default function Sidebar({
                         : "1px solid transparent",
                     }}
                   >
-                    <span className="text-lg w-6 text-center flex-shrink-0 leading-none">{item.icon}</span>
+                    {item.icon && <span className="text-lg w-6 text-center flex-shrink-0 leading-none">{item.icon}</span>}
                     <span className="flex-1">{item.label}</span>
                     {isActive && !item.highlight && (
                       <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: accentColor }} />

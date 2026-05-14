@@ -4,10 +4,10 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 const TOOL_ICON: Record<string, string> = {
-  "financial-roadmap": "📈",
-  "pricing-system": "💰",
-  "market-cap": "📊",
-  "pat-kpi": "🎯",
+  "financial-roadmap": "FV",
+  "pricing-system": "QT",
+  "market-cap": "PE",
+  "pat-kpi": "KPI",
 };
 
 const DOC_STATUS: Record<string, { label: string; color: string }> = {
@@ -47,7 +47,7 @@ export default async function ClientDashboardPage() {
         <div>
           <p className="text-sm mb-1" style={{ color: "#666660" }}>{greeting}，</p>
           <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
-            {firstName} 👋
+            {firstName}
           </h1>
         </div>
         <div
@@ -62,9 +62,9 @@ export default async function ClientDashboardPage() {
       {/* ── Stats row ── */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "合约文件", value: String(documents.length), unit: "份", icon: "📄", href: "/client/documents" },
+          { label: "合约文件", value: String(documents.length), unit: "份", icon: "DOC", href: "/client/documents" },
           { label: "已签署",   value: String(signedCount),        unit: "份", icon: "✓", href: "/client/documents" },
-          { label: "授权工具", value: String(toolAccess.length),  unit: "个", icon: "🧮", href: "/client/tools" },
+          { label: "授权工具", value: String(toolAccess.length),  unit: "个", icon: "工具", href: "/client/tools" },
         ].map((s) => (
           <Link
             key={s.label}
@@ -98,7 +98,7 @@ export default async function ClientDashboardPage() {
             className="rounded-2xl p-10 text-center"
             style={{ backgroundColor: "#0D0D0D", border: "1px dashed #1E1E1E" }}
           >
-            <div className="text-3xl mb-3">📄</div>
+            <div className="text-sm mb-3" style={{ color: "#555550" }}>暂无文件</div>
             <p className="text-sm mb-1" style={{ color: "#555550" }}>暂无合约文件</p>
             <p className="text-xs" style={{ color: "#333330" }}>顾问将为您生成定制合约文件</p>
           </div>
@@ -114,10 +114,10 @@ export default async function ClientDashboardPage() {
                   style={{ backgroundColor: "#111111", border: "1px solid #1A1A1A" }}
                 >
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center text-base flex-shrink-0"
-                    style={{ backgroundColor: "#1A1A1A" }}
+                    className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-mono flex-shrink-0"
+                    style={{ backgroundColor: "#1A1A1A", color: "#666660" }}
                   >
-                    📋
+                    DOC
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="text-sm font-medium truncate" style={{ color: "#F5F5F0" }}>
@@ -162,7 +162,7 @@ export default async function ClientDashboardPage() {
             className="rounded-2xl p-10 text-center"
             style={{ backgroundColor: "#0D0D0D", border: "1px dashed #1E1E1E" }}
           >
-            <div className="text-3xl mb-3">🔒</div>
+            <div className="text-sm mb-3" style={{ color: "#555550" }}>暂无授权</div>
             <p className="text-sm mb-1" style={{ color: "#555550" }}>暂无授权工具</p>
             <p className="text-xs" style={{ color: "#333330" }}>联系顾问为您开通专业工具访问权限</p>
           </div>
@@ -179,7 +179,7 @@ export default async function ClientDashboardPage() {
                   className="w-9 h-9 rounded-lg flex items-center justify-center text-base flex-shrink-0"
                   style={{ backgroundColor: "rgba(107,143,212,0.1)", border: "1px solid rgba(107,143,212,0.2)" }}
                 >
-                  {TOOL_ICON[tool.slug] ?? "🧮"}
+                  {TOOL_ICON[tool.slug] ?? "工具"}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium truncate" style={{ color: "#F5F5F0" }}>{tool.name}</div>

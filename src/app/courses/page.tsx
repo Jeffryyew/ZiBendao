@@ -169,8 +169,8 @@ export default async function CoursesPage() {
           </h1>
           <p className="text-base leading-relaxed mb-8" style={{ color: "#68625C" }}>
             {isEn
-              ? "Designed by Jeffry Yew with 25 years of business development and 13 years of fundraising expertise, systematically teaching Malaysian SME owners to master capital operations."
-              : "由 Jeffry Yew（姚国雄）主导设计，融合 25 年商业发展与 13 年融资专业经验，系统教授马来西亚中小企业主掌握资本运作的完整路径。"}
+              ? "Designed by Jeffry Yew with 25 years of business development and 13 years of fundraising expertise, systematically teaching SME owners to master capital operations."
+              : "由 Jeffry Yew（姚国雄）主导设计，融合 25 年商业发展与 13 年融资专业经验，系统教授中小企业主掌握资本运作。"}
           </p>
           <Link
             href="/register"
@@ -193,7 +193,6 @@ export default async function CoursesPage() {
             </div>
             {outcomes.map((o) => (
               <div key={o.text} className="flex items-start gap-3">
-                <span className="text-xl flex-shrink-0">{o.icon}</span>
                 <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>{o.text}</p>
               </div>
             ))}

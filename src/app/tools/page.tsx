@@ -5,76 +5,60 @@ import { getLocale } from "@/lib/i18n";
 const TOOLS = [
   {
     slug: "financial-roadmap",
-    icon: "🗺",
-    level: "L1+",
     accent: "#2D7D4F",
     accentLight: "#EDFAF3",
     zh: {
-      name: "Capital Roadmap",
-      nameZh: "资本路线图",
+      name: "企业财务路线图",
       desc: "系统化规划财务目标，用复利公式预测未来财富增长轨迹。",
       features: ["FV 复利计算", "目标反推月存款", "增长曲线图表", "CSV 导出"],
     },
     en: {
-      name: "Capital Roadmap",
-      nameZh: "Financial Goal Planner",
+      name: "Financial Roadmap",
       desc: "Systematically plan financial goals using compound interest formulas to project future wealth growth trajectories.",
       features: ["FV Compound Calculation", "Reverse Goal Savings", "Growth Curve Chart", "CSV Export"],
     },
   },
   {
     slug: "pricing-system",
-    icon: "💰",
-    level: "L1+",
     accent: "#2D5FA8",
     accentLight: "#EDF2FC",
     zh: {
-      name: "Smart Quotation",
-      nameZh: "智能报价系统",
+      name: "智能报价系统",
       desc: "快速生成专业报价单，动态项目管理，支持折扣和税务计算。",
       features: ["动态行项目", "折扣 / 税务", "报价单预览", "打印 PDF"],
     },
     en: {
-      name: "Smart Quotation",
-      nameZh: "Professional Quoting",
+      name: "Smart Quotation System",
       desc: "Quickly generate professional quotations with dynamic line item management, discount and tax calculations.",
       features: ["Dynamic Line Items", "Discount & Tax", "Quote Preview", "Print PDF"],
     },
   },
   {
     slug: "market-cap",
-    icon: "📊",
-    level: "L2+",
     accent: "#8B6514",
     accentLight: "#FBF4E4",
     zh: {
-      name: "Valuation Engine",
-      nameZh: "企业估值引擎",
+      name: "企业估值系统",
       desc: "多维度企业估值分析：PE、PB、PS 与行业均值对比，识别价值高低。",
       features: ["PE / PB / PS 计算", "行业均值对比", "估值评级", "Bar Chart"],
     },
     en: {
       name: "Valuation Engine",
-      nameZh: "Enterprise Valuation",
       desc: "Multi-dimensional enterprise valuation analysis: PE, PB, PS vs industry averages to identify over/undervaluation.",
       features: ["PE / PB / PS Calc", "Industry Benchmarks", "Valuation Rating", "Bar Chart"],
     },
   },
   {
     slug: "pat-kpi",
-    icon: "📈",
-    level: "L3+",
     accent: "#7C5FBF",
     accentLight: "#F4F0FC",
     zh: {
-      name: "KPI Intelligence",
-      nameZh: "KPI 智能分析",
+      name: "企业绩效系统",
       desc: "完整损益表分解，计算税后净利润 PAT、ROE、ROA，目标达成追踪。",
       features: ["损益表分解", "PAT 计算", "ROE / ROA", "KPI 目标追踪"],
     },
     en: {
-      name: "KPI Intelligence",
-      nameZh: "Profit & KPI Tracker",
+      name: "Performance Intelligence",
       desc: "Full P&L breakdown, calculate PAT (profit after tax), ROE, ROA and track KPI target achievement.",
       features: ["P&L Breakdown", "PAT Calculation", "ROE / ROA", "KPI Target Tracking"],
     },
@@ -121,19 +105,8 @@ export default async function ToolsPage() {
               >
                 <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, transparent, ${tool.accent}80, transparent)` }} />
 
-                <div className="flex items-start justify-between gap-3 mb-5">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0" style={{ backgroundColor: tool.accentLight, border: `1px solid ${tool.accent}25` }}>
-                      {tool.icon}
-                    </div>
-                    <div>
-                      <div className="font-bold text-base" style={{ color: "#1C1814" }}>{t.name}</div>
-                      <div className="text-xs" style={{ color: "#9A9490" }}>{t.nameZh}</div>
-                    </div>
-                  </div>
-                  <span className="text-xs px-2.5 py-1 rounded-full font-mono flex-shrink-0" style={{ backgroundColor: tool.accentLight, color: tool.accent, border: `1px solid ${tool.accent}25` }}>
-                    {tool.level}
-                  </span>
+                <div className="mb-5">
+                  <div className="font-bold text-base" style={{ color: "#1C1814" }}>{t.name}</div>
                 </div>
 
                 <p className="text-sm leading-relaxed mb-5 flex-1" style={{ color: "#68625C" }}>{t.desc}</p>

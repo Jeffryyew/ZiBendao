@@ -40,7 +40,7 @@ export default async function ClientDocumentsPage() {
           className="rounded-2xl p-12 text-center"
           style={{ backgroundColor: "#111111", border: "1px solid #1A1A1A" }}
         >
-          <div className="text-5xl mb-4">📄</div>
+          <div className="text-sm mb-4" style={{ color: "#555550" }}>暂无文件</div>
           <h2 className="text-lg font-semibold mb-2" style={{ color: "#F5F5F0" }}>暂无合约文件</h2>
           <p className="text-sm" style={{ color: "#666660" }}>
             您的顾问将在签署咨询协议后为您生成合约文件。
@@ -57,10 +57,10 @@ export default async function ClientDocumentsPage() {
             >
               <div className="flex items-center gap-5">
                 <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0"
-                  style={{ backgroundColor: "rgba(201,168,76,0.1)" }}
+                  className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-mono flex-shrink-0"
+                  style={{ backgroundColor: "rgba(201,168,76,0.1)", color: "#C9A84C" }}
                 >
-                  📋
+                  DOC
                 </div>
                 <div>
                   <div className="font-medium text-sm" style={{ color: "#F5F5F0" }}>{doc.title}</div>

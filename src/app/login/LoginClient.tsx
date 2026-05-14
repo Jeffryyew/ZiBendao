@@ -21,7 +21,8 @@ const EmailIcon = () => (
   </svg>
 );
 
-export default function RegisterPage() {
+export default function LoginClient({ locale }: { locale: string }) {
+  const isEn = locale === "en";
   const [step, setStep] = useState<"buttons" | "email">("buttons");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -64,29 +65,24 @@ export default function RegisterPage() {
           </div>
           <p className="text-xs mt-1.5" style={{ color: "#9A9490" }}>金融教育 · 资本咨询 一体化平台</p>
         </Link>
-
-        <div className="space-y-4">
-          <p className="text-xs font-medium tracking-widest" style={{ color: "#9A9490" }}>注册即可获得</p>
+        <div className="space-y-6">
           {[
-            "免费体验前3关核心课程内容",
-            "1个基础资本工具使用权",
-            "专属学习进度追踪与成就系统",
-            "优先了解最新课程与活动资讯",
-          ].map((item) => (
-            <div key={item} className="flex items-start gap-3">
-              <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: "#8B6514" }}>○</span>
-              <span className="text-sm leading-relaxed" style={{ color: "#68625C" }}>{item}</span>
+            { icon: "◈", title: isEn ? "Structured Courses" : "系统化金融课程", desc: isEn ? "Step-by-step capital mastery from fundamentals to advanced" : "从基础财务分析到高级资本运作，分阶段闯关学习" },
+            { icon: "◈", title: isEn ? "Professional Tools" : "专业计算工具", desc: isEn ? "Valuation, KPI tracking, financial roadmap" : "市值估值、KPI追踪、财务路线图，实战导向" },
+            { icon: "◈", title: isEn ? "Advisory Services" : "一对一咨询服务", desc: isEn ? "Custom consulting with digital contract management" : "企业顾问定制方案，合约在线生成与签署" },
+          ].map((f) => (
+            <div key={f.title} className="flex gap-4">
+              <span className="text-base flex-shrink-0 mt-0.5" style={{ color: "#8B6514" }}>{f.icon}</span>
+              <div>
+                <div className="text-sm font-semibold mb-0.5" style={{ color: "#1C1814" }}>{f.title}</div>
+                <div className="text-xs leading-relaxed" style={{ color: "#68625C" }}>{f.desc}</div>
+              </div>
             </div>
           ))}
         </div>
-
-        <div className="grid grid-cols-3 gap-3">
-          {[{ value: "500+", label: "学员" }, { value: "4", label: "专业工具" }, { value: "13+", label: "课程内容" }].map((s) => (
-            <div key={s.label} className="rounded-xl p-3 text-center" style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.12)" }}>
-              <div className="text-lg font-bold font-mono" style={{ color: "#8B6514" }}>{s.value}</div>
-              <div className="text-xs mt-0.5" style={{ color: "#9A9490" }}>{s.label}</div>
-            </div>
-          ))}
+        <div className="rounded-2xl px-5 py-4" style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.15)" }}>
+          <p className="text-sm italic leading-relaxed" style={{ color: "#68625C" }}>"知识是最好的资本，方法是最短的捷径。"</p>
+          <p className="text-xs mt-2" style={{ color: "#9A9490" }}>— 资本道创始人</p>
         </div>
       </div>
 
@@ -100,8 +96,12 @@ export default function RegisterPage() {
 
         <div className="w-full max-w-sm">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold mb-1.5" style={{ color: "#1C1814" }}>创建账号</h1>
-            <p className="text-sm" style={{ color: "#68625C" }}>免费开始你的资本成长之旅</p>
+            <h1 className="text-2xl font-bold mb-1.5" style={{ color: "#1C1814" }}>
+              {isEn ? "Welcome Back" : "欢迎回来"}
+            </h1>
+            <p className="text-sm" style={{ color: "#68625C" }}>
+              {isEn ? "Sign in to your ZiBenDao account" : "登录你的资本道账号"}
+            </p>
           </div>
 
           {step === "buttons" && (
@@ -115,7 +115,7 @@ export default function RegisterPage() {
                 onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#E0D9CE"; (e.currentTarget as HTMLButtonElement).style.boxShadow = "none"; }}
               >
                 <GoogleIcon />
-                使用 Google 继续
+                {isEn ? "Continue with Google" : "使用 Google 继续"}
               </button>
 
               {/* Email */}
@@ -127,11 +127,11 @@ export default function RegisterPage() {
                 onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.backgroundColor = "#1C1814"; }}
               >
                 <EmailIcon />
-                使用邮箱继续
+                {isEn ? "Continue with Email" : "使用邮箱继续"}
               </button>
 
               <p className="text-xs text-center pt-1" style={{ color: "#9A9490" }}>
-                无需密码，我们将发送验证码至你的邮箱。
+                {isEn ? "No password needed — we'll send a verification code." : "无需密码，我们将发送验证码至你的邮箱。"}
               </p>
             </div>
           )}
@@ -144,10 +144,12 @@ export default function RegisterPage() {
                 className="flex items-center gap-1.5 text-xs mb-2"
                 style={{ color: "#9A9490" }}
               >
-                ← 返回
+                ← {isEn ? "Back" : "返回"}
               </button>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium tracking-wide" style={{ color: "#68625C" }}>邮箱地址</label>
+                <label className="text-xs font-medium tracking-wide" style={{ color: "#68625C" }}>
+                  {isEn ? "Email address" : "邮箱地址"}
+                </label>
                 <input
                   type="email"
                   required
@@ -175,33 +177,30 @@ export default function RegisterPage() {
                 {isPending ? (
                   <span className="flex items-center justify-center gap-2">
                     <span className="w-4 h-4 rounded-full border-2 animate-spin inline-block" style={{ borderColor: "#F7F4EF", borderTopColor: "transparent" }} />
-                    发送中…
+                    {isEn ? "Sending…" : "发送中…"}
                   </span>
-                ) : "发送验证码"}
+                ) : (isEn ? "Send Code" : "发送验证码")}
               </button>
-              <p className="text-xs text-center" style={{ color: "#9A9490" }}>
-                已有账号？{" "}
-                <Link href="/login" style={{ color: "#8B6514" }}>直接登录</Link>
-              </p>
             </form>
           )}
 
-          {step === "buttons" && (
-            <>
-              <div className="flex items-center gap-3 my-6">
-                <div className="flex-1 h-px" style={{ backgroundColor: "#E0D9CE" }} />
-                <span className="text-xs" style={{ color: "#C0B8B0" }}>或</span>
-                <div className="flex-1 h-px" style={{ backgroundColor: "#E0D9CE" }} />
-              </div>
-              <p className="text-center text-sm" style={{ color: "#68625C" }}>
-                已有账号？{" "}
-                <Link href="/login" className="font-medium" style={{ color: "#8B6514" }}>立即登录</Link>
-              </p>
-            </>
-          )}
+          <div className="flex items-center gap-3 my-6">
+            <div className="flex-1 h-px" style={{ backgroundColor: "#E0D9CE" }} />
+            <span className="text-xs" style={{ color: "#C0B8B0" }}>{isEn ? "or" : "或"}</span>
+            <div className="flex-1 h-px" style={{ backgroundColor: "#E0D9CE" }} />
+          </div>
+
+          <p className="text-center text-sm" style={{ color: "#68625C" }}>
+            {isEn ? "Don't have an account? " : "还没有账号？"}
+            <Link href="/register" className="font-medium" style={{ color: "#8B6514" }}>
+              {isEn ? "Register" : "注册"}
+            </Link>
+          </p>
 
           <div className="mt-8 text-center">
-            <Link href="/" className="text-xs" style={{ color: "#9A9490" }}>← 返回主页</Link>
+            <Link href="/" className="text-xs" style={{ color: "#9A9490" }}>
+              {isEn ? "← Back to home" : "← 返回主页"}
+            </Link>
           </div>
         </div>
       </div>

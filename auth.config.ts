@@ -9,8 +9,8 @@ export const authConfig: NextAuthConfig = {
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.role = (user as { role: string }).role;
-        token.studentLevel = (user as { studentLevel: number | null }).studentLevel ?? null;
+        token.role = (user as { role?: string }).role ?? "FREE_MEMBER";
+        token.studentLevel = (user as { studentLevel?: number | null }).studentLevel ?? null;
       }
       return token;
     },

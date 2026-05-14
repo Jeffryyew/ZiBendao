@@ -136,3 +136,23 @@ export async function sendContractEmail(
     `),
   });
 }
+
+export async function sendOtpEmail(to: string, otp: string): Promise<void> {
+  const resend = getResend();
+  if (!resend) return;
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `${otp} — 资本道登录验证码`,
+    html: wrap(`
+      <h2 style="color:#F5F5F0;font-size:20px;margin:0 0 16px;">你的登录验证码</h2>
+      <p style="color:#A0A09A;line-height:1.8;margin:0 0 24px;">请使用以下验证码完成登录。验证码 <strong style="color:#F5F5F0;">10 分钟内</strong>有效，请勿分享给他人。</p>
+      <div style="text-align:center;margin:0 0 24px;">
+        <div style="display:inline-block;background:#111111;border:1px solid #C9A84C44;border-radius:16px;padding:24px 48px;">
+          <span style="font-size:40px;font-weight:700;letter-spacing:12px;color:#C9A84C;font-family:monospace;">${otp}</span>
+        </div>
+      </div>
+      <p style="color:#555550;font-size:12px;text-align:center;">如果你没有请求此验证码，请忽略此邮件。</p>
+    `),
+  });
+}

@@ -5,15 +5,15 @@ import Link from "next/link";
 
 const FREE_LESSONS = [
   { id: 1, title: "什么是财务自由？", type: "视频", duration: "8 分钟", icon: "▶" },
-  { id: 2, title: "资产与负债的秘密", type: "阅读", duration: "5 分钟", icon: "📖" },
+  { id: 2, title: "资产与负债的秘密", type: "阅读", duration: "5 分钟", icon: "≡" },
   { id: 3, title: "现金流管理技巧", type: "测验", duration: "10 分钟", icon: "✏" },
 ];
 
 const LOCKED_TOOLS = [
-  { name: "金融路线图方程式", icon: "📈", desc: "复利增长路径规划" },
-  { name: "产品服务报价系统", icon: "💰", desc: "专业报价单生成" },
-  { name: "市值/市盈率计算器", icon: "📊", desc: "PE/PB/PS 估值分析" },
-  { name: "PAT & KPI 计算器", icon: "🎯", desc: "税后利润与指标追踪" },
+  { name: "金融路线图方程式", icon: "FV", desc: "复利增长路径规划" },
+  { name: "产品服务报价系统", icon: "QT", desc: "专业报价单生成" },
+  { name: "市值/市盈率计算器", icon: "PE", desc: "PE/PB/PS 估值分析" },
+  { name: "PAT & KPI 计算器", icon: "KPI", desc: "税后利润与指标追踪" },
 ];
 
 export default async function MemberDashboardPage() {
@@ -43,7 +43,7 @@ export default async function MemberDashboardPage() {
         <div>
           <p className="text-sm mb-1" style={{ color: "#666660" }}>{greeting}，</p>
           <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)" }}>
-            {firstName} 👋
+            {firstName}
           </h1>
         </div>
         <div
@@ -58,7 +58,7 @@ export default async function MemberDashboardPage() {
       {/* ── Stats row ── */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "体验课程", value: "3", unit: "关可学", icon: "📚" },
+          { label: "体验课程", value: "3", unit: "关可学", icon: "○" },
           { label: "已完成", value: String(completedCount), unit: "关", icon: "✓" },
           { label: "累计积分", value: String(totalXP), unit: "XP", icon: "⚡" },
         ].map((s) => (
@@ -197,7 +197,7 @@ export default async function MemberDashboardPage() {
                 <div className="text-sm font-medium" style={{ color: "#666660" }}>{tool.name}</div>
                 <div className="text-xs mt-0.5" style={{ color: "#333330" }}>{tool.desc}</div>
               </div>
-              <span style={{ color: "#2A2A28" }}>🔒</span>
+              <span className="text-xs" style={{ color: "#2A2A28" }}>锁定</span>
             </div>
           ))}
         </div>

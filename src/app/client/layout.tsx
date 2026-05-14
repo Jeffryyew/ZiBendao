@@ -4,8 +4,8 @@ import Sidebar, { NavItem } from "@/components/Sidebar";
 
 const NAV_ITEMS: NavItem[] = [
   { label: "主页", href: "/client/dashboard", icon: "⊕" },
-  { label: "计算工具", href: "/client/tools", icon: "🧮" },
-  { label: "合约文件", href: "/client/documents", icon: "📄" },
+  { label: "计算工具", href: "/client/tools" },
+  { label: "合约文件", href: "/client/documents" },
 ];
 
 export default async function ClientLayout({ children }: { children: React.ReactNode }) {

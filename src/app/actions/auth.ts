@@ -5,7 +5,7 @@ import { signIn, signOut } from "../../../auth";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { AuthError } from "next-auth";
-import { sendVerificationEmail, sendWelcomeEmail } from "@/lib/email";
+import { sendVerificationEmail, sendWelcomeEmail, sendOtpEmail } from "@/lib/email";
 import { randomBytes } from "crypto";
 
 const RegisterSchema = z.object({
@@ -109,6 +109,28 @@ export async function login(_prev: ActionResult | undefined, formData: FormData)
 
 export async function logout() {
   await signOut({ redirectTo: "/" });
+}
+
+export async function sendOtp(email: string): Promise<ActionResult> {
+  const parsed = z.string().email("请输入有效邮箱").safeParse(email.trim().toLowerCase());
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+
+  const cleanEmail = parsed.data;
+
+  // Delete any existing OTP for this email
+  await prisma.verificationToken.deleteMany({ where: { identifier: `otp_${cleanEmail}` } });
+
+  // Generate 6-digit OTP
+  const otp = String(Math.floor(100000 + Math.random() * 900000));
+  const expires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+  await prisma.verificationToken.create({
+    data: { identifier: `otp_${cleanEmail}`, token: otp, expires },
+  });
+
+  sendOtpEmail(cleanEmail, otp).catch(() => {});
+
+  return { success: "otp_sent" };
 }
 
 export async function verifyEmailToken(token: string): Promise<{ success: boolean; error?: string }> {

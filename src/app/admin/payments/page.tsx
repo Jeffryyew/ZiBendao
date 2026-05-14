@@ -42,9 +42,9 @@ export default async function AdminPaymentsPage({
       {/* Summary */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "总笔数",  value: String(payments.length),                                                    icon: "💳", color: "#F5F5F0" },
+          { label: "总笔数",  value: String(payments.length),                                                    icon: "笔", color: "#F5F5F0" },
           { label: "成功笔数", value: String(payments.filter((p) => p.status === "SUCCESS").length),              icon: "✓",  color: "#4CAF82" },
-          { label: "成功金额", value: `MYR ${totalSuccess.toFixed(0)}`,                                           icon: "💰", color: "#C9A84C" },
+          { label: "成功金额", value: `MYR ${totalSuccess.toFixed(0)}`,                                           icon: "MYR", color: "#C9A84C" },
         ].map((s) => (
           <div
             key={s.label}
@@ -95,7 +95,7 @@ export default async function AdminPaymentsPage({
           className="rounded-2xl p-12 text-center"
           style={{ backgroundColor: "#111111", border: "1px solid #1A1A1A" }}
         >
-          <div className="text-4xl mb-4">💳</div>
+          <div className="text-sm mb-4" style={{ color: "#555550" }}>暂无记录</div>
           <p className="text-sm" style={{ color: "#666660" }}>暂无支付记录</p>
         </div>
       ) : (

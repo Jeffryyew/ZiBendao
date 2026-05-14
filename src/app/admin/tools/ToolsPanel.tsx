@@ -31,10 +31,10 @@ interface Props {
 }
 
 const TOOL_ICONS: Record<string, string> = {
-  "financial-roadmap": "📈",
-  "pricing-system": "💹",
-  "market-cap": "📊",
-  "pat-kpi": "📋",
+  "financial-roadmap": "FV",
+  "pricing-system": "QT",
+  "market-cap": "PE",
+  "pat-kpi": "KPI",
 };
 
 export default function ToolsPanel({ tools, clients }: Props) {

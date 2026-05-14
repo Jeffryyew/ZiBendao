@@ -4,10 +4,10 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 const TOOL_ICONS: Record<string, string> = {
-  "financial-roadmap": "📈",
-  "pricing-system": "💹",
-  "market-cap": "📊",
-  "pat-kpi": "📋",
+  "financial-roadmap": "FV",
+  "pricing-system": "QT",
+  "market-cap": "PE",
+  "pat-kpi": "KPI",
 };
 
 const TOOL_LABELS: Record<string, string> = {
@@ -43,7 +43,7 @@ export default async function ClientToolsPage() {
           className="rounded-2xl p-12 text-center"
           style={{ backgroundColor: "#111111", border: "1px solid #1A1A1A" }}
         >
-          <div className="text-5xl mb-4">🔒</div>
+          <div className="text-2xl mb-4" style={{ color: "#555550" }}>暂无授权</div>
           <h2 className="text-lg font-semibold mb-2" style={{ color: "#F5F5F0" }}>暂无授权工具</h2>
           <p className="text-sm" style={{ color: "#666660" }}>
             请联系您的资本道顾问开通相应工具权限。
@@ -52,7 +52,7 @@ export default async function ClientToolsPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {toolAccess.map(({ tool, grantedAt }) => {
-            const icon = TOOL_ICONS[tool.slug] ?? "🔧";
+            const icon = TOOL_ICONS[tool.slug] ?? "工具";
             const label = TOOL_LABELS[tool.slug] ?? tool.name;
             return (
               <Link

@@ -7,10 +7,10 @@ const DATA = {
     founder: {
       name: "姚国雄",
       nameEn: "Jeffry Yew",
-      role: "创始人 & 首席导师",
+      role: "创始人",
       biz: "25 年商业发展经验",
       finance: "13 年融资专业经验",
-      bio: "姚国雄（Jeffry Yew）是马来西亚顶尖的企业资本运作导师，拥有 25 年商业发展及 13 年融资专业经验。深耕房地产、科技与零售领域，足迹横跨亚洲多个市场。他创立资本道（Capital Mastery），致力于将复杂的资本运作知识系统化，帮助中小企业主与创业者掌握企业估值、股权架构、融资杠杆与 IPO 路径，建立可靠、可投、可扩展的企业。",
+      bio: "姚国雄（Jeffry Yew）是马来西亚的企业资本运作导师，深耕房地产、科技与零售领域，足迹横跨亚洲多个市场。他创立资本道，致力于将复杂的资本运作知识系统化，帮助中小企业主与创业者掌握企业估值、股权架构、融资杠杆与 IPO 路线，建立可靠、可投、可扩展的企业。",
       bioLabel: "创始人简介",
       stats: [{ value: "25年", label: "商业发展经验" }, { value: "13年", label: "融资专业经验" }],
     },
@@ -18,11 +18,11 @@ const DATA = {
       badge: "关于我们",
       title: "掌握资本之道，",
       title2: "创建可靠、可投、可扩展企业",
-      desc: "资本道（Capital Mastery）由 Craftspace Sdn Bhd 运营，是马来西亚专注企业资本运作教育的综合平台。我们帮助中小企业主与创业者系统掌握资本运作，从融资到上市，每一步都有清晰路径。",
+      desc: "资本道由 Eutopos Equity Sdn Bhd 运营，专注于企业资本运作教育的综合平台。我们帮助中小企业主与创业者系统掌握资本运作，从融资到上市，每一步都有清晰方向。",
     },
     mission: {
       title: "我们的使命",
-      desc: "帮助马来西亚中小企业主与创业者系统掌握企业估值、股权架构、融资杠杆与资本退出策略，建立可靠、可投、可扩展的企业，最终实现从创业到资本市场的完整跨越。",
+      desc: "帮助中小企业主与创业者系统掌握企业估值、股权架构、融资杠杆与资本退出策略，建立可靠、可投、可扩展的企业，最终实现从创业到资本市场的完整跨越。",
       highlight: "可靠、可投、可扩展",
     },
     values: {
@@ -64,10 +64,10 @@ const DATA = {
     founder: {
       name: "Jeffry Yew",
       nameEn: "姚国雄",
-      role: "Founder & Chief Instructor",
+      role: "Founder",
       biz: "25 years Business Development",
       finance: "13 years Fundraising Expertise",
-      bio: "Jeffry Yew is Malaysia's leading enterprise capital operations mentor with 25 years of business development and 13 years of fundraising experience. He specialises in real estate, technology, and retail across Asian markets. He founded Capital Mastery to systematise complex capital operation knowledge, helping SME owners and entrepreneurs master enterprise valuation, equity structuring, financial leverage, and IPO pathways to build reliable, investable, and scalable businesses.",
+      bio: "Jeffry Yew is Malaysia's leading enterprise capital operations mentor, specialising in real estate, technology, and retail across Asian markets. He founded ZiBenDao to systematise complex capital operation knowledge, helping SME owners and entrepreneurs master enterprise valuation, equity structuring, financial leverage, and IPO pathways to build reliable, investable, and scalable businesses.",
       bioLabel: "Founder Profile",
       stats: [{ value: "25yrs", label: "Business Development" }, { value: "13yrs", label: "Fundraising Expertise" }],
     },
@@ -79,7 +79,7 @@ const DATA = {
     },
     mission: {
       title: "Our Mission",
-      desc: "To help Malaysian SME owners and entrepreneurs systematically master enterprise valuation, equity structuring, financial leverage, and capital exit strategies — building reliable, investable, scalable businesses and achieving the full journey from startup to capital markets.",
+      desc: "To help SME owners and entrepreneurs systematically master enterprise valuation, equity structuring, financial leverage, and capital exit strategies — building reliable, investable, scalable businesses and achieving the full journey from startup to capital markets.",
       highlight: "Reliable, Investable, Scalable",
     },
     values: {
@@ -146,21 +146,13 @@ export default async function AboutPage() {
       {/* Founder */}
       <section className="py-16 px-4">
         <div className="max-w-4xl mx-auto">
-          <div className="rounded-2xl p-8 md:p-12 grid md:grid-cols-3 gap-8 items-start" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", boxShadow: "0 4px 24px rgba(28,24,20,0.06)" }}>
-            <div className="flex flex-col items-center text-center">
-              <div className="w-24 h-24 rounded-2xl flex items-center justify-center text-5xl mb-4" style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.15)" }}>
-                👨‍💼
-              </div>
+          <div className="rounded-2xl p-8 md:p-12" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", boxShadow: "0 4px 24px rgba(28,24,20,0.06)" }}>
+            <div className="mb-6">
               <div className="text-xs mb-0.5" style={{ color: "#9A9490" }}>{d.founder.nameEn}</div>
-              <h3 className="font-bold text-lg mb-0.5" style={{ color: "#1C1814" }}>{d.founder.name}</h3>
-              <div className="text-xs mb-4" style={{ color: "#8B6514" }}>{d.founder.role}</div>
-              <div className="flex flex-col gap-1.5 w-full">
-                {[d.founder.biz, d.founder.finance].map((s) => (
-                  <div key={s} className="text-xs px-3 py-1.5 rounded-lg" style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}>{s}</div>
-                ))}
-              </div>
+              <h3 className="font-bold text-xl mb-0.5" style={{ color: "#1C1814" }}>{d.founder.name}</h3>
+              <div className="text-xs" style={{ color: "#8B6514" }}>{d.founder.role}</div>
             </div>
-            <div className="md:col-span-2">
+            <div>
               <div className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4" style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.15)" }}>
                 {d.founder.bioLabel}
               </div>
@@ -198,7 +190,6 @@ export default async function AboutPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             {d.values.items.map((v) => (
               <div key={v.title} className="rounded-2xl p-6" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
-                <div className="text-3xl mb-4">{v.icon}</div>
                 <h3 className="font-semibold mb-2 text-sm" style={{ color: "#1C1814" }}>{v.title}</h3>
                 <p className="text-xs leading-relaxed" style={{ color: "#68625C" }}>{v.desc}</p>
               </div>
@@ -258,13 +249,6 @@ export default async function AboutPage() {
           <div className="rounded-2xl p-10" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
             <h2 className="text-2xl font-bold mb-2" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>{d.contact.title}</h2>
             <p className="text-xs mb-8" style={{ color: "#9A9490" }}>{d.contact.desc}</p>
-            <div className="mb-8">
-              <div className="text-xs mb-3" style={{ color: "#9A9490" }}>{d.contact.address_label}</div>
-              <div className="text-sm" style={{ color: "#68625C" }}>
-                Leisure Commerce Square, Jalan PJS 8/9,<br />
-                46150 Petaling Jaya, Selangor, Malaysia
-              </div>
-            </div>
             <div className="flex gap-3 flex-wrap">
               {[
                 { label: "Facebook", href: "https://www.facebook.com/capitalmastery.net" },
