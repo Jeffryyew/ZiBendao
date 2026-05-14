@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/Dell/Desktop/zibendao/**)",
+      "Bash(npx tsc *)",
+      "Bash(echo \"EXIT:$?\")"
+    ]
+  }
+}
