@@ -1,79 +1,26 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import SharedNav from "@/components/SharedNav";
 import { getLocale } from "@/lib/i18n";
+import { CAPITAL_MODULES, LAYER_META, getModulesByLayer } from "@/lib/capitalModules";
+import type { LayerId } from "@/lib/capitalModules";
 
-const TOOLS = [
-  {
-    slug: "financial-roadmap",
-    accent: "#2D7D4F",
-    accentLight: "#EDFAF3",
-    zh: {
-      name: "企业财务路线图",
-      desc: "系统化规划财务目标，用复利公式预测未来财富增长轨迹。",
-      features: ["FV 复利计算", "目标反推月存款", "增长曲线图表", "CSV 导出"],
-    },
-    en: {
-      name: "Financial Roadmap",
-      desc: "Systematically plan financial goals using compound interest formulas to project future wealth growth trajectories.",
-      features: ["FV Compound Calculation", "Reverse Goal Savings", "Growth Curve Chart", "CSV Export"],
-    },
-  },
-  {
-    slug: "pricing-system",
-    accent: "#2D5FA8",
-    accentLight: "#EDF2FC",
-    zh: {
-      name: "智能报价系统",
-      desc: "快速生成专业报价单，动态项目管理，支持折扣和税务计算。",
-      features: ["动态行项目", "折扣 / 税务", "报价单预览", "打印 PDF"],
-    },
-    en: {
-      name: "Smart Quotation System",
-      desc: "Quickly generate professional quotations with dynamic line item management, discount and tax calculations.",
-      features: ["Dynamic Line Items", "Discount & Tax", "Quote Preview", "Print PDF"],
-    },
-  },
-  {
-    slug: "market-cap",
-    accent: "#8B6514",
-    accentLight: "#FBF4E4",
-    zh: {
-      name: "企业估值系统",
-      desc: "多维度企业估值分析：PE、PB、PS 与行业均值对比，识别价值高低。",
-      features: ["PE / PB / PS 计算", "行业均值对比", "估值评级", "Bar Chart"],
-    },
-    en: {
-      name: "Valuation Engine",
-      desc: "Multi-dimensional enterprise valuation analysis: PE, PB, PS vs industry averages to identify over/undervaluation.",
-      features: ["PE / PB / PS Calc", "Industry Benchmarks", "Valuation Rating", "Bar Chart"],
-    },
-  },
-  {
-    slug: "pat-kpi",
-    accent: "#7C5FBF",
-    accentLight: "#F4F0FC",
-    zh: {
-      name: "企业绩效系统",
-      desc: "完整损益表分解，计算税后净利润 PAT、ROE、ROA，目标达成追踪。",
-      features: ["损益表分解", "PAT 计算", "ROE / ROA", "KPI 目标追踪"],
-    },
-    en: {
-      name: "Performance Intelligence",
-      desc: "Full P&L breakdown, calculate PAT (profit after tax), ROE, ROA and track KPI target achievement.",
-      features: ["P&L Breakdown", "PAT Calculation", "ROE / ROA", "KPI Target Tracking"],
-    },
-  },
-];
+const LAYER_DISPLAY: Record<LayerId, { zh: string; en: string }> = {
+  1: { zh: "资本基础", en: "Capital Foundations" },
+  2: { zh: "资本智慧", en: "Capital Intelligence" },
+  3: { zh: "资本架构", en: "Capital Structure" },
+};
 
 export default async function ToolsPage() {
   const locale = await getLocale();
   const isEn = locale === "en";
+  const layers = [1, 2, 3] as const;
 
   return (
     <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814", minHeight: "100vh" }}>
       <SharedNav locale={locale} activeHref="/tools" />
 
       <div className="max-w-6xl mx-auto px-4 pt-28 pb-20">
+
         {/* Header */}
         <div className="text-center mb-16">
           <div
@@ -81,86 +28,84 @@ export default async function ToolsPage() {
             style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.15)", color: "#8B6514" }}
           >
             <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#C9A84C" }} />
-            Capital Apps Ecosystem
+            {CAPITAL_MODULES.length} {isEn ? "Professional Tools" : "个专业工具"}
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
-            {isEn ? "Professional Capital Tools" : "专业资本工具"}
+            {isEn ? "Capital Tools" : "资本工具"}
           </h1>
           <p className="text-lg max-w-2xl mx-auto" style={{ color: "#68625C" }}>
             {isEn
-              ? "SaaS-grade professional tools covering wealth planning, enterprise valuation, profit analysis and more. Export results as PDF / Excel with local data processing."
-              : "SaaS 级专业工具，涵盖财富规划、企业估值、利润分析等。结果支持导出 PDF / Excel，数据本地计算。"}
+              ? "Professional tools covering financial analysis, fundraising, equity structure and capital governance. All calculations run locally in your browser."
+              : "涵盖财务分析、融资、股权架构与资本治理的专业工具套件。所有计算在浏览器本地完成。"}
           </p>
         </div>
 
-        {/* Tools Grid */}
-        <div className="grid md:grid-cols-2 gap-6 mb-16">
-          {TOOLS.map((tool) => {
-            const t = isEn ? tool.en : tool.zh;
+        {/* Tools by layer */}
+        <div className="space-y-14">
+          {layers.map((layer) => {
+            const meta = LAYER_META[layer];
+            const modules = getModulesByLayer(layer);
+            const display = LAYER_DISPLAY[layer];
+
             return (
-              <div
-                key={tool.slug}
-                className="rounded-2xl p-7 flex flex-col relative overflow-hidden"
-                style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
-              >
-                <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, transparent, ${tool.accent}80, transparent)` }} />
-
-                <div className="mb-5">
-                  <div className="font-bold text-base" style={{ color: "#1C1814" }}>{t.name}</div>
+              <div key={layer}>
+                {/* Layer header */}
+                <div className="flex items-center gap-3 mb-6">
+                  <h2 className="text-base font-bold" style={{ color: "#1C1814", fontFamily: "var(--font-display)" }}>
+                    {isEn ? display.en : display.zh}
+                  </h2>
+                  <div className="flex-1 h-px" style={{ backgroundColor: "#E0D9CE" }} />
+                  <span className="text-xs font-mono flex-shrink-0" style={{ color: "#9A9490" }}>
+                    {modules.length} {isEn ? "tools" : "个工具"}
+                  </span>
                 </div>
 
-                <p className="text-sm leading-relaxed mb-5 flex-1" style={{ color: "#68625C" }}>{t.desc}</p>
-
-                <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mb-6">
-                  {t.features.map((f) => (
-                    <div key={f} className="flex items-center gap-1.5 text-xs" style={{ color: "#9A9490" }}>
-                      <span style={{ color: tool.accent }}></span>
-                      {f}
-                    </div>
-                  ))}
+                {/* Grid */}
+                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {modules.map((mod) => {
+                    const t = isEn ? mod.en : mod.zh;
+                    return (
+                      <Link
+                        key={mod.id}
+                        href={mod.href}
+                        className="group rounded-2xl p-5 flex flex-col relative overflow-hidden transition-all duration-200"
+                        style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLAnchorElement).style.borderColor = meta.color + "60";
+                          (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#FDFCF9";
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLAnchorElement).style.borderColor = "#E0D9CE";
+                          (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#FFFFFF";
+                        }}
+                      >
+                        <div
+                          style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, backgroundColor: meta.color, opacity: 0.5 }}
+                        />
+                        <div className="text-sm font-semibold mb-2 mt-1" style={{ color: "#1C1814" }}>
+                          {t.name}
+                        </div>
+                        <p className="text-xs leading-relaxed flex-1" style={{ color: "#68625C" }}>
+                          {t.desc}
+                        </p>
+                        <div className="mt-4 text-xs font-medium" style={{ color: meta.color }}>
+                          {isEn ? "Open →" : "使用 →"}
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
-
-                <Link
-                  href={`/tools/${tool.slug}`}
-                  className="block text-center py-2.5 rounded-xl text-sm font-medium transition-colors"
-                  style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
-                  onMouseOver={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#EEE9E0"; }}
-                  onMouseOut={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#F7F4EF"; }}
-                >
-                  {isEn ? "Open Tool →" : "使用工具 →"}
-                </Link>
               </div>
             );
           })}
         </div>
 
-        {/* CTA */}
-        <div className="text-center py-16 px-10 rounded-3xl" style={{ backgroundColor: "#1C1814" }}>
-          <h2 className="text-2xl font-bold mb-3" style={{ fontFamily: "var(--font-display)", color: "#F0EBE1" }}>
-            {isEn ? "22 Professional Capital Tools" : "22 个专业资本工具"}
-          </h2>
-          <p className="text-sm mb-8" style={{ color: "#9A9490" }}>
-            {isEn
-              ? "Access the full Capital Operating System — financial analysis, fundraising, equity structure and more."
-              : "进入企业资本操作系统，涵盖财务分析、融资、股权架构等完整工具套件。"}
-          </p>
-          <div className="flex flex-wrap justify-center gap-3">
-            <Link
-              href="/dashboard/capital"
-              className="inline-block px-8 py-3 rounded-xl font-semibold text-sm transition-opacity hover:opacity-88"
-              style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
-            >
-              {isEn ? "Open Capital System →" : "进入资本系统 →"}
-            </Link>
-            <Link
-              href="/about"
-              className="inline-block px-8 py-3 rounded-xl font-semibold text-sm"
-              style={{ backgroundColor: "transparent", color: "#9A9490", border: "1px solid #302B26" }}
-            >
-              {isEn ? "Contact Advisor" : "联系顾问"}
-            </Link>
-          </div>
-        </div>
+        {/* Footer note */}
+        <p className="text-center text-xs mt-16" style={{ color: "#9A9490" }}>
+          {isEn
+            ? "All calculations run locally in your browser · Data never uploaded to servers"
+            : "所有计算在浏览器本地完成 · 数据不上传服务器"}
+        </p>
       </div>
     </div>
   );
