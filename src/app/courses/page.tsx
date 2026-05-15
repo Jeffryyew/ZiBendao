@@ -249,14 +249,14 @@ export default async function CoursesPage() {
                 className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold"
                 style={{ backgroundColor: "#7C5FBF", color: "#FFFFFF", minWidth: "140px" }}
               >
-                {isEn ? "Unlock Capital →" : "解锁资本 →"}
+                {isEn ? "Get Started →" : "立即开始 →"}
               </Link>
               <Link
-                href="/register"
+                href="/login"
                 className="flex-1 text-center py-2.5 rounded-xl text-sm"
                 style={{ backgroundColor: "#F4F0FC", color: "#7C5FBF", border: "1px solid rgba(124,95,191,0.2)", minWidth: "140px" }}
               >
-                {isEn ? "Free Trial" : "免费体验"}
+                {isEn ? "Login" : "登录"}
               </Link>
             </div>
           </div>
@@ -309,7 +309,7 @@ export default async function CoursesPage() {
                     className="block w-full text-center py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
                     style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
                   >
-                    {isEn ? "Unlock Capital →" : "解锁资本 →"}
+                    {isEn ? "Get Started →" : "立即开始 →"}
                   </Link>
                 </div>
               );
@@ -335,14 +335,14 @@ export default async function CoursesPage() {
               className="inline-block px-10 py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
               style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
             >
-              {isEn ? "Unlock Capital →" : "解锁资本 →"}
+              {isEn ? "Get Started →" : "立即开始 →"}
             </Link>
             <Link
-              href="/register"
+              href="/login"
               className="inline-block px-10 py-3 rounded-xl text-sm"
               style={{ backgroundColor: "transparent", color: "#9A9490", border: "1px solid #302B26" }}
             >
-              {isEn ? "Free Trial — Online Course" : "免费体验线上课程"}
+              {isEn ? "Login →" : "登录 →"}
             </Link>
           </div>
         </div>

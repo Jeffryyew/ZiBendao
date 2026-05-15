@@ -63,16 +63,16 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
 
   const COURSE_ITEMS: DropdownItem[] = locale === "zh"
     ? [
-        { label: "资本启航", href: "/courses" },
-        { label: "资本通", href: "/courses" },
-        { label: "启动资本", href: "/courses" },
-        { label: "资本道", href: "/courses" },
+        { label: "资本启航", href: "/courses#capital-start" },
+        { label: "资本通", href: "/courses#capital-map" },
+        { label: "启动资本", href: "/courses#capital-code" },
+        { label: "资本道", href: "/courses#capital-dao" },
       ]
     : [
-        { label: "Capital Start", href: "/courses" },
-        { label: "The Capital Map", href: "/courses" },
-        { label: "The Capital Code", href: "/courses" },
-        { label: "Capital Dao", href: "/courses" },
+        { label: "Capital Start", href: "/courses#capital-start" },
+        { label: "The Capital Map", href: "/courses#capital-map" },
+        { label: "The Capital Code", href: "/courses#capital-code" },
+        { label: "Capital Dao", href: "/courses#capital-dao" },
       ];
 
   const TOOLS_ITEMS: DropdownItem[] = locale === "zh"
