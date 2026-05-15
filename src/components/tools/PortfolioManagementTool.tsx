@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -162,7 +162,7 @@ export default function PortfolioManagementTool({ locale }: { locale: Locale }) 
 
   return (
     <ToolShell
-      icon="📂"
+      icon=""
       title={isEn ? "Portfolio Management" : "投资组合管理"}
       desc={isEn ? "Track your investment portfolio, calculate MOIC and analyze distribution." : "追踪投资组合，计算MOIC、IRR与行业分布分析。"}
       levelRequired={3}
@@ -189,7 +189,7 @@ export default function PortfolioManagementTool({ locale }: { locale: Locale }) 
           <div className="grid sm:grid-cols-2 gap-3">
             {metrics.best && (
               <div className="rounded-xl p-4 flex gap-3" style={{ backgroundColor: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)" }}>
-                <span className="text-xl">🏆</span>
+                <span className="text-xl"></span>
                 <div>
                   <p className="text-xs" style={{ color: "#10B981" }}>{isEn ? "Best Performer" : "最佳表现"}</p>
                   <p className="text-sm font-semibold" style={{ color: "#F5F5F0" }}>{metrics.best.company}</p>
@@ -199,7 +199,7 @@ export default function PortfolioManagementTool({ locale }: { locale: Locale }) 
             )}
             {metrics.worst && (
               <div className="rounded-xl p-4 flex gap-3" style={{ backgroundColor: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)" }}>
-                <span className="text-xl">📉</span>
+                <span className="text-xl"></span>
                 <div>
                   <p className="text-xs" style={{ color: "#EF4444" }}>{isEn ? "Needs Attention" : "需关注"}</p>
                   <p className="text-sm font-semibold" style={{ color: "#F5F5F0" }}>{metrics.worst.company}</p>

@@ -9,13 +9,14 @@ datasource db {
 model User {
   id                String             @id @default(cuid())
   email             String             @unique
-  name              String
+  name              String?
   hashedPassword    String?
   role              Role               @default(FREE_MEMBER)
   studentLevel      Int?
   isActive          Boolean            @default(true)
   createdAt         DateTime           @default(now())
   updatedAt         DateTime           @updatedAt
+  image             String?
   emailVerified     DateTime?
   verifyToken       String?            @unique
   verifyTokenExpiry DateTime?

@@ -1,4 +1,4 @@
-export interface ContractVariables {
+﻿export interface ContractVariables {
   contract_no: string;
   client_name: string;
   company_name: string;
@@ -61,7 +61,7 @@ CONSULTING SERVICES AGREEMENT
 合同编号 Contract No.：{{contract_no}}
 合同日期 Date：{{contract_date}}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 
 甲方（委托方）PARTY A – CLIENT
 姓名 / Name：{{client_name}}
@@ -71,7 +71,7 @@ CONSULTING SERVICES AGREEMENT
 顾问 / Consultant：{{consultant_name}}
 机构 / Organization：资本道 ZiBenDao Capital Advisory
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 
 一、服务内容 SCOPE OF SERVICES
 
@@ -90,7 +90,7 @@ CONSULTING SERVICES AGREEMENT
 
 {{terms_and_conditions}}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 
 五、签署 SIGNATURES
 
@@ -113,7 +113,7 @@ CONSULTING SERVICES AGREEMENT
 
 日期 Date：________ / ________ / ________
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 本合同一式两份，双方各执一份，具有同等法律效力。
 This agreement is executed in two counterparts, each of which shall be deemed an original.
 `,

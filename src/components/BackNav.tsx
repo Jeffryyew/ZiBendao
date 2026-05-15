@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -39,7 +39,7 @@ export default function BackNav({ className }: Props) {
           (e.currentTarget as HTMLAnchorElement).style.borderColor = "#1A1A1A";
         }}
       >
-        ⌂ 返回主页
+         返回主页
       </Link>
     </div>
   );

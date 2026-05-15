@@ -1,15 +1,15 @@
-import { auth } from "../../../../auth";
+﻿import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getRoleLabel } from "@/lib/roles";
 
 const ACHIEVEMENTS = [
-  { id: "register", icon: "✦", title: "欢迎加入", desc: "完成注册，开始学习之旅", unlocked: true },
-  { id: "first-lesson", icon: "①", title: "第一步", desc: "完成第一关课程" },
-  { id: "module-done", icon: "◈", title: "财务启蒙", desc: "完成财务基础模块" },
+  { id: "register", icon: "", title: "欢迎加入", desc: "完成注册，开始学习之旅", unlocked: true },
+  { id: "first-lesson", icon: "", title: "第一步", desc: "完成第一关课程" },
+  { id: "module-done", icon: "", title: "财务启蒙", desc: "完成财务基础模块" },
   { id: "streak-7", icon: "→", title: "学习达人", desc: "连续学习7天" },
-  { id: "tools-3", icon: "✓", title: "工具专家", desc: "使用3种计算工具" },
-  { id: "level-2", icon: "▲", title: "进阶成就", desc: "升级至 L2 学生" },
+  { id: "tools-3", icon: "", title: "工具专家", desc: "使用3种计算工具" },
+  { id: "level-2", icon: "", title: "进阶成就", desc: "升级至 L2 学生" },
 ];
 
 export default async function StudentProfilePage() {
@@ -96,9 +96,9 @@ export default async function StudentProfilePage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "完成课程", value: completedCount, unit: "关", icon: "✓" },
+          { label: "完成课程", value: completedCount, unit: "关", icon: "" },
           { label: "累计积分", value: totalXP, unit: "XP", icon: "XP" },
-          { label: "可用工具", value: "22", unit: "个", icon: "◈" },
+          { label: "可用工具", value: "22", unit: "个", icon: "" },
         ].map((s) => (
           <div
             key={s.label}

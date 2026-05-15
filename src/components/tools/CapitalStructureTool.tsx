@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -77,7 +77,7 @@ export default function CapitalStructureTool({ locale }: { locale: Locale }) {
 
   return (
     <ToolShell
-      icon="🏛️"
+      icon=""
       title={isEn ? "Capital Structure Optimizer" : "资本架构优化器"}
       desc={isEn ? "Optimize your debt-equity mix and calculate WACC and tax shield benefits." : "优化债务与股权组合，计算WACC与税盾效益。"}
       levelRequired={3}
@@ -260,7 +260,7 @@ export default function CapitalStructureTool({ locale }: { locale: Locale }) {
 
           {/* Insight */}
           <div className="rounded-xl p-4 flex gap-3" style={{ backgroundColor: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.2)" }}>
-            <span className="text-lg">💡</span>
+            <span className="text-lg"></span>
             <p className="text-sm" style={{ color: "#A0A09A" }}>
               {isEn
                 ? `With ${equityPct}%/${debtPct}% E/D mix, your WACC is ${(wacc * 100).toFixed(2)}%. Debt creates a tax shield of ${fmtRM(taxShield)}/year. Lower WACC = cheaper capital.`

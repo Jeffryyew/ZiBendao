@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -111,7 +111,7 @@ export default function SpvStructureTool({ locale }: { locale: Locale }) {
 
   return (
     <ToolShell
-      icon="🏗️"
+      icon=""
       title={isEn ? "SPV Structure Designer" : "SPV架构设计器"}
       desc={isEn ? "Design special purpose vehicle structures and calculate investor returns." : "设计特殊目的载体架构，计算投资人回报与所需文件。"}
       levelRequired={3}
@@ -301,7 +301,7 @@ export default function SpvStructureTool({ locale }: { locale: Locale }) {
             </>
           ) : (
             <div className="flex flex-col items-center justify-center h-48 rounded-2xl" style={{ backgroundColor: "#111111", border: "1px dashed #222222" }}>
-              <span className="text-4xl mb-3 opacity-20">🏗️</span>
+              <span className="text-4xl mb-3 opacity-20"></span>
               <p className="text-sm" style={{ color: "#444440" }}>{isEn ? "Fill in the form and calculate SPV returns" : "填写表单后点击计算"}</p>
             </div>
           )}
@@ -313,7 +313,7 @@ export default function SpvStructureTool({ locale }: { locale: Locale }) {
               {DOC_CHECKLIST.map((d, i) => (
                 <div key={i} className="flex items-center gap-3 py-2 border-b" style={{ borderColor: "#1E1E1E" }}>
                   <div className="w-5 h-5 rounded-md flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "rgba(139,92,246,0.15)", border: "1px solid rgba(139,92,246,0.3)" }}>
-                    <span className="text-xs" style={{ color: PURPLE }}>✓</span>
+                    <span className="text-xs" style={{ color: PURPLE }}></span>
                   </div>
                   <span className="text-sm" style={{ color: "#A0A09A" }}>{isEn ? d.en : d.zh}</span>
                 </div>

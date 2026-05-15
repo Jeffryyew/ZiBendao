@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
@@ -67,9 +67,9 @@ export default function LoginClient({ locale }: { locale: string }) {
         </Link>
         <div className="space-y-6">
           {[
-            { icon: "◈", title: isEn ? "Structured Courses" : "系统化金融课程", desc: isEn ? "Step-by-step capital mastery from fundamentals to advanced" : "从基础财务分析到高级资本运作，分阶段闯关学习" },
-            { icon: "◈", title: isEn ? "Professional Tools" : "专业计算工具", desc: isEn ? "Valuation, KPI tracking, financial roadmap" : "市值估值、KPI追踪、财务路线图，实战导向" },
-            { icon: "◈", title: isEn ? "Advisory Services" : "一对一咨询服务", desc: isEn ? "Custom consulting with digital contract management" : "企业顾问定制方案，合约在线生成与签署" },
+            { icon: "", title: isEn ? "Structured Courses" : "系统化金融课程", desc: isEn ? "Step-by-step capital mastery from fundamentals to advanced" : "从基础财务分析到高级资本运作，分阶段闯关学习" },
+            { icon: "", title: isEn ? "Professional Tools" : "专业计算工具", desc: isEn ? "Valuation, KPI tracking, financial roadmap" : "市值估值、KPI追踪、财务路线图，实战导向" },
+            { icon: "", title: isEn ? "Advisory Services" : "一对一咨询服务", desc: isEn ? "Custom consulting with digital contract management" : "企业顾问定制方案，合约在线生成与签署" },
           ].map((f) => (
             <div key={f.title} className="flex gap-4">
               <span className="text-base flex-shrink-0 mt-0.5" style={{ color: "#8B6514" }}>{f.icon}</span>
@@ -165,7 +165,7 @@ export default function LoginClient({ locale }: { locale: string }) {
               </div>
               {error && (
                 <div className="flex items-start gap-2 rounded-xl px-4 py-3 text-sm" style={{ backgroundColor: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", color: "#DC2626" }}>
-                  <span className="flex-shrink-0">✕</span>{error}
+                  <span className="flex-shrink-0"></span>{error}
                 </div>
               )}
               <button

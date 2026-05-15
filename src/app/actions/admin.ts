@@ -1,4 +1,4 @@
-"use server";
+﻿"use server";
 
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -14,7 +14,7 @@ async function requireAdmin() {
   if (role !== "SUPER_ADMIN" && role !== "ADMIN") throw new Error("Forbidden");
 }
 
-// ─── Users ───────────────────────────────────────────────
+//  Users 
 
 export async function updateUserRole(
   userId: string,
@@ -67,7 +67,7 @@ export async function createClientUser(
   }
 }
 
-// ─── Tool access ──────────────────────────────────────────
+//  Tool access 
 
 export async function grantToolAccess(userId: string, toolId: string): Promise<ActionResult> {
   try {
@@ -97,7 +97,7 @@ export async function revokeToolAccess(userId: string, toolId: string): Promise<
   }
 }
 
-// ─── Courses ─────────────────────────────────────────────
+//  Courses 
 
 export async function createModule(
   title: string,
@@ -182,7 +182,7 @@ export async function deleteLesson(lessonId: string, moduleId: string): Promise<
   }
 }
 
-// ─── Tools ───────────────────────────────────────────────
+//  Tools 
 
 export async function createTool(
   name: string,

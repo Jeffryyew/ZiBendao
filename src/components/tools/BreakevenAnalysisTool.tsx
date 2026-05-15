@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -77,14 +77,14 @@ export default function BreakevenAnalysisTool({ locale }: { locale: "zh" | "en" 
 
   return (
     <ToolShell
-      icon="⚖️"
+      icon=""
       title={isEn ? "Breakeven Analysis" : "损益平衡分析"}
       desc={isEn ? "Calculate breakeven units, revenue & contribution margin" : "计算保本点销量、收入与贡献毛益"}
       levelRequired={1}
       backHref="/dashboard/capital"
     >
       <div className="grid lg:grid-cols-5 gap-6">
-        {/* ── Left panel: inputs + results ── */}
+        {/*  Left panel: inputs + results  */}
         <div className="lg:col-span-2 space-y-4">
           {/* Inputs */}
           <div
@@ -212,7 +212,7 @@ export default function BreakevenAnalysisTool({ locale }: { locale: "zh" | "en" 
           </div>
         </div>
 
-        {/* ── Right panel: chart ── */}
+        {/*  Right panel: chart  */}
         <div className="lg:col-span-3">
           <div
             className="rounded-2xl p-5"

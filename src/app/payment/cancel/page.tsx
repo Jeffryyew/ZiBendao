@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 export default function PaymentCancelPage() {
   return (
@@ -10,7 +10,7 @@ export default function PaymentCancelPage() {
         className="w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-8"
         style={{ backgroundColor: "rgba(239,68,68,0.06)", border: "2px solid rgba(239,68,68,0.15)", color: "#DC2626" }}
       >
-        ✕
+        
       </div>
 
       <h1

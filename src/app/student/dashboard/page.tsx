@@ -1,4 +1,4 @@
-import { auth } from "../../../../auth";
+﻿import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -47,9 +47,9 @@ export default async function StudentDashboardPage() {
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "已完成课程", value: completedCount.toString(), unit: "关", icon: "✓" },
+          { label: "已完成课程", value: completedCount.toString(), unit: "关", icon: "" },
           { label: "累计积分", value: totalXP.toString(), unit: "XP", icon: "XP" },
-          { label: "可用工具", value: "22", unit: "个", icon: "◈" },
+          { label: "可用工具", value: "22", unit: "个", icon: "" },
         ].map((stat) => (
           <div
             key={stat.label}

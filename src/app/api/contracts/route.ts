@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     },
   });
 
-  sendContractEmail(client.email, client.name, body.title, document.id).catch(() => {});
+  sendContractEmail(client.email, client.name ?? client.email.split("@")[0], body.title, document.id).catch(() => {});
 
   return NextResponse.json({ id: document.id }, { status: 201 });
 }

@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import SharedNav from "@/components/SharedNav";
 import { getLocale } from "@/lib/i18n";
 
@@ -130,16 +130,16 @@ const OFFLINE_COURSES = [
 
 const OUTCOMES = {
   zh: [
-    { icon: "📊", text: "掌握企业估值核心方法，知道自己公司值多少钱" },
-    { icon: "🏛️", text: "设计合理股权架构，避免稀释与纠纷风险" },
-    { icon: "💼", text: "制定融资策略，与投资人建立有效沟通框架" },
-    { icon: "🚀", text: "规划清晰资本退出路径，从并购到 IPO 逐步推进" },
+    { icon: "", text: "掌握企业估值核心方法，知道自己公司值多少钱" },
+    { icon: "", text: "设计合理股权架构，避免稀释与纠纷风险" },
+    { icon: "", text: "制定融资策略，与投资人建立有效沟通框架" },
+    { icon: "", text: "规划清晰资本退出路径，从并购到 IPO 逐步推进" },
   ],
   en: [
-    { icon: "📊", text: "Master core valuation methods and know exactly what your company is worth" },
-    { icon: "🏛️", text: "Design sound equity structures to avoid dilution and shareholder disputes" },
-    { icon: "💼", text: "Formulate fundraising strategies and build effective investor communication" },
-    { icon: "🚀", text: "Plan clear capital exit paths — from mergers & acquisitions to IPO" },
+    { icon: "", text: "Master core valuation methods and know exactly what your company is worth" },
+    { icon: "", text: "Design sound equity structures to avoid dilution and shareholder disputes" },
+    { icon: "", text: "Formulate fundraising strategies and build effective investor communication" },
+    { icon: "", text: "Plan clear capital exit paths — from mergers & acquisitions to IPO" },
   ],
 };
 
@@ -237,7 +237,7 @@ export default async function CoursesPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1.5 gap-x-4 mb-6">
               {onlineCourse.abilities.map((ability) => (
                 <div key={ability} className="flex items-start gap-2 text-xs" style={{ color: "#68625C" }}>
-                  <span className="flex-shrink-0 mt-0.5" style={{ color: "#7C5FBF" }}>✦</span>
+                  <span className="flex-shrink-0 mt-0.5" style={{ color: "#7C5FBF" }}></span>
                   {ability}
                 </div>
               ))}
@@ -298,7 +298,7 @@ export default async function CoursesPage() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1.5 gap-x-4 mb-6">
                     {c.abilities.map((ability) => (
                       <div key={ability} className="flex items-start gap-2 text-xs" style={{ color: "#68625C" }}>
-                        <span className="flex-shrink-0 mt-0.5" style={{ color: course.accent }}>✦</span>
+                        <span className="flex-shrink-0 mt-0.5" style={{ color: course.accent }}></span>
                         {ability}
                       </div>
                     ))}

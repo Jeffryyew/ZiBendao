@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 
@@ -24,7 +24,7 @@ export default function NotificationBanner({ isEn }: NotificationBannerProps) {
     >
       <div>
         <p className="text-xs font-semibold" style={{ color: "#C9A84C" }}>
-          ✓ {isEn ? "Congratulations, Capitalist." : "恭喜，资本家。"}
+           {isEn ? "Congratulations, Capitalist." : "恭喜，资本家。"}
         </p>
         <p className="text-xs mt-0.5" style={{ color: "#666660" }}>
           {isEn

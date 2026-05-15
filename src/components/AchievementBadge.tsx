@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import type { Achievement } from "@/lib/achievements";
 
@@ -38,7 +38,7 @@ export default function AchievementBadge({ achievement, isEn, size = "md" }: Ach
           <div className="flex-1 min-w-0">
             <div className="text-sm font-semibold mb-0.5" style={{ color: "#F5F5F0" }}>{name}</div>
             <div className="text-xs" style={{ color }}>
-              {isEn ? "✓ Unlocked" : "✓ 已解锁"}
+              {isEn ? " Unlocked" : " 已解锁"}
             </div>
           </div>
           <span
@@ -69,7 +69,7 @@ export default function AchievementBadge({ achievement, isEn, size = "md" }: Ach
       </div>
       <div>
         <div className="text-xs font-semibold leading-snug" style={{ color: "#E5E5E0" }}>{name}</div>
-        <div className="text-xs mt-0.5" style={{ color: `${color}CC` }}>{isEn ? "✓ Unlocked" : "✓ 已解锁"}</div>
+        <div className="text-xs mt-0.5" style={{ color: `${color}CC` }}>{isEn ? " Unlocked" : " 已解锁"}</div>
       </div>
     </div>
   );

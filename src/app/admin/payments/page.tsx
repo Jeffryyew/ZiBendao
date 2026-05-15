@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+﻿import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 
@@ -43,7 +43,7 @@ export default async function AdminPaymentsPage({
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: "总笔数",  value: String(payments.length),                                                    icon: "笔", color: "#F5F5F0" },
-          { label: "成功笔数", value: String(payments.filter((p) => p.status === "SUCCESS").length),              icon: "✓",  color: "#4CAF82" },
+          { label: "成功笔数", value: String(payments.filter((p) => p.status === "SUCCESS").length),              icon: "",  color: "#4CAF82" },
           { label: "成功金额", value: `MYR ${totalSuccess.toFixed(0)}`,                                           icon: "MYR", color: "#C9A84C" },
         ].map((s) => (
           <div

@@ -1,4 +1,4 @@
-import { auth } from "../../../../auth";
+﻿import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
@@ -37,10 +37,10 @@ const LOCKED_LESSONS = [
 ];
 
 const TYPE_ICON: Record<string, string> = {
-  VIDEO: "▶",
-  READING: "📖",
-  QUIZ: "❓",
-  EXERCISE: "✏",
+  VIDEO: "",
+  READING: "",
+  QUIZ: "",
+  EXERCISE: "",
 };
 
 const TYPE_LABEL: Record<string, string> = {
@@ -72,7 +72,7 @@ export default async function MemberLearnPage() {
           className="flex items-center gap-3 p-4 rounded-2xl mb-5"
           style={{ backgroundColor: "#1A1A1A", border: "1px solid rgba(201,168,76,0.25)" }}
         >
-          <span className="text-2xl">💡</span>
+          <span className="text-2xl"></span>
           <div>
             <div className="text-sm font-semibold" style={{ color: "#F5F5F0" }}>模块一：财务基础</div>
             <div className="text-xs mt-0.5" style={{ color: "#666660" }}>3 关免费体验</div>
@@ -125,7 +125,7 @@ export default async function MemberLearnPage() {
                       {lesson.desc}
                     </p>
                     <div className="flex items-center gap-3 mt-2">
-                      <span className="text-xs" style={{ color: "#555550" }}>⏱ {lesson.duration}</span>
+                      <span className="text-xs" style={{ color: "#555550" }}> {lesson.duration}</span>
                       <span className="text-xs" style={{ color: "#444440" }}>+{lesson.points} XP</span>
                     </div>
                   </div>
@@ -166,7 +166,7 @@ export default async function MemberLearnPage() {
                 className="w-11 h-11 rounded-full flex items-center justify-center text-base flex-shrink-0"
                 style={{ backgroundColor: "#1A1A1A", color: "#555550" }}
               >
-                🔒
+                
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-sm font-medium" style={{ color: "#888880" }}>{lesson.title}</div>
@@ -182,7 +182,7 @@ export default async function MemberLearnPage() {
             className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl mb-4"
             style={{ backgroundColor: "rgba(201,168,76,0.12)", border: "1px solid rgba(201,168,76,0.25)" }}
           >
-            🔓
+            
           </div>
           <h3 className="text-lg font-bold mb-2" style={{ fontFamily: "var(--font-display)" }}>
             解锁完整课程体系

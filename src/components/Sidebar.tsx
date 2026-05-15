@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -110,7 +110,6 @@ export default function Sidebar({
         className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-colors hover:bg-[#EEE9E0]"
         style={{ color: "#9A9490" }}
       >
-        <span className="w-5 text-center text-base">⌂</span>
         主页
       </Link>
       <form action={logout} className="w-full">
@@ -231,7 +230,7 @@ export default function Sidebar({
               style={{ backgroundColor: "#EEE9E0", color: "#68625C" }}
               aria-label="关闭菜单"
             >
-              ✕
+              
             </button>
           </div>
           <div className="flex flex-col flex-1 overflow-hidden">

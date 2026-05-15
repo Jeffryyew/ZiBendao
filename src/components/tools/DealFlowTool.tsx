@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -119,7 +119,7 @@ export default function DealFlowTool({ locale }: { locale: "zh" | "en" }) {
 
   return (
     <ToolShell
-      icon="🔀"
+      icon=""
       title={isEn ? "Deal Flow" : "交易流"}
       desc={isEn ? "Track and manage investment opportunities across your pipeline." : "追踪和管理多个投资机会的完整流程。"}
       levelRequired={2}

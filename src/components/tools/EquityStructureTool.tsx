@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -121,7 +121,7 @@ export default function EquityStructureTool({ locale }: { locale: Locale }) {
 
   return (
     <ToolShell
-      icon="🔺"
+      icon=""
       title={isEn ? "Equity Structure" : "股权架构"}
       desc={isEn ? "Build your cap table, model dilution, and visualize equity distribution." : "构建股权表，模拟稀释，可视化股权分配。"}
       levelRequired={3}

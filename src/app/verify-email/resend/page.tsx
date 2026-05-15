@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useActionState } from "react";
 import { resendVerification } from "@/app/actions/auth";
@@ -15,7 +15,7 @@ export default function ResendVerificationPage() {
             className="w-20 h-20 rounded-full flex items-center justify-center mx-auto text-3xl"
             style={{ backgroundColor: "#FBF4E4", border: "2px solid rgba(139,101,20,0.2)", color: "#8B6514" }}
           >
-            ✉
+            
           </div>
           <div>
             <h2 className="text-xl font-bold mb-2" style={{ color: "#1C1814" }}>验证邮件已发送</h2>
@@ -39,7 +39,7 @@ export default function ResendVerificationPage() {
             className="w-20 h-20 rounded-full flex items-center justify-center mx-auto text-3xl"
             style={{ backgroundColor: "rgba(22,163,74,0.08)", border: "2px solid rgba(22,163,74,0.25)", color: "#16A34A" }}
           >
-            ✓
+            
           </div>
           <div>
             <h2 className="text-xl font-bold mb-2" style={{ color: "#1C1814" }}>邮箱已验证</h2>
@@ -97,7 +97,7 @@ export default function ResendVerificationPage() {
               className="flex items-center gap-2.5 rounded-xl px-4 py-3 text-sm"
               style={{ backgroundColor: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", color: "#DC2626" }}
             >
-              <span>✕</span>
+              <span></span>
               {state.error}
             </div>
           )}

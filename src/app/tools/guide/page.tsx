@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { isGraduate } from "@/lib/roles";
 
@@ -254,7 +254,7 @@ export default async function ToolsGuidePage() {
                         <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                           {tool.features.map((f) => (
                             <div key={f} className="flex items-start gap-1.5 text-xs" style={{ color: unlocked ? "#68625C" : "#C0B8B0" }}>
-                              <span className="flex-shrink-0 mt-0.5" style={{ color: unlocked ? tool.accent : "#C0B8B0" }}>✓</span>
+                              <span className="flex-shrink-0 mt-0.5" style={{ color: unlocked ? tool.accent : "#C0B8B0" }}></span>
                               {f}
                             </div>
                           ))}

@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { getLocale } from "@/lib/i18n";
 import { CAPITAL_MODULES, LAYER_META, getModulesByLayer } from "@/lib/capitalModules";
 import { getXPProgress } from "@/lib/capitalLevels";
@@ -62,7 +62,7 @@ export default async function CapitalDashboardPage() {
   return (
     <div style={{ backgroundColor: "#0A0A0A", minHeight: "100vh", color: "#F5F5F0" }}>
 
-      {/* ── Top bar ── */}
+      {/*  Top bar  */}
       <div
         className="sticky top-0 z-30"
         style={{ backgroundColor: "rgba(10,10,10,0.95)", borderBottom: "1px solid #1A1A1A", backdropFilter: "blur(8px)" }}
@@ -92,7 +92,7 @@ export default async function CapitalDashboardPage() {
 
       <div className="max-w-6xl mx-auto px-4 py-10 space-y-10">
 
-        {/* ── 1. Hero Section ── */}
+        {/*  1. Hero Section  */}
         <div className="pb-2">
           <p className="text-sm mb-1" style={{ color: "#666660" }}>
             {isEn ? "Welcome back, Capitalist." : "欢迎回来，资本家。"}
@@ -114,10 +114,10 @@ export default async function CapitalDashboardPage() {
           </div>
         </div>
 
-        {/* ── 2. Notification Banner ── */}
+        {/*  2. Notification Banner  */}
         <NotificationBanner isEn={isEn} />
 
-        {/* ── 3. Level Card + Health Score ── */}
+        {/*  3. Level Card + Health Score  */}
         <div className="grid lg:grid-cols-2 gap-6">
 
           {/* Level Card */}
@@ -197,13 +197,13 @@ export default async function CapitalDashboardPage() {
                 className="inline-flex items-center gap-1 mt-3 text-xs px-2 py-1 rounded-full"
                 style={{ backgroundColor: "rgba(251,191,36,0.08)", color: "#FBBF24", border: "1px solid rgba(251,191,36,0.15)" }}
               >
-                ⚠ {isEn ? "Needs attention" : "需要完善"}
+                 {isEn ? "Needs attention" : "需要完善"}
               </div>
             </div>
           </div>
         </div>
 
-        {/* ── 4. Stats Row ── */}
+        {/*  4. Stats Row  */}
         <div className="grid grid-cols-3 gap-4">
           {[
             {
@@ -239,7 +239,7 @@ export default async function CapitalDashboardPage() {
           ))}
         </div>
 
-        {/* ── 5. Achievement Strip ── */}
+        {/*  5. Achievement Strip  */}
         <div>
           <h2 className="text-sm font-semibold mb-4" style={{ color: "#A0A09A" }}>
             {isEn ? "Recent Achievements" : "最新成就"}
@@ -251,13 +251,13 @@ export default async function CapitalDashboardPage() {
           </div>
         </div>
 
-        {/* ── 6. AI Insight Panel ── */}
+        {/*  6. AI Insight Panel  */}
         <div
           className="px-5 py-4 rounded-xl"
           style={{ backgroundColor: "#111111", border: "1px solid #1E1E1E", borderLeft: "3px solid rgba(201,168,76,0.5)" }}
         >
           <div className="flex items-start gap-3">
-            <span className="text-base flex-shrink-0 mt-0.5">💡</span>
+            <span className="text-base flex-shrink-0 mt-0.5 font-bold" style={{ color: "#C9A84C" }}>!</span>
             <div>
               <p className="text-sm" style={{ color: "#D0D0CA" }}>
                 {isEn
@@ -274,7 +274,7 @@ export default async function CapitalDashboardPage() {
           </div>
         </div>
 
-        {/* ── 7. Module Grid ── */}
+        {/*  7. Module Grid  */}
         <div className="space-y-14">
           {layers.map((layer) => {
             const meta = LAYER_META[layer];
@@ -332,7 +332,7 @@ export default async function CapitalDashboardPage() {
                         <div className="flex items-start justify-between mb-3">
                           <span className="text-2xl">{mod.icon}</span>
                           {isUnlocked && (
-                            <span className="text-xs" style={{ color: "#34D39988" }}>🔓</span>
+                            <span className="text-xs font-bold" style={{ color: "#34D39988" }}>+</span>
                           )}
                         </div>
                         <div className="text-sm font-semibold mb-1.5" style={{ color: "#F5F5F0" }}>
@@ -350,7 +350,7 @@ export default async function CapitalDashboardPage() {
           })}
         </div>
 
-        {/* ── 8. Progress Timeline ── */}
+        {/*  8. Progress Timeline  */}
         <div
           className="p-6 rounded-2xl"
           style={{ backgroundColor: "#111111", border: "1px solid #1A1A1A" }}

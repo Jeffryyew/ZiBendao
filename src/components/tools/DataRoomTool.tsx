@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -20,7 +20,7 @@ interface Folder {
 const FOLDERS: Folder[] = [
   {
     id: "corporate",
-    icon: "📁",
+    icon: "",
     zh: "企业文件",
     en: "Corporate Documents",
     docs: [
@@ -32,7 +32,7 @@ const FOLDERS: Folder[] = [
   },
   {
     id: "financial",
-    icon: "📁",
+    icon: "",
     zh: "财务报表",
     en: "Financial Statements",
     docs: [
@@ -44,7 +44,7 @@ const FOLDERS: Folder[] = [
   },
   {
     id: "captable",
-    icon: "📁",
+    icon: "",
     zh: "股权结构",
     en: "Cap Table",
     docs: [
@@ -55,7 +55,7 @@ const FOLDERS: Folder[] = [
   },
   {
     id: "legal",
-    icon: "📁",
+    icon: "",
     zh: "法律文件",
     en: "Legal",
     docs: [
@@ -67,7 +67,7 @@ const FOLDERS: Folder[] = [
   },
   {
     id: "team",
-    icon: "📁",
+    icon: "",
     zh: "团队",
     en: "Team",
     docs: [
@@ -79,7 +79,7 @@ const FOLDERS: Folder[] = [
   },
   {
     id: "product",
-    icon: "📁",
+    icon: "",
     zh: "产品",
     en: "Product",
     docs: [
@@ -91,7 +91,7 @@ const FOLDERS: Folder[] = [
   },
   {
     id: "market",
-    icon: "📁",
+    icon: "",
     zh: "市场",
     en: "Market",
     docs: [
@@ -150,7 +150,7 @@ export default function DataRoomTool({ locale }: { locale: "zh" | "en" }) {
 
   return (
     <ToolShell
-      icon="🗂️"
+      icon=""
       title={isEn ? "Data Room" : "数据室"}
       desc={isEn ? "Organise and track your investor-ready document repository." : "整理并追踪投资人就绪的数据室文件。"}
       levelRequired={2}
@@ -214,7 +214,7 @@ export default function DataRoomTool({ locale }: { locale: "zh" | "en" }) {
               className="w-full mt-5 py-2.5 rounded-xl text-sm font-medium"
               style={{ backgroundColor: "rgba(59,130,246,0.1)", color: "#3B82F6", border: "1px solid rgba(59,130,246,0.2)" }}
             >
-              🔗 {isEn ? "Share Data Room" : "分享数据室"}
+               {isEn ? "Share Data Room" : "分享数据室"}
             </button>
           </div>
         </div>
@@ -239,7 +239,7 @@ export default function DataRoomTool({ locale }: { locale: "zh" | "en" }) {
                 >
                   <div className="flex items-center gap-3">
                     <span style={{ fontSize: "16px" }}>
-                      {isOpen ? "📂" : "📁"}
+                      {isOpen ? "" : ""}
                     </span>
                     <div>
                       <span className="text-sm font-semibold" style={{ color: "#F5F5F0" }}>
@@ -257,7 +257,7 @@ export default function DataRoomTool({ locale }: { locale: "zh" | "en" }) {
                     >
                       {folderPct}%
                     </span>
-                    <span style={{ color: "#444440", fontSize: "11px" }}>{isOpen ? "▲" : "▼"}</span>
+                    <span style={{ color: "#444440", fontSize: "11px" }}>{isOpen ? "" : ""}</span>
                   </div>
                 </button>
 
@@ -281,9 +281,9 @@ export default function DataRoomTool({ locale }: { locale: "zh" | "en" }) {
                               color: done ? "#3B82F6" : "transparent",
                             }}
                           >
-                            {done ? "✓" : ""}
+                            {done ? "" : ""}
                           </div>
-                          <span className="text-xs" style={{ color: "#888888" }}>📄</span>
+                          <span className="text-xs" style={{ color: "#888888" }}></span>
                           <span
                             className="text-sm flex-1 transition-all"
                             style={{
@@ -310,7 +310,7 @@ export default function DataRoomTool({ locale }: { locale: "zh" | "en" }) {
 
           {/* Tip */}
           <div className="rounded-xl p-4 flex items-center gap-3" style={{ backgroundColor: "rgba(59,130,246,0.05)", border: "1px solid rgba(59,130,246,0.12)" }}>
-            <span className="text-lg flex-shrink-0">💡</span>
+            <span className="text-lg flex-shrink-0"></span>
             <p className="text-xs leading-relaxed" style={{ color: "#666660" }}>
               {isEn
                 ? "Check documents as you upload them to your secure storage. Aim for 70%+ readiness before sharing with investors."

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -65,7 +65,7 @@ export default function StartupExpenseTool({ locale }: { locale: "zh" | "en" }) 
 
   return (
     <ToolShell
-      icon="🧾"
+      icon=""
       title={isEn ? "Startup Expense Planner" : "创业费用规划"}
       desc={isEn ? "Calculate startup costs, monthly burn rate & runway" : "计算创业启动成本、月燃烧率与资金跑道"}
       levelRequired={1}
@@ -204,8 +204,8 @@ export default function StartupExpenseTool({ locale }: { locale: "zh" | "en" }) 
             {runway > 0 && runway < 6 && (
               <p className="mt-3 text-xs" style={{ color: "#A0A09A" }}>
                 {isEn
-                  ? "⚠ Consider raising more capital or cutting costs."
-                  : "⚠ 建议增加资金或降低运营成本。"}
+                  ? " Consider raising more capital or cutting costs."
+                  : " 建议增加资金或降低运营成本。"}
               </p>
             )}
           </div>

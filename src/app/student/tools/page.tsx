@@ -1,4 +1,4 @@
-import { auth } from "../../../../auth";
+﻿import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 
@@ -76,7 +76,7 @@ export default async function StudentToolsPage() {
               <div className="grid grid-cols-2 gap-1.5">
                 {tool.features.map((f) => (
                   <div key={f} className="flex items-center gap-1.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                    <span style={{ color: "#C9A84C" }}>✓</span>
+                    <span style={{ color: "#C9A84C" }}></span>
                     {f}
                   </div>
                 ))}

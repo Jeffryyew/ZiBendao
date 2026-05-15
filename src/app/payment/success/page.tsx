@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 
 export default function PaymentSuccessPage() {
   return (
@@ -10,7 +10,7 @@ export default function PaymentSuccessPage() {
         className="w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-8"
         style={{ backgroundColor: "rgba(22,163,74,0.08)", border: "2px solid rgba(22,163,74,0.2)", color: "#16A34A" }}
       >
-        ✓
+        
       </div>
 
       <h1

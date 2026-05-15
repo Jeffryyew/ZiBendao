@@ -66,7 +66,7 @@ export async function resendVerification(_prev: ActionResult | undefined, formDa
     data: { verifyToken, verifyTokenExpiry },
   });
 
-  sendVerificationEmail(email, user.name, verifyToken).catch(() => {});
+  sendVerificationEmail(email, user.name ?? email.split("@")[0], verifyToken).catch(() => {});
 
   return { success: "verification_sent" };
 }
@@ -146,7 +146,7 @@ export async function verifyEmailToken(token: string): Promise<{ success: boolea
     data: { emailVerified: new Date(), verifyToken: null, verifyTokenExpiry: null },
   });
 
-  sendWelcomeEmail(user.email, user.name).catch(() => {});
+  sendWelcomeEmail(user.email, user.name ?? user.email.split("@")[0]).catch(() => {});
 
   return { success: true };
 }

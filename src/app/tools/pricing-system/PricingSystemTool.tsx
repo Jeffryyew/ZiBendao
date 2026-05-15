@@ -96,7 +96,7 @@ export default function PricingSystemTool() {
   } as const;
 
   return (
-    <ToolShell icon="💰" title="产品服务报价系统" desc="快速生成专业报价单，支持动态项目、折扣与税务计算。" levelRequired={2}>
+    <ToolShell icon="" title="产品服务报价系统" desc="快速生成专业报价单，支持动态项目、折扣与税务计算。" levelRequired={2}>
       <div className="space-y-6">
         {/* Client Info */}
         <div className="rounded-2xl p-6" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
@@ -183,7 +183,7 @@ export default function PricingSystemTool() {
                     className="opacity-0 group-hover:opacity-100 w-6 h-6 rounded-lg flex items-center justify-center text-xs transition-opacity"
                     style={{ backgroundColor: "#D8D1C6", color: "#888880" }}
                   >
-                    ✕
+                    
                   </button>
                 </div>
               </div>
@@ -239,7 +239,7 @@ export default function PricingSystemTool() {
             ↓ 导出 CSV
           </button>
           <button onClick={() => window.print()} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#EEE9E0", color: "#68625C", border: "1px solid #2A2A2A" }}>
-            🖨 打印 PDF
+             打印 PDF
           </button>
         </div>
 

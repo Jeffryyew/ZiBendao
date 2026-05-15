@@ -1,4 +1,4 @@
-import { Resend } from "resend";
+﻿import { Resend } from "resend";
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -85,7 +85,7 @@ export async function sendPaymentConfirmationEmail(
   await resend.emails.send({
     from: FROM,
     to,
-    subject: "付款成功 — 你已成为资本道学生会员 🎉",
+    subject: "付款成功 — 你已成为资本道学生会员 ",
     html: wrap(`
       <h2 style="color:#F5F5F0;font-size:20px;margin:0 0 16px;">恭喜，${name}！</h2>
       <p style="color:#A0A09A;line-height:1.8;margin:0 0 20px;">您的付款已成功处理，您现在是资本道 <strong style="color:#C9A84C;">学生会员（L1）</strong>。</p>

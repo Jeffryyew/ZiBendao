@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useTransition } from "react";
 import {
@@ -20,7 +20,7 @@ interface ToolRecord {
 
 interface ClientRecord {
   id: string;
-  name: string;
+  name: string | null;
   email: string;
   toolAccess: { toolId: string }[];
 }
@@ -92,7 +92,7 @@ export default function ToolsPanel({ tools, clients }: Props) {
         ))}
       </div>
 
-      {/* ─── Catalog tab ─── */}
+      {/*  Catalog tab  */}
       {tab === "catalog" && (
         <div className="space-y-6">
           {/* Seed button */}
@@ -120,7 +120,7 @@ export default function ToolsPanel({ tools, clients }: Props) {
                   className="flex items-center gap-4 rounded-2xl px-5 py-4"
                   style={{ backgroundColor: "#111111", border: "1px solid #1A1A1A" }}
                 >
-                  <span className="text-2xl flex-shrink-0">{TOOL_ICONS[tool.slug] ?? "🔧"}</span>
+                  <span className="text-2xl flex-shrink-0">{TOOL_ICONS[tool.slug] ?? ""}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-medium" style={{ color: "#F5F5F0" }}>{tool.name}</span>
@@ -222,7 +222,7 @@ export default function ToolsPanel({ tools, clients }: Props) {
         </div>
       )}
 
-      {/* ─── Access tab ─── */}
+      {/*  Access tab  */}
       {tab === "access" && (
         <div className="space-y-6">
           {tools.length === 0 ? (
@@ -254,7 +254,7 @@ export default function ToolsPanel({ tools, clients }: Props) {
                       color: selectedTool?.id === tool.id ? "#C9A84C" : "#666660",
                     }}
                   >
-                    <span>{TOOL_ICONS[tool.slug] ?? "🔧"}</span>
+                    <span>{TOOL_ICONS[tool.slug] ?? ""}</span>
                     {tool.name}
                   </button>
                 ))}
@@ -288,7 +288,7 @@ export default function ToolsPanel({ tools, clients }: Props) {
                               color: hasAccess ? "#C9A84C" : "#666660",
                             }}
                           >
-                            {hasAccess ? "✓ 已授权" : "+ 授权"}
+                            {hasAccess ? " 已授权" : "+ 授权"}
                           </button>
                         </div>
                       );

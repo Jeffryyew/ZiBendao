@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -126,7 +126,7 @@ export default function CapitalRoadmapTool({ locale }: { locale: "zh" | "en" }) 
 
   return (
     <ToolShell
-      icon="🗺️"
+      icon=""
       title={isEn ? "Capital Roadmap" : "资本路线图"}
       desc={isEn ? "Navigate your company's capital journey from Pre-Seed to IPO-Ready." : "规划企业从天使前到上市准备的完整资本旅程。"}
       levelRequired={2}
@@ -157,7 +157,7 @@ export default function CapitalRoadmapTool({ locale }: { locale: "zh" | "en" }) 
                       border: `1px solid ${isCompleted ? "rgba(94,171,106,0.35)" : isActive ? "rgba(59,130,246,0.35)" : "#2A2A2A"}`,
                     }}
                   >
-                    {isCompleted ? "✓" : i + 1}
+                    {isCompleted ? "" : i + 1}
                   </div>
                   <span
                     className="text-xs font-medium whitespace-nowrap"
@@ -183,7 +183,7 @@ export default function CapitalRoadmapTool({ locale }: { locale: "zh" | "en" }) 
         className="mb-6 p-4 rounded-xl flex items-center gap-4"
         style={{ backgroundColor: "rgba(59,130,246,0.06)", border: "1px solid rgba(59,130,246,0.15)" }}
       >
-        <span className="text-2xl flex-shrink-0">📍</span>
+        <span className="text-2xl flex-shrink-0"></span>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold" style={{ color: "#3B82F6" }}>
             {isEn
@@ -192,7 +192,7 @@ export default function CapitalRoadmapTool({ locale }: { locale: "zh" | "en" }) 
           </p>
           <p className="text-xs mt-0.5" style={{ color: "#A0A09A" }}>
             {checkedCount === milestones.length
-              ? (isEn ? "All milestones complete — ready to advance! 🎉" : "所有里程碑已完成，准备晋级！🎉")
+              ? (isEn ? "All milestones complete — ready to advance! " : "所有里程碑已完成，准备晋级！")
               : isEn
               ? `${checkedCount} / ${milestones.length} milestones completed. Complete ${milestones.length - checkedCount} more to advance.`
               : `已完成 ${checkedCount} / ${milestones.length} 个里程碑。还需完成 ${milestones.length - checkedCount} 个方可晋级。`}
@@ -225,7 +225,7 @@ export default function CapitalRoadmapTool({ locale }: { locale: "zh" | "en" }) 
                         color: done ? "#3B82F6" : "transparent",
                       }}
                     >
-                      {done ? "✓" : ""}
+                      {done ? "" : ""}
                     </div>
                     <span
                       className="text-sm transition-all"
@@ -254,7 +254,7 @@ export default function CapitalRoadmapTool({ locale }: { locale: "zh" | "en" }) 
           <div className="rounded-xl p-4 flex items-center justify-between" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
             <span className="text-xs" style={{ color: "#666660" }}>{isEn ? "Estimated Timeline" : "预计时间"}</span>
             <span className="text-sm font-medium" style={{ color: "#3B82F6" }}>
-              ⏱ {isEn ? stage.timeline.en : stage.timeline.zh}
+               {isEn ? stage.timeline.en : stage.timeline.zh}
             </span>
           </div>
         </div>
@@ -275,7 +275,7 @@ export default function CapitalRoadmapTool({ locale }: { locale: "zh" | "en" }) 
             <div className="space-y-2">
               {(isEn ? stage.documents.en : stage.documents.zh).map((doc, i) => (
                 <div key={i} className="flex items-center gap-2 text-sm" style={{ color: "#A0A09A" }}>
-                  <span style={{ color: "#3B82F6" }}>📄</span>
+                  <span style={{ color: "#3B82F6" }}></span>
                   {doc}
                 </div>
               ))}

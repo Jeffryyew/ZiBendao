@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+﻿import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -46,7 +46,7 @@ export default async function AdminDashboardPage() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 md:py-10 space-y-7">
 
-      {/* ── Header ── */}
+      {/*  Header  */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm mb-1" style={{ color: "#666660" }}>{greeting}，</p>
@@ -67,7 +67,7 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* ── Summary Stats ── */}
+      {/*  Summary Stats  */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: "总用户", value: totalUsers,                                icon: "用户", href: "/admin/users" },
@@ -88,7 +88,7 @@ export default async function AdminDashboardPage() {
         ))}
       </div>
 
-      {/* ── User Breakdown ── */}
+      {/*  User Breakdown  */}
       <div>
         <h2 className="font-semibold text-sm tracking-wide mb-4" style={{ color: "#A0A09A" }}>用户角色分布</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
@@ -114,14 +114,14 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* ── Quick Actions ── */}
+      {/*  Quick Actions  */}
       <div>
         <h2 className="font-semibold text-sm tracking-wide mb-4" style={{ color: "#A0A09A" }}>快捷操作</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
           {[
             { href: "/admin/contracts/new", icon: "+", title: "生成新合约", desc: "为客户创建咨询服务合约" },
-            { href: "/admin/users",         icon: "◈", title: "用户管理",   desc: "查看、编辑用户角色与权限" },
-            { href: "/admin/reports",       icon: "▦", title: "数据报告",   desc: "平台运营统计与分析" },
+            { href: "/admin/users",         icon: "", title: "用户管理",   desc: "查看、编辑用户角色与权限" },
+            { href: "/admin/reports",       icon: "", title: "数据报告",   desc: "平台运营统计与分析" },
             { href: "/admin/payments",      icon: "¥", title: "支付记录",   desc: "查看所有订单与支付状态" },
           ].map((action) => (
             <Link
@@ -146,7 +146,7 @@ export default async function AdminDashboardPage() {
         </div>
       </div>
 
-      {/* ── Recent Payments ── */}
+      {/*  Recent Payments  */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-sm tracking-wide" style={{ color: "#A0A09A" }}>最近支付记录</h2>

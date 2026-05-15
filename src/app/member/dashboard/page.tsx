@@ -1,12 +1,12 @@
-import { auth } from "../../../../auth";
+﻿import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 
 const FREE_LESSONS = [
-  { id: 1, title: "什么是财务自由？", type: "视频", duration: "8 分钟", icon: "▶" },
+  { id: 1, title: "什么是财务自由？", type: "视频", duration: "8 分钟", icon: "" },
   { id: 2, title: "资产与负债的秘密", type: "阅读", duration: "5 分钟", icon: "≡" },
-  { id: 3, title: "现金流管理技巧", type: "测验", duration: "10 分钟", icon: "✏" },
+  { id: 3, title: "现金流管理技巧", type: "测验", duration: "10 分钟", icon: "" },
 ];
 
 const LOCKED_TOOLS = [
@@ -38,7 +38,7 @@ export default async function MemberDashboardPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 md:py-10 space-y-7">
 
-      {/* ── Header ── */}
+      {/*  Header  */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm mb-1" style={{ color: "#666660" }}>{greeting}，</p>
@@ -55,12 +55,12 @@ export default async function MemberDashboardPage() {
         </div>
       </div>
 
-      {/* ── Stats row ── */}
+      {/*  Stats row  */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "体验课程", value: "3", unit: "关可学", icon: "○" },
-          { label: "已完成", value: String(completedCount), unit: "关", icon: "✓" },
-          { label: "累计积分", value: String(totalXP), unit: "XP", icon: "⚡" },
+          { label: "体验课程", value: "3", unit: "关可学", icon: "" },
+          { label: "已完成", value: String(completedCount), unit: "关", icon: "" },
+          { label: "累计积分", value: String(totalXP), unit: "XP", icon: "" },
         ].map((s) => (
           <div
             key={s.label}
@@ -77,7 +77,7 @@ export default async function MemberDashboardPage() {
         ))}
       </div>
 
-      {/* ── Upgrade Banner ── */}
+      {/*  Upgrade Banner  */}
       <div
         className="relative overflow-hidden rounded-2xl p-6"
         style={{
@@ -115,7 +115,7 @@ export default async function MemberDashboardPage() {
         </div>
       </div>
 
-      {/* ── Free Lessons ── */}
+      {/*  Free Lessons  */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-sm tracking-wide" style={{ color: "#A0A09A" }}>
@@ -145,7 +145,7 @@ export default async function MemberDashboardPage() {
                     color: done ? "#4CAF82" : "#C9A84C",
                   }}
                 >
-                  {done ? "✓" : String(i + 1)}
+                  {done ? "" : String(i + 1)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium" style={{ color: done ? "#888880" : "#F5F5F0" }}>
@@ -173,7 +173,7 @@ export default async function MemberDashboardPage() {
         </div>
       </div>
 
-      {/* ── Locked Tools ── */}
+      {/*  Locked Tools  */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-sm tracking-wide" style={{ color: "#A0A09A" }}>
@@ -203,7 +203,7 @@ export default async function MemberDashboardPage() {
         </div>
       </div>
 
-      {/* ── Bottom CTA ── */}
+      {/*  Bottom CTA  */}
       <div
         className="rounded-2xl p-6 text-center"
         style={{ backgroundColor: "#111111", border: "1px solid #1A1A1A" }}

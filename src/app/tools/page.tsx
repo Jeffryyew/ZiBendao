@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import SharedNav from "@/components/SharedNav";
 import { getLocale } from "@/lib/i18n";
 
@@ -114,7 +114,7 @@ export default async function ToolsPage() {
                 <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mb-6">
                   {t.features.map((f) => (
                     <div key={f} className="flex items-center gap-1.5 text-xs" style={{ color: "#9A9490" }}>
-                      <span style={{ color: tool.accent }}>✓</span>
+                      <span style={{ color: tool.accent }}></span>
                       {f}
                     </div>
                   ))}

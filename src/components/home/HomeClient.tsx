@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { motion, useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
@@ -27,7 +27,7 @@ export default function HomeClient({ t, locale, isLoggedIn }: Props) {
   );
 }
 
-// ─── Navbar ──────────────────────────────────────────────────────────────────
+//  Navbar 
 
 function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isLoggedIn?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
@@ -140,7 +140,7 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
                   onMouseLeave={(e) => { if (openDropdown !== item.href) (e.currentTarget as HTMLButtonElement).style.color = "#68625C"; }}
                 >
                   {item.label}
-                  <span style={{ fontSize: "9px", opacity: 0.4, marginLeft: 2, display: "inline-block", transform: openDropdown === item.href ? "rotate(180deg)" : "none", transition: "transform 150ms" }}>▾</span>
+                  <span style={{ fontSize: "9px", opacity: 0.4, marginLeft: 2, display: "inline-block", transform: openDropdown === item.href ? "rotate(180deg)" : "none", transition: "transform 150ms" }}>&#x25BE;</span>
                 </button>
                 {openDropdown === item.href && (
                   <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50" style={{ minWidth: 168 }}>
@@ -331,7 +331,7 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
   );
 }
 
-// ─── Hero ─────────────────────────────────────────────────────────────────────
+//  Hero 
 
 function HeroSection({ t, isLoggedIn }: { t: Dict["hero"]; isLoggedIn?: boolean }) {
   return (
@@ -446,22 +446,22 @@ function HeroSection({ t, isLoggedIn }: { t: Dict["hero"]; isLoggedIn?: boolean 
   );
 }
 
-// ─── What Is Capital Transformation ──────────────────────────────────────────
+//  What Is Capital Transformation 
 
 function WhatIsCapital() {
   const PILLARS = [
     {
-      icon: "◈",
+      icon: "",
       title: "为什么企业需要资本化？",
       desc: "营业额高不代表企业有价值。资本化是将经营型企业，转化为可估值、可融资、可被投资的商业体。",
     },
     {
-      icon: "◎",
+      icon: "",
       title: "资本思维 vs 经营思维",
       desc: "经营思维关注利润，资本思维关注估值。学习如何用资本逻辑重新设计你的企业结构与增长路径。",
     },
     {
-      icon: "◐",
+      icon: "",
       title: "建立可投资的企业结构",
       desc: "SPV 架构、股权设计、融资准备度——让企业在需要资本时，已经具备被投资的能力。",
     },
@@ -516,7 +516,7 @@ function WhatIsCapital() {
   );
 }
 
-// ─── Capital Learning Journey ─────────────────────────────────────────────────
+//  Capital Learning Journey 
 
 function CapitalLearningJourney({ locale }: { locale: string }) {
   const LEVELS = [
@@ -671,7 +671,7 @@ function LevelCard({
   );
 }
 
-// ─── Tools preview ────────────────────────────────────────────────────────────
+//  Tools preview 
 
 function ToolsPreview({ locale }: { locale: Locale }) {
   const TOOLS_ZH = [
@@ -779,7 +779,7 @@ function ToolCard({
   );
 }
 
-// ─── CTA ──────────────────────────────────────────────────────────────────────
+//  CTA 
 
 function CTASection({ isLoggedIn }: { isLoggedIn?: boolean }) {
   const ref = useRef<HTMLElement>(null);
@@ -841,7 +841,7 @@ function CTASection({ isLoggedIn }: { isLoggedIn?: boolean }) {
   );
 }
 
-// ─── Footer ───────────────────────────────────────────────────────────────────
+//  Footer 
 
 function Footer({ t }: { t: Dict["footer"] }) {
   const COL_A = [

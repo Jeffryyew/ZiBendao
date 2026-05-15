@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -12,7 +12,7 @@ import {
 
 interface Client {
   id: string;
-  name: string;
+  name: string | null;
   email: string;
 }
 
@@ -60,7 +60,7 @@ export default function ContractForm({ clients, consultantName }: Props) {
     setSelectedClientId(id);
     const client = clients.find((c) => c.id === id);
     if (client) {
-      setVars((v) => ({ ...v, client_name: client.name }));
+      setVars((v) => ({ ...v, client_name: client.name ?? client.email.split("@")[0] }));
     }
   }
 
@@ -170,7 +170,7 @@ export default function ContractForm({ clients, consultantName }: Props) {
           style={{ backgroundColor: "#111111", color: "#A0A09A" }}
         >
           <span>合同预览</span>
-          <span>{preview ? "▲ 收起" : "▼ 展开"}</span>
+          <span>{preview ? " 收起" : " 展开"}</span>
         </button>
         {preview && (
           <div className="p-6" style={{ backgroundColor: "#FAFAF8" }}>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
@@ -74,7 +74,7 @@ export default function RegisterPage() {
             "优先了解最新课程与活动资讯",
           ].map((item) => (
             <div key={item} className="flex items-start gap-3">
-              <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: "#8B6514" }}>○</span>
+              <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: "#8B6514" }}></span>
               <span className="text-sm leading-relaxed" style={{ color: "#68625C" }}>{item}</span>
             </div>
           ))}
@@ -163,7 +163,7 @@ export default function RegisterPage() {
               </div>
               {error && (
                 <div className="flex items-start gap-2 rounded-xl px-4 py-3 text-sm" style={{ backgroundColor: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", color: "#DC2626" }}>
-                  <span className="flex-shrink-0">✕</span>{error}
+                  <span className="flex-shrink-0"></span>{error}
                 </div>
               )}
               <button

@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth";
+﻿import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import PrintButton from "./PrintButton";
@@ -86,7 +86,7 @@ export default async function DocumentViewPage({ params }: { params: Promise<{ i
           style={{ backgroundColor: "#111111", border: "1px solid #4CAF8244" }}
         >
           <div className="flex items-center gap-2 mb-4">
-            <span style={{ color: "#4CAF82" }}>✓</span>
+            <span style={{ color: "#4CAF82" }}></span>
             <span className="text-sm font-medium" style={{ color: "#4CAF82" }}>已电子签署</span>
             {signedAt && <span className="text-xs" style={{ color: "#555550" }}>— {signedAt}</span>}
           </div>

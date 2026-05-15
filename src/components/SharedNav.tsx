@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
@@ -37,7 +37,7 @@ function DropdownMenu({ item, isActive }: { item: NavLink; isActive: boolean }) 
         onMouseLeave={(e) => { if (!isActive && !open) (e.currentTarget as HTMLButtonElement).style.color = "#68625C"; }}
       >
         {item.label}
-        <span style={{ fontSize: "9px", opacity: 0.4, marginLeft: 1, display: "inline-block", transform: open ? "rotate(180deg)" : "none", transition: "transform 150ms" }}>▾</span>
+        <span style={{ fontSize: "9px", opacity: 0.4, marginLeft: 1, display: "inline-block", transform: open ? "rotate(180deg)" : "none", transition: "transform 150ms" }}>&#x25BE;</span>
       </button>
 
       {open && (

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -149,7 +149,7 @@ export default function RiskControlTool({ locale }: { locale: Locale }) {
 
   return (
     <ToolShell
-      icon="🛡️"
+      icon=""
       title={isEn ? "Risk Control System" : "风控系统"}
       desc={isEn ? "Enterprise risk register, 5×5 matrix, and category heat map." : "企业风险登记册、5×5风险矩阵与分类热力图。"}
       levelRequired={3}
@@ -283,7 +283,7 @@ export default function RiskControlTool({ locale }: { locale: Locale }) {
             {/* Highest risk callout */}
             {highest && (
               <div className="rounded-xl p-4 flex gap-3" style={{ backgroundColor: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)" }}>
-                <span className="text-lg">⚠️</span>
+                <span className="text-lg"></span>
                 <div>
                   <p className="text-xs font-semibold mb-0.5" style={{ color: "#EF4444" }}>{isEn ? "Highest Risk" : "最高风险"}</p>
                   <p className="text-sm" style={{ color: "#A0A09A" }}>{highest.name} — {isEn ? "Score" : "得分"} {highest.likelihood * highest.impact}/25</p>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -134,13 +134,13 @@ export default function FundraisingSystemTool({ locale }: { locale: "zh" | "en" 
 
   return (
     <ToolShell
-      icon="💼"
+      icon=""
       title={isEn ? "Fundraising System" : "融资系统"}
       desc={isEn ? "Calculate your raise terms and track your investor pipeline." : "计算融资条款，追踪投资人管道进展。"}
       levelRequired={2}
       backHref="/dashboard/capital"
     >
-      {/* ── Section 1: Calculator ── */}
+      {/*  Section 1: Calculator  */}
       <div className="mb-8">
         <p className="text-xs font-mono mb-4" style={{ color: "#3B82F6" }}>
           {isEn ? "01 / FUNDRAISING CALCULATOR" : "01 / 融资计算器"}
@@ -219,7 +219,7 @@ export default function FundraisingSystemTool({ locale }: { locale: "zh" | "en" 
                         {isEn ? "DILUTION TABLE" : "稀释对照表"}
                       </span>
                     </div>
-                    <div className="divide-y" style={{ divideColor: "#1E1E1E" }}>
+                    <div className="divide-y divide-[#1E1E1E]">
                       {[
                         { label: isEn ? "Founder (Before Round)" : "创始人（融资前）", value: `${results.founderBefore.toFixed(2)}%`, color: "#A0A09A" },
                         { label: isEn ? "Founder (After Round)" : "创始人（融资后）", value: `${results.founderAfter.toFixed(2)}%`, color: "#C9A84C" },
@@ -237,7 +237,7 @@ export default function FundraisingSystemTool({ locale }: { locale: "zh" | "en" 
               </div>
             ) : (
               <div className="flex flex-col items-center justify-center h-full min-h-48 rounded-xl" style={{ backgroundColor: "#111111", border: "1px dashed #222222" }}>
-                <span className="text-3xl mb-2 opacity-30">💰</span>
+                <span className="text-3xl mb-2 opacity-30"></span>
                 <p className="text-sm" style={{ color: "#444440" }}>
                   {isEn ? "Fill inputs and click Calculate" : "填写参数后点击「开始计算」"}
                 </p>
@@ -247,7 +247,7 @@ export default function FundraisingSystemTool({ locale }: { locale: "zh" | "en" 
         </div>
       </div>
 
-      {/* ── Section 2: Investor Pipeline ── */}
+      {/*  Section 2: Investor Pipeline  */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <p className="text-xs font-mono" style={{ color: "#3B82F6" }}>

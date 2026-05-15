@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import SharedNav from "@/components/SharedNav";
 import { getLocale } from "@/lib/i18n";
 
@@ -28,10 +28,10 @@ const DATA = {
     values: {
       title: "我们的价值观",
       items: [
-        { icon: "🎯", title: "实战导向", desc: "每个知识点都源于真实案例，学员即学即用，直接应用于自身企业。" },
-        { icon: "📈", title: "系统思维", desc: "从企业估值到 IPO 路径，构建完整的资本运作知识体系，而非碎片化内容。" },
-        { icon: "🔐", title: "专业保密", desc: "客户财务与合约信息严格保密，数字化处理，安全可靠。" },
-        { icon: "🤝", title: "长期陪伴", desc: "不只是一次课程，而是企业从创业到上市全程的知识与资源伙伴。" },
+        { icon: "", title: "实战导向", desc: "每个知识点都源于真实案例，学员即学即用，直接应用于自身企业。" },
+        { icon: "", title: "系统思维", desc: "从企业估值到 IPO 路径，构建完整的资本运作知识体系，而非碎片化内容。" },
+        { icon: "", title: "专业保密", desc: "客户财务与合约信息严格保密，数字化处理，安全可靠。" },
+        { icon: "", title: "长期陪伴", desc: "不只是一次课程，而是企业从创业到上市全程的知识与资源伙伴。" },
       ],
     },
     programs: {
@@ -55,7 +55,7 @@ const DATA = {
     contact: {
       title: "联系我们",
       desc: "如需咨询课程、企业合作或一对一顾问服务，欢迎通过社交媒体与我们联系。",
-      address_label: "📍 地址",
+      address_label: " 地址",
       cta_register: "注册 →",
       cta_contact: "联系我们",
     },
@@ -85,10 +85,10 @@ const DATA = {
     values: {
       title: "Our Core Values",
       items: [
-        { icon: "🎯", title: "Practice-Driven", desc: "Every concept is grounded in real cases. Students apply knowledge immediately to their own businesses." },
-        { icon: "📈", title: "Systems Thinking", desc: "From enterprise valuation to IPO pathways — we build a complete knowledge system, not fragmented content." },
-        { icon: "🔐", title: "Professional Confidentiality", desc: "Client financial and contract information is strictly confidential, digitally processed, and secure." },
-        { icon: "🤝", title: "Long-term Partnership", desc: "Not just a course — but a knowledge and resource partner throughout your entire journey from startup to listing." },
+        { icon: "", title: "Practice-Driven", desc: "Every concept is grounded in real cases. Students apply knowledge immediately to their own businesses." },
+        { icon: "", title: "Systems Thinking", desc: "From enterprise valuation to IPO pathways — we build a complete knowledge system, not fragmented content." },
+        { icon: "", title: "Professional Confidentiality", desc: "Client financial and contract information is strictly confidential, digitally processed, and secure." },
+        { icon: "", title: "Long-term Partnership", desc: "Not just a course — but a knowledge and resource partner throughout your entire journey from startup to listing." },
       ],
     },
     programs: {
@@ -112,7 +112,7 @@ const DATA = {
     contact: {
       title: "Contact Us",
       desc: "For course enquiries, corporate partnerships, or one-to-one advisory services, please reach us via social media.",
-      address_label: "📍 Address",
+      address_label: " Address",
       cta_register: "Register →",
       cta_contact: "Contact Us",
     },
@@ -173,7 +173,7 @@ export default async function AboutPage() {
       {/* Mission */}
       <section className="py-16 px-4" style={{ backgroundColor: "#EEE9E0" }}>
         <div className="max-w-4xl mx-auto rounded-2xl p-10 text-center" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
-          <div className="text-3xl mb-4" style={{ color: "#C9A84C" }}>✦</div>
+          <div className="text-3xl mb-4" style={{ color: "#C9A84C" }}></div>
           <h2 className="text-2xl font-bold mb-4" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>{d.mission.title}</h2>
           <p className="text-sm leading-loose max-w-2xl mx-auto" style={{ color: "#68625C" }}>
             {d.mission.desc.split(d.mission.highlight).map((part, i, arr) => (
@@ -231,7 +231,7 @@ export default async function AboutPage() {
           <div className="grid md:grid-cols-3 gap-5">
             {d.testimonials.items.map((t) => (
               <div key={t.name} className="rounded-2xl p-6" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
-                <div className="text-lg mb-4" style={{ color: "#C9A84C" }}>❝</div>
+                <div className="text-lg mb-4" style={{ color: "#C9A84C" }}></div>
                 <p className="text-sm leading-relaxed mb-5" style={{ color: "#68625C" }}>{t.quote}</p>
                 <div>
                   <div className="font-semibold text-sm" style={{ color: "#1C1814" }}>{t.name}</div>

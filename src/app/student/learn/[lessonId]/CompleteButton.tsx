@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -31,7 +31,7 @@ export default function CompleteButton({ lessonId, points, nextLessonId }: Props
         className="rounded-2xl p-5 text-center"
         style={{ backgroundColor: "rgba(76,175,130,0.08)", border: "1px solid rgba(76,175,130,0.25)" }}
       >
-        <div className="text-2xl mb-2">✓</div>
+        <div className="text-2xl mb-2"></div>
         <p className="text-sm font-semibold mb-0.5" style={{ color: "#4CAF82" }}>
           完成！获得 +{points} XP
         </p>

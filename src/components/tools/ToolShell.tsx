@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 
@@ -43,7 +43,7 @@ export default function ToolShell({
             className="flex items-center gap-1.5 text-sm transition-colors hover:text-[#1C1814]"
             style={{ color: "var(--color-text-muted)" }}
           >
-            ⌂ 主页
+             主页
           </Link>
           <span style={{ color: "#D8D1C6" }}>·</span>
           <span className="text-sm font-medium flex-1 truncate" style={{ color: "var(--color-text-primary)" }}>

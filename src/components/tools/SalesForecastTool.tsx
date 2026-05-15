@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -73,7 +73,7 @@ export default function SalesForecastTool({ locale }: { locale: "zh" | "en" }) {
 
   return (
     <ToolShell
-      icon="📉"
+      icon=""
       title={isEn ? "Sales Forecast" : "销售预测系统"}
       desc={isEn ? "12-month revenue projection with growth analysis" : "12个月收入预测，增长率分析与图表"}
       levelRequired={1}

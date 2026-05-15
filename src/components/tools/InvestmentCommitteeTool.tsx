@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -127,11 +127,11 @@ export default function InvestmentCommitteeTool({ locale }: { locale: Locale }) 
 INVESTMENT COMMITTEE MEMO
 ${isEn ? "Date" : "日期"}: ${new Date().toLocaleDateString()}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 COMPANY: ${form.companyName || "—"}
 INDUSTRY: ${form.industry || "—"}  |  STAGE: ${form.stage}
 ASK: ${fmtRM(parseFloat(form.ask))}  |  VALUATION: ${fmtRM(parseFloat(form.valuation))}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
 
 INVESTMENT THESIS:
 ${form.thesis || "—"}
@@ -165,7 +165,7 @@ ${form.recommendation === "Conditional" && form.conditions.filter(Boolean).lengt
 
   return (
     <ToolShell
-      icon="👥"
+      icon=""
       title={isEn ? "Investment Committee" : "投资委员会"}
       desc={isEn ? "Build IC memos, score investments and structure governance decisions." : "构建IC备忘录、评分投资机会并建立治理决策框架。"}
       levelRequired={3}
@@ -399,7 +399,7 @@ ${form.recommendation === "Conditional" && form.conditions.filter(Boolean).lengt
                 className="text-xs px-3 py-1 rounded-lg transition-colors"
                 style={{ backgroundColor: copied ? "rgba(16,185,129,0.15)" : "rgba(139,92,246,0.12)", color: copied ? "#10B981" : "#A78BFA", border: `1px solid ${copied ? "rgba(16,185,129,0.3)" : "rgba(139,92,246,0.25)"}` }}
               >
-                {copied ? "✓ Copied!" : (isEn ? "Copy Memo" : "复制备忘录")}
+                {copied ? " Copied!" : (isEn ? "Copy Memo" : "复制备忘录")}
               </button>
             </div>
             <div

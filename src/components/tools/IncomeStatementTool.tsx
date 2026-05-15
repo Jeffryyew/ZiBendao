@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -24,7 +24,7 @@ function pctStr(n: number): string {
   return n.toFixed(1) + "%";
 }
 
-// ── Sub-component: a single P&L row ─────────────────────────────────────────
+//  Sub-component: a single P&L row 
 function PnLRow({
   label,
   value,
@@ -71,7 +71,7 @@ function PnLRow({
   );
 }
 
-// ── Main component ───────────────────────────────────────────────────────────
+//  Main component 
 export default function IncomeStatementTool({ locale }: { locale: "zh" | "en" }) {
   const isEn = locale === "en";
 
@@ -121,7 +121,7 @@ export default function IncomeStatementTool({ locale }: { locale: "zh" | "en" })
     { name: isEn ? "Others" : "其他", value: calc.others },
   ].filter((d) => d.value > 0);
 
-  // ── Input field list ───────────────────────────────────────────────────────
+  //  Input field list 
   const revenueFields: { field: keyof IncomeForm; label: string }[] = [
     { field: "revenue", label: isEn ? "Revenue" : "营业收入" },
     { field: "cogs", label: isEn ? "Cost of Goods Sold (COGS)" : "销售成本 (COGS)" },
@@ -161,14 +161,14 @@ export default function IncomeStatementTool({ locale }: { locale: "zh" | "en" })
 
   return (
     <ToolShell
-      icon="📋"
+      icon=""
       title={isEn ? "Income Statement" : "利润表"}
       desc={isEn ? "Full P&L statement with margin analysis" : "完整损益表，毛利率、净利率分析"}
       levelRequired={1}
       backHref="/dashboard/capital"
     >
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* ── Left: inputs ── */}
+        {/*  Left: inputs  */}
         <div className="space-y-4">
           {/* Revenue & COGS */}
           <div
@@ -216,7 +216,7 @@ export default function IncomeStatementTool({ locale }: { locale: "zh" | "en" })
           </div>
         </div>
 
-        {/* ── Right: output ── */}
+        {/*  Right: output  */}
         <div className="space-y-4">
           {/* P&L statement */}
           <div

@@ -44,7 +44,7 @@ export async function POST(req: Request) {
       }),
     ]);
 
-    sendPaymentConfirmationEmail(user.email, user.name, amount.toFixed(2), currency).catch(() => {});
+    sendPaymentConfirmationEmail(user.email, user.name ?? user.email.split("@")[0], amount.toFixed(2), currency).catch(() => {});
   }
 
   return NextResponse.json({ received: true });

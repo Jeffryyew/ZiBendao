@@ -110,7 +110,7 @@ export default function FinancialRoadmapTool() {
   };
 
   return (
-    <ToolShell icon="🗺" title="金融路线图方程式" desc="规划财务目标，预测未来财富增长轨迹。" levelRequired={1}>
+    <ToolShell icon="" title="金融路线图方程式" desc="规划财务目标，预测未来财富增长轨迹。" levelRequired={1}>
       <div className="grid lg:grid-cols-5 gap-6">
         {/* Input Form */}
         <div className="lg:col-span-2">
@@ -205,7 +205,7 @@ export default function FinancialRoadmapTool() {
                   className="rounded-xl p-4 flex items-center gap-3"
                   style={{ backgroundColor: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)" }}
                 >
-                  <span className="text-xl">💡</span>
+                  <span className="text-xl"></span>
                   <p className="text-sm" style={{ color: "#68625C" }}>
                     达成目标财富需每月存款&nbsp;
                     <span className="font-semibold font-mono" style={{ color: "#C9A84C" }}>
@@ -251,13 +251,13 @@ export default function FinancialRoadmapTool() {
                   ↓ 导出 CSV
                 </button>
                 <button onClick={() => window.print()} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#EEE9E0", color: "#68625C", border: "1px solid #2A2A2A" }}>
-                  🖨 打印 PDF
+                   打印 PDF
                 </button>
               </div>
             </>
           ) : (
             <div className="flex flex-col items-center justify-center h-64 rounded-2xl" style={{ backgroundColor: "#FFFFFF", border: "1px dashed #222222" }}>
-              <span className="text-4xl mb-3 opacity-30">📊</span>
+              <span className="text-4xl mb-3 opacity-30"></span>
               <p className="text-sm" style={{ color: "#68625C" }}>填写参数后点击「开始计算」</p>
             </div>
           )}

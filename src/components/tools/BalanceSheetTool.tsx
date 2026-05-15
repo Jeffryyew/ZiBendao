@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -29,7 +29,7 @@ function ratioStr(n: number): string {
   return isFinite(n) && !isNaN(n) ? n.toFixed(2) + "x" : "N/A";
 }
 
-// ── Reusable input row ───────────────────────────────────────────────────────
+//  Reusable input row 
 function InputRow({
   label,
   value,
@@ -65,7 +65,7 @@ function InputRow({
   );
 }
 
-// ── Section subtotal row ─────────────────────────────────────────────────────
+//  Section subtotal row 
 function SectionTotal({
   label,
   value,
@@ -99,7 +99,7 @@ function SectionTotal({
   );
 }
 
-// ── Section heading ──────────────────────────────────────────────────────────
+//  Section heading 
 function SectionHeading({ label }: { label: string }) {
   return (
     <p className="text-xs font-semibold mt-4 mb-1.5" style={{ color: "#555550" }}>
@@ -108,7 +108,7 @@ function SectionHeading({ label }: { label: string }) {
   );
 }
 
-// ── Main component ───────────────────────────────────────────────────────────
+//  Main component 
 export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
   const isEn = locale === "en";
 
@@ -171,7 +171,7 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
 
   return (
     <ToolShell
-      icon="🏦"
+      icon=""
       title={isEn ? "Balance Sheet" : "资产负债表"}
       desc={isEn ? "Full balance sheet with financial ratio analysis" : "资产、负债、权益完整呈现，财务比率计算"}
       levelRequired={1}
@@ -184,7 +184,7 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
             className="flex items-center gap-3 px-4 py-3 rounded-xl"
             style={{ backgroundColor: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.2)" }}
           >
-            <span className="text-sm">✓</span>
+            <span className="text-sm"></span>
             <p className="text-sm" style={{ color: "#22C55E" }}>
               {isEn ? "Balance sheet is balanced." : "资产负债表已平衡。"}
             </p>
@@ -194,7 +194,7 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
             className="flex items-center gap-3 px-4 py-3 rounded-xl"
             style={{ backgroundColor: "rgba(220,38,38,0.05)", border: "1px solid rgba(220,38,38,0.2)" }}
           >
-            <span className="text-sm">⚠️</span>
+            <span className="text-sm"></span>
             <p className="text-sm" style={{ color: "#EF4444" }}>
               {isEn
                 ? `Assets ≠ Liabilities + Equity. Difference: ${fmtRm(Math.abs(calc.diff))}`

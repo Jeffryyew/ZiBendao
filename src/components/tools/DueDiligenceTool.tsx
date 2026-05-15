@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -20,7 +20,7 @@ interface DDCategory {
 const DD_CATEGORIES: DDCategory[] = [
   {
     id: "legal",
-    icon: "⚖️",
+    icon: "",
     zh: "法律文件",
     en: "Legal Documents",
     items: [
@@ -33,7 +33,7 @@ const DD_CATEGORIES: DDCategory[] = [
   },
   {
     id: "financial",
-    icon: "💰",
+    icon: "",
     zh: "财务记录",
     en: "Financial Records",
     items: [
@@ -46,7 +46,7 @@ const DD_CATEGORIES: DDCategory[] = [
   },
   {
     id: "hr",
-    icon: "👥",
+    icon: "",
     zh: "人力资源",
     en: "HR",
     items: [
@@ -58,7 +58,7 @@ const DD_CATEGORIES: DDCategory[] = [
   },
   {
     id: "business",
-    icon: "📈",
+    icon: "",
     zh: "商业模式",
     en: "Business Model",
     items: [
@@ -71,7 +71,7 @@ const DD_CATEGORIES: DDCategory[] = [
   },
   {
     id: "tech",
-    icon: "💻",
+    icon: "",
     zh: "技术",
     en: "Technology",
     items: [
@@ -83,7 +83,7 @@ const DD_CATEGORIES: DDCategory[] = [
   },
   {
     id: "market",
-    icon: "🌏",
+    icon: "",
     zh: "市场",
     en: "Market",
     items: [
@@ -95,7 +95,7 @@ const DD_CATEGORIES: DDCategory[] = [
   },
   {
     id: "ops",
-    icon: "⚙️",
+    icon: "",
     zh: "运营",
     en: "Operations",
     items: [
@@ -107,7 +107,7 @@ const DD_CATEGORIES: DDCategory[] = [
   },
   {
     id: "management",
-    icon: "🎯",
+    icon: "",
     zh: "管理层",
     en: "Management",
     items: [
@@ -167,7 +167,7 @@ export default function DueDiligenceTool({ locale }: { locale: "zh" | "en" }) {
 
   return (
     <ToolShell
-      icon="🔍"
+      icon=""
       title={isEn ? "Due Diligence" : "尽职调查"}
       desc={isEn ? "Track your DD readiness across 8 key categories." : "追踪 8 大类尽职调查准备度，评估投资人就绪程度。"}
       levelRequired={2}
@@ -265,7 +265,7 @@ export default function DueDiligenceTool({ locale }: { locale: "zh" | "en" }) {
                     >
                       {catChecked} / {cat.items.length}
                     </span>
-                    <span style={{ color: "#555550", fontSize: "12px" }}>{isOpen ? "▲" : "▼"}</span>
+                    <span style={{ color: "#555550", fontSize: "12px" }}>{isOpen ? "" : ""}</span>
                   </div>
                 </button>
 
@@ -288,7 +288,7 @@ export default function DueDiligenceTool({ locale }: { locale: "zh" | "en" }) {
                               color: done ? "#3B82F6" : "transparent",
                             }}
                           >
-                            {done ? "✓" : ""}
+                            {done ? "" : ""}
                           </div>
                           <span
                             className="text-sm transition-all"

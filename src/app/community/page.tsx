@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import SharedNav from "@/components/SharedNav";
 import { getLocale } from "@/lib/i18n";
 import type React from "react";
@@ -51,9 +51,9 @@ const DATA = {
     values: {
       title: "社群文化",
       items: [
-        { icon: "🤝", title: "互助共赢", desc: "鼓励学员分享实战经验，共同解决企业在资本化过程中遇到的真实挑战。" },
-        { icon: "📚", title: "持续学习", desc: "定期分享最新资本市场动态、融资案例与工具更新，保持知识常新。" },
-        { icon: "🔗", title: "资源对接", desc: "连接投资人、法律顾问、财务专家等资本生态伙伴，为学员创造对接机会。" },
+        { icon: "", title: "互助共赢", desc: "鼓励学员分享实战经验，共同解决企业在资本化过程中遇到的真实挑战。" },
+        { icon: "", title: "持续学习", desc: "定期分享最新资本市场动态、融资案例与工具更新，保持知识常新。" },
+        { icon: "", title: "资源对接", desc: "连接投资人、法律顾问、财务专家等资本生态伙伴，为学员创造对接机会。" },
       ],
     },
     events: {
@@ -115,9 +115,9 @@ const DATA = {
     values: {
       title: "Community Culture",
       items: [
-        { icon: "🤝", title: "Mutual Growth", desc: "We encourage students to share real experiences and collectively solve challenges faced during business capitalisation." },
-        { icon: "📚", title: "Continuous Learning", desc: "Regular updates on capital market trends, fundraising case studies, and tool improvements to keep knowledge current." },
-        { icon: "🔗", title: "Resource Matching", desc: "Connect with investors, legal advisors, financial experts, and capital ecosystem partners to create real opportunities." },
+        { icon: "", title: "Mutual Growth", desc: "We encourage students to share real experiences and collectively solve challenges faced during business capitalisation." },
+        { icon: "", title: "Continuous Learning", desc: "Regular updates on capital market trends, fundraising case studies, and tool improvements to keep knowledge current." },
+        { icon: "", title: "Resource Matching", desc: "Connect with investors, legal advisors, financial experts, and capital ecosystem partners to create real opportunities." },
       ],
     },
     events: {

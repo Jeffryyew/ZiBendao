@@ -1,4 +1,4 @@
-import { auth } from "../../../../auth";
+﻿import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -42,7 +42,7 @@ export default async function ClientDashboardPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 md:py-10 space-y-7">
 
-      {/* ── Header ── */}
+      {/*  Header  */}
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm mb-1" style={{ color: "#666660" }}>{greeting}，</p>
@@ -59,11 +59,11 @@ export default async function ClientDashboardPage() {
         </div>
       </div>
 
-      {/* ── Stats row ── */}
+      {/*  Stats row  */}
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: "合约文件", value: String(documents.length), unit: "份", icon: "DOC", href: "/client/documents" },
-          { label: "已签署",   value: String(signedCount),        unit: "份", icon: "✓", href: "/client/documents" },
+          { label: "已签署",   value: String(signedCount),        unit: "份", icon: "", href: "/client/documents" },
           { label: "授权工具", value: String(toolAccess.length),  unit: "个", icon: "工具", href: "/client/tools" },
         ].map((s) => (
           <Link
@@ -82,7 +82,7 @@ export default async function ClientDashboardPage() {
         ))}
       </div>
 
-      {/* ── Recent Documents ── */}
+      {/*  Recent Documents  */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-sm tracking-wide" style={{ color: "#A0A09A" }}>
@@ -144,7 +144,7 @@ export default async function ClientDashboardPage() {
         )}
       </div>
 
-      {/* ── Authorized Tools ── */}
+      {/*  Authorized Tools  */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-semibold text-sm tracking-wide" style={{ color: "#A0A09A" }}>
@@ -192,7 +192,7 @@ export default async function ClientDashboardPage() {
         )}
       </div>
 
-      {/* ── Contact Advisor CTA ── */}
+      {/*  Contact Advisor CTA  */}
       <div
         className="relative overflow-hidden rounded-2xl p-6"
         style={{

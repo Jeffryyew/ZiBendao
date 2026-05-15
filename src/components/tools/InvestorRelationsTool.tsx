@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -89,22 +89,22 @@ export default function InvestorRelationsTool({ locale }: { locale: "zh" | "en" 
   const previewText = `
 ${isEn ? "INVESTOR UPDATE" : "投资人月报"} — ${fields.month || (isEn ? "Month Year" : "年月")}
 
-${isEn ? "🚀 Business Highlights" : "🚀 业务亮点"}
+${isEn ? " Business Highlights" : " 业务亮点"}
 ${fields.highlights || (isEn ? "(Enter highlights...)" : "（请填写亮点...）")}
 
-${isEn ? "📊 Key Metrics" : "📊 关键指标"}
+${isEn ? " Key Metrics" : " 关键指标"}
 • ${isEn ? "Revenue:" : "收入："} ${fields.revenue || "–"}
 • ${isEn ? "Users:" : "用户："} ${fields.users || "–"}
 • ${isEn ? "Burn Rate:" : "资金消耗："} ${fields.burnRate || "–"}
 
-${isEn ? "⚠️ Challenges & How We're Addressing Them" : "⚠️ 挑战与应对"}
+${isEn ? " Challenges & How We're Addressing Them" : " 挑战与应对"}
 ${fields.challenges || (isEn ? "(Enter challenges...)" : "（请填写挑战...）")}
 ${isEn ? "→ How:" : "→ 解决方案："} ${fields.solutions || "–"}
 
-${isEn ? "🎯 Next Month Goals" : "🎯 下月目标"}
+${isEn ? " Next Month Goals" : " 下月目标"}
 ${fields.nextGoals || (isEn ? "(Enter goals...)" : "（请填写目标...）")}
 
-${fields.ask ? `${isEn ? "🙏 Ask / Request" : "🙏 请求"}
+${fields.ask ? `${isEn ? " Ask / Request" : " 请求"}
 ${fields.ask}` : ""}
 
 —
@@ -136,7 +136,7 @@ ${isEn ? "Sent with ZiBenDao Capital OS" : "由资本道资本操作系统发送
 
   return (
     <ToolShell
-      icon="🤝"
+      icon=""
       title={isEn ? "Investor Relations" : "投资关系"}
       desc={isEn ? "Build investor updates, track KPIs, and manage your investor registry." : "撰写投资人月报，追踪 KPI，管理投资人名册。"}
       levelRequired={2}
@@ -160,7 +160,7 @@ ${isEn ? "Sent with ZiBenDao Capital OS" : "由资本道资本操作系统发送
         ))}
       </div>
 
-      {/* ── Tab 1: Update Template ── */}
+      {/*  Tab 1: Update Template  */}
       {activeTab === "update" && (
         <div className="grid lg:grid-cols-2 gap-5">
           {/* Form */}
@@ -224,7 +224,7 @@ ${isEn ? "Sent with ZiBenDao Capital OS" : "由资本道资本操作系统发送
                     border: `1px solid ${copied ? "rgba(94,171,106,0.25)" : "rgba(59,130,246,0.25)"}`,
                   }}
                 >
-                  {copied ? (isEn ? "✓ Copied!" : "✓ 已复制！") : (isEn ? "Copy to Clipboard" : "复制到剪贴板")}
+                  {copied ? (isEn ? " Copied!" : " 已复制！") : (isEn ? "Copy to Clipboard" : "复制到剪贴板")}
                 </button>
               </div>
               <pre className="flex-1 p-4 text-xs leading-relaxed overflow-auto whitespace-pre-wrap" style={{ color: "#A0A09A", fontFamily: "var(--font-mono)" }}>
@@ -235,7 +235,7 @@ ${isEn ? "Sent with ZiBenDao Capital OS" : "由资本道资本操作系统发送
         </div>
       )}
 
-      {/* ── Tab 2: KPI Dashboard ── */}
+      {/*  Tab 2: KPI Dashboard  */}
       {activeTab === "kpi" && (
         <div className="space-y-5">
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -298,7 +298,7 @@ ${isEn ? "Sent with ZiBenDao Capital OS" : "由资本道资本操作系统发送
         </div>
       )}
 
-      {/* ── Tab 3: Investor Registry ── */}
+      {/*  Tab 3: Investor Registry  */}
       {activeTab === "registry" && (
         <div className="space-y-4">
           <div className="flex justify-end">

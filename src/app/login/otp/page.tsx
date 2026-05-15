@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useRef, useState, useTransition, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -149,7 +149,7 @@ function OtpForm() {
 
         {error && (
           <div className="flex items-start gap-2 rounded-xl px-4 py-3 text-sm mb-4" style={{ backgroundColor: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", color: "#DC2626" }}>
-            <span className="flex-shrink-0">✕</span>{error}
+            <span className="flex-shrink-0"></span>{error}
           </div>
         )}
 

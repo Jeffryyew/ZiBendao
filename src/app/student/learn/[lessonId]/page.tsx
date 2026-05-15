@@ -1,4 +1,4 @@
-import { auth } from "../../../../../auth";
+﻿import { auth } from "../../../../../auth";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { isGraduate, isStudentArea } from "@/lib/roles";
@@ -13,10 +13,10 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 const TYPE_ICON: Record<string, string> = {
-  VIDEO: "▶",
-  READING: "📖",
-  QUIZ: "✏",
-  EXERCISE: "🧩",
+  VIDEO: "",
+  READING: "",
+  QUIZ: "",
+  EXERCISE: "",
 };
 
 const TYPE_COLOR: Record<string, string> = {
@@ -56,7 +56,7 @@ export default async function LessonDetailPage({
   if (studentLevel < lesson.module.requiredLevel) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <div className="text-4xl mb-4">🔒</div>
+        <div className="text-4xl mb-4"></div>
         <h1 className="text-xl font-bold mb-2" style={{ fontFamily: "var(--font-display)" }}>
           需要 L{lesson.module.requiredLevel} 解锁
         </h1>
@@ -136,7 +136,7 @@ export default async function LessonDetailPage({
                   className="text-xs px-2 py-0.5 rounded-full font-medium"
                   style={{ backgroundColor: "rgba(76,175,130,0.15)", color: "#4CAF82" }}
                 >
-                  ✓ 已完成
+                   已完成
                 </span>
               )}
             </div>
@@ -189,7 +189,7 @@ export default async function LessonDetailPage({
         >
           <div>
             <div className="text-sm font-semibold mb-0.5" style={{ color: "#4CAF82" }}>
-              ✓ 本课已完成！
+               本课已完成！
             </div>
             <div className="text-xs" style={{ color: "#666660" }}>
               下一课：{nextLesson.title}

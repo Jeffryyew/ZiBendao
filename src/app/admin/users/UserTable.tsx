@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useTransition } from "react";
 import { updateUserRole, toggleUserActive, grantToolAccess, revokeToolAccess } from "@/app/actions/admin";
@@ -12,7 +12,7 @@ interface ToolRecord {
 
 interface UserRecord {
   id: string;
-  name: string;
+  name: string | null;
   email: string;
   role: string;
   studentLevel: number | null;
@@ -102,7 +102,7 @@ export default function UserTable({ users, tools }: Props) {
                   className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
                   style={{ backgroundColor: "rgba(201,168,76,0.15)", color: "#C9A84C" }}
                 >
-                  {user.name.slice(0, 2).toUpperCase()}
+                  {(user.name ?? user.email).slice(0, 2).toUpperCase()}
                 </div>
                 <div className="min-w-0">
                   <div className="text-sm font-medium truncate" style={{ color: user.isActive ? "#F5F5F0" : "#555550" }}>
@@ -172,7 +172,7 @@ export default function UserTable({ users, tools }: Props) {
                   className="px-3 py-1.5 rounded-lg text-xs"
                   style={{ backgroundColor: "#1A1A1A", color: "#A0A09A" }}
                 >
-                  工具权限 {isExpanded ? "▲" : "▼"}
+                  工具权限 {isExpanded ? "" : ""}
                 </button>
               )}
 
@@ -203,7 +203,7 @@ export default function UserTable({ users, tools }: Props) {
                           color: has ? "#C9A84C" : "#666660",
                         }}
                       >
-                        <span>{has ? "✓" : "+"}</span>
+                        <span>{has ? "" : "+"}</span>
                         {tool.name}
                       </button>
                     );

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -62,7 +62,7 @@ export default function SignDocumentPage() {
   if (done) {
     return (
       <div className="p-6 max-w-2xl mx-auto flex flex-col items-center justify-center min-h-[60vh] text-center space-y-4">
-        <div className="text-5xl">✅</div>
+        <div className="text-5xl"></div>
         <h2 className="text-xl font-bold" style={{ color: "#4CAF82", fontFamily: "var(--font-display)" }}>
           合约签署成功
         </h2>

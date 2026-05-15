@@ -169,7 +169,7 @@ export default function PatKpiTool() {
   };
 
   return (
-    <ToolShell icon="📈" title="PAT & KPI 计算器" desc="税后净利润与关键绩效指标综合分析，可视化利润分解。" levelRequired={3}>
+    <ToolShell icon="" title="PAT & KPI 计算器" desc="税后净利润与关键绩效指标综合分析，可视化利润分解。" levelRequired={3}>
       <div className="grid lg:grid-cols-5 gap-6">
         {/* Form */}
         <div className="lg:col-span-2 space-y-4">
@@ -357,13 +357,13 @@ export default function PatKpiTool() {
                   ↓ 导出 CSV
                 </button>
                 <button onClick={() => window.print()} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#EEE9E0", color: "#68625C", border: "1px solid #2A2A2A" }}>
-                  🖨 打印 PDF
+                   打印 PDF
                 </button>
               </div>
             </>
           ) : (
             <div className="flex flex-col items-center justify-center h-64 rounded-2xl" style={{ backgroundColor: "#FFFFFF", border: "1px dashed #222222" }}>
-              <span className="text-4xl mb-3 opacity-30">📈</span>
+              <span className="text-4xl mb-3 opacity-30"></span>
               <p className="text-sm" style={{ color: "#68625C" }}>填写损益数据后点击「开始计算」</p>
             </div>
           )}

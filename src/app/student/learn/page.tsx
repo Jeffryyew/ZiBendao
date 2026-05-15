@@ -1,4 +1,4 @@
-import { auth } from "../../../../auth";
+﻿import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
@@ -7,10 +7,10 @@ type LessonType = "VIDEO" | "READING" | "QUIZ" | "EXERCISE";
 type LessonStatus = "completed" | "current" | "locked";
 
 const TYPE_ICON: Record<LessonType, string> = {
-  VIDEO: "▶",
+  VIDEO: "",
   READING: "≡",
   QUIZ: "?",
-  EXERCISE: "✎",
+  EXERCISE: "",
 };
 
 const TYPE_LABEL: Record<LessonType, string> = {
@@ -207,7 +207,7 @@ function LessonMap({
           }[status];
 
           const icon =
-            status === "completed" ? "✓"
+            status === "completed" ? ""
             : status === "locked" ? "×"
             : TYPE_ICON[lesson.type];
 

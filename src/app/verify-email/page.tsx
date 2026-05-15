@@ -1,4 +1,4 @@
-import { verifyEmailToken } from "@/app/actions/auth";
+﻿import { verifyEmailToken } from "@/app/actions/auth";
 import Link from "next/link";
 
 export default async function VerifyEmailPage({
@@ -9,7 +9,7 @@ export default async function VerifyEmailPage({
   const { token } = await searchParams;
 
   if (!token) {
-    return <Result icon="✕" color="#DC2626" title="链接无效" message="验证链接缺少必要参数。" showResend />;
+    return <Result icon="" color="#DC2626" title="链接无效" message="验证链接缺少必要参数。" showResend />;
   }
 
   const result = await verifyEmailToken(token);
@@ -17,7 +17,7 @@ export default async function VerifyEmailPage({
   if (!result.success) {
     return (
       <Result
-        icon="✕"
+        icon=""
         color="#DC2626"
         title="验证失败"
         message={result.error ?? "链接无效或已失效。"}
@@ -28,7 +28,7 @@ export default async function VerifyEmailPage({
 
   return (
     <Result
-      icon="✓"
+      icon=""
       color="#16A34A"
       title="邮箱验证成功！"
       message="你的账号已激活，现在可以登录使用资本道了。"

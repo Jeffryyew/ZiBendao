@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -81,7 +81,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
 
   return (
     <ToolShell
-      icon="💸"
+      icon=""
       title={isEn ? "Cash Flow Analysis" : "现金流分析"}
       desc={isEn ? "12-month cash flow projection and balance tracking" : "12个月现金流预测，余额追踪"}
       levelRequired={1}

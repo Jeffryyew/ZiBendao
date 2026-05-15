@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useTransition } from "react";
 import { createClientUser } from "@/app/actions/admin";
@@ -44,7 +44,7 @@ export default function CreateClientDialog() {
           >
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-bold" style={{ color: "#F5F5F0" }}>创建咨询客户账户</h2>
-              <button onClick={handleClose} className="text-sm" style={{ color: "#666660" }}>✕</button>
+              <button onClick={handleClose} className="text-sm" style={{ color: "#666660" }}></button>
             </div>
 
             {[
