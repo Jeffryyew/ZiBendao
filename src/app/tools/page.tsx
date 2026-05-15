@@ -88,8 +88,8 @@ export default async function ToolsPage() {
           </h1>
           <p className="text-lg max-w-2xl mx-auto" style={{ color: "#68625C" }}>
             {isEn
-              ? "4 SaaS-grade professional tools covering wealth planning, enterprise valuation, and profit analysis. Export results as PDF / Excel with local data processing."
-              : "4 款 SaaS 级专业工具，涵盖财富规划、企业估值、利润分析。结果支持导出 PDF / Excel，数据本地计算。"}
+              ? "SaaS-grade professional tools covering wealth planning, enterprise valuation, profit analysis and more. Export results as PDF / Excel with local data processing."
+              : "SaaS 级专业工具，涵盖财富规划、企业估值、利润分析等。结果支持导出 PDF / Excel，数据本地计算。"}
           </p>
         </div>
 
@@ -121,13 +121,13 @@ export default async function ToolsPage() {
                 </div>
 
                 <Link
-                  href="/register"
+                  href={`/tools/${tool.slug}`}
                   className="block text-center py-2.5 rounded-xl text-sm font-medium transition-colors"
                   style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
                   onMouseOver={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#EEE9E0"; }}
                   onMouseOut={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#F7F4EF"; }}
                 >
-                  {isEn ? "Register to Use →" : "注册即可使用 →"}
+                  {isEn ? "Open Tool →" : "使用工具 →"}
                 </Link>
               </div>
             );
@@ -137,20 +137,20 @@ export default async function ToolsPage() {
         {/* CTA */}
         <div className="text-center py-16 px-10 rounded-3xl" style={{ backgroundColor: "#1C1814" }}>
           <h2 className="text-2xl font-bold mb-3" style={{ fontFamily: "var(--font-display)", color: "#F0EBE1" }}>
-            {isEn ? "Unlock All Tools Now" : "立即解锁全部工具"}
+            {isEn ? "22 Professional Capital Tools" : "22 个专业资本工具"}
           </h2>
           <p className="text-sm mb-8" style={{ color: "#9A9490" }}>
             {isEn
-              ? "Register to start using them. Contact us to activate enterprise advisory tools."
-              : "注册即可开始使用，企业顾问工具可联系我们开通专属权限。"}
+              ? "Access the full Capital Operating System — financial analysis, fundraising, equity structure and more."
+              : "进入企业资本操作系统，涵盖财务分析、融资、股权架构等完整工具套件。"}
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link
-              href="/register"
+              href="/dashboard/capital"
               className="inline-block px-8 py-3 rounded-xl font-semibold text-sm transition-opacity hover:opacity-88"
               style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
             >
-              {isEn ? "Register →" : "注册 →"}
+              {isEn ? "Open Capital System →" : "进入资本系统 →"}
             </Link>
             <Link
               href="/about"
