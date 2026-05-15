@@ -42,8 +42,8 @@ function DropdownMenu({ item, isActive }: { item: NavLink; isActive: boolean }) 
       </button>
 
       {open && (
-        <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50" style={{ minWidth: 168 }}>
-          <div className="rounded-xl overflow-hidden" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", boxShadow: "0 8px 24px rgba(28,24,20,0.08)" }}>
+        <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 z-50" style={{ minWidth: 200 }}>
+          <div className="rounded-xl" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", boxShadow: "0 8px 24px rgba(28,24,20,0.08)", maxHeight: item.dropdown!.length > 6 ? "320px" : undefined, overflowY: item.dropdown!.length > 6 ? "auto" : undefined }}>
             {item.dropdown!.map((sub, i) =>
               sub.comingSoon ? (
                 <div
@@ -90,8 +90,54 @@ export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavP
     : [{ label: "Capital Start", href: "/courses" }, { label: "The Capital Map", href: "/courses" }, { label: "The Capital Code", href: "/courses" }, { label: "Capital Dao", href: "/courses" }];
 
   const TOOLS_ITEMS: DropdownItem[] = isZh
-    ? [{ label: "企业估值", href: "/tools/market-cap" }, { label: "融资计算", href: "/tools", comingSoon: true }, { label: "报价系统", href: "/tools/pricing-system" }, { label: "财务预测", href: "/tools/financial-roadmap" }, { label: "股权模拟", href: "/tools", comingSoon: true }]
-    : [{ label: "Valuation Engine", href: "/tools/market-cap" }, { label: "Funding Calculator", href: "/tools", comingSoon: true }, { label: "Quotation System", href: "/tools/pricing-system" }, { label: "Financial Forecast", href: "/tools/financial-roadmap" }, { label: "Equity Simulator", href: "/tools", comingSoon: true }];
+    ? [
+        { label: "企业财务路线图", href: "/tools/financial-roadmap" },
+        { label: "智能报价系统", href: "/tools/pricing-system" },
+        { label: "企业估值系统", href: "/tools/market-cap" },
+        { label: "绩效分析系统", href: "/tools/pat-kpi" },
+        { label: "现金流规划", href: "/tools/cash-flow" },
+        { label: "资产负债表", href: "/tools/balance-sheet" },
+        { label: "利润表", href: "/tools/income-statement" },
+        { label: "损益平衡分析", href: "/tools/breakeven-analysis" },
+        { label: "尽职调查", href: "/tools/due-diligence" },
+        { label: "数据室管理", href: "/tools/data-room" },
+        { label: "销售预测系统", href: "/tools/sales-forecast" },
+        { label: "创业费用规划", href: "/tools/startup-expense" },
+        { label: "交易流", href: "/tools/deal-flow" },
+        { label: "资本路线图", href: "/tools/capital-roadmap" },
+        { label: "融资系统", href: "/tools/fundraising-system" },
+        { label: "投资关系", href: "/tools/investor-relations" },
+        { label: "SPV架构", href: "/tools/spv-structure" },
+        { label: "股权架构", href: "/tools/equity-structure" },
+        { label: "资本架构", href: "/tools/capital-structure" },
+        { label: "投资委员会", href: "/tools/investment-committee" },
+        { label: "风控系统", href: "/tools/risk-control" },
+        { label: "投资组合", href: "/tools/portfolio-management" },
+      ]
+    : [
+        { label: "Financial Roadmap", href: "/tools/financial-roadmap" },
+        { label: "Pricing System", href: "/tools/pricing-system" },
+        { label: "Valuation Engine", href: "/tools/market-cap" },
+        { label: "Performance Intelligence", href: "/tools/pat-kpi" },
+        { label: "Cash Flow Planner", href: "/tools/cash-flow" },
+        { label: "Balance Sheet", href: "/tools/balance-sheet" },
+        { label: "Income Statement", href: "/tools/income-statement" },
+        { label: "Breakeven Analysis", href: "/tools/breakeven-analysis" },
+        { label: "Due Diligence", href: "/tools/due-diligence" },
+        { label: "Data Room", href: "/tools/data-room" },
+        { label: "Sales Forecast", href: "/tools/sales-forecast" },
+        { label: "Startup Expense Planner", href: "/tools/startup-expense" },
+        { label: "Deal Flow", href: "/tools/deal-flow" },
+        { label: "Capital Roadmap", href: "/tools/capital-roadmap" },
+        { label: "Fundraising System", href: "/tools/fundraising-system" },
+        { label: "Investor Relations", href: "/tools/investor-relations" },
+        { label: "SPV Structure", href: "/tools/spv-structure" },
+        { label: "Equity Structure", href: "/tools/equity-structure" },
+        { label: "Capital Structure", href: "/tools/capital-structure" },
+        { label: "Investment Committee", href: "/tools/investment-committee" },
+        { label: "Risk Control", href: "/tools/risk-control" },
+        { label: "Portfolio Management", href: "/tools/portfolio-management" },
+      ];
 
   const COMMUNITY_ITEMS: DropdownItem[] = isZh
     ? [{ label: "Investor Friday", href: "/community" }, { label: "Asian Circle", href: "/community" }, { label: "活动", href: "/community" }]
