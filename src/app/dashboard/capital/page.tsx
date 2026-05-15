@@ -17,11 +17,6 @@ const LAYER_DISPLAY: Record<LayerId, { zh: string; en: string }> = {
   3: { zh: "资本架构能力", en: "Capital Architecture Skills" },
 };
 
-const LAYER_TIER: Record<LayerId, string | null> = {
-  1: null,
-  2: "PRO",
-  3: "Enterprise",
-};
 
 // SVG health score circle
 function HealthCircle({ score }: { score: number }) {
@@ -280,32 +275,17 @@ export default async function CapitalDashboardPage() {
             const meta = LAYER_META[layer];
             const modules = getModulesByLayer(layer);
             const displayName = LAYER_DISPLAY[layer];
-            const tierBadge = LAYER_TIER[layer];
 
             return (
               <div key={layer}>
                 {/* Layer header */}
                 <div className="flex items-center gap-3 mb-6">
-                  <span
-                    className="text-xs font-mono font-bold px-3 py-1 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: meta.bg, color: meta.color, border: `1px solid ${meta.border}` }}
-                  >
-                    L{layer}
-                  </span>
                   <h2 className="text-base font-bold" style={{ fontFamily: "var(--font-display)" }}>
                     {isEn ? displayName.en : displayName.zh}
                   </h2>
-                  {tierBadge && (
-                    <span
-                      className="text-xs px-2 py-0.5 rounded-full font-mono"
-                      style={{ backgroundColor: "rgba(168,139,250,0.08)", color: "#A78BFA", border: "1px solid rgba(168,139,250,0.2)" }}
-                    >
-                      {tierBadge}
-                    </span>
-                  )}
                   <div className="flex-1 h-px" style={{ backgroundColor: "#1A1A1A" }} />
                   <span className="text-xs font-mono flex-shrink-0" style={{ color: "#3A3A3A" }}>
-                    {modules.length} {isEn ? "tools" : "模块"}
+                    {modules.length} {isEn ? "tools" : "工具"}
                   </span>
                 </div>
 
@@ -313,7 +293,6 @@ export default async function CapitalDashboardPage() {
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {modules.map((mod) => {
                     const t = isEn ? mod.en : mod.zh;
-                    const isUnlocked = layer === 1;
                     return (
                       <Link
                         key={mod.id}
@@ -329,12 +308,6 @@ export default async function CapitalDashboardPage() {
                           (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#141414";
                         }}
                       >
-                        <div className="flex items-start justify-between mb-3">
-                          <span className="text-2xl">{mod.icon}</span>
-                          {isUnlocked && (
-                            <span className="text-xs font-bold" style={{ color: "#34D39988" }}>+</span>
-                          )}
-                        </div>
                         <div className="text-sm font-semibold mb-1.5" style={{ color: "#F5F5F0" }}>
                           {t.name}
                         </div>
