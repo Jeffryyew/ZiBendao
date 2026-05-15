@@ -6,7 +6,7 @@ export const ROLE_LABEL: Record<string, string> = {
   ZIBENDAO_GRAD: "资本道毕业生",
   ONLINE_STUDENT: "线上课程学生",
   ENTERPRISE_CLIENT: "企业顾问客户",
-  FREE_MEMBER: "免费用户",
+  FREE_MEMBER: "学员",
 };
 
 export const ROLE_COLOR: Record<string, string> = {
@@ -21,7 +21,7 @@ export const ROLE_COLOR: Record<string, string> = {
 };
 
 export const ROLE_OPTIONS = [
-  { value: "FREE_MEMBER", label: "免费用户" },
+  { value: "FREE_MEMBER", label: "学员" },
   { value: "ONLINE_STUDENT", label: "线上课程学生" },
   { value: "ZIBENTONG_GRAD", label: "资本通毕业生" },
   { value: "QIDONG_GRAD", label: "启动资本毕业生" },

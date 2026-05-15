@@ -51,7 +51,7 @@ export default async function MemberDashboardPage() {
           style={{ backgroundColor: "rgba(102,102,96,0.15)", border: "1px solid #2A2A28", color: "#888880" }}
         >
           <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: "#666660" }} />
-          免费用户
+          学员
         </div>
       </div>
 
