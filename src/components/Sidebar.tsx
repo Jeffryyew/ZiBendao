@@ -30,10 +30,7 @@ export default function Sidebar({
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  // Close drawer on route change
   useEffect(() => { setOpen(false); }, [pathname]);
-
-  // Close drawer on Escape
   useEffect(() => {
     const handler = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
     window.addEventListener("keydown", handler);
@@ -51,14 +48,6 @@ export default function Sidebar({
     (item) => pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href))
   );
 
-  const accentAlpha = (a: number) => {
-    const hex = accentColor.replace("#", "");
-    const r = parseInt(hex.slice(0, 2), 16);
-    const g = parseInt(hex.slice(2, 4), 16);
-    const b = parseInt(hex.slice(4, 6), 16);
-    return `rgba(${r},${g},${b},${a})`;
-  };
-
   const navList = (
     <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
       {navItems.map((item) => {
@@ -70,19 +59,25 @@ export default function Sidebar({
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all"
             style={{
               backgroundColor: item.highlight
-                ? accentAlpha(0.1)
+                ? "#FBF4E4"
                 : isActive
-                ? "#1A1A1A"
+                ? "#EEE9E0"
                 : "transparent",
-              color: item.highlight ? accentColor : isActive ? "#F5F5F0" : "#808080",
-              border: item.highlight
-                ? `1px solid ${accentAlpha(0.2)}`
+              color: item.highlight
+                ? accentColor
                 : isActive
-                ? "1px solid #252525"
+                ? "#1C1814"
+                : "#68625C",
+              border: item.highlight
+                ? `1px solid rgba(201,168,76,0.3)`
+                : isActive
+                ? "1px solid #D8D1C6"
                 : "1px solid transparent",
             }}
           >
-            {item.icon && <span className="text-base w-5 text-center flex-shrink-0 leading-none">{item.icon}</span>}
+            {item.icon && (
+              <span className="text-base w-5 text-center flex-shrink-0 leading-none">{item.icon}</span>
+            )}
             <span className="flex-1">{item.label}</span>
             {isActive && !item.highlight && (
               <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: accentColor }} />
@@ -94,34 +89,26 @@ export default function Sidebar({
   );
 
   const userFooter = (
-    <div className="px-3 pb-4 pt-2 border-t space-y-1" style={{ borderColor: "#1A1A1A" }}>
+    <div className="px-3 pb-4 pt-2 border-t space-y-1" style={{ borderColor: "#E0D9CE" }}>
       <div
         className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
-        style={{ backgroundColor: "#151515" }}
+        style={{ backgroundColor: "#F0EDE7" }}
       >
         <div
           className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-          style={{ backgroundColor: accentAlpha(0.18), color: accentColor }}
+          style={{ backgroundColor: "#FBF4E4", color: accentColor, border: `1px solid rgba(201,168,76,0.3)` }}
         >
           {initials}
         </div>
         <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium truncate" style={{ color: "#F5F5F0" }}>{userName}</div>
-          <div className="text-xs truncate" style={{ color: "#555550" }}>{roleLabel}</div>
+          <div className="text-sm font-medium truncate" style={{ color: "#1C1814" }}>{userName}</div>
+          <div className="text-xs truncate" style={{ color: "#9A9490" }}>{roleLabel}</div>
         </div>
       </div>
       <Link
         href="/"
-        className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-colors"
-        style={{ color: "#555550" }}
-        onMouseEnter={(e) => {
-          (e.currentTarget as HTMLAnchorElement).style.color = "#A0A09A";
-          (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#151515";
-        }}
-        onMouseLeave={(e) => {
-          (e.currentTarget as HTMLAnchorElement).style.color = "#555550";
-          (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "transparent";
-        }}
+        className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-colors hover:bg-[#EEE9E0]"
+        style={{ color: "#9A9490" }}
       >
         <span className="w-5 text-center text-base">⌂</span>
         主页
@@ -129,16 +116,8 @@ export default function Sidebar({
       <form action={logout} className="w-full">
         <button
           type="submit"
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-colors text-left"
-          style={{ color: "#555550" }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.color = "#EF4444";
-            (e.currentTarget as HTMLButtonElement).style.backgroundColor = "rgba(239,68,68,0.06)";
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.color = "#555550";
-            (e.currentTarget as HTMLButtonElement).style.backgroundColor = "transparent";
-          }}
+          className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-colors text-left hover:bg-red-50 hover:text-red-500"
+          style={{ color: "#9A9490" }}
         >
           <span className="w-5 text-center">↩</span>
           退出登录
@@ -149,13 +128,12 @@ export default function Sidebar({
 
   return (
     <>
-      {/* ── Desktop sidebar ── */}
+      {/* Desktop sidebar */}
       <aside
         className="hidden md:flex flex-col fixed left-0 top-0 h-full w-60 z-40"
-        style={{ backgroundColor: "#0B0B0B", borderRight: "1px solid #1A1A1A" }}
+        style={{ backgroundColor: "#FFFFFF", borderRight: "1px solid #E0D9CE" }}
       >
-        {/* Logo */}
-        <div className="px-5 py-5 border-b" style={{ borderColor: "#1A1A1A" }}>
+        <div className="px-5 py-5 border-b" style={{ borderColor: "#E0D9CE" }}>
           <Link href="/" className="flex items-baseline gap-2">
             <span
               className="text-xl font-bold tracking-wide"
@@ -163,24 +141,23 @@ export default function Sidebar({
             >
               资本道
             </span>
-            <span className="text-xs" style={{ color: "#383835" }}>ZiBenDao</span>
+            <span className="text-xs" style={{ color: "#9A9490" }}>ZiBenDao</span>
           </Link>
           <div
             className="mt-2 text-xs px-2 py-0.5 rounded-full inline-block"
-            style={{ backgroundColor: accentAlpha(0.1), color: accentColor }}
+            style={{ backgroundColor: "#FBF4E4", color: accentColor, border: "1px solid rgba(201,168,76,0.25)" }}
           >
             {roleLabel}
           </div>
         </div>
-
         {navList}
         {userFooter}
       </aside>
 
-      {/* ── Mobile top bar ── */}
+      {/* Mobile top bar */}
       <header
         className="md:hidden fixed top-0 left-0 right-0 h-14 z-50 flex items-center justify-between px-4"
-        style={{ backgroundColor: "#0B0B0B", borderBottom: "1px solid #1A1A1A" }}
+        style={{ backgroundColor: "#FFFFFF", borderBottom: "1px solid #E0D9CE" }}
       >
         <div className="flex items-center gap-3 min-w-0">
           <span
@@ -191,8 +168,8 @@ export default function Sidebar({
           </span>
           {activeItem && (
             <>
-              <span style={{ color: "#2A2A2A" }}>/</span>
-              <span className="text-sm truncate" style={{ color: "#A0A09A" }}>
+              <span style={{ color: "#C8C1B8" }}>/</span>
+              <span className="text-sm truncate" style={{ color: "#68625C" }}>
                 {activeItem.icon ? `${activeItem.icon} ` : ""}{activeItem.label}
               </span>
             </>
@@ -201,43 +178,36 @@ export default function Sidebar({
         <button
           onClick={() => setOpen(true)}
           className="w-9 h-9 flex flex-col items-center justify-center gap-1.5 rounded-lg flex-shrink-0"
-          style={{ backgroundColor: "#1A1A1A" }}
+          style={{ backgroundColor: "#EEE9E0" }}
           aria-label="打开菜单"
         >
-          <span className="w-4 h-0.5 rounded" style={{ backgroundColor: "#A0A09A" }} />
-          <span className="w-4 h-0.5 rounded" style={{ backgroundColor: "#A0A09A" }} />
-          <span className="w-3 h-0.5 rounded" style={{ backgroundColor: "#A0A09A" }} />
+          <span className="w-4 h-0.5 rounded" style={{ backgroundColor: "#68625C" }} />
+          <span className="w-4 h-0.5 rounded" style={{ backgroundColor: "#68625C" }} />
+          <span className="w-3 h-0.5 rounded" style={{ backgroundColor: "#68625C" }} />
         </button>
       </header>
 
-      {/* ── Mobile drawer ── */}
+      {/* Mobile drawer */}
       <div
         className="md:hidden fixed inset-0 z-50 transition-all duration-200"
-        style={{
-          pointerEvents: open ? "auto" : "none",
-          opacity: open ? 1 : 0,
-        }}
+        style={{ pointerEvents: open ? "auto" : "none", opacity: open ? 1 : 0 }}
       >
-        {/* Backdrop */}
         <div
           className="absolute inset-0 transition-opacity duration-200"
-          style={{ backgroundColor: "rgba(0,0,0,0.7)", opacity: open ? 1 : 0 }}
+          style={{ backgroundColor: "rgba(0,0,0,0.4)", opacity: open ? 1 : 0 }}
           onClick={() => setOpen(false)}
         />
-
-        {/* Drawer panel */}
         <aside
           className="absolute left-0 top-0 h-full w-72 flex flex-col transition-transform duration-200"
           style={{
-            backgroundColor: "#0B0B0B",
+            backgroundColor: "#FFFFFF",
             transform: open ? "translateX(0)" : "translateX(-100%)",
           }}
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Drawer header */}
           <div
             className="flex items-center justify-between px-5 py-5 border-b flex-shrink-0"
-            style={{ borderColor: "#1A1A1A" }}
+            style={{ borderColor: "#E0D9CE" }}
           >
             <div>
               <Link href="/" className="flex items-baseline gap-2">
@@ -250,7 +220,7 @@ export default function Sidebar({
               </Link>
               <div
                 className="mt-1 text-xs px-2 py-0.5 rounded-full inline-block"
-                style={{ backgroundColor: accentAlpha(0.1), color: accentColor }}
+                style={{ backgroundColor: "#FBF4E4", color: accentColor, border: "1px solid rgba(201,168,76,0.25)" }}
               >
                 {roleLabel}
               </div>
@@ -258,14 +228,12 @@ export default function Sidebar({
             <button
               onClick={() => setOpen(false)}
               className="w-8 h-8 flex items-center justify-center rounded-lg text-sm flex-shrink-0"
-              style={{ backgroundColor: "#1A1A1A", color: "#808080" }}
+              style={{ backgroundColor: "#EEE9E0", color: "#68625C" }}
               aria-label="关闭菜单"
             >
               ✕
             </button>
           </div>
-
-          {/* Drawer nav */}
           <div className="flex flex-col flex-1 overflow-hidden">
             <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
               {navItems.map((item) => {
@@ -277,19 +245,21 @@ export default function Sidebar({
                     className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium"
                     style={{
                       backgroundColor: item.highlight
-                        ? accentAlpha(0.1)
+                        ? "#FBF4E4"
                         : isActive
-                        ? "#1A1A1A"
+                        ? "#EEE9E0"
                         : "transparent",
-                      color: item.highlight ? accentColor : isActive ? "#F5F5F0" : "#808080",
+                      color: item.highlight ? accentColor : isActive ? "#1C1814" : "#68625C",
                       border: item.highlight
-                        ? `1px solid ${accentAlpha(0.2)}`
+                        ? "1px solid rgba(201,168,76,0.3)"
                         : isActive
-                        ? "1px solid #252525"
+                        ? "1px solid #D8D1C6"
                         : "1px solid transparent",
                     }}
                   >
-                    {item.icon && <span className="text-lg w-6 text-center flex-shrink-0 leading-none">{item.icon}</span>}
+                    {item.icon && (
+                      <span className="text-lg w-6 text-center flex-shrink-0 leading-none">{item.icon}</span>
+                    )}
                     <span className="flex-1">{item.label}</span>
                     {isActive && !item.highlight && (
                       <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: accentColor }} />

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -57,7 +57,7 @@ function fmtMYR(n: number): string {
 }
 
 function ratingColor(metric: string, value: number | null): string {
-  if (value === null) return "#555550";
+  if (value === null) return "#68625C";
   if (metric === "pe") {
     if (value < 10) return "#5EAB6A";
     if (value < 25) return "#C9A84C";
@@ -118,9 +118,9 @@ export default function MarketCapTool() {
     : [];
 
   const inputStyle = {
-    backgroundColor: "#0D0D0D",
+    backgroundColor: "#FFFFFF",
     border: "1px solid #2A2A2A",
-    color: "#F5F5F0",
+    color: "#1C1814",
     borderRadius: "10px",
     fontSize: "13px",
     fontFamily: "var(--font-mono)",
@@ -132,8 +132,8 @@ export default function MarketCapTool() {
       <div className="grid lg:grid-cols-5 gap-6">
         {/* Form */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="rounded-2xl p-6" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-            <p className="text-xs font-mono mb-5" style={{ color: "#666660" }}>INPUT / 输入参数</p>
+          <div className="rounded-2xl p-6" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
+            <p className="text-xs font-mono mb-5" style={{ color: "#68625C" }}>INPUT / 输入参数</p>
 
             <div className="space-y-4">
               {[
@@ -145,9 +145,9 @@ export default function MarketCapTool() {
                 { field: "netProfit", label: "净利润（百万 RM）", suffix: "M" },
               ].map(({ field, label, prefix, suffix }) => (
                 <div key={field}>
-                  <label className="block text-xs mb-1.5" style={{ color: "#A0A09A" }}>{label}</label>
+                  <label className="block text-xs mb-1.5" style={{ color: "#68625C" }}>{label}</label>
                   <div className="relative">
-                    {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: "#555550" }}>{prefix}</span>}
+                    {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: "#68625C" }}>{prefix}</span>}
                     <input
                       type="number"
                       value={form[field as keyof FormState]}
@@ -155,16 +155,16 @@ export default function MarketCapTool() {
                       className="w-full py-2.5"
                       style={{ ...inputStyle, paddingLeft: prefix ? "44px" : "12px", paddingRight: suffix ? "40px" : "12px" }}
                       onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                      onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                      onBlur={(e) => (e.target.style.borderColor = "#D8D1C6")}
                     />
-                    {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: "#555550" }}>{suffix}</span>}
+                    {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: "#68625C" }}>{suffix}</span>}
                   </div>
                 </div>
               ))}
 
               {/* Industry selector */}
               <div>
-                <label className="block text-xs mb-1.5" style={{ color: "#A0A09A" }}>对比行业</label>
+                <label className="block text-xs mb-1.5" style={{ color: "#68625C" }}>对比行业</label>
                 <select
                   value={form.industry}
                   onChange={set("industry")}
@@ -181,22 +181,22 @@ export default function MarketCapTool() {
             <button
               onClick={calculate}
               className="w-full mt-5 py-3 rounded-xl text-sm font-semibold"
-              style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}
+              style={{ backgroundColor: "#C9A84C", color: "#FFFFFF" }}
             >
               开始计算 →
             </button>
           </div>
 
           {/* Reference table */}
-          <div className="rounded-2xl p-5" style={{ backgroundColor: "#111111", border: "1px solid #1A1A1A" }}>
-            <p className="text-xs font-mono mb-3" style={{ color: "#555550" }}>估值参考指标</p>
+          <div className="rounded-2xl p-5" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1A1A1A" }}>
+            <p className="text-xs font-mono mb-3" style={{ color: "#68625C" }}>估值参考指标</p>
             <div className="space-y-2 text-xs">
               {[
                 { label: "市盈率 PE", low: "<10 低估", mid: "10-25 合理", high: ">25 偏高" },
                 { label: "市净率 PB", low: "<1 低于账面", mid: "1-3 合理", high: ">3 溢价" },
               ].map(({ label, low, mid, high }) => (
                 <div key={label}>
-                  <span style={{ color: "#666660" }}>{label}</span>
+                  <span style={{ color: "#68625C" }}>{label}</span>
                   <div className="flex gap-2 mt-1">
                     <span className="px-1.5 py-0.5 rounded" style={{ backgroundColor: "rgba(94,171,106,0.15)", color: "#5EAB6A" }}>{low}</span>
                     <span className="px-1.5 py-0.5 rounded" style={{ backgroundColor: "rgba(201,168,76,0.15)", color: "#C9A84C" }}>{mid}</span>
@@ -217,9 +217,9 @@ export default function MarketCapTool() {
                 className="rounded-2xl p-5 text-center"
                 style={{ background: "linear-gradient(135deg, #1A1A1A, #1E1A0A)", border: "1px solid rgba(201,168,76,0.3)" }}
               >
-                <p className="text-xs mb-1" style={{ color: "#A0A09A" }}>总市值</p>
+                <p className="text-xs mb-1" style={{ color: "#68625C" }}>总市值</p>
                 <p className="text-3xl font-bold font-mono" style={{ color: "#C9A84C" }}>{fmtMYR(results.marketCap)}</p>
-                <p className="text-xs mt-1" style={{ color: "#555550" }}>{industryRef.label} 基准对比</p>
+                <p className="text-xs mt-1" style={{ color: "#68625C" }}>{industryRef.label} 基准对比</p>
               </div>
 
               {/* Valuation metrics */}
@@ -230,11 +230,11 @@ export default function MarketCapTool() {
                   { label: "市销率 PS", value: results.ps, refVal: industryRef.ps, metric: "ps" },
                   { label: "净资产收益 ROE", value: results.roe, refVal: null, metric: "roe", unit: "%" },
                 ].map(({ label, value, refVal, metric, unit }) => (
-                  <div key={label} className="rounded-xl p-4 text-center" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
+                  <div key={label} className="rounded-xl p-4 text-center" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
                     <div className="text-xl font-bold font-mono" style={{ color: ratingColor(metric, value) }}>
                       {fmtNum(value)}{unit || "x"}
                     </div>
-                    <div className="text-xs mt-1" style={{ color: "#555550" }}>{label}</div>
+                    <div className="text-xs mt-1" style={{ color: "#68625C" }}>{label}</div>
                     {refVal !== null && (
                       <div className="text-xs mt-0.5" style={{ color: "#3A3A38" }}>
                         行业 {refVal.toFixed(1)}x
@@ -245,15 +245,15 @@ export default function MarketCapTool() {
               </div>
 
               {/* Comparison chart */}
-              <div className="rounded-2xl p-5" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
+              <div className="rounded-2xl p-5" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
                 <p className="text-sm font-semibold mb-4">估值指标对比 vs {industryRef.label}</p>
                 <ResponsiveContainer width="100%" height={220}>
                   <BarChart data={chartData} barCategoryGap="30%" barGap={4} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1E1E1E" vertical={false} />
-                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#666660" }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fontSize: 10, fill: "#555550" }} axisLine={false} tickLine={false} width={30} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E0D9CE" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#68625C" }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 10, fill: "#68625C" }} axisLine={false} tickLine={false} width={30} />
                     <Tooltip
-                      contentStyle={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: "10px", fontSize: "12px" }}
+                      contentStyle={{ backgroundColor: "#EEE9E0", border: "1px solid #2A2A2A", borderRadius: "10px", fontSize: "12px" }}
                       formatter={(v) => [typeof v === "number" ? `${v.toFixed(2)}x` : "N/A", undefined]}
                     />
                     <Bar dataKey="公司" radius={[4, 4, 0, 0]}>
@@ -261,10 +261,10 @@ export default function MarketCapTool() {
                         <Cell key={i} fill={entry["公司"] > entry["行业均值"] ? "#C9A84C" : "#5EAB6A"} />
                       ))}
                     </Bar>
-                    <Bar dataKey="行业均值" fill="#2A2A2A" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="行业均值" fill="#D8D1C6" radius={[4, 4, 0, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
-                <p className="text-xs text-center mt-2" style={{ color: "#444440" }}>
+                <p className="text-xs text-center mt-2" style={{ color: "#68625C" }}>
                   金色 = 高于行业均值（可能偏贵）· 绿色 = 低于行业均值（可能低估）
                 </p>
               </div>
@@ -285,19 +285,19 @@ export default function MarketCapTool() {
                     Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: "市值分析.csv" }).click();
                   }}
                   className="px-5 py-2.5 rounded-xl text-sm font-medium"
-                  style={{ backgroundColor: "#1A1A1A", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.25)" }}
+                  style={{ backgroundColor: "#EEE9E0", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.25)" }}
                 >
                   ↓ 导出 CSV
                 </button>
-                <button onClick={() => window.print()} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#1A1A1A", color: "#A0A09A", border: "1px solid #2A2A2A" }}>
+                <button onClick={() => window.print()} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#EEE9E0", color: "#68625C", border: "1px solid #2A2A2A" }}>
                   🖨 打印 PDF
                 </button>
               </div>
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center h-64 rounded-2xl" style={{ backgroundColor: "#111111", border: "1px dashed #222222" }}>
+            <div className="flex flex-col items-center justify-center h-64 rounded-2xl" style={{ backgroundColor: "#FFFFFF", border: "1px dashed #222222" }}>
               <span className="text-4xl mb-3 opacity-30">📊</span>
-              <p className="text-sm" style={{ color: "#444440" }}>填写参数后点击「开始计算」</p>
+              <p className="text-sm" style={{ color: "#68625C" }}>填写参数后点击「开始计算」</p>
             </div>
           )}
         </div>

@@ -211,7 +211,7 @@ export default async function CoursesPage() {
             <div className="h-px flex-1" style={{ backgroundColor: "#E0D9CE" }} />
           </div>
 
-          <div className="rounded-2xl p-7 relative overflow-hidden" style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(124,95,191,0.2)" }}>
+          <div id="capital-start" className="rounded-2xl p-7 relative overflow-hidden" style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(124,95,191,0.2)" }}>
             <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: "linear-gradient(90deg, transparent, #7C5FBF80, transparent)" }} />
 
             <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -277,8 +277,9 @@ export default async function CoursesPage() {
           <div className="space-y-5">
             {OFFLINE_COURSES.map((course) => {
               const c = isEn ? course.en : course.zh;
+              const courseSlug = course.id === 1 ? "capital-map" : course.id === 2 ? "capital-code" : "capital-dao";
               return (
-                <div key={course.id} className="rounded-2xl p-7 relative overflow-hidden" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
+                <div key={course.id} id={courseSlug} className="rounded-2xl p-7 relative overflow-hidden" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
                   <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, transparent, ${course.accent}80, transparent)` }} />
 
                   <div className="flex flex-wrap items-center gap-2 mb-4">

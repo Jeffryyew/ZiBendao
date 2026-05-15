@@ -527,10 +527,7 @@ function CapitalLearningJourney({ locale }: { locale: string }) {
       name: "资本启航",
       nameEn: "Capital Start",
       desc: "专为忙碌创业者设计的线上入门课程。随时随地建立资本思维基础，零门槛开启资本成长之旅。",
-      topics: ["资本思维框架", "估值核心概念", "资本化第一步"],
-      xp: "+30 XP",
-      duration: "随时开始",
-      badgeLabel: "Starter",
+      href: "/courses#capital-start",
       accent: "#7C5FBF",
       accentLight: "#F4F0FC",
     },
@@ -539,10 +536,7 @@ function CapitalLearningJourney({ locale }: { locale: string }) {
       name: "资本通",
       nameEn: "The Capital Map",
       desc: "建立资本思维框架，认识企业从经营到资本化的核心逻辑。线下深度课程，知行合一。",
-      topics: ["现金流 vs 利润", "企业估值入门", "资本 vs 债务"],
-      xp: "+50 XP",
-      duration: "约 4 周",
-      badgeLabel: "Foundation",
+      href: "/courses#capital-map",
       accent: "#8B6514",
       accentLight: "#FBF4E4",
     },
@@ -551,10 +545,7 @@ function CapitalLearningJourney({ locale }: { locale: string }) {
       name: "启动资本",
       nameEn: "The Capital Code",
       desc: "系统启动企业资本化进程。掌握 SPV 架构与融资结构，让企业具备被投资的真实能力。",
-      topics: ["SPV 架构设计", "股权稀释计算", "融资准备度评分"],
-      xp: "+80 XP",
-      duration: "约 6 周",
-      badgeLabel: "Builder",
+      href: "/courses#capital-code",
       accent: "#2D5FA8",
       accentLight: "#EDF2FC",
     },
@@ -563,10 +554,7 @@ function CapitalLearningJourney({ locale }: { locale: string }) {
       name: "资本道",
       nameEn: "Capital Dao",
       desc: "进阶资本策略巅峰。理解 IPO、REIT 路径，建立企业级资本操作体系与投资人沟通能力。",
-      topics: ["IPO 路径规划", "REIT 结构", "投资人关系管理"],
-      xp: "+120 XP",
-      duration: "约 8 周",
-      badgeLabel: "Strategist",
+      href: "/courses#capital-dao",
       accent: "#8B6514",
       accentLight: "#FBF4E4",
     },
@@ -628,102 +616,59 @@ function LevelCard({
 }: {
   lvl: {
     stageLabel: string; name: string; nameEn: string; desc: string;
-    topics: string[]; xp: string; duration: string; badgeLabel: string;
-    accent: string; accentLight: string;
+    href: string; accent: string; accentLight: string;
   };
   delay: number;
   inView: boolean;
 }) {
-  const [expanded, setExpanded] = useState(false);
-
   return (
     <motion.div
       initial={{ opacity: 0, x: -16 }}
       animate={inView ? { opacity: 1, x: 0 } : {}}
       transition={{ duration: 0.5, delay, ease: "easeOut" }}
-      onClick={() => setExpanded(!expanded)}
-      className="rounded-2xl cursor-pointer overflow-hidden"
-      style={{
-        backgroundColor: "#FFFFFF",
-        border: expanded ? `1px solid ${lvl.accent}50` : "1px solid #E0D9CE",
-        boxShadow: expanded ? "0 4px 24px rgba(28,24,20,0.08)" : "none",
-        transition: "box-shadow 0.25s ease, border-color 0.25s ease",
-      }}
     >
-      {/* Top accent bar */}
-      <div style={{ height: 3, background: `linear-gradient(90deg, ${lvl.accent}80, ${lvl.accent}, ${lvl.accent}80)` }} />
+      <Link
+        href={lvl.href}
+        className="block rounded-2xl overflow-hidden transition-all duration-200 hover:shadow-md"
+        style={{
+          backgroundColor: "#FFFFFF",
+          border: "1px solid #E0D9CE",
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLAnchorElement).style.borderColor = `${lvl.accent}50`;
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLAnchorElement).style.borderColor = "#E0D9CE";
+        }}
+      >
+        {/* Top accent bar */}
+        <div style={{ height: 3, background: `linear-gradient(90deg, ${lvl.accent}80, ${lvl.accent}, ${lvl.accent}80)` }} />
 
-      {/* Card body */}
-      <div className="p-6 flex items-center gap-4">
-        {/* Stage badge */}
-        <div
-          className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-bold text-center leading-tight"
-          style={{ backgroundColor: lvl.accentLight, border: `1px solid ${lvl.accent}25`, color: lvl.accent }}
-        >
-          {lvl.stageLabel}
-        </div>
-
-        {/* Main content */}
-        <div className="flex-1 min-w-0">
-          <div className="flex flex-wrap items-center gap-2 mb-1">
-            <h3 className="font-bold text-base" style={{ color: "#1C1814", fontFamily: "var(--font-display)" }}>
-              {lvl.name}
-            </h3>
-            <span className="text-xs" style={{ color: "#9A9490" }}>· {lvl.nameEn}</span>
-            <span
-              className="text-xs font-medium px-2 py-0.5 rounded-full"
-              style={{ backgroundColor: lvl.accentLight, color: lvl.accent, border: `1px solid ${lvl.accent}25` }}
-            >
-              {lvl.badgeLabel}
-            </span>
-          </div>
-          <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>{lvl.desc}</p>
-        </div>
-
-        {/* Right */}
-        <div className="flex flex-col items-end gap-2 flex-shrink-0">
-          <span
-            className="text-xs font-mono font-bold px-2.5 py-1 rounded-lg"
-            style={{ backgroundColor: "#FBF4E4", color: "#8B6514" }}
+        {/* Card body */}
+        <div className="p-6 flex items-center gap-4">
+          {/* Stage badge */}
+          <div
+            className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 text-xs font-bold text-center leading-tight"
+            style={{ backgroundColor: lvl.accentLight, border: `1px solid ${lvl.accent}25`, color: lvl.accent }}
           >
-            {lvl.xp}
-          </span>
-          <span className="text-xs" style={{ color: "#C0B8B0" }}>{lvl.duration}</span>
-          <span
-            className="text-xs"
-            style={{ color: "#C0B8B0", display: "block", transform: expanded ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}
-          >
-            ▾
-          </span>
-        </div>
-      </div>
+            {lvl.stageLabel}
+          </div>
 
-      {/* Expanded */}
-      {expanded && (
-        <div className="px-6 pb-6" style={{ borderTop: "1px solid #F0EBE1" }}>
-          <div className="flex flex-wrap gap-2 pt-4">
-            {lvl.topics.map((topic) => (
-              <span
-                key={topic}
-                className="text-xs px-3 py-1.5 rounded-full"
-                style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
-              >
-                {topic}
-              </span>
-            ))}
+          {/* Main content */}
+          <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <h3 className="font-bold text-base" style={{ color: "#1C1814", fontFamily: "var(--font-display)" }}>
+                {lvl.name}
+              </h3>
+              <span className="text-xs" style={{ color: "#9A9490" }}>· {lvl.nameEn}</span>
+            </div>
+            <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>{lvl.desc}</p>
           </div>
-          <div className="mt-4">
-            <Link
-              href="/courses"
-              onClick={(e) => e.stopPropagation()}
-              className="text-xs font-medium"
-              style={{ color: lvl.accent }}
-            >
-              了解更多 →
-            </Link>
-          </div>
+
+          {/* Arrow */}
+          <span className="flex-shrink-0 text-sm" style={{ color: lvl.accent }}>→</span>
         </div>
-      )}
+      </Link>
     </motion.div>
   );
 }

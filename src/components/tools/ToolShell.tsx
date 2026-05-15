@@ -6,7 +6,7 @@ interface ToolShellProps {
   icon: string;
   title: string;
   desc: string;
-  levelRequired: number;
+  levelRequired?: number;
   backHref?: string;
   children: React.ReactNode;
 }
@@ -15,64 +15,56 @@ export default function ToolShell({
   icon,
   title,
   desc,
-  levelRequired,
   backHref = "/student/tools",
   children,
 }: ToolShellProps) {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#0D0D0D" }}>
+    <div className="min-h-screen" style={{ backgroundColor: "var(--color-bg-primary)" }}>
       {/* Sticky top bar */}
       <div
         className="sticky top-0 z-30 print:hidden"
-        style={{ backgroundColor: "rgba(11,11,11,0.95)", borderBottom: "1px solid #1A1A1A", backdropFilter: "blur(8px)" }}
+        style={{
+          backgroundColor: "rgba(247,244,239,0.95)",
+          borderBottom: "1px solid #E0D9CE",
+          backdropFilter: "blur(8px)",
+        }}
       >
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
           <Link
             href={backHref}
-            className="flex items-center gap-1.5 text-sm transition-colors"
-            style={{ color: "#666660" }}
-            onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "#A0A09A")}
-            onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "#666660")}
+            className="flex items-center gap-1.5 text-sm transition-colors hover:text-[#1C1814]"
+            style={{ color: "var(--color-text-muted)" }}
           >
             ← 返回工具
           </Link>
-          <span style={{ color: "#2A2A2A" }}>·</span>
+          <span style={{ color: "#D8D1C6" }}>·</span>
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-sm transition-colors"
-            style={{ color: "#666660" }}
-            onMouseEnter={(e) => ((e.target as HTMLElement).style.color = "#A0A09A")}
-            onMouseLeave={(e) => ((e.target as HTMLElement).style.color = "#666660")}
+            className="flex items-center gap-1.5 text-sm transition-colors hover:text-[#1C1814]"
+            style={{ color: "var(--color-text-muted)" }}
           >
             ⌂ 主页
           </Link>
-          <span style={{ color: "#2A2A2A" }}>·</span>
-          <span className="text-sm font-medium flex-1 truncate" style={{ color: "#F5F5F0" }}>
+          <span style={{ color: "#D8D1C6" }}>·</span>
+          <span className="text-sm font-medium flex-1 truncate" style={{ color: "var(--color-text-primary)" }}>
             {icon} {title}
-          </span>
-          <span
-            className="text-xs px-2.5 py-1 rounded-full font-mono flex-shrink-0"
-            style={{ backgroundColor: "rgba(201,168,76,0.1)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}
-          >
-            L{levelRequired}+
           </span>
         </div>
       </div>
 
       {/* Page content */}
       <div className="max-w-5xl mx-auto px-4 py-8 md:py-10">
-        {/* Tool header */}
         <div className="mb-8 print:mb-4">
           <div className="flex items-center gap-3 mb-2">
             <span className="text-3xl print:text-xl">{icon}</span>
             <h1
               className="text-2xl font-bold print:text-xl"
-              style={{ fontFamily: "var(--font-display)", color: "#F5F5F0" }}
+              style={{ fontFamily: "var(--font-display)", color: "var(--color-text-primary)" }}
             >
               {title}
             </h1>
           </div>
-          <p className="text-sm print:hidden" style={{ color: "#A0A09A" }}>
+          <p className="text-sm print:hidden" style={{ color: "var(--color-text-secondary)" }}>
             {desc}
           </p>
         </div>

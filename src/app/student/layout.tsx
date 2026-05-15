@@ -1,7 +1,7 @@
 import { auth } from "../../../auth";
 import { redirect } from "next/navigation";
 import Sidebar, { NavItem } from "@/components/Sidebar";
-import { getRoleLabel, isStudentArea } from "@/lib/roles";
+import { getRoleLabel } from "@/lib/roles";
 
 const NAV_ITEMS: NavItem[] = [
   { label: "主页", href: "/student/dashboard", icon: "⊕" },
@@ -15,10 +15,9 @@ export default async function StudentLayout({ children }: { children: React.Reac
   const session = await auth();
   if (!session?.user) redirect("/login");
   const role = session.user.role as string;
-  if (!isStudentArea(role)) redirect("/dashboard");
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#0D0D0D" }}>
+    <div className="min-h-screen" style={{ backgroundColor: "var(--color-bg-primary)" }}>
       <Sidebar
         navItems={NAV_ITEMS}
         userName={session.user.name}

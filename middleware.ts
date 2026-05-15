@@ -22,7 +22,8 @@ export default auth((req) => {
     pathname === "/pricing" ||
     pathname === "/about" ||
     pathname.startsWith("/payment") ||
-    pathname.startsWith("/login/otp");
+    pathname.startsWith("/login/otp") ||
+    pathname.startsWith("/api/db-test");
 
   if (isPublic) return NextResponse.next();
 
@@ -40,13 +41,7 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
-  if (pathname.startsWith("/student") && !STUDENT_AREA_ROLES.has(role)) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
-  }
-
-  if (pathname.startsWith("/member") && role !== "FREE_MEMBER") {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
-  }
+  // /student and /member are open to all logged-in users
 
   return NextResponse.next();
 });

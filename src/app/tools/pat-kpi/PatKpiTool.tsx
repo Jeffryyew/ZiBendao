@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -118,9 +118,9 @@ export default function PatKpiTool() {
     : [];
 
   const inputStyle = {
-    backgroundColor: "#0D0D0D",
+    backgroundColor: "#FFFFFF",
     border: "1px solid #2A2A2A",
-    color: "#F5F5F0",
+    color: "#1C1814",
     borderRadius: "10px",
     fontSize: "13px",
     fontFamily: "var(--font-mono)",
@@ -129,9 +129,9 @@ export default function PatKpiTool() {
 
   const InputRow = ({ field, label, prefix = "RM" }: { field: keyof FormState; label: string; prefix?: string }) => (
     <div>
-      <label className="block text-xs mb-1.5" style={{ color: "#A0A09A" }}>{label}</label>
+      <label className="block text-xs mb-1.5" style={{ color: "#68625C" }}>{label}</label>
       <div className="relative">
-        {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: "#555550" }}>{prefix}</span>}
+        {prefix && <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: "#68625C" }}>{prefix}</span>}
         <input
           type="number"
           value={form[field]}
@@ -139,7 +139,7 @@ export default function PatKpiTool() {
           className="w-full py-2.5"
           style={{ ...inputStyle, paddingLeft: "44px" }}
           onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-          onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+          onBlur={(e) => (e.target.style.borderColor = "#D8D1C6")}
         />
       </div>
     </div>
@@ -174,15 +174,15 @@ export default function PatKpiTool() {
         {/* Form */}
         <div className="lg:col-span-2 space-y-4">
           {/* P&L Inputs */}
-          <div className="rounded-2xl p-6" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-            <p className="text-xs font-mono mb-5" style={{ color: "#666660" }}>P&L / 损益数据</p>
+          <div className="rounded-2xl p-6" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
+            <p className="text-xs font-mono mb-5" style={{ color: "#68625C" }}>P&L / 损益数据</p>
             <div className="space-y-4">
               <InputRow field="revenue" label="年营收 Revenue" />
               <InputRow field="cogs" label="销货成本 COGS" />
               <InputRow field="opex" label="运营费用 OPEX" />
               <InputRow field="otherExpenses" label="其他支出（利息等）" />
               <div>
-                <label className="block text-xs mb-1.5" style={{ color: "#A0A09A" }}>企业所得税率</label>
+                <label className="block text-xs mb-1.5" style={{ color: "#68625C" }}>企业所得税率</label>
                 <div className="relative">
                   <input
                     type="number"
@@ -191,17 +191,17 @@ export default function PatKpiTool() {
                     className="w-full py-2.5"
                     style={{ ...inputStyle, paddingLeft: "12px", paddingRight: "40px" }}
                     onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                    onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                    onBlur={(e) => (e.target.style.borderColor = "#D8D1C6")}
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: "#555550" }}>%</span>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: "#68625C" }}>%</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* Balance Sheet inputs */}
-          <div className="rounded-2xl p-6" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-            <p className="text-xs font-mono mb-4" style={{ color: "#666660" }}>BALANCE SHEET / 资产负债（可选）</p>
+          <div className="rounded-2xl p-6" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
+            <p className="text-xs font-mono mb-4" style={{ color: "#68625C" }}>BALANCE SHEET / 资产负债（可选）</p>
             <div className="space-y-4">
               <InputRow field="equity" label="股东权益 Equity" />
               <InputRow field="totalAssets" label="总资产 Total Assets" />
@@ -209,12 +209,12 @@ export default function PatKpiTool() {
           </div>
 
           {/* KPI Targets */}
-          <div className="rounded-2xl p-6" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-            <p className="text-xs font-mono mb-4" style={{ color: "#666660" }}>KPI TARGETS / 目标（可选）</p>
+          <div className="rounded-2xl p-6" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
+            <p className="text-xs font-mono mb-4" style={{ color: "#68625C" }}>KPI TARGETS / 目标（可选）</p>
             <div className="space-y-4">
               <InputRow field="targetRevenue" label="目标营收 (RM)" />
               <div>
-                <label className="block text-xs mb-1.5" style={{ color: "#A0A09A" }}>目标净利率 (%)</label>
+                <label className="block text-xs mb-1.5" style={{ color: "#68625C" }}>目标净利率 (%)</label>
                 <div className="relative">
                   <input
                     type="number"
@@ -223,9 +223,9 @@ export default function PatKpiTool() {
                     className="w-full py-2.5"
                     style={{ ...inputStyle, paddingLeft: "12px", paddingRight: "40px" }}
                     onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                    onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                    onBlur={(e) => (e.target.style.borderColor = "#D8D1C6")}
                   />
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: "#555550" }}>%</span>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs" style={{ color: "#68625C" }}>%</span>
                 </div>
               </div>
             </div>
@@ -234,7 +234,7 @@ export default function PatKpiTool() {
           <button
             onClick={calculate}
             className="w-full py-3 rounded-xl text-sm font-semibold"
-            style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}
+            style={{ backgroundColor: "#C9A84C", color: "#FFFFFF" }}
           >
             开始计算 →
           </button>
@@ -245,7 +245,7 @@ export default function PatKpiTool() {
           {results ? (
             <>
               {/* P&L Statement */}
-              <div className="rounded-2xl p-5" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
+              <div className="rounded-2xl p-5" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
                 <p className="text-sm font-semibold mb-4">损益表</p>
                 <div className="space-y-2">
                   {[
@@ -265,7 +265,7 @@ export default function PatKpiTool() {
                       style={{
                         paddingLeft: indent ? "16px" : "0",
                         borderBottom: bold ? "1px solid #222222" : "none",
-                        color: gold ? "#C9A84C" : highlight ? "#F5F5F0" : indent ? "#A0A09A" : "#F5F5F0",
+                        color: gold ? "#C9A84C" : highlight ? "#1C1814" : indent ? "#68625C" : "#1C1814",
                         backgroundColor: gold ? "rgba(201,168,76,0.04)" : "transparent",
                         borderRadius: gold ? "8px" : "0",
                         padding: gold ? "8px 12px" : undefined,
@@ -275,7 +275,7 @@ export default function PatKpiTool() {
                       <span>{label}</span>
                       <div className="text-right">
                         <span className="font-mono">{fmtMYR(value)}</span>
-                        <span className="ml-2 text-xs font-mono" style={{ color: "#444440", minWidth: "50px", display: "inline-block", textAlign: "right" }}>
+                        <span className="ml-2 text-xs font-mono" style={{ color: "#68625C", minWidth: "50px", display: "inline-block", textAlign: "right" }}>
                           {fmtPct(Math.abs(pct))}
                         </span>
                       </div>
@@ -289,19 +289,19 @@ export default function PatKpiTool() {
                 {[
                   { label: "净利率", value: fmtPct(results.netMargin), color: marginRating(results.netMargin) },
                   { label: "毛利率", value: fmtPct(results.grossMargin), color: marginRating(results.grossMargin) },
-                  { label: "ROE", value: results.roe !== null ? fmtPct(results.roe) : "N/A", color: results.roe !== null ? marginRating(results.roe) : "#555550" },
-                  { label: "ROA", value: results.roa !== null ? fmtPct(results.roa) : "N/A", color: results.roa !== null ? marginRating(results.roa) : "#555550" },
+                  { label: "ROE", value: results.roe !== null ? fmtPct(results.roe) : "N/A", color: results.roe !== null ? marginRating(results.roe) : "#68625C" },
+                  { label: "ROA", value: results.roa !== null ? fmtPct(results.roa) : "N/A", color: results.roa !== null ? marginRating(results.roa) : "#68625C" },
                 ].map(({ label, value, color }) => (
-                  <div key={label} className="rounded-xl p-4 text-center" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
+                  <div key={label} className="rounded-xl p-4 text-center" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
                     <div className="text-xl font-bold font-mono" style={{ color }}>{value}</div>
-                    <div className="text-xs mt-1" style={{ color: "#555550" }}>{label}</div>
+                    <div className="text-xs mt-1" style={{ color: "#68625C" }}>{label}</div>
                   </div>
                 ))}
               </div>
 
               {/* KPI vs Target */}
               {(results.revenueGap !== null || results.marginGap !== null) && (
-                <div className="rounded-2xl p-5" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
+                <div className="rounded-2xl p-5" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
                   <p className="text-sm font-semibold mb-3">KPI 目标达成情况</p>
                   <div className="space-y-3">
                     {results.revenueGap !== null && (
@@ -327,15 +327,15 @@ export default function PatKpiTool() {
               )}
 
               {/* Profit breakdown chart */}
-              <div className="rounded-2xl p-5" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
+              <div className="rounded-2xl p-5" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
                 <p className="text-sm font-semibold mb-4">利润层级瀑布图</p>
                 <ResponsiveContainer width="100%" height={200}>
                   <BarChart data={waterfallData} margin={{ top: 5, right: 10, left: 10, bottom: 5 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1E1E1E" vertical={false} />
-                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#666660" }} axisLine={false} tickLine={false} />
-                    <YAxis tickFormatter={(v) => `${(v / 1e6).toFixed(1)}M`} tick={{ fontSize: 10, fill: "#555550" }} axisLine={false} tickLine={false} width={42} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E0D9CE" vertical={false} />
+                    <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#68625C" }} axisLine={false} tickLine={false} />
+                    <YAxis tickFormatter={(v) => `${(v / 1e6).toFixed(1)}M`} tick={{ fontSize: 10, fill: "#68625C" }} axisLine={false} tickLine={false} width={42} />
                     <Tooltip
-                      contentStyle={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: "10px", fontSize: "12px" }}
+                      contentStyle={{ backgroundColor: "#EEE9E0", border: "1px solid #2A2A2A", borderRadius: "10px", fontSize: "12px" }}
                       formatter={(v) => [typeof v === "number" ? fmtMYR(v) : "N/A", undefined]}
                     />
                     <Bar dataKey="value" radius={[4, 4, 0, 0]}>
@@ -344,7 +344,7 @@ export default function PatKpiTool() {
                         dataKey="value"
                         position="top"
                         formatter={(v) => typeof v === "number" ? fmtMYR(v) : ""}
-                        style={{ fontSize: "10px", fill: "#A0A09A" }}
+                        style={{ fontSize: "10px", fill: "#68625C" }}
                       />
                     </Bar>
                   </BarChart>
@@ -353,18 +353,18 @@ export default function PatKpiTool() {
 
               {/* Export */}
               <div className="flex gap-3">
-                <button onClick={exportCSV} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#1A1A1A", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.25)" }}>
+                <button onClick={exportCSV} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#EEE9E0", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.25)" }}>
                   ↓ 导出 CSV
                 </button>
-                <button onClick={() => window.print()} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#1A1A1A", color: "#A0A09A", border: "1px solid #2A2A2A" }}>
+                <button onClick={() => window.print()} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#EEE9E0", color: "#68625C", border: "1px solid #2A2A2A" }}>
                   🖨 打印 PDF
                 </button>
               </div>
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center h-64 rounded-2xl" style={{ backgroundColor: "#111111", border: "1px dashed #222222" }}>
+            <div className="flex flex-col items-center justify-center h-64 rounded-2xl" style={{ backgroundColor: "#FFFFFF", border: "1px dashed #222222" }}>
               <span className="text-4xl mb-3 opacity-30">📈</span>
-              <p className="text-sm" style={{ color: "#444440" }}>填写损益数据后点击「开始计算」</p>
+              <p className="text-sm" style={{ color: "#68625C" }}>填写损益数据后点击「开始计算」</p>
             </div>
           )}
         </div>
@@ -379,19 +379,19 @@ function KpiBar({ label, actual, target, gap, formatFn }: { label: string; actua
   return (
     <div>
       <div className="flex justify-between text-xs mb-1.5">
-        <span style={{ color: "#A0A09A" }}>{label}</span>
+        <span style={{ color: "#68625C" }}>{label}</span>
         <span className="font-mono" style={{ color: achieved ? "#5EAB6A" : "#E05A5A" }}>
           {achieved ? "+" : ""}{gap.toFixed(1)}% vs 目标
         </span>
       </div>
       <div className="flex items-center gap-2">
-        <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: "#1E1E1E" }}>
+        <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: "#E0D9CE" }}>
           <div
             className="h-full rounded-full transition-all duration-500"
             style={{ width: `${Math.min(pct, 100)}%`, backgroundColor: achieved ? "#5EAB6A" : "#E05A5A" }}
           />
         </div>
-        <div className="text-xs font-mono w-28 text-right" style={{ color: "#A0A09A" }}>
+        <div className="text-xs font-mono w-28 text-right" style={{ color: "#68625C" }}>
           {formatFn(actual)} / {formatFn(target)}
         </div>
       </div>

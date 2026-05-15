@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -114,15 +114,15 @@ export default function FinancialRoadmapTool() {
       <div className="grid lg:grid-cols-5 gap-6">
         {/* Input Form */}
         <div className="lg:col-span-2">
-          <div className="rounded-2xl p-6" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-            <p className="text-xs font-mono mb-5" style={{ color: "#666660" }}>INPUT / 输入参数</p>
+          <div className="rounded-2xl p-6" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
+            <p className="text-xs font-mono mb-5" style={{ color: "#68625C" }}>INPUT / 输入参数</p>
             <div className="space-y-4">
               {FIELD_CONFIG.map(({ field, label, prefix, suffix, placeholder }) => (
                 <div key={field}>
-                  <label className="block text-xs mb-1.5" style={{ color: "#A0A09A" }}>{label}</label>
+                  <label className="block text-xs mb-1.5" style={{ color: "#68625C" }}>{label}</label>
                   <div className="relative">
                     {prefix && (
-                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-mono" style={{ color: "#555550" }}>
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-mono" style={{ color: "#68625C" }}>
                         {prefix}
                       </span>
                     )}
@@ -133,18 +133,18 @@ export default function FinancialRoadmapTool() {
                       placeholder={placeholder}
                       className="w-full py-2.5 rounded-xl text-sm outline-none"
                       style={{
-                        backgroundColor: "#0D0D0D",
+                        backgroundColor: "#FFFFFF",
                         border: "1px solid #2A2A2A",
-                        color: "#F5F5F0",
+                        color: "#1C1814",
                         fontFamily: "var(--font-mono)",
                         paddingLeft: prefix ? "44px" : "12px",
                         paddingRight: suffix ? "40px" : "12px",
                       }}
                       onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                      onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                      onBlur={(e) => (e.target.style.borderColor = "#D8D1C6")}
                     />
                     {suffix && (
-                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono" style={{ color: "#555550" }}>
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono" style={{ color: "#68625C" }}>
                         {suffix}
                       </span>
                     )}
@@ -156,15 +156,15 @@ export default function FinancialRoadmapTool() {
             <button
               onClick={calculate}
               className="w-full mt-6 py-3 rounded-xl text-sm font-semibold transition-opacity"
-              style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}
+              style={{ backgroundColor: "#C9A84C", color: "#FFFFFF" }}
             >
               开始计算 →
             </button>
 
             {/* Formula reference */}
-            <div className="mt-5 pt-5 border-t" style={{ borderColor: "#1E1E1E" }}>
-              <p className="text-xs mb-2" style={{ color: "#555550" }}>公式</p>
-              <div className="text-xs space-y-0.5 font-mono" style={{ color: "#444440" }}>
+            <div className="mt-5 pt-5 border-t" style={{ borderColor: "#E0D9CE" }}>
+              <p className="text-xs mb-2" style={{ color: "#68625C" }}>公式</p>
+              <div className="text-xs space-y-0.5 font-mono" style={{ color: "#68625C" }}>
                 <p>FV = PV×(1+r)ⁿ + PMT×[(1+r)ⁿ-1]/r</p>
                 <p className="mt-1">r = 年利率/12，n = 年数×12</p>
               </div>
@@ -188,14 +188,14 @@ export default function FinancialRoadmapTool() {
                     key={m.label}
                     className="rounded-xl p-4 text-center"
                     style={{
-                      backgroundColor: m.accent ? "rgba(201,168,76,0.07)" : "#141414",
-                      border: `1px solid ${m.accent ? "rgba(201,168,76,0.25)" : "#1E1E1E"}`,
+                      backgroundColor: m.accent ? "rgba(201,168,76,0.07)" : "#FFFFFF",
+                      border: `1px solid ${m.accent ? "rgba(201,168,76,0.25)" : "#E0D9CE"}`,
                     }}
                   >
-                    <div className="text-lg font-bold font-mono" style={{ color: m.accent ? "#C9A84C" : m.positive ? "#5EAB6A" : "#F5F5F0" }}>
+                    <div className="text-lg font-bold font-mono" style={{ color: m.accent ? "#C9A84C" : m.positive ? "#5EAB6A" : "#1C1814" }}>
                       {m.value}
                     </div>
-                    <div className="text-xs mt-1" style={{ color: "#555550" }}>{m.label}</div>
+                    <div className="text-xs mt-1" style={{ color: "#68625C" }}>{m.label}</div>
                   </div>
                 ))}
               </div>
@@ -206,7 +206,7 @@ export default function FinancialRoadmapTool() {
                   style={{ backgroundColor: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.2)" }}
                 >
                   <span className="text-xl">💡</span>
-                  <p className="text-sm" style={{ color: "#A0A09A" }}>
+                  <p className="text-sm" style={{ color: "#68625C" }}>
                     达成目标财富需每月存款&nbsp;
                     <span className="font-semibold font-mono" style={{ color: "#C9A84C" }}>
                       {fmt(results.monthlyNeeded, 2)}
@@ -216,7 +216,7 @@ export default function FinancialRoadmapTool() {
               )}
 
               {/* Chart */}
-              <div className="rounded-2xl p-5" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
+              <div className="rounded-2xl p-5" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
                 <p className="text-sm font-semibold mb-4">财富增长曲线</p>
                 <ResponsiveContainer width="100%" height={240}>
                   <AreaChart data={results.chartData} margin={{ top: 5, right: 5, left: 10, bottom: 0 }}>
@@ -226,39 +226,39 @@ export default function FinancialRoadmapTool() {
                         <stop offset="95%" stopColor="#C9A84C" stopOpacity={0} />
                       </linearGradient>
                       <linearGradient id="gSave" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#444440" stopOpacity={0.3} />
-                        <stop offset="95%" stopColor="#444440" stopOpacity={0} />
+                        <stop offset="5%" stopColor="#68625C" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#68625C" stopOpacity={0} />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#1E1E1E" vertical={false} />
-                    <XAxis dataKey="year" tickFormatter={(v) => `${v}y`} tick={{ fontSize: 10, fill: "#555550" }} axisLine={false} tickLine={false} />
-                    <YAxis tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 10, fill: "#555550" }} axisLine={false} tickLine={false} width={38} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#E0D9CE" vertical={false} />
+                    <XAxis dataKey="year" tickFormatter={(v) => `${v}y`} tick={{ fontSize: 10, fill: "#68625C" }} axisLine={false} tickLine={false} />
+                    <YAxis tickFormatter={(v) => `${(v / 1000).toFixed(0)}k`} tick={{ fontSize: 10, fill: "#68625C" }} axisLine={false} tickLine={false} width={38} />
                     <Tooltip
-                      contentStyle={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: "10px", fontSize: "12px" }}
+                      contentStyle={{ backgroundColor: "#EEE9E0", border: "1px solid #2A2A2A", borderRadius: "10px", fontSize: "12px" }}
                       formatter={(v) => [typeof v === "number" ? fmt(v) : "N/A", undefined]}
                       labelFormatter={(l) => `第 ${l} 年`}
                     />
                     <Legend wrapperStyle={{ fontSize: "11px", color: "#888880", paddingTop: "8px" }} />
                     <Area type="monotone" dataKey="投资增长" stroke="#C9A84C" strokeWidth={2} fill="url(#gInvest)" />
-                    <Area type="monotone" dataKey="仅储蓄" stroke="#444440" strokeWidth={1.5} fill="url(#gSave)" strokeDasharray="4 2" />
+                    <Area type="monotone" dataKey="仅储蓄" stroke="#68625C" strokeWidth={1.5} fill="url(#gSave)" strokeDasharray="4 2" />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
 
               {/* Export */}
               <div className="flex gap-3">
-                <button onClick={exportCSV} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#1A1A1A", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.25)" }}>
+                <button onClick={exportCSV} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#EEE9E0", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.25)" }}>
                   ↓ 导出 CSV
                 </button>
-                <button onClick={() => window.print()} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#1A1A1A", color: "#A0A09A", border: "1px solid #2A2A2A" }}>
+                <button onClick={() => window.print()} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#EEE9E0", color: "#68625C", border: "1px solid #2A2A2A" }}>
                   🖨 打印 PDF
                 </button>
               </div>
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center h-64 rounded-2xl" style={{ backgroundColor: "#111111", border: "1px dashed #222222" }}>
+            <div className="flex flex-col items-center justify-center h-64 rounded-2xl" style={{ backgroundColor: "#FFFFFF", border: "1px dashed #222222" }}>
               <span className="text-4xl mb-3 opacity-30">📊</span>
-              <p className="text-sm" style={{ color: "#444440" }}>填写参数后点击「开始计算」</p>
+              <p className="text-sm" style={{ color: "#68625C" }}>填写参数后点击「开始计算」</p>
             </div>
           )}
         </div>

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useRef } from "react";
 import ToolShell from "@/components/tools/ToolShell";
@@ -87,9 +87,9 @@ export default function PricingSystemTool() {
   };
 
   const inputCls = {
-    backgroundColor: "#0D0D0D",
+    backgroundColor: "#FFFFFF",
     border: "1px solid #2A2A2A",
-    color: "#F5F5F0",
+    color: "#1C1814",
     borderRadius: "10px",
     outline: "none",
     fontSize: "13px",
@@ -99,8 +99,8 @@ export default function PricingSystemTool() {
     <ToolShell icon="💰" title="产品服务报价系统" desc="快速生成专业报价单，支持动态项目、折扣与税务计算。" levelRequired={2}>
       <div className="space-y-6">
         {/* Client Info */}
-        <div className="rounded-2xl p-6" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-          <p className="text-xs font-mono mb-4" style={{ color: "#666660" }}>CLIENT INFO / 客户信息</p>
+        <div className="rounded-2xl p-6" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
+          <p className="text-xs font-mono mb-4" style={{ color: "#68625C" }}>CLIENT INFO / 客户信息</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {[
               { field: "clientName", label: "客户姓名", placeholder: "张三" },
@@ -110,7 +110,7 @@ export default function PricingSystemTool() {
               { field: "taxRate", label: "税率 (%)", placeholder: "6", type: "number" },
             ].map(({ field, label, placeholder, type }) => (
               <div key={field}>
-                <label className="block text-xs mb-1.5" style={{ color: "#A0A09A" }}>{label}</label>
+                <label className="block text-xs mb-1.5" style={{ color: "#68625C" }}>{label}</label>
                 <input
                   type={type || "text"}
                   value={info[field as keyof QuoteInfo]}
@@ -119,7 +119,7 @@ export default function PricingSystemTool() {
                   className="w-full px-3 py-2.5"
                   style={inputCls}
                   onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                  onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                  onBlur={(e) => (e.target.style.borderColor = "#D8D1C6")}
                 />
               </div>
             ))}
@@ -127,9 +127,9 @@ export default function PricingSystemTool() {
         </div>
 
         {/* Line Items */}
-        <div className="rounded-2xl p-6" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
+        <div className="rounded-2xl p-6" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
           <div className="flex items-center justify-between mb-4">
-            <p className="text-xs font-mono" style={{ color: "#666660" }}>LINE ITEMS / 报价明细</p>
+            <p className="text-xs font-mono" style={{ color: "#68625C" }}>LINE ITEMS / 报价明细</p>
             <button
               onClick={addItem}
               className="text-xs px-3 py-1.5 rounded-lg"
@@ -140,7 +140,7 @@ export default function PricingSystemTool() {
           </div>
 
           {/* Table header */}
-          <div className="hidden md:grid grid-cols-12 gap-2 mb-2 text-xs px-1" style={{ color: "#555550" }}>
+          <div className="hidden md:grid grid-cols-12 gap-2 mb-2 text-xs px-1" style={{ color: "#68625C" }}>
             <div className="col-span-5">项目描述</div>
             <div className="col-span-2 text-right">数量</div>
             <div className="col-span-2 text-right">单价 (RM)</div>
@@ -160,7 +160,7 @@ export default function PricingSystemTool() {
                     className="w-full px-3 py-2"
                     style={inputCls}
                     onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                    onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                    onBlur={(e) => (e.target.style.borderColor = "#D8D1C6")}
                   />
                 </div>
                 {(["qty", "unitPrice", "discount"] as const).map((f, i) => (
@@ -172,7 +172,7 @@ export default function PricingSystemTool() {
                       className="w-full px-2 py-2 text-right"
                       style={{ ...inputCls, fontFamily: "var(--font-mono)" }}
                       onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                      onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                      onBlur={(e) => (e.target.style.borderColor = "#D8D1C6")}
                     />
                   </div>
                 ))}
@@ -181,7 +181,7 @@ export default function PricingSystemTool() {
                   <button
                     onClick={() => removeItem(item.id)}
                     className="opacity-0 group-hover:opacity-100 w-6 h-6 rounded-lg flex items-center justify-center text-xs transition-opacity"
-                    style={{ backgroundColor: "#2A2A2A", color: "#888880" }}
+                    style={{ backgroundColor: "#D8D1C6", color: "#888880" }}
                   >
                     ✕
                   </button>
@@ -191,14 +191,14 @@ export default function PricingSystemTool() {
           </div>
 
           {/* Totals */}
-          <div className="mt-5 pt-5 border-t ml-auto max-w-xs space-y-2" style={{ borderColor: "#222222" }}>
+          <div className="mt-5 pt-5 border-t ml-auto max-w-xs space-y-2" style={{ borderColor: "#E0D9CE" }}>
             {[
               { label: "小计", value: subtotal },
               { label: `税额 (${info.taxRate}%)`, value: taxAmt },
             ].map(({ label, value }) => (
               <div key={label} className="flex justify-between text-sm">
-                <span style={{ color: "#A0A09A" }}>{label}</span>
-                <span className="font-mono" style={{ color: "#F5F5F0" }}>RM {fmt(value)}</span>
+                <span style={{ color: "#68625C" }}>{label}</span>
+                <span className="font-mono" style={{ color: "#1C1814" }}>RM {fmt(value)}</span>
               </div>
             ))}
             <div
@@ -212,8 +212,8 @@ export default function PricingSystemTool() {
         </div>
 
         {/* Notes */}
-        <div className="rounded-2xl p-6" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-          <p className="text-xs font-mono mb-3" style={{ color: "#666660" }}>NOTES / 备注</p>
+        <div className="rounded-2xl p-6" style={{ backgroundColor: "#FFFFFF", border: "1px solid #1E1E1E" }}>
+          <p className="text-xs font-mono mb-3" style={{ color: "#68625C" }}>NOTES / 备注</p>
           <textarea
             value={info.notes}
             onChange={setInfoField("notes")}
@@ -222,7 +222,7 @@ export default function PricingSystemTool() {
             className="w-full px-3 py-2.5 resize-none text-sm"
             style={{ ...inputCls, borderRadius: "12px" }}
             onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-            onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+            onBlur={(e) => (e.target.style.borderColor = "#D8D1C6")}
           />
         </div>
 
@@ -231,31 +231,31 @@ export default function PricingSystemTool() {
           <button
             onClick={() => setShowPreview(!showPreview)}
             className="px-5 py-2.5 rounded-xl text-sm font-medium"
-            style={{ backgroundColor: "#C9A84C", color: "#0D0D0D" }}
+            style={{ backgroundColor: "#C9A84C", color: "#FFFFFF" }}
           >
             {showPreview ? "隐藏预览" : "预览报价单"}
           </button>
-          <button onClick={exportCSV} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#1A1A1A", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.25)" }}>
+          <button onClick={exportCSV} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#EEE9E0", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.25)" }}>
             ↓ 导出 CSV
           </button>
-          <button onClick={() => window.print()} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#1A1A1A", color: "#A0A09A", border: "1px solid #2A2A2A" }}>
+          <button onClick={() => window.print()} className="px-5 py-2.5 rounded-xl text-sm font-medium" style={{ backgroundColor: "#EEE9E0", color: "#68625C", border: "1px solid #2A2A2A" }}>
             🖨 打印 PDF
           </button>
         </div>
 
         {/* Quote Preview */}
         {showPreview && (
-          <div ref={printRef} className="rounded-2xl overflow-hidden print:shadow-none" style={{ backgroundColor: "#F5F5F0", color: "#1A1A1A" }}>
+          <div ref={printRef} className="rounded-2xl overflow-hidden print:shadow-none" style={{ backgroundColor: "#1C1814", color: "#EEE9E0" }}>
             {/* Invoice header */}
-            <div className="px-8 py-6 flex items-start justify-between" style={{ backgroundColor: "#1A1A1A" }}>
+            <div className="px-8 py-6 flex items-start justify-between" style={{ backgroundColor: "#EEE9E0" }}>
               <div>
                 <div className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)", color: "#C9A84C" }}>资本道</div>
-                <div className="text-xs mt-0.5" style={{ color: "#666660" }}>ZiBenDao Capital Advisory</div>
+                <div className="text-xs mt-0.5" style={{ color: "#68625C" }}>ZiBenDao Capital Advisory</div>
               </div>
               <div className="text-right">
-                <div className="text-sm font-semibold" style={{ color: "#F5F5F0" }}>报价单</div>
-                <div className="text-xs mt-1 font-mono" style={{ color: "#A0A09A" }}>{info.quoteNo}</div>
-                <div className="text-xs mt-0.5" style={{ color: "#666660" }}>{info.date}</div>
+                <div className="text-sm font-semibold" style={{ color: "#1C1814" }}>报价单</div>
+                <div className="text-xs mt-1 font-mono" style={{ color: "#68625C" }}>{info.quoteNo}</div>
+                <div className="text-xs mt-0.5" style={{ color: "#68625C" }}>{info.date}</div>
               </div>
             </div>
 
