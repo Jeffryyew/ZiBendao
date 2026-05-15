@@ -153,7 +153,7 @@ export default function RiskControlTool({ locale }: { locale: Locale }) {
       title={isEn ? "Risk Control System" : "风控系统"}
       desc={isEn ? "Enterprise risk register, 5×5 matrix, and category heat map." : "企业风险登记册、5×5风险矩阵与分类热力图。"}
       levelRequired={3}
-      backHref="/dashboard/capital"
+      backHref="/tools"
     >
       <div className="space-y-6">
         {/* Summary + Add button row */}

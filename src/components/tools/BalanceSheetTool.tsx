@@ -175,7 +175,7 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
       title={isEn ? "Balance Sheet" : "资产负债表"}
       desc={isEn ? "Full balance sheet with financial ratio analysis" : "资产、负债、权益完整呈现，财务比率计算"}
       levelRequired={1}
-      backHref="/dashboard/capital"
+      backHref="/tools"
     >
       <div className="space-y-6">
         {/* Balance validation banner */}

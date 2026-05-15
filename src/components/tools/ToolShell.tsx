@@ -15,7 +15,7 @@ export default function ToolShell({
   icon,
   title,
   desc,
-  backHref = "/student/tools",
+  backHref = "/tools",
   children,
 }: ToolShellProps) {
   return (

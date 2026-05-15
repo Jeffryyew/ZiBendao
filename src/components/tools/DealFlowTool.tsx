@@ -123,7 +123,7 @@ export default function DealFlowTool({ locale }: { locale: "zh" | "en" }) {
       title={isEn ? "Deal Flow" : "交易流"}
       desc={isEn ? "Track and manage investment opportunities across your pipeline." : "追踪和管理多个投资机会的完整流程。"}
       levelRequired={2}
-      backHref="/dashboard/capital"
+      backHref="/tools"
     >
       {/* Summary Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">

@@ -130,7 +130,7 @@ export default function CapitalRoadmapTool({ locale }: { locale: "zh" | "en" }) 
       title={isEn ? "Capital Roadmap" : "资本路线图"}
       desc={isEn ? "Navigate your company's capital journey from Pre-Seed to IPO-Ready." : "规划企业从天使前到上市准备的完整资本旅程。"}
       levelRequired={2}
-      backHref="/dashboard/capital"
+      backHref="/tools"
     >
       {/* Horizontal Stepper */}
       <div className="mb-6 overflow-x-auto pb-2">

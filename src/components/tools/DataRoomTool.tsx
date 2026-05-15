@@ -154,7 +154,7 @@ export default function DataRoomTool({ locale }: { locale: "zh" | "en" }) {
       title={isEn ? "Data Room" : "数据室"}
       desc={isEn ? "Organise and track your investor-ready document repository." : "整理并追踪投资人就绪的数据室文件。"}
       levelRequired={2}
-      backHref="/dashboard/capital"
+      backHref="/tools"
     >
       {/* Toast */}
       {toast && (

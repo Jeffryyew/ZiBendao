@@ -81,7 +81,7 @@ export default function BreakevenAnalysisTool({ locale }: { locale: "zh" | "en" 
       title={isEn ? "Breakeven Analysis" : "损益平衡分析"}
       desc={isEn ? "Calculate breakeven units, revenue & contribution margin" : "计算保本点销量、收入与贡献毛益"}
       levelRequired={1}
-      backHref="/dashboard/capital"
+      backHref="/tools"
     >
       <div className="grid lg:grid-cols-5 gap-6">
         {/*  Left panel: inputs + results  */}
