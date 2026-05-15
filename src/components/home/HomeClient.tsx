@@ -93,13 +93,11 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
         { label: "Investor Friday", href: "/community" },
         { label: "Asian Circle", href: "/community" },
         { label: "活动", href: "/community" },
-        { label: "会员", href: "/community" },
       ]
     : [
         { label: "Investor Friday", href: "/community" },
         { label: "Asian Circle", href: "/community" },
         { label: "Events", href: "/community" },
-        { label: "Members", href: "/community" },
       ];
 
   const NAV_LINKS: NavLink[] = [

@@ -93,8 +93,8 @@ export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavP
     : [{ label: "Valuation Engine", href: "/tools/market-cap" }, { label: "Funding Calculator", href: "/tools", comingSoon: true }, { label: "Quotation System", href: "/tools/pricing-system" }, { label: "Financial Forecast", href: "/tools/financial-roadmap" }, { label: "Equity Simulator", href: "/tools", comingSoon: true }];
 
   const COMMUNITY_ITEMS: DropdownItem[] = isZh
-    ? [{ label: "Investor Friday", href: "/community" }, { label: "Asian Circle", href: "/community" }, { label: "活动", href: "/community" }, { label: "会员", href: "/community" }]
-    : [{ label: "Investor Friday", href: "/community" }, { label: "Asian Circle", href: "/community" }, { label: "Events", href: "/community" }, { label: "Members", href: "/community" }];
+    ? [{ label: "Investor Friday", href: "/community" }, { label: "Asian Circle", href: "/community" }, { label: "活动", href: "/community" }]
+    : [{ label: "Investor Friday", href: "/community" }, { label: "Asian Circle", href: "/community" }, { label: "Events", href: "/community" }];
 
   const links: NavLink[] = [
     { label: isZh ? "首页" : "Home", href: "/" },
@@ -136,6 +136,14 @@ export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavP
       </div>
 
       <div className="flex items-center gap-3">
+        {/* Level pill — mock Level 5 */}
+        <span
+          className="hidden sm:inline-flex items-center gap-1.5 text-xs font-mono px-2.5 py-1 rounded-full"
+          style={{ color: "#C9A84C", backgroundColor: "rgba(201,168,76,0.07)", border: "1px solid rgba(201,168,76,0.15)" }}
+        >
+          <span className="w-1 h-1 rounded-full" style={{ backgroundColor: "#C9A84C" }} />
+          {isZh ? "L5 · 资本架构师" : "L5 · Capital Architect"}
+        </span>
         <LanguageSwitcher current={locale} />
         {isLoggedIn ? (
           <Link
@@ -143,7 +151,7 @@ export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavP
             className="text-sm px-4 py-2 rounded-xl font-medium transition-opacity hover:opacity-85"
             style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
           >
-            {isZh ? "进入平台 →" : "Dashboard →"}
+            {isZh ? "资本仪表板 →" : "Capital Dashboard →"}
           </Link>
         ) : (
           <>

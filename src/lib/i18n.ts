@@ -12,7 +12,7 @@ const dict = {
       about: "关于",
       login: "登录",
       register: "注册",
-      dashboard: "进入平台",
+      dashboard: "资本仪表板",
     },
     hero: {
       badge: "企业资本操作系统 · Capital Operating System",
@@ -65,11 +65,15 @@ const dict = {
       founder_title: "创始人 & 首席导师",
       values_title: "我们的核心价值",
       programs_title: "课程体系",
-      testimonials_title: "学员心声",
+      testimonials_title: "资本家心声",
       cta_title: "准备开始你的资本之旅？",
       cta_desc: "免费注册体验课程内容，或联系我们了解企业定制顾问服务。",
       cta_register: "注册 →",
       cta_contact: "联系我们",
+    },
+    dashboard: {
+      welcome: "欢迎回来，资本家。",
+      nav_label: "资本仪表板",
     },
     footer: {
       tagline: "掌握资本之道，创建可靠、可投、可扩展企业",
@@ -87,7 +91,7 @@ const dict = {
       about: "About",
       login: "Login",
       register: "Get Started",
-      dashboard: "Enter Platform",
+      dashboard: "Capital Dashboard",
     },
     hero: {
       badge: "Capital Operating System",
@@ -140,11 +144,15 @@ const dict = {
       founder_title: "Founder & Chief Instructor",
       values_title: "Our Core Values",
       programs_title: "Programme Overview",
-      testimonials_title: "Student Testimonials",
+      testimonials_title: "Capitalist Testimonials",
       cta_title: "Ready to Start Your Capital Journey?",
       cta_desc: "Register free to explore course content, or contact us for bespoke enterprise advisory services.",
       cta_register: "Register →",
       cta_contact: "Contact Us",
+    },
+    dashboard: {
+      welcome: "Welcome back, Capitalist.",
+      nav_label: "Capital Dashboard",
     },
     footer: {
       tagline: "Master Capital Strategy. Build Reliable, Investable, Scalable Enterprises.",
