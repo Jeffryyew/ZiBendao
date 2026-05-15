@@ -5,6 +5,7 @@ import Link from "next/link";
 import LogoImg from "@/components/LogoImg";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import type { Locale } from "@/lib/i18n";
+import { logout } from "@/app/actions/auth";
 
 interface SharedNavProps {
   locale: Locale;
@@ -146,13 +147,17 @@ export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavP
         </span>
         <LanguageSwitcher current={locale} />
         {isLoggedIn ? (
-          <Link
-            href="/dashboard"
-            className="text-sm px-4 py-2 rounded-xl font-medium transition-opacity hover:opacity-85"
-            style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
-          >
-            {isZh ? "资本仪表板 →" : "Capital Dashboard →"}
-          </Link>
+          <form action={logout}>
+            <button
+              type="submit"
+              className="text-sm px-4 py-2 rounded-xl transition-colors cursor-pointer"
+              style={{ color: "#68625C", backgroundColor: "transparent", border: "1px solid #E0D9CE" }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#1C1814"; (e.currentTarget as HTMLButtonElement).style.borderColor = "#C8C1B8"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#68625C"; (e.currentTarget as HTMLButtonElement).style.borderColor = "#E0D9CE"; }}
+            >
+              {isZh ? "退出" : "Logout"}
+            </button>
+          </form>
         ) : (
           <>
             <Link href="/login" className="hidden sm:block text-sm transition-colors" style={{ color: "#68625C" }}

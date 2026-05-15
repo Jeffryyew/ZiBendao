@@ -6,6 +6,7 @@ import Link from "next/link";
 import type { Dict, Locale } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import LogoImg from "@/components/LogoImg";
+import { logout } from "@/app/actions/auth";
 
 interface Props {
   t: Dict;
@@ -192,13 +193,17 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
         <div className="hidden md:flex items-center gap-3">
           <LanguageSwitcher current={locale} />
           {isLoggedIn ? (
-            <Link
-              href="/dashboard"
-              className="text-sm px-5 py-2 rounded-xl font-semibold transition-opacity hover:opacity-85"
-              style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
-            >
-              进入平台 →
-            </Link>
+            <form action={logout}>
+              <button
+                type="submit"
+                className="text-sm px-4 py-2 rounded-xl transition-colors cursor-pointer"
+                style={{ color: "#68625C", backgroundColor: "transparent", border: "1px solid #E0D9CE" }}
+                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#1C1814"; (e.currentTarget as HTMLButtonElement).style.borderColor = "#C8C1B8"; }}
+                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = "#68625C"; (e.currentTarget as HTMLButtonElement).style.borderColor = "#E0D9CE"; }}
+              >
+                {locale === "zh" ? "退出" : "Logout"}
+              </button>
+            </form>
           ) : (
             <>
               <Link
@@ -296,14 +301,15 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
           <div className="space-y-3">
             <LanguageSwitcher current={locale} />
             {isLoggedIn ? (
-              <Link
-                href="/dashboard"
-                onClick={() => setMenuOpen(false)}
-                className="block w-full py-3 rounded-xl font-semibold text-sm text-center"
-                style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
-              >
-                进入平台 →
-              </Link>
+              <form action={logout}>
+                <button
+                  type="submit"
+                  className="w-full py-3 rounded-xl text-sm text-center cursor-pointer transition-colors"
+                  style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
+                >
+                  {locale === "zh" ? "退出登录" : "Logout"}
+                </button>
+              </form>
             ) : (
               <>
                 <Link
