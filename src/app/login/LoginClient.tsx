@@ -190,12 +190,15 @@ export default function LoginClient({ locale }: { locale: string }) {
             <div className="flex-1 h-px" style={{ backgroundColor: "#E0D9CE" }} />
           </div>
 
-          <p className="text-center text-sm" style={{ color: "#68625C" }}>
-            {isEn ? "Don't have an account? " : "还没有账号？"}
-            <Link href="/register" className="font-medium" style={{ color: "#8B6514" }}>
-              {isEn ? "Register" : "注册"}
-            </Link>
-          </p>
+          <Link
+            href="/register"
+            className="block w-full text-center py-2.5 rounded-xl text-sm font-medium transition-colors"
+            style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#EEE9E0"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#F7F4EF"; }}
+          >
+            {isEn ? "No account? Register →" : "还没有账号？注册 →"}
+          </Link>
 
           <div className="mt-8 text-center">
             <Link href="/" className="text-xs" style={{ color: "#9A9490" }}>

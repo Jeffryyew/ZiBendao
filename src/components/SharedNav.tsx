@@ -205,21 +205,13 @@ export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavP
             </button>
           </form>
         ) : (
-          <>
-            <Link href="/login" className="hidden sm:block text-sm transition-colors" style={{ color: "#68625C" }}
-              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C1814"; }}
-              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#68625C"; }}
-            >
-              {isZh ? "登录" : "Login"}
-            </Link>
-            <Link
-              href="/register"
-              className="text-sm px-4 py-2 rounded-xl font-medium transition-opacity hover:opacity-85"
-              style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
-            >
-              {isZh ? "注册" : "Register"}
-            </Link>
-          </>
+          <Link
+            href="/login"
+            className="text-sm px-4 py-2 rounded-xl font-medium transition-opacity hover:opacity-85"
+            style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
+          >
+            {isZh ? "登录" : "Login"}
+          </Link>
         )}
       </div>
     </nav>

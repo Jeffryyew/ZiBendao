@@ -241,24 +241,13 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
               </button>
             </form>
           ) : (
-            <>
-              <Link
-                href="/login"
-                className="text-sm px-4 py-2 rounded-xl transition-colors"
-                style={{ color: "#68625C" }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C1814"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#68625C"; }}
-              >
-                {t.login}
-              </Link>
-              <Link
-                href="/register"
-                className="text-sm px-4 py-2 rounded-xl font-medium transition-opacity hover:opacity-85"
-                style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
-              >
-                {t.register}
-              </Link>
-            </>
+            <Link
+              href="/login"
+              className="text-sm px-4 py-2 rounded-xl font-medium transition-opacity hover:opacity-85"
+              style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
+            >
+              {t.login}
+            </Link>
           )}
         </div>
 
@@ -347,24 +336,14 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
                 </button>
               </form>
             ) : (
-              <>
-                <Link
-                  href="/login"
-                  onClick={() => setMenuOpen(false)}
-                  className="block w-full py-3 rounded-xl text-sm text-center"
-                  style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
-                >
-                  {t.login}
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={() => setMenuOpen(false)}
-                  className="block w-full py-3 rounded-xl font-semibold text-sm text-center"
-                  style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
-                >
-                  {t.register}
-                </Link>
-              </>
+              <Link
+                href="/login"
+                onClick={() => setMenuOpen(false)}
+                className="block w-full py-3 rounded-xl font-semibold text-sm text-center"
+                style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
+              >
+                {t.login}
+              </Link>
             )}
           </div>
         </div>
