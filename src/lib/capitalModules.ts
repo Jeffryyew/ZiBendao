@@ -1,4 +1,4 @@
-﻿export type LayerId = 1 | 2 | 3;
+export type LayerId = 1 | 2 | 3;
 
 export interface CapitalModule {
   id: string;
@@ -43,19 +43,19 @@ export const CAPITAL_MODULES: CapitalModule[] = [
     en: { name: "Cash Flow Planner", desc: "Forecast cash inflows and outflows, identify funding gaps and optimize working capital" },
   },
   {
-    id: "financial-ratios", icon: "", layer: 1, href: "/tools/financial-ratios",
-    zh: { name: "财务比率分析", desc: "全面计算流动性、盈利性、杠杆与效率比率" },
-    en: { name: "Financial Ratios", desc: "Calculate liquidity, profitability, leverage and efficiency ratios" },
+    id: "balance-sheet", icon: "", layer: 1, href: "/tools/balance-sheet",
+    zh: { name: "资产负债表", desc: "资产、负债、权益完整呈现，财务比率计算" },
+    en: { name: "Balance Sheet", desc: "Full balance sheet with financial ratio analysis" },
   },
   {
-    id: "pl-builder", icon: "", layer: 1, href: "/tools/pl-builder",
-    zh: { name: "损益表构建", desc: "专业损益表模板，自动计算各层级利润与利润率" },
-    en: { name: "P&L Builder", desc: "Professional P&L template with automatic profit and margin calculations" },
+    id: "income-statement", icon: "", layer: 1, href: "/tools/income-statement",
+    zh: { name: "利润表", desc: "完整损益表，毛利率、净利率分析" },
+    en: { name: "Income Statement", desc: "Full P&L statement with margin analysis" },
   },
   {
-    id: "working-capital", icon: "", layer: 1, href: "/tools/working-capital",
-    zh: { name: "营运资金管理", desc: "分析应收应付账款和存货周转，优化资金使用效率" },
-    en: { name: "Working Capital", desc: "Analyze receivables, payables and inventory turnover to optimize capital efficiency" },
+    id: "breakeven-analysis", icon: "", layer: 1, href: "/tools/breakeven-analysis",
+    zh: { name: "损益平衡分析", desc: "计算保本点销量、收入与贡献毛益" },
+    en: { name: "Breakeven Analysis", desc: "Calculate breakeven units, revenue and contribution margin" },
   },
 
   // Layer 2 — Capital Intelligence (8 modules)
@@ -70,34 +70,34 @@ export const CAPITAL_MODULES: CapitalModule[] = [
     en: { name: "Data Room", desc: "Digital document organization and categorization for structured investor file presentation" },
   },
   {
-    id: "dcf-valuation", icon: "", layer: 2, href: "/tools/dcf-valuation",
-    zh: { name: "DCF估值模型", desc: "现金流折现估值，计算企业内在价值与安全边际" },
-    en: { name: "DCF Valuation", desc: "Discounted cash flow valuation to calculate intrinsic value and margin of safety" },
+    id: "sales-forecast", icon: "", layer: 2, href: "/tools/sales-forecast",
+    zh: { name: "销售预测系统", desc: "12个月收入预测，增长率分析与图表" },
+    en: { name: "Sales Forecast", desc: "12-month revenue projection with growth analysis" },
   },
   {
-    id: "business-model", icon: "", layer: 2, href: "/tools/business-model",
-    zh: { name: "商业模式画布", desc: "系统梳理价值主张、客户细分、收入来源与成本结构" },
-    en: { name: "Business Model Canvas", desc: "Map value propositions, customer segments, revenue streams and cost structure" },
+    id: "startup-expense", icon: "", layer: 2, href: "/tools/startup-expense",
+    zh: { name: "创业费用规划", desc: "计算创业启动成本、月燃烧率与资金跑道" },
+    en: { name: "Startup Expense Planner", desc: "Calculate startup costs, monthly burn rate and runway" },
   },
   {
-    id: "competitive-analysis", icon: "", layer: 2, href: "/tools/competitive-analysis",
-    zh: { name: "竞争格局分析", desc: "多维度竞争对手对比，识别差异化优势与市场定位" },
-    en: { name: "Competitive Analysis", desc: "Multi-dimensional competitor comparison to identify differentiation and positioning" },
+    id: "deal-flow", icon: "", layer: 2, href: "/tools/deal-flow",
+    zh: { name: "交易流", desc: "追踪和管理多个投资机会的完整流程" },
+    en: { name: "Deal Flow", desc: "Track and manage investment opportunities across your pipeline" },
   },
   {
-    id: "financial-projection", icon: "", layer: 2, href: "/tools/financial-projection",
-    zh: { name: "财务预测", desc: "3至5年财务预测模型，多情景假设与敏感性分析" },
-    en: { name: "Financial Projection", desc: "3-5 year financial projection model with scenario assumptions and sensitivity analysis" },
+    id: "capital-roadmap", icon: "", layer: 2, href: "/tools/capital-roadmap",
+    zh: { name: "资本路线图", desc: "规划企业从天使前到上市准备的完整资本旅程" },
+    en: { name: "Capital Roadmap", desc: "Navigate your company's capital journey from Pre-Seed to IPO-Ready" },
   },
   {
-    id: "fundraising-navigator", icon: "", layer: 2, href: "/tools/fundraising-navigator",
-    zh: { name: "融资导航", desc: "融资阶段规划、投资人策略与估值谈判框架" },
-    en: { name: "Fundraising Navigator", desc: "Fundraising stage planning, investor strategy and valuation negotiation framework" },
+    id: "fundraising-system", icon: "", layer: 2, href: "/tools/fundraising-system",
+    zh: { name: "融资系统", desc: "计算融资条款，追踪投资人管道进展" },
+    en: { name: "Fundraising System", desc: "Calculate raise terms and track your investor pipeline" },
   },
   {
-    id: "investor-briefing", icon: "", layer: 2, href: "/tools/investor-briefing",
-    zh: { name: "投资人简报", desc: "专业投资简报生成器，系统呈现融资亮点与关键数据" },
-    en: { name: "Investor Briefing", desc: "Professional investor briefing generator to present fundraising highlights systematically" },
+    id: "investor-relations", icon: "", layer: 2, href: "/tools/investor-relations",
+    zh: { name: "投资关系", desc: "撰写投资人月报，追踪KPI，管理投资人名册" },
+    en: { name: "Investor Relations", desc: "Build investor updates, track KPIs and manage your investor registry" },
   },
 
   // Layer 3 — Capital Structure (6 modules)
