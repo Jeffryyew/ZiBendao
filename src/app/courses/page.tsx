@@ -248,17 +248,10 @@ export default async function CoursesPage() {
             <div className="flex flex-wrap gap-3">
               <Link
                 href="/login"
-                className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold"
-                style={{ backgroundColor: "#7C5FBF", color: "#FFFFFF", minWidth: "140px" }}
+                className="inline-block text-center py-2.5 px-6 rounded-xl text-sm font-semibold"
+                style={{ backgroundColor: "#7C5FBF", color: "#FFFFFF" }}
               >
                 {isEn ? "Get Started →" : "立即开始 →"}
-              </Link>
-              <Link
-                href="/login"
-                className="flex-1 text-center py-2.5 rounded-xl text-sm"
-                style={{ backgroundColor: "#F4F0FC", color: "#7C5FBF", border: "1px solid rgba(124,95,191,0.2)", minWidth: "140px" }}
-              >
-                {isEn ? "Login" : "登录"}
               </Link>
             </div>
           </div>
