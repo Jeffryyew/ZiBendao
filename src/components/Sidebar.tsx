@@ -18,6 +18,8 @@ interface SidebarProps {
   userEmail: string;
   roleLabel: string;
   accentColor?: string;
+  topOffset?: number;
+  showFooterActions?: boolean;
 }
 
 export default function Sidebar({
@@ -26,6 +28,8 @@ export default function Sidebar({
   userEmail,
   roleLabel,
   accentColor = "#C9A84C",
+  topOffset = 0,
+  showFooterActions = true,
 }: SidebarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -88,30 +92,63 @@ export default function Sidebar({
     </nav>
   );
 
-  const userFooter = (
-    <div className="px-3 pb-4 pt-2 border-t space-y-1" style={{ borderColor: "#E0D9CE" }}>
+  const userCard = (
+    <div
+      className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
+      style={{ backgroundColor: "#F0EDE7" }}
+    >
       <div
-        className="flex items-center gap-3 px-3 py-2.5 rounded-xl"
-        style={{ backgroundColor: "#F0EDE7" }}
+        className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
+        style={{ backgroundColor: "#FBF4E4", color: accentColor, border: `1px solid rgba(201,168,76,0.3)` }}
       >
-        <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0"
-          style={{ backgroundColor: "#FBF4E4", color: accentColor, border: `1px solid rgba(201,168,76,0.3)` }}
-        >
-          {initials}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="text-sm font-medium truncate" style={{ color: "#1C1814" }}>{userName}</div>
-          <div className="text-xs truncate" style={{ color: "#9A9490" }}>{roleLabel}</div>
-        </div>
+        {initials}
       </div>
-      <Link
-        href="/"
-        className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-colors hover:bg-[#EEE9E0]"
-        style={{ color: "#9A9490" }}
-      >
-        主页
-      </Link>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-medium truncate" style={{ color: "#1C1814" }}>{userName}</div>
+        <div className="text-xs truncate" style={{ color: "#9A9490" }}>{roleLabel}</div>
+      </div>
+    </div>
+  );
+
+  const desktopFooter = (
+    <div className="px-3 pb-4 pt-2 border-t space-y-1" style={{ borderColor: "#E0D9CE" }}>
+      {userCard}
+      {showFooterActions && (
+        <>
+          <Link
+            href="/"
+            className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-colors hover:bg-[#EEE9E0]"
+            style={{ color: "#9A9490" }}
+          >
+            主页
+          </Link>
+          <form action={logout} className="w-full">
+            <button
+              type="submit"
+              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-colors text-left hover:bg-red-50 hover:text-red-500"
+              style={{ color: "#9A9490" }}
+            >
+              <span className="w-5 text-center">↩</span>
+              退出登录
+            </button>
+          </form>
+        </>
+      )}
+    </div>
+  );
+
+  const mobileFooter = (
+    <div className="px-3 pb-4 pt-2 border-t space-y-1" style={{ borderColor: "#E0D9CE" }}>
+      {userCard}
+      {showFooterActions && (
+        <Link
+          href="/"
+          className="flex items-center gap-3 px-3 py-2 rounded-xl text-sm transition-colors hover:bg-[#EEE9E0]"
+          style={{ color: "#9A9490" }}
+        >
+          主页
+        </Link>
+      )}
       <form action={logout} className="w-full">
         <button
           type="submit"
@@ -129,8 +166,8 @@ export default function Sidebar({
     <>
       {/* Desktop sidebar */}
       <aside
-        className="hidden md:flex flex-col fixed left-0 top-0 h-full w-60 z-40"
-        style={{ backgroundColor: "#FFFFFF", borderRight: "1px solid #E0D9CE" }}
+        className="hidden md:flex flex-col fixed left-0 bottom-0 w-60 z-40"
+        style={{ top: topOffset, backgroundColor: "#FFFFFF", borderRight: "1px solid #E0D9CE" }}
       >
         <div className="px-5 py-5 border-b" style={{ borderColor: "#E0D9CE" }}>
           <Link href="/" className="flex items-baseline gap-2">
@@ -150,7 +187,7 @@ export default function Sidebar({
           </div>
         </div>
         {navList}
-        {userFooter}
+        {desktopFooter}
       </aside>
 
       {/* Mobile top bar */}
@@ -267,7 +304,7 @@ export default function Sidebar({
                 );
               })}
             </nav>
-            {userFooter}
+            {mobileFooter}
           </div>
         </aside>
       </div>
