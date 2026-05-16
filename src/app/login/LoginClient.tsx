@@ -191,7 +191,7 @@ export default function LoginClient({ locale }: { locale: string }) {
           </div>
 
           <Link
-            href="/login"
+            href="/register"
             className="block w-full text-center py-2.5 rounded-xl text-sm font-medium transition-colors"
             style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
             onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#EEE9E0"; }}
