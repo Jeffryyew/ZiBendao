@@ -46,6 +46,8 @@ export default async function ToolsGuidePage() {
       ? "/admin"
       : role === "ENTERPRISE_CLIENT"
       ? "/client/dashboard"
+      : role
+      ? "/student/dashboard"
       : "/tools";
 
   return (
