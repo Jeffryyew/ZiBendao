@@ -6,7 +6,6 @@ import { getRoleLabel } from "@/lib/roles";
 import { getLocale } from "@/lib/i18n";
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "主页", href: "/student/dashboard", icon: "⊕" },
   { label: "学习中心", href: "/student/learn" },
   { label: "计算工具", href: "/student/tools" },
   { label: "工具讲解", href: "/tools/guide" },
@@ -31,6 +30,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
         roleLabel={getRoleLabel(role)}
         topOffset={64}
         showFooterActions={false}
+        hideBrand={true}
       />
       <main className="md:ml-60 pt-14 md:pt-16 min-h-screen">
         {children}

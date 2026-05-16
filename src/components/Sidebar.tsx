@@ -20,6 +20,7 @@ interface SidebarProps {
   accentColor?: string;
   topOffset?: number;
   showFooterActions?: boolean;
+  hideBrand?: boolean;
 }
 
 export default function Sidebar({
@@ -30,6 +31,7 @@ export default function Sidebar({
   accentColor = "#C9A84C",
   topOffset = 0,
   showFooterActions = true,
+  hideBrand = false,
 }: SidebarProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
@@ -105,7 +107,7 @@ export default function Sidebar({
       </div>
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium truncate" style={{ color: "#1C1814" }}>{userName}</div>
-        <div className="text-xs truncate" style={{ color: "#9A9490" }}>{roleLabel}</div>
+        {!hideBrand && <div className="text-xs truncate" style={{ color: "#9A9490" }}>{roleLabel}</div>}
       </div>
     </div>
   );
@@ -169,23 +171,25 @@ export default function Sidebar({
         className="hidden md:flex flex-col fixed left-0 bottom-0 w-60 z-40"
         style={{ top: topOffset, backgroundColor: "#FFFFFF", borderRight: "1px solid #E0D9CE" }}
       >
-        <div className="px-5 py-5 border-b" style={{ borderColor: "#E0D9CE" }}>
-          <Link href="/" className="flex items-baseline gap-2">
-            <span
-              className="text-xl font-bold tracking-wide"
-              style={{ fontFamily: "var(--font-display)", color: accentColor }}
+        {!hideBrand && (
+          <div className="px-5 py-5 border-b" style={{ borderColor: "#E0D9CE" }}>
+            <Link href="/" className="flex items-baseline gap-2">
+              <span
+                className="text-xl font-bold tracking-wide"
+                style={{ fontFamily: "var(--font-display)", color: accentColor }}
+              >
+                资本道
+              </span>
+              <span className="text-xs" style={{ color: "#9A9490" }}>ZiBenDao</span>
+            </Link>
+            <div
+              className="mt-2 text-xs px-2 py-0.5 rounded-full inline-block"
+              style={{ backgroundColor: "#FBF4E4", color: accentColor, border: "1px solid rgba(201,168,76,0.25)" }}
             >
-              资本道
-            </span>
-            <span className="text-xs" style={{ color: "#9A9490" }}>ZiBenDao</span>
-          </Link>
-          <div
-            className="mt-2 text-xs px-2 py-0.5 rounded-full inline-block"
-            style={{ backgroundColor: "#FBF4E4", color: accentColor, border: "1px solid rgba(201,168,76,0.25)" }}
-          >
-            {roleLabel}
+              {roleLabel}
+            </div>
           </div>
-        </div>
+        )}
         {navList}
         {desktopFooter}
       </aside>

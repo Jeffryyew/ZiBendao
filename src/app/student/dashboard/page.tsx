@@ -2,7 +2,6 @@ import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
-import { getRoleLabel } from "@/lib/roles";
 
 const TOOLS = [
   { label: "企业财务路线图", href: "/tools/financial-roadmap" },
@@ -33,7 +32,6 @@ export default async function StudentDashboardPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
-  const role = session.user.role as string;
   const firstName = session.user.name.split(" ")[0];
 
   let completedCount = 0;
@@ -68,19 +66,11 @@ export default async function StudentDashboardPage() {
     <div className="max-w-5xl mx-auto px-4 py-8 md:py-10 space-y-8">
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        <div className="flex-1">
-          <p className="text-sm mb-0.5" style={{ color: "var(--color-text-muted)" }}>欢迎回来，</p>
-          <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text-primary)" }}>
-            {firstName}
-          </h1>
-        </div>
-        <div
-          className="px-3 py-1.5 rounded-full text-xs font-medium self-start sm:self-auto"
-          style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(201,168,76,0.3)", color: "#C9A84C" }}
-        >
-          {getRoleLabel(role)}
-        </div>
+      <div>
+        <p className="text-sm mb-0.5" style={{ color: "var(--color-text-muted)" }}>欢迎回来，</p>
+        <h1 className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)", color: "var(--color-text-primary)" }}>
+          {firstName}
+        </h1>
       </div>
 
       {/* Learning Status */}
