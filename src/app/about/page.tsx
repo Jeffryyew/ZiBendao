@@ -1,6 +1,7 @@
 ﻿import Link from "next/link";
 import SharedNav from "@/components/SharedNav";
 import { getLocale } from "@/lib/i18n";
+import { auth } from "@/lib/auth";
 
 const DATA = {
   zh: {
@@ -121,12 +122,13 @@ const DATA = {
 
 export default async function AboutPage() {
   const locale = await getLocale();
+  const session = await auth();
   const isEn = locale === "en";
   const d = isEn ? DATA.en : DATA.zh;
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: "#F7F4EF", color: "#1C1814" }}>
-      <SharedNav locale={locale} activeHref="/about" />
+      <SharedNav locale={locale} activeHref="/about" isLoggedIn={!!session?.user} />
 
       {/* Hero */}
       <section className="pt-32 pb-16 px-4 text-center">

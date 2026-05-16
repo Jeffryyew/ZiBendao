@@ -1,6 +1,7 @@
 ﻿import Link from "next/link";
 import SharedNav from "@/components/SharedNav";
 import { getLocale } from "@/lib/i18n";
+import { auth } from "@/lib/auth";
 import type React from "react";
 
 const DATA = {
@@ -136,12 +137,13 @@ const DATA = {
 
 export default async function CommunityPage() {
   const locale = await getLocale();
+  const session = await auth();
   const isEn = locale === "en";
   const d = isEn ? DATA.en : DATA.zh;
 
   return (
     <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814", minHeight: "100vh" }}>
-      <SharedNav locale={locale} activeHref="/community" />
+      <SharedNav locale={locale} activeHref="/community" isLoggedIn={!!session?.user} />
 
       {/* Hero */}
       <section className="pt-32 pb-20 px-4 text-center">

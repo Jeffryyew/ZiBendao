@@ -1,6 +1,7 @@
 import Link from "next/link";
 import SharedNav from "@/components/SharedNav";
 import { getLocale } from "@/lib/i18n";
+import { auth } from "@/lib/auth";
 import { CAPITAL_MODULES, LAYER_META, getModulesByLayer } from "@/lib/capitalModules";
 import type { LayerId } from "@/lib/capitalModules";
 
@@ -12,12 +13,13 @@ const LAYER_DISPLAY: Record<LayerId, { zh: string; en: string }> = {
 
 export default async function ToolsPage() {
   const locale = await getLocale();
+  const session = await auth();
   const isEn = locale === "en";
   const layers = [1, 2, 3] as const;
 
   return (
     <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814", minHeight: "100vh" }}>
-      <SharedNav locale={locale} activeHref="/tools" />
+      <SharedNav locale={locale} activeHref="/tools" isLoggedIn={!!session?.user} />
 
       <div className="max-w-6xl mx-auto px-4 pt-28 pb-20">
 
