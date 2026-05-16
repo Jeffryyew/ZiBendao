@@ -255,7 +255,7 @@ export default async function CommunityPage() {
           <p className="text-sm mb-8 leading-relaxed" style={{ color: "#9A9490" }}>{d.cta.desc}</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              href="/register"
+              href="/login"
               className="px-8 py-3 rounded-xl font-semibold text-sm transition-opacity hover:opacity-88"
               style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
             >

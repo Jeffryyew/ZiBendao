@@ -444,7 +444,7 @@ function HeroSection({ t, isLoggedIn }: { t: Dict["hero"]; isLoggedIn?: boolean 
           ) : (
             <>
               <Link
-                href="/register"
+                href="/login"
                 className="px-8 py-4 rounded-xl font-semibold text-base transition-opacity hover:opacity-88"
                 style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
               >
@@ -849,7 +849,7 @@ function CTASection({ isLoggedIn }: { isLoggedIn?: boolean }) {
             </Link>
           ) : (
             <Link
-              href="/register"
+              href="/login"
               className="px-10 py-4 rounded-xl font-semibold text-sm transition-opacity hover:opacity-88 inline-block"
               style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
             >
@@ -873,7 +873,7 @@ function Footer({ t }: { t: Dict["footer"] }) {
   ];
   const COL_B = [
     { label: "登录", href: "/login" },
-    { label: "注册", href: "/register" },
+    { label: "关于我们", href: "/about" },
     { label: "联系我们", href: "/about" },
   ];
 

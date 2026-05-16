@@ -173,7 +173,7 @@ export default async function CoursesPage() {
               : "由 Jeffry Yew（姚国雄）主导设计，融合 25 年商业发展与 13 年融资专业经验，系统教授中小企业主掌握资本运作。"}
           </p>
           <Link
-            href="/register"
+            href="/login"
             className="inline-block px-8 py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
             style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
           >
@@ -245,7 +245,7 @@ export default async function CoursesPage() {
 
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/register"
+                href="/login"
                 className="flex-1 text-center py-2.5 rounded-xl text-sm font-semibold"
                 style={{ backgroundColor: "#7C5FBF", color: "#FFFFFF", minWidth: "140px" }}
               >
@@ -305,7 +305,7 @@ export default async function CoursesPage() {
                   </div>
 
                   <Link
-                    href="/register"
+                    href="/login"
                     className="block w-full text-center py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
                     style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
                   >
@@ -331,7 +331,7 @@ export default async function CoursesPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link
-              href="/register"
+              href="/login"
               className="inline-block px-10 py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
               style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
             >
