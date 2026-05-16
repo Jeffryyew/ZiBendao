@@ -83,27 +83,6 @@ export default async function StudentDashboardPage() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: "已完成课程", value: completedCount.toString(), unit: "关" },
-          { label: "累计积分", value: totalXP.toString(), unit: "XP" },
-          { label: "可用工具", value: TOOLS.length.toString(), unit: "个" },
-        ].map((stat) => (
-          <div
-            key={stat.label}
-            className="p-4 rounded-2xl text-center"
-            style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
-          >
-            <div className="text-xl font-bold font-mono" style={{ color: "#C9A84C" }}>
-              {stat.value}
-              <span className="text-xs font-normal ml-0.5" style={{ color: "var(--color-text-muted)" }}>{stat.unit}</span>
-            </div>
-            <div className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>{stat.label}</div>
-          </div>
-        ))}
-      </div>
-
       {/* Learning Status */}
       <div>
         <div className="flex items-center justify-between mb-4">
