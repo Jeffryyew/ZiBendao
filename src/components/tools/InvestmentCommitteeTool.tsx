@@ -169,7 +169,7 @@ ${form.recommendation === "Conditional" && form.conditions.filter(Boolean).lengt
       title={isEn ? "Investment Committee" : "投资委员会"}
       desc={isEn ? "Build IC memos, score investments and structure governance decisions." : "构建IC备忘录、评分投资机会并建立治理决策框架。"}
       levelRequired={3}
-      backHref="/tools"
+      backHref="/student/dashboard"
     >
       <div className="grid lg:grid-cols-5 gap-6">
         {/* Form */}

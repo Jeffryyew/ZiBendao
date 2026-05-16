@@ -171,7 +171,7 @@ export default function DueDiligenceTool({ locale }: { locale: "zh" | "en" }) {
       title={isEn ? "Due Diligence" : "尽职调查"}
       desc={isEn ? "Track your DD readiness across 8 key categories." : "追踪 8 大类尽职调查准备度，评估投资人就绪程度。"}
       levelRequired={2}
-      backHref="/tools"
+      backHref="/student/dashboard"
     >
       {/* Toast */}
       {toast && (

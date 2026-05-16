@@ -165,7 +165,7 @@ export default function IncomeStatementTool({ locale }: { locale: "zh" | "en" })
       title={isEn ? "Income Statement" : "利润表"}
       desc={isEn ? "Full P&L statement with margin analysis" : "完整损益表，毛利率、净利率分析"}
       levelRequired={1}
-      backHref="/tools"
+      backHref="/student/dashboard"
     >
       <div className="grid lg:grid-cols-2 gap-6">
         {/*  Left: inputs  */}

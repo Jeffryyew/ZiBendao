@@ -69,7 +69,7 @@ export default function StartupExpenseTool({ locale }: { locale: "zh" | "en" }) 
       title={isEn ? "Startup Expense Planner" : "创业费用规划"}
       desc={isEn ? "Calculate startup costs, monthly burn rate & runway" : "计算创业启动成本、月燃烧率与资金跑道"}
       levelRequired={1}
-      backHref="/tools"
+      backHref="/student/dashboard"
     >
       <div className="grid lg:grid-cols-5 gap-6">
         {/* Input table */}

@@ -138,7 +138,7 @@ export default function FundraisingSystemTool({ locale }: { locale: "zh" | "en" 
       title={isEn ? "Fundraising System" : "融资系统"}
       desc={isEn ? "Calculate your raise terms and track your investor pipeline." : "计算融资条款，追踪投资人管道进展。"}
       levelRequired={2}
-      backHref="/tools"
+      backHref="/student/dashboard"
     >
       {/*  Section 1: Calculator  */}
       <div className="mb-8">

@@ -15,7 +15,7 @@ export default function ToolShell({
   icon,
   title,
   desc,
-  backHref = "/tools",
+  backHref = "/student/dashboard",
   children,
 }: ToolShellProps) {
   return (
@@ -35,7 +35,7 @@ export default function ToolShell({
             className="flex items-center gap-1.5 text-sm transition-colors hover:text-[#1C1814]"
             style={{ color: "var(--color-text-muted)" }}
           >
-            ← 返回工具
+            ← 返回
           </Link>
           <span style={{ color: "#D8D1C6" }}>·</span>
           <Link

@@ -115,7 +115,7 @@ export default function SpvStructureTool({ locale }: { locale: Locale }) {
       title={isEn ? "SPV Structure Designer" : "SPV架构设计器"}
       desc={isEn ? "Design special purpose vehicle structures and calculate investor returns." : "设计特殊目的载体架构，计算投资人回报与所需文件。"}
       levelRequired={3}
-      backHref="/tools"
+      backHref="/student/dashboard"
     >
       {/* SPV Overview card */}
       <div className="mb-6 rounded-2xl p-5" style={{ backgroundColor: "#141414", border: `1px solid rgba(139,92,246,0.2)` }}>

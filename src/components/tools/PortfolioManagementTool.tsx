@@ -166,7 +166,7 @@ export default function PortfolioManagementTool({ locale }: { locale: Locale }) 
       title={isEn ? "Portfolio Management" : "投资组合管理"}
       desc={isEn ? "Track your investment portfolio, calculate MOIC and analyze distribution." : "追踪投资组合，计算MOIC、IRR与行业分布分析。"}
       levelRequired={3}
-      backHref="/tools"
+      backHref="/student/dashboard"
     >
       <div className="space-y-6">
         {/* Metrics row */}

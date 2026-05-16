@@ -81,7 +81,7 @@ export default function CapitalStructureTool({ locale }: { locale: Locale }) {
       title={isEn ? "Capital Structure Optimizer" : "资本架构优化器"}
       desc={isEn ? "Optimize your debt-equity mix and calculate WACC and tax shield benefits." : "优化债务与股权组合，计算WACC与税盾效益。"}
       levelRequired={3}
-      backHref="/tools"
+      backHref="/student/dashboard"
     >
       <div className="grid lg:grid-cols-5 gap-6">
         {/* Inputs */}

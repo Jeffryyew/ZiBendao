@@ -140,7 +140,7 @@ ${isEn ? "Sent with ZiBenDao Capital OS" : "由资本道资本操作系统发送
       title={isEn ? "Investor Relations" : "投资关系"}
       desc={isEn ? "Build investor updates, track KPIs, and manage your investor registry." : "撰写投资人月报，追踪 KPI，管理投资人名册。"}
       levelRequired={2}
-      backHref="/tools"
+      backHref="/student/dashboard"
     >
       {/* Tabs */}
       <div className="flex gap-2 mb-6">

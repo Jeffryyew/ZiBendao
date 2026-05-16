@@ -77,7 +77,7 @@ export default function SalesForecastTool({ locale }: { locale: "zh" | "en" }) {
       title={isEn ? "Sales Forecast" : "销售预测系统"}
       desc={isEn ? "12-month revenue projection with growth analysis" : "12个月收入预测，增长率分析与图表"}
       levelRequired={1}
-      backHref="/tools"
+      backHref="/student/dashboard"
     >
       <div className="space-y-6">
         {/* Inputs */}

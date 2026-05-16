@@ -85,7 +85,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
       title={isEn ? "Cash Flow Analysis" : "现金流分析"}
       desc={isEn ? "12-month cash flow projection and balance tracking" : "12个月现金流预测，余额追踪"}
       levelRequired={1}
-      backHref="/tools"
+      backHref="/student/dashboard"
     >
       <div className="space-y-6">
         {/* Inputs */}
