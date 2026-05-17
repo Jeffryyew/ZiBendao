@@ -1,119 +1,88 @@
-﻿import { auth } from "../../../../auth";
+import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import { CAPITAL_MODULES, LAYER_META, getModulesByLayer } from "@/lib/capitalModules";
+import type { LayerId } from "@/lib/capitalModules";
 
-const TOOLS = [
-  {
-    slug: "financial-roadmap",
-    name: "金融路线图方程式",
-    desc: "系统化规划你的财务目标与实现路径，生成个性化财富增长方案。",
-    icon: "FV",
-    features: ["目标财富计算", "时间规划", "投资回报预测", "CSV 导出"],
-  },
-  {
-    slug: "pricing-system",
-    name: "产品服务报价系统",
-    desc: "专业级报价单生成器，支持多项目报价、税务计算和品牌定制。",
-    icon: "QT",
-    features: ["多项目明细", "税务计算", "折扣管理", "PDF 打印"],
-  },
-  {
-    slug: "market-cap",
-    name: "市值/市盈率计算器",
-    desc: "深度企业估值分析工具，帮助你识别价值洼地，做出更理智的投资决策。",
-    icon: "PE",
-    features: ["市值计算", "PE/PB 分析", "行业对比", "图表可视化"],
-  },
-  {
-    slug: "pat-kpi",
-    name: "PAT & KPI 计算器",
-    desc: "税后净利润与关键绩效指标综合分析，为企业经营决策提供数据支撑。",
-    icon: "KPI",
-    features: ["PAT 计算", "KPI 追踪", "趋势图表", "报告导出"],
-  },
-];
+const LAYER_DISPLAY: Record<LayerId, string> = {
+  1: "商业基础层",
+  2: "资本成长层",
+  3: "资本架构层",
+};
 
 export default async function StudentToolsPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
+  const layers = [1, 2, 3] as const;
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 md:py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-1" style={{ fontFamily: "var(--font-display)", color: "var(--color-text-primary)" }}>
-          计算工具
+          资本工具
         </h1>
         <p className="text-sm" style={{ color: "var(--color-text-secondary)" }}>
-          专业级金融计算工具，支持导出 PDF / Excel
+          {CAPITAL_MODULES.length} 个专业工具，涵盖商业基础到资本架构
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-5">
-        {TOOLS.map((tool) => (
-          <div
-            key={tool.slug}
-            className="rounded-2xl overflow-hidden flex flex-col"
-            style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
-          >
-            <div className="p-5 pb-4">
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-sm font-bold font-mono flex-shrink-0"
-                  style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(201,168,76,0.25)", color: "#C9A84C" }}
-                >
-                  {tool.icon}
-                </div>
-              </div>
-              <h3 className="text-base font-semibold mb-2" style={{ color: "var(--color-text-primary)" }}>
-                {tool.name}
-              </h3>
-              <p className="text-sm leading-relaxed" style={{ color: "var(--color-text-secondary)" }}>
-                {tool.desc}
-              </p>
-            </div>
+      <div className="space-y-10">
+        {layers.map((layer) => {
+          const meta = LAYER_META[layer];
+          const modules = getModulesByLayer(layer);
 
-            <div className="px-5 pb-4">
-              <div className="grid grid-cols-2 gap-1.5">
-                {tool.features.map((f) => (
-                  <div key={f} className="flex items-center gap-1.5 text-xs" style={{ color: "var(--color-text-secondary)" }}>
-                    <span style={{ color: "#C9A84C" }}></span>
-                    {f}
-                  </div>
+          return (
+            <div key={layer}>
+              <div className="flex items-center gap-3 mb-4">
+                <span
+                  className="text-xs font-semibold px-2.5 py-1 rounded-full"
+                  style={{ backgroundColor: `${meta.color}15`, color: meta.color, border: `1px solid ${meta.color}30` }}
+                >
+                  {LAYER_DISPLAY[layer]}
+                </span>
+                <div className="flex-1 h-px" style={{ backgroundColor: "#E0D9CE" }} />
+                <span className="text-xs" style={{ color: "var(--color-text-muted)" }}>
+                  {modules.length} 个工具
+                </span>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-3">
+                {modules.map((mod) => (
+                  <Link
+                    key={mod.id}
+                    href={mod.href}
+                    className="group block rounded-xl p-4 relative overflow-hidden transition-all duration-200"
+                    style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
+                    onMouseEnter={(e) => {
+                      (e.currentTarget as HTMLAnchorElement).style.borderColor = `${meta.color}60`;
+                      (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#FDFCF9";
+                    }}
+                    onMouseLeave={(e) => {
+                      (e.currentTarget as HTMLAnchorElement).style.borderColor = "#E0D9CE";
+                      (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#FFFFFF";
+                    }}
+                  >
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, backgroundColor: meta.color, opacity: 0.4 }} />
+                    <div className="text-sm font-semibold mb-1 mt-0.5" style={{ color: "var(--color-text-primary)" }}>
+                      {mod.zh.name}
+                    </div>
+                    <p className="text-xs leading-relaxed mb-3" style={{ color: "var(--color-text-secondary)" }}>
+                      {mod.zh.desc}
+                    </p>
+                    <span className="text-xs font-medium" style={{ color: meta.color }}>
+                      使用工具 →
+                    </span>
+                  </Link>
                 ))}
               </div>
             </div>
-
-            <div className="px-5 pb-5 mt-auto">
-              <Link
-                href={`/tools/${tool.slug}`}
-                className="block w-full text-center py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-85"
-                style={{ backgroundColor: "#C9A84C", color: "#FFFFFF" }}
-              >
-                使用工具 →
-              </Link>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
-      <div className="mt-8 p-5 rounded-2xl text-center" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
-        <p className="text-sm font-medium mb-2" style={{ color: "var(--color-text-primary)" }}>
-          企业资本操作系统
-        </p>
-        <p className="text-xs mb-4" style={{ color: "var(--color-text-secondary)" }}>
-          22 个企业级专业工具，涵盖财务、融资、股权、风控等核心模块
-        </p>
-        <Link
-          href="/dashboard/capital"
-          className="inline-block px-6 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-85"
-          style={{ backgroundColor: "#1C1814", color: "#FFFFFF" }}
-        >
-          进入企业资本系统 →
-        </Link>
-      </div>
-
-      <p className="text-center text-xs mt-6" style={{ color: "var(--color-text-muted)" }}>
-        所有工具均支持导出 PDF / Excel · 数据本地计算，安全可靠
+      <p className="text-center text-xs mt-10" style={{ color: "var(--color-text-muted)" }}>
+        所有计算在浏览器本地完成 · 数据不上传服务器
       </p>
     </div>
   );
