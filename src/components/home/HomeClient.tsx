@@ -760,7 +760,7 @@ function ToolsPreview({ locale }: { locale: Locale }) {
                   return (
                     <Link
                       key={mod.id}
-                      href={mod.href}
+                      href={`/tools/guide#${mod.id}`}
                       className="group block p-4 rounded-xl transition-all duration-200 relative overflow-hidden"
                       style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
                       onMouseEnter={(e) => {
@@ -966,6 +966,4 @@ function Footer({ t }: { t: Dict["footer"] }) {
       >
         <span>{t.copyright}</span>
       </div>
-    </footer>
-  );
-}
+    <

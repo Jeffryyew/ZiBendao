@@ -94,7 +94,8 @@ export default async function ToolsGuidePage() {
                     return (
                       <div
                         key={mod.id}
-                        className="rounded-2xl overflow-hidden"
+                        id={mod.id}
+                        className="rounded-2xl overflow-hidden scroll-mt-24"
                         style={{ backgroundColor: "#FFFFFF", border: `1px solid #E0D9CE` }}
                       >
                         <div style={{ height: 2, background: `linear-gradient(90deg, ${meta.color}00, ${meta.color}, ${meta.color}00)` }} />
@@ -141,9 +142,4 @@ export default async function ToolsGuidePage() {
         </div>
 
         <p className="text-center text-xs mt-12" style={{ color: "#C0B8B0" }}>
-          所有计算在浏览器本地完成 · 数据不上传服务器 · 支持导出 PDF / CSV
-        </p>
-      </div>
-    </div>
-  );
-}
+          所有计算在浏览器本地完成 · 数据不上传服务器 · 支持导出 PDF /
