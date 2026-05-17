@@ -25,7 +25,7 @@ export default function HomeClient({ t, locale, isLoggedIn }: Props) {
       <CapitalLearningJourney locale={locale} />
       <ToolsPreview locale={locale} />
       <CTASection isLoggedIn={isLoggedIn} />
-      <Footer t={t.footer} />
+      <Footer t={t.footer} isLoggedIn={isLoggedIn} />
     </div>
   );
 }
@@ -896,13 +896,13 @@ function CTASection({ isLoggedIn }: { isLoggedIn?: boolean }) {
 
 //  Footer 
 
-function Footer({ t }: { t: Dict["footer"] }) {
+function Footer({ t, isLoggedIn }: { t: Dict["footer"]; isLoggedIn?: boolean }) {
   const LINKS = [
     { label: "课程体系", href: "/courses" },
-    { label: "资本系统", href: "/tools" },
+    { label: "资本工具", href: "/tools/guide" },
     { label: "关于我们", href: "/about" },
     { label: "社群", href: "/community" },
-    { label: "登录", href: "/login" },
+    { label: isLoggedIn ? "进入平台" : "登录", href: isLoggedIn ? "/dashboard" : "/login" },
   ];
 
   return (
@@ -962,8 +962,4 @@ function Footer({ t }: { t: Dict["footer"] }) {
 
       <div
         className="max-w-6xl mx-auto mt-12 pt-6 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs"
-        style={{ borderTop: "1px solid #E0D9CE", color: "#C0B8B0" }}
-      >
-        <span>{t.copyright}</span>
-      </div>
-    <
+        

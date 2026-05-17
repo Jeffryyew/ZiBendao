@@ -181,6 +181,38 @@ export default async function CommunityPage() {
                 whatsapp: <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.554 4.112 1.523 5.84L.057 23.886a.5.5 0 0 0 .609.61l6.101-1.474A11.934 11.934 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22a9.938 9.938 0 0 1-5.073-1.388l-.361-.214-3.754.907.934-3.667-.235-.374A9.96 9.96 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/></svg>,
               };
               const iconKey = ch.iconType as string;
+              const isWhatsApp = ch.iconType === "whatsapp";
+
+              if (isWhatsApp) {
+                return (
+                  <div
+                    key={ch.name}
+                    className="rounded-2xl p-7 flex flex-col relative overflow-hidden"
+                    style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", opacity: 0.7, cursor: "default" }}
+                  >
+                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, transparent, ${ch.color}40, transparent)` }} />
+                    <div className="flex items-center gap-3 mb-4">
+                      <div
+                        className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: ch.colorLight, color: ch.color, border: `1px solid ${ch.color}25` }}
+                      >
+                        {ICONS[iconKey]}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-sm" style={{ color: "#1C1814" }}>{ch.name}</h3>
+                        <span
+                          className="text-xs px-1.5 py-0.5 rounded font-mono"
+                          style={{ backgroundColor: "#FBF4E4", color: "#C9A84C", fontSize: "9px", border: "1px solid rgba(201,168,76,0.3)" }}
+                        >
+                          Soon
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>{ch.desc}</p>
+                  </div>
+                );
+              }
+
               return (
                 <a
                   key={ch.name}
@@ -237,48 +269,4 @@ export default async function CommunityPage() {
           >
             <div
               className="text-xs font-mono px-3 py-1 rounded-full mb-4"
-              style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.2)" }}
-            >
-              {d.events.coming}
-            </div>
-            <p className="text-sm leading-relaxed max-w-md" style={{ color: "#68625C" }}>
-              {d.events.desc}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="px-4 py-20">
-        <div className="max-w-2xl mx-auto text-center py-16 px-10 rounded-3xl" style={{ backgroundColor: "#1C1814" }}>
-          <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ fontFamily: "var(--font-display)", color: "#F0EBE1" }}>
-            {d.cta.title}
-          </h2>
-          <p className="text-sm mb-8 leading-relaxed" style={{ color: "#9A9490" }}>{d.cta.desc}</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href="/login"
-              className="px-8 py-3 rounded-xl font-semibold text-sm transition-opacity hover:opacity-88"
-              style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
-            >
-              {d.cta.primary}
-            </Link>
-            <Link
-              href="/about"
-              className="px-8 py-3 rounded-xl font-semibold text-sm"
-              style={{ backgroundColor: "transparent", color: "#9A9490", border: "1px solid #302B26" }}
-            >
-              {d.cta.secondary}
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #E0D9CE" }}>
-        <p className="text-xs" style={{ color: "#9A9490" }}>
-          © 2025 Eutopos Equity Sdn Bhd 保留所有权利
-        </p>
-      </footer>
-    </div>
-  );
-}
+              style={{ backgroundColor: "#FBF4E4", color: "#8B6514", borde
