@@ -7,6 +7,8 @@ import type { Dict, Locale } from "@/lib/i18n";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import LogoImg from "@/components/LogoImg";
 import { logout } from "@/app/actions/auth";
+import { CAPITAL_MODULES, LAYER_META, getModulesByLayer } from "@/lib/capitalModules";
+import type { LayerId } from "@/lib/capitalModules";
 
 interface Props {
   t: Dict;
@@ -694,21 +696,15 @@ function LevelCard({
 
 //  Tools preview 
 
-function ToolsPreview({ locale }: { locale: Locale }) {
-  const TOOLS_ZH = [
-    { name: "企业财务路线图", desc: "复利增长路径规划，年度目标可视化" },
-    { name: "智能报价系统", desc: "专业报价单生成，一键导出 PDF" },
-    { name: "企业估值系统", desc: "PE / PB / PS 估值，行业对比图表" },
-    { name: "企业绩效系统", desc: "税后利润、ROE / ROA、KPI 进度" },
-  ];
-  const TOOLS_EN = [
-    { name: "Financial Roadmap", desc: "Compound growth planning with annual target visualisation" },
-    { name: "Smart Quotation System", desc: "Professional quotation generator with one-click PDF export" },
-    { name: "Valuation Engine", desc: "PE / PB / PS valuation with industry comparison charts" },
-    { name: "Performance Intelligence", desc: "PAT, ROE / ROA, and KPI progress tracking" },
-  ];
-  const TOOLS = locale === "en" ? TOOLS_EN : TOOLS_ZH;
+const LAYER_DISPLAY_HOME: Record<LayerId, { zh: string; en: string; color: string }> = {
+  1: { zh: "商业基础层", en: "Business Foundation", color: "#C9A84C" },
+  2: { zh: "资本成长层", en: "Capital Growth", color: "#3B82F6" },
+  3: { zh: "资本架构层", en: "Capital Structure", color: "#8B5CF6" },
+};
 
+function ToolsPreview({ locale }: { locale: Locale }) {
+  const isEn = locale === "en";
+  const layers = [1, 2, 3] as const;
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
@@ -724,36 +720,72 @@ function ToolsPreview({ locale }: { locale: Locale }) {
           className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4"
           style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.15)" }}
         >
-          专业工具库
+          {isEn ? `${CAPITAL_MODULES.length} Professional Tools` : `${CAPITAL_MODULES.length} 个专业工具`}
         </div>
         <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
-          企业资本工具系统
+          {isEn ? "Capital Tools System" : "企业资本工具系统"}
         </h2>
-        <p className="text-sm" style={{ color: "#68625C" }}>打造具备资本扩张能力的企业</p>
+        <p className="text-sm" style={{ color: "#68625C" }}>
+          {isEn ? "All calculations run locally in your browser" : "涵盖商业基础到资本架构的完整工具套件"}
+        </p>
       </motion.div>
 
-      <div className="grid sm:grid-cols-2 gap-3">
-        {TOOLS.map((tool, i) => (
-          <ToolCard key={tool.name} tool={tool} delay={i * 0.08} inView={inView} i={i} />
-        ))}
+      <div className="space-y-12">
+        {layers.map((layer, li) => {
+          const meta = LAYER_META[layer];
+          const display = LAYER_DISPLAY_HOME[layer];
+          const modules = getModulesByLayer(layer);
+          return (
+            <motion.div
+              key={layer}
+              initial={{ opacity: 0, y: 16 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.5, delay: li * 0.1 }}
+            >
+              <div className="flex items-center gap-3 mb-5">
+                <span
+                  className="text-xs font-semibold px-2.5 py-1 rounded-full"
+                  style={{ backgroundColor: `${meta.color}15`, color: meta.color, border: `1px solid ${meta.color}30` }}
+                >
+                  {isEn ? display.en : display.zh}
+                </span>
+                <div className="flex-1 h-px" style={{ backgroundColor: "#E0D9CE" }} />
+                <span className="text-xs" style={{ color: "#9A9490" }}>
+                  {modules.length} {isEn ? "tools" : "个工具"}
+                </span>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {modules.map((mod, i) => {
+                  const t = isEn ? mod.en : mod.zh;
+                  return (
+                    <Link
+                      key={mod.id}
+                      href={mod.href}
+                      className="group block p-4 rounded-xl transition-all duration-200 relative overflow-hidden"
+                      style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLAnchorElement).style.borderColor = `${meta.color}60`;
+                        (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#FDFCF9";
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLAnchorElement).style.borderColor = "#E0D9CE";
+                        (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#FFFFFF";
+                      }}
+                    >
+                      <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, backgroundColor: meta.color, opacity: 0.4 }} />
+                      <div className="text-sm font-semibold mb-1 mt-0.5" style={{ color: "#1C1814" }}>{t.name}</div>
+                      <p className="text-xs leading-relaxed" style={{ color: "#9A9490" }}>{t.desc}</p>
+                      <div className="mt-3 text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity" style={{ color: meta.color }}>
+                        {isEn ? "Open →" : "使用 →"}
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </motion.div>
+          );
+        })}
       </div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={inView ? { opacity: 1 } : {}}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        className="text-center mt-8"
-      >
-        <Link
-          href="/tools"
-          className="inline-block text-sm px-6 py-2.5 rounded-xl transition-colors"
-          style={{ color: "#8B6514", border: "1px solid rgba(139,101,20,0.2)", backgroundColor: "#FBF4E4" }}
-          onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#F5EDD4"; }}
-          onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#FBF4E4"; }}
-        >
-          企业升级入口 →
-        </Link>
-      </motion.div>
     </section>
   );
 }
@@ -865,21 +897,17 @@ function CTASection({ isLoggedIn }: { isLoggedIn?: boolean }) {
 //  Footer 
 
 function Footer({ t }: { t: Dict["footer"] }) {
-  const COL_A = [
+  const LINKS = [
     { label: "课程体系", href: "/courses" },
     { label: "资本系统", href: "/tools" },
     { label: "关于我们", href: "/about" },
     { label: "社群", href: "/community" },
-  ];
-  const COL_B = [
     { label: "登录", href: "/login" },
-    { label: "关于我们", href: "/about" },
-    { label: "联系我们", href: "/about" },
   ];
 
   return (
     <footer className="px-6 py-16" style={{ borderTop: "1px solid #E0D9CE", backgroundColor: "#F7F4EF" }}>
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
+      <div className="max-w-6xl mx-auto flex flex-col md:flex-row md:items-start md:justify-between gap-10">
         <div>
           <div className="mb-3"><LogoImg height={36} onLight /></div>
           <p className="text-xs leading-relaxed mb-3" style={{ color: "#68625C" }}>{t.tagline}</p>
@@ -916,40 +944,19 @@ function Footer({ t }: { t: Dict["footer"] }) {
           </div>
         </div>
 
-        <div>
-          <div className="space-y-2">
-            {COL_A.map((item) => (
-              <div key={item.href}>
-                <Link
-                  href={item.href}
-                  className="text-sm transition-colors"
-                  style={{ color: "#68625C" }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C1814"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#68625C"; }}
-                >
-                  {item.label}
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <div className="mt-6 space-y-2">
-            {COL_B.map((item) => (
-              <div key={item.href}>
-                <Link
-                  href={item.href}
-                  className="text-sm transition-colors"
-                  style={{ color: "#68625C" }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C1814"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#68625C"; }}
-                >
-                  {item.label}
-                </Link>
-              </div>
-            ))}
-          </div>
+        <div className="flex flex-wrap gap-x-8 gap-y-3 md:pt-1">
+          {LINKS.map((item) => (
+            <Link
+              key={item.href + item.label}
+              href={item.href}
+              className="text-sm transition-colors"
+              style={{ color: "#68625C" }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#1C1814"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.color = "#68625C"; }}
+            >
+              {item.label}
+            </Link>
+          ))}
         </div>
       </div>
 

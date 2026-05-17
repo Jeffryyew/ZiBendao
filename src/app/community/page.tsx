@@ -276,7 +276,7 @@ export default async function CommunityPage() {
 
       <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #E0D9CE" }}>
         <p className="text-xs" style={{ color: "#9A9490" }}>
-          {isEn ? "© 2025 ZiBenDao · Eutopos Equity Sdn Bhd" : "© 2025 资本道 · Eutopos Equity Sdn Bhd"}
+          © 2025 Eutopos Equity Sdn Bhd 保留所有权利
         </p>
       </footer>
     </div>
