@@ -41,8 +41,8 @@ export default async function ApplyPage({
           </h1>
           <p className="text-sm" style={{ color: "#68625C" }}>
             {isEn
-              ? "Fill in the form below and our team will reach out within 1-2 business days."
-              : "填写以下信息，我们的顾问团队将在 1-2 个工作日内与您联系。"}
+              ? "Fill in your details and proceed to payment to secure your seat."
+              : "填写您的信息，完成付款即可锁定席位。"}
           </p>
         </div>
 
@@ -51,7 +51,12 @@ export default async function ApplyPage({
           className="rounded-2xl p-7"
           style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
         >
-          <ApplyForm course={course} isEn={isEn} isLoggedIn={!!session?.user} />
+          <ApplyForm
+            course={course}
+            isEn={isEn}
+            isLoggedIn={!!session?.user}
+            callbackUrl={`/apply?course=${course}`}
+          />
         </div>
 
         <p className="text-center text-xs mt-6" style={{ color: "#C0B8B0" }}>

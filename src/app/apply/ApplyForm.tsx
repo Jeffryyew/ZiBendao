@@ -13,136 +13,78 @@ interface ApplyFormProps {
   course: string;
   isEn: boolean;
   isLoggedIn: boolean;
+  callbackUrl: string;
 }
 
 const tr = {
   zh: {
+    interestedIn: "报名课程",
     name: "姓名", namePh: "您的全名",
     email: "邮箱地址", emailPh: "your@email.com",
     phone: "手机号码", phonePh: "+60 / +86",
     company: "公司名称（可选）", companyPh: "您的公司或企业名称",
-    message: "留言（可选）", messagePh: "您的问题或期望，帮助我们更好地为您服务",
-    interestedIn: "申请课程",
-    submitOnly: "提交申请",
-    submitAndPay: "申请并付款 →",
-    submitting: "处理中…",
-    orDivider: "或",
-    loginHint: "付款需要先登录账号",
-    loginBtn: "前往登录",
-    successTitle: "申请已提交",
-    successDesc: "感谢您的申请！我们的顾问团队将在 1-2 个工作日内与您联系。",
+    pay: "立即付款 →",
+    paying: "跳转中…",
+    loginBtn: "登录后付款 →",
     required: "请填写姓名和邮箱",
-    applyError: "提交失败，请重试",
     payError: "跳转付款失败，请重试",
   },
   en: {
+    interestedIn: "Enrolling In",
     name: "Full Name", namePh: "Your full name",
     email: "Email Address", emailPh: "your@email.com",
     phone: "Phone Number", phonePh: "+60 / +1",
     company: "Company (optional)", companyPh: "Your company or business name",
-    message: "Message (optional)", messagePh: "Your questions or goals — help us serve you better",
-    interestedIn: "Applying For",
-    submitOnly: "Submit Application",
-    submitAndPay: "Apply & Pay Now →",
-    submitting: "Processing…",
-    orDivider: "or",
-    loginHint: "Payment requires an account",
-    loginBtn: "Log In",
-    successTitle: "Application Received",
-    successDesc: "Thank you! Our team will contact you within 1-2 business days.",
+    pay: "Pay Now →",
+    paying: "Redirecting…",
+    loginBtn: "Log In to Pay →",
     required: "Please enter your name and email",
-    applyError: "Submission failed, please try again",
     payError: "Payment redirect failed, please try again",
   },
 };
 
-type ActionStatus = "idle" | "submitting" | "paying" | "success" | "error";
-
-export default function ApplyForm({ course, isEn, isLoggedIn }: ApplyFormProps) {
+export default function ApplyForm({ course, isEn, isLoggedIn, callbackUrl }: ApplyFormProps) {
   const lang = isEn ? "en" : "zh";
   const t = tr[lang];
   const courseLabel = COURSE_NAMES[course]?.[lang] ?? course;
 
-  const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
-  const [status, setStatus] = useState<ActionStatus>("idle");
+  const [form, setForm] = useState({ name: "", email: "", phone: "", company: "" });
+  const [paying, setPaying] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  const busy = status === "submitting" || status === "paying";
-
   function set(field: keyof typeof form) {
-    return (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+    return (e: React.ChangeEvent<HTMLInputElement>) =>
       setForm((p) => ({ ...p, [field]: e.target.value }));
   }
 
-  function validate() {
+  async function handlePay(e: React.FormEvent) {
+    e.preventDefault();
     if (!form.name.trim() || !form.email.trim()) {
       setErrorMsg(t.required);
-      return false;
+      return;
     }
     setErrorMsg("");
-    return true;
-  }
-
-  async function submitInquiry() {
-    const res = await fetch("/api/apply", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, course }),
-    });
-    if (!res.ok) throw new Error("apply");
-  }
-
-  async function handleSubmitOnly(e: React.FormEvent) {
-    e.preventDefault();
-    if (!validate()) return;
-    setStatus("submitting");
+    setPaying(true);
     try {
-      await submitInquiry();
-      setStatus("success");
-    } catch {
-      setErrorMsg(t.applyError);
-      setStatus("error");
-    }
-  }
-
-  async function handlePay(e: React.MouseEvent) {
-    e.preventDefault();
-    if (!validate()) return;
-    setStatus("paying");
-    try {
-      await submitInquiry();
-      const priceId = process.env.NEXT_PUBLIC_STRIPE_PRICE_ID;
+      // Save registration info quietly
+      await fetch("/api/apply", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, course }),
+      });
+      // Redirect to Stripe
       const res = await fetch("/api/payments/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ priceId }),
+        body: JSON.stringify({ priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "checkout");
       window.location.href = data.url;
     } catch {
       setErrorMsg(t.payError);
-      setStatus("error");
+      setPaying(false);
     }
-  }
-
-  if (status === "success") {
-    return (
-      <div className="text-center py-16">
-        <div
-          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-2xl"
-          style={{ backgroundColor: "rgba(139,101,20,0.08)", border: "2px solid rgba(139,101,20,0.2)", color: "#8B6514" }}
-        >
-          ✓
-        </div>
-        <h2 className="text-xl font-bold mb-3" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
-          {t.successTitle}
-        </h2>
-        <p className="text-sm leading-relaxed max-w-sm mx-auto" style={{ color: "#68625C" }}>
-          {t.successDesc}
-        </p>
-      </div>
-    );
   }
 
   const inputStyle: React.CSSProperties = {
@@ -165,7 +107,7 @@ export default function ApplyForm({ course, isEn, isLoggedIn }: ApplyFormProps) 
   };
 
   return (
-    <form onSubmit={handleSubmitOnly} className="space-y-5">
+    <form onSubmit={handlePay} className="space-y-5">
       {/* Course badge */}
       <div>
         <label style={labelStyle}>{t.interestedIn}</label>
@@ -199,66 +141,32 @@ export default function ApplyForm({ course, isEn, isLoggedIn }: ApplyFormProps) 
         </div>
       </div>
 
-      <div>
-        <label style={labelStyle}>{t.message}</label>
-        <textarea placeholder={t.messagePh} value={form.message} onChange={set("message")} rows={4} style={{ ...inputStyle, resize: "none" }} />
-      </div>
-
       {errorMsg && (
         <p className="text-xs text-center" style={{ color: "#EF4444" }}>{errorMsg}</p>
       )}
 
-      {/* Action buttons */}
-      <div className="space-y-3 pt-1">
-        {/* Primary: pay */}
-        {isLoggedIn ? (
-          <button
-            type="button"
-            onClick={handlePay}
-            disabled={busy}
-            className="w-full py-3 rounded-xl text-sm font-semibold transition-opacity"
-            style={{
-              background: "linear-gradient(135deg, #B8943A, #C9A84C)",
-              color: "#1C1814",
-              opacity: busy ? 0.7 : 1,
-            }}
-          >
-            {status === "paying" ? t.submitting : t.submitAndPay}
-          </button>
-        ) : (
-          <div
-            className="w-full py-3 rounded-xl text-sm text-center"
-            style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.2)" }}
-          >
-            <span className="text-xs" style={{ color: "#9A9490" }}>{t.loginHint} — </span>
-            <Link href="/login" className="text-xs font-medium" style={{ color: "#8B6514" }}>
-              {t.loginBtn}
-            </Link>
-          </div>
-        )}
-
-        {/* Divider */}
-        <div className="flex items-center gap-3">
-          <div className="flex-1 h-px" style={{ backgroundColor: "#E0D9CE" }} />
-          <span className="text-xs" style={{ color: "#C0B8B0" }}>{t.orDivider}</span>
-          <div className="flex-1 h-px" style={{ backgroundColor: "#E0D9CE" }} />
-        </div>
-
-        {/* Secondary: inquiry only */}
+      {isLoggedIn ? (
         <button
           type="submit"
-          disabled={busy}
-          className="w-full py-3 rounded-xl text-sm font-medium transition-opacity"
+          disabled={paying}
+          className="w-full py-3 rounded-xl text-sm font-semibold transition-opacity"
           style={{
-            backgroundColor: "#FFFFFF",
-            border: "1px solid #E0D9CE",
-            color: "#68625C",
-            opacity: busy ? 0.7 : 1,
+            background: "linear-gradient(135deg, #B8943A, #C9A84C)",
+            color: "#1C1814",
+            opacity: paying ? 0.7 : 1,
           }}
         >
-          {status === "submitting" ? t.submitting : t.submitOnly}
+          {paying ? t.paying : t.pay}
         </button>
-      </div>
+      ) : (
+        <Link
+          href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+          className="block w-full py-3 rounded-xl text-sm font-semibold text-center transition-opacity hover:opacity-88"
+          style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
+        >
+          {t.loginBtn}
+        </Link>
+      )}
     </form>
   );
 }
