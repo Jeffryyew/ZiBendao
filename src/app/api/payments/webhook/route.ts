@@ -6,6 +6,12 @@ import { sendPaymentConfirmationEmail } from "@/lib/email";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: "2026-04-22.dahlia" });
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
+const COURSE_ROLE: Record<string, "ZIBENTONG_GRAD" | "QIDONG_GRAD" | "ZIBENDAO_GRAD" | "ONLINE_STUDENT"> = {
+  "capital-map":  "ZIBENTONG_GRAD",
+  "capital-code": "QIDONG_GRAD",
+  "capital-dao":  "ZIBENDAO_GRAD",
+};
+
 export async function POST(req: Request) {
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
@@ -24,13 +30,16 @@ export async function POST(req: Request) {
     const userId = session.metadata?.userId;
     if (!userId) return NextResponse.json({ error: "No userId in metadata" }, { status: 400 });
 
+    const course = session.metadata?.course ?? "capital-map";
+    const role = COURSE_ROLE[course] ?? "ONLINE_STUDENT";
+
     const amount = (session.amount_total ?? 0) / 100;
     const currency = (session.currency ?? "myr").toUpperCase();
 
     const [user] = await prisma.$transaction([
       prisma.user.update({
         where: { id: userId },
-        data: { role: "ONLINE_STUDENT", studentLevel: 1 },
+        data: { role, studentLevel: 1 },
       }),
       prisma.payment.create({
         data: {
@@ -39,12 +48,17 @@ export async function POST(req: Request) {
           currency,
           status: "SUCCESS",
           provider: "stripe",
-          metadata: { stripeSessionId: session.id },
+          metadata: { stripeSessionId: session.id, course },
         },
       }),
     ]);
 
-    sendPaymentConfirmationEmail(user.email, user.name ?? user.email.split("@")[0], amount.toFixed(2), currency).catch(() => {});
+    sendPaymentConfirmationEmail(
+      user.email,
+      user.name ?? user.email.split("@")[0],
+      amount.toFixed(2),
+      currency,
+    ).catch(() => {});
   }
 
   return NextResponse.json({ received: true });

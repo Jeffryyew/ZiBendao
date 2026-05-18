@@ -100,16 +100,18 @@ export default function ApplyForm({ course, isEn, isLoggedIn, userEmail, callbac
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, course }),
       });
+
       const res = await fetch("/api/payments/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ priceId: process.env.NEXT_PUBLIC_STRIPE_PRICE_ID }),
+        body: JSON.stringify({ course }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "checkout");
+      if (!res.ok) throw new Error(data.error ?? t.payError);
+      if (!data.url) throw new Error(t.payError);
       window.location.href = data.url;
-    } catch {
-      setErrorMsg(t.payError);
+    } catch (err: unknown) {
+      setErrorMsg(err instanceof Error ? err.message : t.payError);
       setPaying(false);
       setStep("confirm");
     }
