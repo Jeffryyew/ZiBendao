@@ -39,6 +39,7 @@ export default async function StudentDashboardPage() {
         completedIds,
         totalXP,
         modules,
+        role: (session.user.role as string) ?? "FREE_MEMBER",
       }}
     />
   );

@@ -21,6 +21,7 @@ interface DashboardData {
   completedIds: string[];
   totalXP: number;
   modules: ModuleData[];
+  role: string;
 }
 
 type TabId = "overview" | "learning" | "enterprise";
@@ -76,7 +77,7 @@ function useLocalStorage<T>(key: string, initial: T): [T, (val: T) => void] {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function DashboardClient({ data }: { data: DashboardData }) {
-  const { firstName, completedIds, totalXP, modules } = data;
+  const { firstName, completedIds, totalXP, modules, role } = data;
   const completed = new Set(completedIds);
 
   const [activeTab, setActiveTab] = useLocalStorage<TabId>("zbd_tab", "overview");
@@ -160,6 +161,7 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
           totalLessons={totalLessons}
           overallPct={overallPct}
           totalXP={totalXP}
+          role={role}
         />
       )}
       {activeTab === "enterprise" && (
@@ -195,7 +197,7 @@ function OverviewTab({
   onGoToLearning: () => void;
 }) {
   const hour = new Date().getHours();
-  const timeLabel = hour < 12 ? "🌅" : hour < 18 ? "☀️" : "🌙";
+  const greeting = hour < 12 ? "早上好" : hour < 18 ? "下午好" : "晚上好";
 
   return (
     <div className="space-y-5">
@@ -217,7 +219,7 @@ function OverviewTab({
           <div>
             <div className="text-xs font-medium mb-1" style={{ color: "#C9A84C" }}>AI 数据总结</div>
             <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>
-              {timeLabel} {firstName}，你已完成 <span className="font-semibold" style={{ color: "#1C1814" }}>{completedCount}</span> 个课程，
+              {greeting}，{firstName}，你已完成 <span className="font-semibold" style={{ color: "#1C1814" }}>{completedCount}</span> 个课程，
               累计 <span className="font-semibold" style={{ color: "#C9A84C" }}>{totalXP} XP</span>。
               {overallPct >= 50
                 ? " 你的学习进度良好，建议继续深入企业资本工具。"
@@ -285,7 +287,12 @@ function OverviewTab({
       >
         {companyMode === null ? (
           <div className="text-center py-6">
-            <div className="text-3xl mb-3">🏢</div>
+            <div
+              className="w-12 h-12 rounded-2xl flex items-center justify-center text-xs font-bold mx-auto mb-3"
+              style={{ backgroundColor: "#FBF4E4", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}
+            >
+              企业
+            </div>
             <p className="text-sm mb-4" style={{ color: "#68625C" }}>绑定企业，解锁资本 AI 分析</p>
             <button
               onClick={onGoToEnterprise}
@@ -366,7 +373,7 @@ function OverviewTab({
 // ─── Learning Tab ─────────────────────────────────────────────────────────────
 
 function LearningTab({
-  modules, completed, completedCount, totalLessons, overallPct, totalXP,
+  modules, completed, completedCount, totalLessons, overallPct, totalXP, role,
 }: {
   modules: ModuleData[];
   completed: Set<string>;
@@ -374,6 +381,7 @@ function LearningTab({
   totalLessons: number;
   overallPct: number;
   totalXP: number;
+  role: string;
 }) {
   return (
     <div className="space-y-5">
@@ -435,12 +443,12 @@ function LearningTab({
 
       {/* Achievements */}
       <Card title="成就徽章">
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+        <div className="grid grid-cols-4 gap-3 mb-4">
           {[
-            { icon: "🌱", label: "起步", desc: "完成第 1 关", unlocked: completedCount >= 1 },
-            { icon: "📚", label: "学习者", desc: "完成 5 关", unlocked: completedCount >= 5 },
-            { icon: "⚡", label: "进阶", desc: "完成 10 关", unlocked: completedCount >= 10 },
-            { icon: "🏆", label: "资本家", desc: "完成全部", unlocked: overallPct === 100 },
+            { abbr: "S1", label: "起步", desc: "完成第 1 关", unlocked: completedCount >= 1 },
+            { abbr: "S5", label: "学习者", desc: "完成 5 关", unlocked: completedCount >= 5 },
+            { abbr: "S10", label: "进阶", desc: "完成 10 关", unlocked: completedCount >= 10 },
+            { abbr: "A+", label: "资本家", desc: "完成全部", unlocked: overallPct === 100 },
           ].map((a) => (
             <div
               key={a.label}
@@ -451,8 +459,61 @@ function LearningTab({
                 opacity: a.unlocked ? 1 : 0.5,
               }}
             >
-              <span className="text-2xl">{a.icon}</span>
+              <span
+                className="text-xs font-bold font-mono px-2 py-0.5 rounded-md"
+                style={{
+                  backgroundColor: a.unlocked ? "rgba(201,168,76,0.15)" : "rgba(154,148,144,0.1)",
+                  color: a.unlocked ? "#C9A84C" : "#9A9490",
+                }}
+              >
+                {a.abbr}
+              </span>
               <span className="text-xs font-medium" style={{ color: a.unlocked ? "#C9A84C" : "#9A9490" }}>{a.label}</span>
+              <span className="text-xs" style={{ color: "#9A9490" }}>{a.desc}</span>
+            </div>
+          ))}
+        </div>
+        <div className="text-xs font-medium mb-2" style={{ color: "#9A9490" }}>线下课程</div>
+        <div className="grid grid-cols-3 gap-3">
+          {[
+            {
+              abbr: "ZBT",
+              label: "资本通",
+              desc: "Stage 1 · RM 2,800",
+              unlocked: ["ZIBENTONG_GRAD","QIDONG_GRAD","ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role),
+            },
+            {
+              abbr: "QD",
+              label: "启动资本",
+              desc: "Stage 2 · RM 7,800",
+              unlocked: ["QIDONG_GRAD","ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role),
+            },
+            {
+              abbr: "ZBD",
+              label: "资本道",
+              desc: "Stage 3 · RM 38,000",
+              unlocked: ["ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role),
+            },
+          ].map((a) => (
+            <div
+              key={a.label}
+              className="flex flex-col items-center gap-1.5 p-3 rounded-xl text-center"
+              style={{
+                backgroundColor: a.unlocked ? "#FFFDF7" : "#F7F4EF",
+                border: `1px solid ${a.unlocked ? "rgba(184,148,58,0.4)" : "#E0D9CE"}`,
+                opacity: a.unlocked ? 1 : 0.45,
+              }}
+            >
+              <span
+                className="text-xs font-bold font-mono px-2 py-0.5 rounded-md"
+                style={{
+                  backgroundColor: a.unlocked ? "rgba(184,148,58,0.18)" : "rgba(154,148,144,0.1)",
+                  color: a.unlocked ? "#B8943A" : "#9A9490",
+                }}
+              >
+                {a.abbr}
+              </span>
+              <span className="text-xs font-medium" style={{ color: a.unlocked ? "#B8943A" : "#9A9490" }}>{a.label}</span>
               <span className="text-xs" style={{ color: "#9A9490" }}>{a.desc}</span>
             </div>
           ))}
@@ -532,10 +593,10 @@ function CompanySetup({ onSetMode }: { onSetMode: (m: CompanyMode) => void }) {
           style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
         >
           <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl mb-4"
-            style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(201,168,76,0.2)" }}
+            className="w-12 h-12 rounded-2xl flex items-center justify-center text-xs font-bold mb-4"
+            style={{ backgroundColor: "#FBF4E4", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}
           >
-            🏢
+            单一
           </div>
           <h3 className="text-base font-semibold mb-2" style={{ color: "#1C1814" }}>单一公司</h3>
           <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>
@@ -556,10 +617,10 @@ function CompanySetup({ onSetMode }: { onSetMode: (m: CompanyMode) => void }) {
           style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
         >
           <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center text-2xl mb-4"
-            style={{ backgroundColor: "#EFF4FF", border: "1px solid rgba(107,155,210,0.2)" }}
+            className="w-12 h-12 rounded-2xl flex items-center justify-center text-xs font-bold mb-4"
+            style={{ backgroundColor: "#EFF4FF", color: "#6B9BD2", border: "1px solid rgba(107,155,210,0.2)" }}
           >
-            🏗️
+            集团
           </div>
           <h3 className="text-base font-semibold mb-2" style={{ color: "#1C1814" }}>集团模式</h3>
           <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>
