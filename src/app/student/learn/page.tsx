@@ -1,6 +1,7 @@
 ﻿import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getLocale } from "@/lib/i18n";
 import Link from "next/link";
 
 type LessonType = "VIDEO" | "READING" | "QUIZ" | "EXERCISE";
@@ -13,11 +14,18 @@ const TYPE_ICON: Record<LessonType, string> = {
   EXERCISE: "",
 };
 
-const TYPE_LABEL: Record<LessonType, string> = {
+const TYPE_LABEL_ZH: Record<LessonType, string> = {
   VIDEO: "视频",
   READING: "阅读",
   QUIZ: "测验",
   EXERCISE: "练习",
+};
+
+const TYPE_LABEL_EN: Record<LessonType, string> = {
+  VIDEO: "Video",
+  READING: "Reading",
+  QUIZ: "Quiz",
+  EXERCISE: "Exercise",
 };
 
 const LEFT_CX = 44;
@@ -28,6 +36,10 @@ const SLOT_HEIGHT = 110;
 export default async function StudentLearnPage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
+
+  const locale = await getLocale();
+  const isEn = locale === "en";
+  const TYPE_LABEL = isEn ? TYPE_LABEL_EN : TYPE_LABEL_ZH;
 
   const modules = await prisma.module.findMany({
     where: { isPublished: true },
@@ -53,7 +65,7 @@ export default async function StudentLearnPage() {
     <div className="max-w-3xl mx-auto px-4 py-8 md:py-10">
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-3" style={{ fontFamily: "var(--font-display)", color: "var(--color-text-primary)" }}>
-          学习路径
+          {isEn ? "Learning Path" : "学习路径"}
         </h1>
         {totalLessons > 0 && (
           <div className="flex items-center gap-3">
@@ -67,7 +79,7 @@ export default async function StudentLearnPage() {
               />
             </div>
             <span className="text-xs font-mono" style={{ color: "var(--color-text-secondary)" }}>
-              {completedLessons}/{totalLessons} 关
+              {completedLessons}/{totalLessons} {isEn ? "lessons" : "关"}
             </span>
           </div>
         )}
@@ -78,9 +90,9 @@ export default async function StudentLearnPage() {
           className="rounded-2xl p-12 text-center"
           style={{ backgroundColor: "#FFFFFF", border: "1px dashed #E0D9CE" }}
         >
-          <div className="text-lg mb-4" style={{ color: "var(--color-text-muted)" }}>课程准备中</div>
-          <p className="text-sm mb-1" style={{ color: "var(--color-text-secondary)" }}>课程内容正在准备中</p>
-          <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>管理员将陆续发布课程模块，请稍后回来查看</p>
+          <div className="text-lg mb-4" style={{ color: "var(--color-text-muted)" }}>{isEn ? "Courses Coming Soon" : "课程准备中"}</div>
+          <p className="text-sm mb-1" style={{ color: "var(--color-text-secondary)" }}>{isEn ? "Course content is being prepared" : "课程内容正在准备中"}</p>
+          <p className="text-xs" style={{ color: "var(--color-text-muted)" }}>{isEn ? "The admin team will publish modules shortly — please check back soon." : "管理员将陆续发布课程模块，请稍后回来查看"}</p>
         </div>
       )}
 
@@ -109,7 +121,7 @@ export default async function StudentLearnPage() {
                     {module.title}
                   </div>
                   <div className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-                    {module.lessons.length} 关
+                    {module.lessons.length} {isEn ? "lessons" : "关"}
                   </div>
                 </div>
                 <span
@@ -126,6 +138,7 @@ export default async function StudentLearnPage() {
                 completedIds={completedIds}
                 allIds={allIds}
                 getStatus={getStatus}
+                typeLabel={TYPE_LABEL}
               />
             </div>
           );
@@ -140,12 +153,14 @@ function LessonMap({
   completedIds,
   allIds,
   getStatus,
+  typeLabel,
 }: {
   moduleId: string;
   lessons: { id: string; title: string; type: LessonType; points: number }[];
   completedIds: Set<string>;
   allIds: string[];
   getStatus: (id: string, i: number, allIds: string[]) => LessonStatus;
+  typeLabel: Record<LessonType, string>;
 }) {
   const containerH = lessons.length * SLOT_HEIGHT + NODE_RADIUS * 2;
   const nodeX = (i: number) => (i % 2 === 0 ? LEFT_CX : RIGHT_CX);
@@ -250,7 +265,7 @@ function LessonMap({
               >
                 <div className="font-medium leading-tight mb-0.5">{lesson.title}</div>
                 <div style={{ color: status === "locked" ? "#C8C1B8" : "#68625C" }}>
-                  {TYPE_LABEL[lesson.type]}
+                  {typeLabel[lesson.type]}
                 </div>
               </div>
             </>

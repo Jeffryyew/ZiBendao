@@ -1,22 +1,31 @@
 import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { getLocale } from "@/lib/i18n";
 import { getRoleLabel } from "@/lib/roles";
 import ProfileForm from "./ProfileForm";
-
-const ACHIEVEMENTS = [
-  { id: "register", icon: "", title: "欢迎加入", desc: "完成注册，开始学习之旅", unlocked: true },
-  { id: "first-lesson", icon: "", title: "第一步", desc: "完成第一关课程" },
-  { id: "module-done", icon: "", title: "财务启蒙", desc: "完成财务基础模块" },
-  { id: "streak-7", icon: "→", title: "学习达人", desc: "连续学习7天" },
-  { id: "tools-3", icon: "", title: "工具专家", desc: "使用3种计算工具" },
-];
 
 export default async function StudentProfilePage() {
   const session = await auth();
   if (!session?.user) redirect("/login");
 
+  const locale = await getLocale();
+  const isEn = locale === "en";
   const role = session.user.role as string;
+
+  const ACHIEVEMENTS = isEn ? [
+    { id: "register", icon: "", title: "Welcome", desc: "Completed registration and started your journey", unlocked: true },
+    { id: "first-lesson", icon: "", title: "First Step", desc: "Completed the first lesson" },
+    { id: "module-done", icon: "", title: "Finance Basics", desc: "Completed the financial fundamentals module" },
+    { id: "streak-7", icon: "→", title: "Dedicated Learner", desc: "7 consecutive days of learning" },
+    { id: "tools-3", icon: "", title: "Tool Expert", desc: "Used 3 different capital tools" },
+  ] : [
+    { id: "register", icon: "", title: "欢迎加入", desc: "完成注册，开始学习之旅", unlocked: true },
+    { id: "first-lesson", icon: "", title: "第一步", desc: "完成第一关课程" },
+    { id: "module-done", icon: "", title: "财务启蒙", desc: "完成财务基础模块" },
+    { id: "streak-7", icon: "→", title: "学习达人", desc: "连续学习7天" },
+    { id: "tools-3", icon: "", title: "工具专家", desc: "使用3种计算工具" },
+  ];
 
   let completedCount = 0;
   let totalXP = 0;
@@ -57,7 +66,7 @@ export default async function StudentProfilePage() {
     .slice(0, 2)
     .toUpperCase();
 
-  const joinDate = memberSince.toLocaleDateString("zh-CN", {
+  const joinDate = memberSince.toLocaleDateString(isEn ? "en-MY" : "zh-CN", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -68,6 +77,16 @@ export default async function StudentProfilePage() {
     email:    session.user.email ?? "",
     ...profileExtra,
   };
+
+  const stats = isEn ? [
+    { label: "Lessons Done", value: completedCount, unit: "", icon: "" },
+    { label: "Total XP", value: totalXP, unit: "XP", icon: "XP" },
+    { label: "Tools Available", value: "22", unit: "", icon: "" },
+  ] : [
+    { label: "完成课程", value: completedCount, unit: "关", icon: "" },
+    { label: "累计积分", value: totalXP, unit: "XP", icon: "XP" },
+    { label: "可用工具", value: "22", unit: "个", icon: "" },
+  ];
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 md:py-10 space-y-6">
@@ -113,18 +132,14 @@ export default async function StudentProfilePage() {
           )}
 
           <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
-            加入于 {joinDate}
+            {isEn ? `Joined ${joinDate}` : `加入于 ${joinDate}`}
           </p>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: "完成课程", value: completedCount, unit: "关", icon: "" },
-          { label: "累计积分", value: totalXP, unit: "XP", icon: "XP" },
-          { label: "可用工具", value: "22", unit: "个", icon: "" },
-        ].map((s) => (
+        {stats.map((s) => (
           <div
             key={s.label}
             className="p-4 rounded-2xl text-center"
@@ -145,7 +160,9 @@ export default async function StudentProfilePage() {
 
       {/* Achievements */}
       <div>
-        <h2 className="text-base font-semibold mb-4" style={{ color: "var(--color-text-primary)" }}>成就徽章</h2>
+        <h2 className="text-base font-semibold mb-4" style={{ color: "var(--color-text-primary)" }}>
+          {isEn ? "Achievement Badges" : "成就徽章"}
+        </h2>
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
           {ACHIEVEMENTS.map((ach) => {
             const unlocked = ach.unlocked === true || (ach.id === "first-lesson" && completedCount > 0);
@@ -170,7 +187,7 @@ export default async function StudentProfilePage() {
           })}
         </div>
         <p className="text-xs text-center mt-3" style={{ color: "var(--color-text-muted)" }}>
-          悬停查看成就详情
+          {isEn ? "Hover to view achievement details" : "悬停查看成就详情"}
         </p>
       </div>
 

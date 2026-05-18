@@ -326,4 +326,12 @@ export default async function CoursesPage() {
               className="inline-block px-10 py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
               style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
             >
-              {session?.user ? (isEn ? "Go to Courses →" : "进入课程 →") : (isEn ? "Get Started
+              {session?.user ? (isEn ? "Go to Courses →" : "进入课程 →") : (isEn ? "Get Started →" : "立即开始 →")}
+            </Link>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  );
+}

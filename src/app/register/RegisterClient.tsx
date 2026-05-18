@@ -21,7 +21,7 @@ const EmailIcon = () => (
   </svg>
 );
 
-export default function LoginClient({ locale }: { locale: string }) {
+export default function RegisterClient({ locale }: { locale: string }) {
   const isEn = locale === "en";
   const [step, setStep] = useState<"buttons" | "email">("buttons");
   const [email, setEmail] = useState("");
@@ -52,6 +52,22 @@ export default function LoginClient({ locale }: { locale: string }) {
     });
   }
 
+  const benefits = isEn ? [
+    "Free access to first 3 core course lessons",
+    "1 basic capital tool included",
+    "Exclusive learning progress tracking & achievement system",
+    "Priority updates on new courses and events",
+  ] : [
+    "免费体验前3关核心课程内容",
+    "1个基础资本工具使用权",
+    "专属学习进度追踪与成就系统",
+    "优先了解最新课程与活动资讯",
+  ];
+
+  const stats = isEn
+    ? [{ value: "500+", label: "Students" }, { value: "4", label: "Tools" }, { value: "13+", label: "Lessons" }]
+    : [{ value: "500+", label: "学员" }, { value: "4", label: "专业工具" }, { value: "13+", label: "课程内容" }];
+
   return (
     <div className="min-h-screen flex" style={{ backgroundColor: "#F7F4EF" }}>
       {/* Left brand panel */}
@@ -66,24 +82,24 @@ export default function LoginClient({ locale }: { locale: string }) {
           </div>
           <p className="text-xs mt-1.5" style={{ color: "#9A9490" }}>{isEn ? "Financial Education · Capital Advisory Platform" : "金融教育 · 资本咨询 一体化平台"}</p>
         </Link>
-        <div className="space-y-6">
-          {[
-            { icon: "", title: isEn ? "Structured Courses" : "系统化金融课程", desc: isEn ? "Step-by-step capital mastery from fundamentals to advanced" : "从基础财务分析到高级资本运作，分阶段闯关学习" },
-            { icon: "", title: isEn ? "Professional Tools" : "专业计算工具", desc: isEn ? "Valuation, KPI tracking, financial roadmap" : "市值估值、KPI追踪、财务路线图，实战导向" },
-            { icon: "", title: isEn ? "Advisory Services" : "一对一咨询服务", desc: isEn ? "Custom consulting with digital contract management" : "企业顾问定制方案，合约在线生成与签署" },
-          ].map((f) => (
-            <div key={f.title} className="flex gap-4">
-              <span className="text-base flex-shrink-0 mt-0.5" style={{ color: "#8B6514" }}>{f.icon}</span>
-              <div>
-                <div className="text-sm font-semibold mb-0.5" style={{ color: "#1C1814" }}>{f.title}</div>
-                <div className="text-xs leading-relaxed" style={{ color: "#68625C" }}>{f.desc}</div>
-              </div>
+
+        <div className="space-y-4">
+          <p className="text-xs font-medium tracking-widest" style={{ color: "#9A9490" }}>{isEn ? "REGISTER TO GET" : "注册即可获得"}</p>
+          {benefits.map((item) => (
+            <div key={item} className="flex items-start gap-3">
+              <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: "#8B6514" }}></span>
+              <span className="text-sm leading-relaxed" style={{ color: "#68625C" }}>{item}</span>
             </div>
           ))}
         </div>
-        <div className="rounded-2xl px-5 py-4" style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.15)" }}>
-          <p className="text-sm italic leading-relaxed" style={{ color: "#68625C" }}>{isEn ? `"Knowledge is the best capital; method is the shortest path."` : `"知识是最好的资本，方法是最短的捷径。"`}</p>
-          <p className="text-xs mt-2" style={{ color: "#9A9490" }}>{isEn ? "— Founder of ZiBenDao" : "— 资本道创始人"}</p>
+
+        <div className="grid grid-cols-3 gap-3">
+          {stats.map((s) => (
+            <div key={s.label} className="rounded-xl p-3 text-center" style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.12)" }}>
+              <div className="text-lg font-bold font-mono" style={{ color: "#8B6514" }}>{s.value}</div>
+              <div className="text-xs mt-0.5" style={{ color: "#9A9490" }}>{s.label}</div>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -97,17 +113,12 @@ export default function LoginClient({ locale }: { locale: string }) {
 
         <div className="w-full max-w-sm">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold mb-1.5" style={{ color: "#1C1814" }}>
-              {isEn ? "Welcome Back" : "欢迎回来"}
-            </h1>
-            <p className="text-sm" style={{ color: "#68625C" }}>
-              {isEn ? "Sign in to your ZiBenDao account" : "登录你的资本道账号"}
-            </p>
+            <h1 className="text-2xl font-bold mb-1.5" style={{ color: "#1C1814" }}>{isEn ? "Create Account" : "创建账号"}</h1>
+            <p className="text-sm" style={{ color: "#68625C" }}>{isEn ? "Start your capital growth journey for free" : "免费开始你的资本成长之旅"}</p>
           </div>
 
           {step === "buttons" && (
             <div className="space-y-3">
-              {/* Google */}
               <button
                 onClick={handleGoogle}
                 className="w-full flex items-center justify-center gap-3 py-3.5 rounded-xl text-sm font-medium transition-all"
@@ -119,7 +130,6 @@ export default function LoginClient({ locale }: { locale: string }) {
                 {isEn ? "Continue with Google" : "使用 Google 继续"}
               </button>
 
-              {/* Email */}
               <button
                 onClick={() => setStep("email")}
                 className="w-full flex items-center justify-center gap-3 py-3.5 rounded-xl text-sm font-medium transition-all"
@@ -145,12 +155,10 @@ export default function LoginClient({ locale }: { locale: string }) {
                 className="flex items-center gap-1.5 text-xs mb-2"
                 style={{ color: "#9A9490" }}
               >
-                ← {isEn ? "Back" : "返回"}
+                {isEn ? "← Back" : "← 返回"}
               </button>
               <div className="space-y-1.5">
-                <label className="text-xs font-medium tracking-wide" style={{ color: "#68625C" }}>
-                  {isEn ? "Email address" : "邮箱地址"}
-                </label>
+                <label className="text-xs font-medium tracking-wide" style={{ color: "#68625C" }}>{isEn ? "Email address" : "邮箱地址"}</label>
                 <input
                   type="email"
                   required
@@ -193,29 +201,29 @@ export default function LoginClient({ locale }: { locale: string }) {
                   </span>
                 ) : (isEn ? "Send Code" : "发送验证码")}
               </button>
+              <p className="text-xs text-center" style={{ color: "#9A9490" }}>
+                {isEn ? "Already have an account? " : "已有账号？"}
+                <Link href="/login" style={{ color: "#8B6514" }}>{isEn ? "Login" : "直接登录"}</Link>
+              </p>
             </form>
           )}
 
-          <div className="flex items-center gap-3 my-6">
-            <div className="flex-1 h-px" style={{ backgroundColor: "#E0D9CE" }} />
-            <span className="text-xs" style={{ color: "#C0B8B0" }}>{isEn ? "or" : "或"}</span>
-            <div className="flex-1 h-px" style={{ backgroundColor: "#E0D9CE" }} />
-          </div>
-
-          <Link
-            href="/register"
-            className="block w-full text-center py-2.5 rounded-xl text-sm font-medium transition-colors"
-            style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#EEE9E0"; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#F7F4EF"; }}
-          >
-            {isEn ? "No account? Register →" : "还没有账号？注册 →"}
-          </Link>
+          {step === "buttons" && (
+            <>
+              <div className="flex items-center gap-3 my-6">
+                <div className="flex-1 h-px" style={{ backgroundColor: "#E0D9CE" }} />
+                <span className="text-xs" style={{ color: "#C0B8B0" }}>{isEn ? "or" : "或"}</span>
+                <div className="flex-1 h-px" style={{ backgroundColor: "#E0D9CE" }} />
+              </div>
+              <p className="text-center text-sm" style={{ color: "#68625C" }}>
+                {isEn ? "Already have an account? " : "已有账号？"}
+                <Link href="/login" className="font-medium" style={{ color: "#8B6514" }}>{isEn ? "Login" : "立即登录"}</Link>
+              </p>
+            </>
+          )}
 
           <div className="mt-8 text-center">
-            <Link href="/" className="text-xs" style={{ color: "#9A9490" }}>
-              {isEn ? "← Back to home" : "← 返回主页"}
-            </Link>
+            <Link href="/" className="text-xs" style={{ color: "#9A9490" }}>{isEn ? "← Back to home" : "← 返回主页"}</Link>
           </div>
         </div>
       </div>

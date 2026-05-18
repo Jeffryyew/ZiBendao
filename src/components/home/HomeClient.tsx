@@ -20,12 +20,12 @@ export default function HomeClient({ t, locale, isLoggedIn }: Props) {
   return (
     <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814", minHeight: "100vh", overflowX: "hidden" }}>
       <Navbar t={t.nav} locale={locale} isLoggedIn={isLoggedIn} />
-      <HeroSection t={t.hero} isLoggedIn={isLoggedIn} />
-      <WhatIsCapital />
+      <HeroSection t={t.hero} locale={locale} isLoggedIn={isLoggedIn} />
+      <WhatIsCapital locale={locale} />
       <CapitalLearningJourney locale={locale} />
       <ToolsPreview locale={locale} />
-      <CTASection isLoggedIn={isLoggedIn} />
-      <Footer t={t.footer} isLoggedIn={isLoggedIn} />
+      <CTASection locale={locale} isLoggedIn={isLoggedIn} />
+      <Footer t={t.footer} locale={locale} isLoggedIn={isLoggedIn} />
     </div>
   );
 }
@@ -207,7 +207,7 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
         <button
           className="md:hidden flex flex-col justify-center items-center gap-1.5 w-8 h-8"
           onClick={() => setMenuOpen((v) => !v)}
-          aria-label="菜单"
+          aria-label={locale === "zh" ? "菜单" : "Menu"}
         >
           <span className="block w-5 h-px transition-all" style={{ backgroundColor: "#1C1814", transform: menuOpen ? "rotate(45deg) translate(2px, 2px)" : "none" }} />
           <span className="block w-5 h-px transition-all" style={{ backgroundColor: "#1C1814", opacity: menuOpen ? 0 : 1 }} />
@@ -306,7 +306,8 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
 
 //  Hero 
 
-function HeroSection({ t, isLoggedIn }: { t: Dict["hero"]; isLoggedIn?: boolean }) {
+function HeroSection({ t, locale, isLoggedIn }: { t: Dict["hero"]; locale: string; isLoggedIn?: boolean }) {
+  const isEn = locale === "en";
   return (
     <section className="relative px-4 pt-36 pb-24 overflow-hidden">
       {/* Subtle grid background */}
@@ -391,7 +392,7 @@ function HeroSection({ t, isLoggedIn }: { t: Dict["hero"]; isLoggedIn?: boolean 
               className="px-8 py-4 rounded-xl font-semibold text-base transition-opacity hover:opacity-85"
               style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
             >
-              进入平台 →
+              {isEn ? "Go to Platform →" : "进入平台 →"}
             </Link>
           ) : (
             <>
@@ -421,8 +422,25 @@ function HeroSection({ t, isLoggedIn }: { t: Dict["hero"]; isLoggedIn?: boolean 
 
 //  What Is Capital Transformation 
 
-function WhatIsCapital() {
-  const PILLARS = [
+function WhatIsCapital({ locale }: { locale: string }) {
+  const isEn = locale === "en";
+  const PILLARS = isEn ? [
+    {
+      icon: "",
+      title: "Why Do Businesses Need Capitalisation?",
+      desc: "High revenue doesn't mean high value. Capitalisation transforms an operational business into one that can be valued, funded, and invested in.",
+    },
+    {
+      icon: "",
+      title: "Capital Thinking vs. Operational Thinking",
+      desc: "Operational thinking focuses on profit; capital thinking focuses on valuation. Learn to redesign your business structure using capital logic.",
+    },
+    {
+      icon: "",
+      title: "Build an Investable Business Structure",
+      desc: "SPV architecture, equity design, fundraising readiness — ensure your business is investment-ready when capital opportunities arise.",
+    },
+  ] : [
     {
       icon: "",
       title: "为什么企业需要资本化？",
@@ -456,13 +474,13 @@ function WhatIsCapital() {
             className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4"
             style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.15)" }}
           >
-            企业资本化
+            {isEn ? "Enterprise Capitalisation" : "企业资本化"}
           </div>
           <h2 className="text-3xl md:text-4xl font-bold mb-3 max-w-xl" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
-            什么是企业资本化？
+            {isEn ? "What Is Enterprise Capitalisation?" : "什么是企业资本化？"}
           </h2>
           <p className="text-sm max-w-lg leading-relaxed" style={{ color: "#68625C" }}>
-            从经营企业到资本企业，不只是融资——而是重新定义你的企业价值。
+            {isEn ? "From operating a business to owning a capital asset — it's not just fundraising, it's redefining your enterprise value." : "从经营企业到资本企业，不只是融资——而是重新定义你的企业价值。"}
           </p>
         </motion.div>
 
@@ -491,39 +509,48 @@ function WhatIsCapital() {
 //  Capital Learning Journey 
 
 function CapitalLearningJourney({ locale }: { locale: string }) {
+  const isEn = locale === "en";
   const LEVELS = [
     {
-      stageLabel: "线上",
-      name: "资本启航",
-      nameEn: "Capital Start",
-      desc: "专为忙碌创业者设计的线上入门课程。随时随地建立资本思维基础，零门槛开启资本成长之旅。",
+      stageLabel: isEn ? "Online" : "线上",
+      name: isEn ? "Capital Start" : "资本启航",
+      nameEn: isEn ? "资本启航" : "Capital Start",
+      desc: isEn
+        ? "An online entry-level programme designed for busy entrepreneurs. Build capital thinking fundamentals anytime, anywhere."
+        : "专为忙碌创业者设计的线上入门课程。随时随地建立资本思维基础，零门槛开启资本成长之旅。",
       href: "/courses#capital-start",
       accent: "#7C5FBF",
       accentLight: "#F4F0FC",
     },
     {
-      stageLabel: "阶段一",
-      name: "资本通",
-      nameEn: "The Capital Map",
-      desc: "建立资本思维框架，认识企业从经营到资本化的核心逻辑。线下深度课程，知行合一。",
+      stageLabel: isEn ? "Stage 1" : "阶段一",
+      name: isEn ? "The Capital Map" : "资本通",
+      nameEn: isEn ? "资本通" : "The Capital Map",
+      desc: isEn
+        ? "Build the right capital thinking framework and understand the core logic of enterprise capitalisation. Offline deep-dive programme."
+        : "建立资本思维框架，认识企业从经营到资本化的核心逻辑。线下深度课程，知行合一。",
       href: "/courses#capital-map",
       accent: "#8B6514",
       accentLight: "#FBF4E4",
     },
     {
-      stageLabel: "阶段二",
-      name: "启动资本",
-      nameEn: "The Capital Code",
-      desc: "系统启动企业资本化进程。掌握 SPV 架构与融资结构，让企业具备被投资的真实能力。",
+      stageLabel: isEn ? "Stage 2" : "阶段二",
+      name: isEn ? "The Capital Code" : "启动资本",
+      nameEn: isEn ? "启动资本" : "The Capital Code",
+      desc: isEn
+        ? "Systematically initiate your business capitalisation. Master SPV structures and fundraising frameworks to become truly investment-ready."
+        : "系统启动企业资本化进程。掌握 SPV 架构与融资结构，让企业具备被投资的真实能力。",
       href: "/courses#capital-code",
       accent: "#2D5FA8",
       accentLight: "#EDF2FC",
     },
     {
-      stageLabel: "阶段三",
-      name: "资本道",
-      nameEn: "Capital Dao",
-      desc: "进阶资本策略巅峰。理解IPO逻辑，建立企业级资本操作体系与投资人沟通能力。",
+      stageLabel: isEn ? "Stage 3" : "阶段三",
+      name: isEn ? "Capital Dao" : "资本道",
+      nameEn: isEn ? "资本道" : "Capital Dao",
+      desc: isEn
+        ? "Advanced capital strategy. Understand IPO logic and build an enterprise-grade capital operating system with strong investor communication."
+        : "进阶资本策略巅峰。理解IPO逻辑，建立企业级资本操作体系与投资人沟通能力。",
       href: "/courses#capital-dao",
       accent: "#8B6514",
       accentLight: "#FBF4E4",
@@ -545,13 +572,13 @@ function CapitalLearningJourney({ locale }: { locale: string }) {
           className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-4"
           style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.15)" }}
         >
-          资本成长路径
+          {isEn ? "Capital Learning Journey" : "资本成长路径"}
         </div>
         <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
-          {locale === "en" ? "Capital Learning Journey" : "资本成长之路"}
+          {isEn ? "Capital Learning Journey" : "资本成长之路"}
         </h2>
         <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>
-          从资本启蒙到企业操盘，系统化的四阶段成长体系
+          {isEn ? "A systematic four-stage growth programme from capital fundamentals to enterprise mastery." : "从资本启蒙到企业操盘，系统化的四阶段成长体系"}
         </p>
       </motion.div>
 
@@ -574,7 +601,7 @@ function CapitalLearningJourney({ locale }: { locale: string }) {
           onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#F5EDD4"; }}
           onMouseLeave={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#FBF4E4"; }}
         >
-          查看完整课程体系 →
+          {isEn ? "View Full Programme Details →" : "查看完整课程体系 →"}
         </Link>
       </motion.div>
     </section>
@@ -783,7 +810,8 @@ function ToolCard({
 
 //  CTA 
 
-function CTASection({ isLoggedIn }: { isLoggedIn?: boolean }) {
+function CTASection({ locale, isLoggedIn }: { locale: string; isLoggedIn?: boolean }) {
+  const isEn = locale === "en";
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
@@ -808,15 +836,13 @@ function CTASection({ isLoggedIn }: { isLoggedIn?: boolean }) {
           className="inline-block text-xs font-medium px-3 py-1 rounded-full mb-6"
           style={{ backgroundColor: "rgba(201,168,76,0.12)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}
         >
-          开始你的资本成长路径
+          {isEn ? "Begin Your Capital Journey" : "开始你的资本成长路径"}
         </div>
         <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ fontFamily: "var(--font-display)", color: "#F0EBE1" }}>
-          你的企业，<span style={{ color: "#C9A84C" }}>值得被资本看见</span>
+          {isEn ? <>Your Business <span style={{ color: "#C9A84C" }}>Deserves Capital Attention</span></> : <>你的企业，<span style={{ color: "#C9A84C" }}>值得被资本看见</span></>}
         </h2>
         <p className="mb-10 text-sm leading-relaxed" style={{ color: "#9A9490" }}>
-          从资本通开始，每一步都有系统、有工具。
-          <br />
-          注册开始，随时解锁下一个资本阶段。
+          {isEn ? <>Start with The Capital Map — every step backed by a system and the right tools.<br />Register now and unlock each capital stage at your own pace.</> : <>从资本通开始，每一步都有系统、有工具。<br />注册开始，随时解锁下一个资本阶段。</>}
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -826,7 +852,7 @@ function CTASection({ isLoggedIn }: { isLoggedIn?: boolean }) {
               className="px-10 py-4 rounded-xl font-semibold text-sm transition-opacity hover:opacity-88 inline-block"
               style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
             >
-              进入平台 →
+              {isEn ? "Go to Platform →" : "进入平台 →"}
             </Link>
           ) : (
             <Link
@@ -834,7 +860,7 @@ function CTASection({ isLoggedIn }: { isLoggedIn?: boolean }) {
               className="px-10 py-4 rounded-xl font-semibold text-sm transition-opacity hover:opacity-88 inline-block"
               style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
             >
-              开始资本之旅
+              {isEn ? "Start Capital Journey" : "开始资本之旅"}
             </Link>
           )}
         </div>
@@ -845,13 +871,14 @@ function CTASection({ isLoggedIn }: { isLoggedIn?: boolean }) {
 
 //  Footer 
 
-function Footer({ t, isLoggedIn }: { t: Dict["footer"]; isLoggedIn?: boolean }) {
+function Footer({ t, locale, isLoggedIn }: { t: Dict["footer"]; locale: string; isLoggedIn?: boolean }) {
+  const isEn = locale === "en";
   const LINKS = [
-    { label: "课程体系", href: "/courses" },
-    { label: "资本工具", href: "/tools/guide" },
-    { label: "关于我们", href: "/about" },
-    { label: "社群", href: "/community" },
-    { label: isLoggedIn ? "进入平台" : "登录", href: isLoggedIn ? "/dashboard" : "/login" },
+    { label: isEn ? "Courses" : "课程体系", href: "/courses" },
+    { label: isEn ? "Capital Tools" : "资本工具", href: "/tools/guide" },
+    { label: isEn ? "About Us" : "关于我们", href: "/about" },
+    { label: isEn ? "Community" : "社群", href: "/community" },
+    { label: isLoggedIn ? (isEn ? "Platform" : "进入平台") : (isEn ? "Login" : "登录"), href: isLoggedIn ? "/dashboard" : "/login" },
   ];
 
   return (
@@ -918,4 +945,3 @@ function Footer({ t, isLoggedIn }: { t: Dict["footer"]; isLoggedIn?: boolean }) 
     </footer>
   );
 }
-                                                                                            

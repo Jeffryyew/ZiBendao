@@ -292,14 +292,14 @@ export default async function CommunityPage() {
             className="inline-block px-10 py-3 rounded-xl font-semibold text-sm transition-opacity hover:opacity-88"
             style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
           >
-            {isEn ? "Join Us →" : "加入我们 →"}
+            {d.cta.primary}
           </Link>
         </div>
       </section>
 
       <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #E0D9CE" }}>
         <p className="text-xs" style={{ color: "#9A9490" }}>
-          © 2025 Eutopos Equity Sdn Bhd 保留所有权利
+          {isEn ? "© 2025 Eutopos Equity Sdn Bhd All Rights Reserved" : "© 2025 Eutopos Equity Sdn Bhd 保留所有权利"}
         </p>
       </footer>
     </div>

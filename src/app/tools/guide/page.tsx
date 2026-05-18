@@ -11,7 +11,7 @@ const LAYER_DISPLAY: Record<LayerId, { zh: string; en: string }> = {
   3: { zh: "资本架构", en: "Capital Structure" },
 };
 
-const TOOL_USECASES: Record<string, string[]> = {
+const TOOL_USECASES_ZH: Record<string, string[]> = {
   "financial-roadmap": ["正在规划 5–10 年财务目标的个人", "为客户制作财富增长方案的顾问", "需向投资人展示回报预测的创业者"],
   "pricing-system": ["顾问和服务商向客户提交正式报价", "产品团队快速计算多方案报价对比", "企业销售制作含税报价备案文件"],
   "market-cap": ["投资者筛选优质标的、判断买卖时机", "企业主了解自身估值水平以备融资谈判", "顾问为客户出具独立估值分析报告"],
@@ -36,11 +36,38 @@ const TOOL_USECASES: Record<string, string[]> = {
   "portfolio-management": ["基金经理追踪多个被投企业表现", "投资人计算各项目的 MOIC 与 IRR", "顾问为客户提供投资组合健康度分析"],
 };
 
+const TOOL_USECASES_EN: Record<string, string[]> = {
+  "financial-roadmap": ["Individuals planning 5–10 year financial goals", "Advisors building wealth growth plans for clients", "Entrepreneurs showcasing return projections to investors"],
+  "pricing-system": ["Consultants submitting formal proposals to clients", "Product teams comparing multi-scenario pricing quickly", "Sales teams generating tax-inclusive quote documents"],
+  "market-cap": ["Investors screening quality targets and timing decisions", "Business owners understanding their valuation before fundraising", "Advisors producing independent valuation reports for clients"],
+  "pat-kpi": ["Business owners conducting quarterly operational reviews", "CFOs presenting financial health metrics to the board", "Advisors diagnosing profitability for client businesses"],
+  "cash-flow": ["Startups projecting cash position over the next 12 months", "Finance leads identifying seasonal funding gaps", "Investors assessing cash flow health of portfolio companies"],
+  "balance-sheet": ["Business owners understanding asset and liability structure", "Accountants quickly generating standard balance sheet reports", "Investors analysing target company financial health"],
+  "income-statement": ["Management tracking gross and net margin changes", "Finance teams producing monthly P&L reports", "Advisors analysing client company profitability structure"],
+  "breakeven-analysis": ["Entrepreneurs calculating sales volume needed to break even", "Product managers evaluating breakeven pricing for new lines", "Investors verifying whether a business model can be profitable"],
+  "due-diligence": ["Investors conducting pre-investment due diligence", "M&A advisors systematically assessing target company risks", "Founders self-auditing before receiving external investor review"],
+  "data-room": ["Founders preparing fundraising document packages", "Advisors organising structured investor materials for clients", "Buy and sell sides exchanging documents in M&A deals"],
+  "sales-forecast": ["Sales leads setting annual revenue targets", "Founders preparing financial projections for business plans", "Management tracking actual sales versus forecast variance"],
+  "startup-expense": ["Entrepreneurs estimating total startup capital required", "Angel investors reviewing cost structure of startup projects", "Founding teams calculating runway from current funding"],
+  "deal-flow": ["VC/PE firms managing multiple active deals", "Independent investors tracking investment opportunity progress", "Investment advisors managing client investment funnels"],
+  "capital-roadmap": ["Fundraising entrepreneurs planning funding round sequences", "Advisors designing capital strategy from angel to IPO", "Investors understanding portfolio company capital plans"],
+  "fundraising-system": ["Founders calculating funding terms and dilution", "Advisors tracking progress across multiple investor conversations", "Fundraising leads managing their investor pipeline"],
+  "investor-relations": ["Post-investment companies sending regular investor updates", "Founders building and maintaining investor registries", "Advisors helping clients manage post-investment relationships"],
+  "spv-structure": ["Setting up special purpose vehicles to pool investors", "Advisors designing SPV structures and modelling returns", "Investors evaluating terms for SPV co-investments"],
+  "equity-structure": ["Founding teams planning equity allocation and option pools", "Investors analysing dilution across multiple funding rounds", "Advisors designing exit waterfalls and liquidation preferences"],
+  "capital-structure": ["CFOs optimising debt-to-equity capital mix", "Analysts calculating WACC for investment evaluation", "Advisors designing optimal financing structures for businesses"],
+  "investment-committee": ["VC/PE firms preparing IC meeting memos", "IC members scoring and recording investment decisions", "Advisors building standardised investment governance for clients"],
+  "risk-control": ["Management building comprehensive risk registers", "Compliance leads identifying and quantifying key business risks", "Advisors producing risk heatmap reports for clients"],
+  "portfolio-management": ["Fund managers tracking performance across portfolio companies", "Investors calculating MOIC and IRR for each holding", "Advisors providing portfolio health analysis for clients"],
+};
+
 const layers = [1, 2, 3] as const;
 
 export default async function ToolsGuidePage() {
   const session = await auth();
   const locale = await getLocale();
+  const isEn = locale === "en";
+
   return (
     <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814", minHeight: "100vh" }}>
       <SharedNav locale={locale} activeHref="/tools/guide" isLoggedIn={!!session?.user} />
@@ -50,10 +77,12 @@ export default async function ToolsGuidePage() {
         {/* Header */}
         <div className="mb-12">
           <h1 className="text-3xl md:text-4xl font-bold mb-3" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
-            工具全览与使用指南
+            {isEn ? "Tool Directory & Usage Guide" : "工具全览与使用指南"}
           </h1>
           <p style={{ color: "#68625C" }}>
-            {CAPITAL_MODULES.length} 个专业资本工具的功能说明与适用场景
+            {isEn
+              ? `${CAPITAL_MODULES.length} professional capital tools — features, descriptions, and use cases`
+              : `${CAPITAL_MODULES.length} 个专业资本工具的功能说明与适用场景`}
           </p>
         </div>
 
@@ -69,17 +98,18 @@ export default async function ToolsGuidePage() {
                 {/* Layer header */}
                 <div className="flex items-center gap-3 mb-6">
                   <h2 className="text-base font-bold" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
-                    {display.zh}
+                    {isEn ? display.en : display.zh}
                   </h2>
                   <div className="flex-1 h-px" style={{ backgroundColor: "#E0D9CE" }} />
                   <span className="text-xs font-mono flex-shrink-0" style={{ color: "#9A9490" }}>
-                    {modules.length} 个工具
+                    {modules.length} {isEn ? "tools" : "个工具"}
                   </span>
                 </div>
 
                 <div className="space-y-4">
                   {modules.map((mod) => {
-                    const usecases = TOOL_USECASES[mod.id] ?? [];
+                    const usecases = (isEn ? TOOL_USECASES_EN : TOOL_USECASES_ZH)[mod.id] ?? [];
+                    const t = isEn ? mod.en : mod.zh;
                     return (
                       <div
                         key={mod.id}
@@ -92,10 +122,10 @@ export default async function ToolsGuidePage() {
                           <div className="flex items-start justify-between gap-4 flex-wrap mb-3">
                             <div>
                               <h3 className="text-base font-bold mb-1" style={{ color: "#1C1814" }}>
-                                {mod.zh.name}
+                                {t.name}
                               </h3>
                               <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>
-                                {mod.zh.desc}
+                                {t.desc}
                               </p>
                             </div>
                             <Link
@@ -103,13 +133,13 @@ export default async function ToolsGuidePage() {
                               className="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-opacity hover:opacity-85"
                               style={{ backgroundColor: meta.color + "15", color: meta.color, border: `1px solid ${meta.color}30` }}
                             >
-                              使用工具 →
+                              {isEn ? "Use Tool →" : "使用工具 →"}
                             </Link>
                           </div>
 
                           {usecases.length > 0 && (
                             <div className="mt-4 pt-4" style={{ borderTop: "1px solid #F0EBE1" }}>
-                              <p className="text-xs font-semibold mb-2" style={{ color: "#9A9490" }}>适合谁使用</p>
+                              <p className="text-xs font-semibold mb-2" style={{ color: "#9A9490" }}>{isEn ? "Who is this for" : "适合谁使用"}</p>
                               <div className="space-y-1">
                                 {usecases.map((u) => (
                                   <div key={u} className="flex items-start gap-2 text-xs leading-relaxed" style={{ color: "#68625C" }}>
@@ -131,10 +161,11 @@ export default async function ToolsGuidePage() {
         </div>
 
         <p className="text-center text-xs mt-12" style={{ color: "#C0B8B0" }}>
-          所有计算在浏览器本地完成 · 数据不上传服务器 · 支持导出 PDF / CSV
+          {isEn
+            ? "All calculations run locally in your browser · No data uploaded · Supports PDF / CSV export"
+            : "所有计算在浏览器本地完成 · 数据不上传服务器 · 支持导出 PDF / CSV"}
         </p>
       </div>
     </div>
   );
 }
-                                                                                                                                                         

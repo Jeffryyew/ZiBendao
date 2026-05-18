@@ -156,7 +156,7 @@ const dict = {
     },
     footer: {
       tagline: "Master Capital Strategy. Build Reliable, Investable, Scalable Enterprises.",
-      copyright: "© 2025 Eutopos Equity Sdn Bhd 保留所有权利",
+      copyright: "© 2025 Eutopos Equity Sdn Bhd All Rights Reserved",
       platform: "Platform",
       address_title: "Address",
     },

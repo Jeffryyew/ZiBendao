@@ -286,7 +286,7 @@ export default async function AboutPage() {
 
       <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #E0D9CE" }}>
         <p className="text-xs" style={{ color: "#C0B8B0" }}>
-          © 2025 Eutopos Equity Sdn Bhd 保留所有权利
+          {isEn ? "© 2025 Eutopos Equity Sdn Bhd All Rights Reserved" : "© 2025 Eutopos Equity Sdn Bhd 保留所有权利"}
         </p>
       </footer>
     </div>
