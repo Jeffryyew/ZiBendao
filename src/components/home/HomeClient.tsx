@@ -453,7 +453,7 @@ function HeroSection({ t, isLoggedIn }: { t: Dict["hero"]; isLoggedIn?: boolean 
                 {t.cta_primary}
               </Link>
               <Link
-                href="/tools"
+                href="/tools/guide"
                 className="px-8 py-4 rounded-xl font-semibold text-base transition-all"
                 style={{ backgroundColor: "transparent", color: "#68625C", border: "1px solid #E0D9CE" }}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#B0A898"; (e.currentTarget as HTMLAnchorElement).style.color = "#1C1814"; }}
