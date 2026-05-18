@@ -39,6 +39,9 @@ const ONLINE_COURSE = {
 const OFFLINE_COURSES = [
   {
     id: 1,
+    slug: "capital-map",
+    price: "RM 2,800",
+    duration: { zh: "2 天线下课程", en: "2-Day Offline Programme" },
     zh: {
       name: "资本通",
       nameEn: "The Capital Map",
@@ -65,10 +68,12 @@ const OFFLINE_COURSES = [
     },
     accent: "#2D7D4F",
     accentLight: "#EDFAF3",
-    badge: { zh: null, en: null },
   },
   {
     id: 2,
+    slug: "capital-code",
+    price: "RM 7,800",
+    duration: { zh: "3 天线下课程", en: "3-Day Offline Programme" },
     zh: {
       name: "启动资本",
       nameEn: "The Capital Code",
@@ -98,6 +103,9 @@ const OFFLINE_COURSES = [
   },
   {
     id: 3,
+    slug: "capital-dao",
+    price: "RM 38,000",
+    duration: { zh: "5 天线下课程", en: "5-Day Offline Programme" },
     zh: {
       name: "资本道",
       nameEn: "Capital Dao",
@@ -267,9 +275,8 @@ export default async function CoursesPage() {
           <div className="space-y-5">
             {OFFLINE_COURSES.map((course) => {
               const c = isEn ? course.en : course.zh;
-              const courseSlug = course.id === 1 ? "capital-map" : course.id === 2 ? "capital-code" : "capital-dao";
               return (
-                <div key={course.id} id={courseSlug} className="rounded-2xl p-7 relative overflow-hidden" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
+                <div key={course.id} id={course.slug} className="rounded-2xl p-7 relative overflow-hidden" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
                   <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 3, background: `linear-gradient(90deg, transparent, ${course.accent}80, transparent)` }} />
 
                   <div className="flex flex-wrap items-center gap-2 mb-4">
@@ -277,12 +284,19 @@ export default async function CoursesPage() {
                       {c.stage}
                     </span>
                     <span className="text-xs px-2.5 py-1 rounded-full" style={{ backgroundColor: "#F7F4EF", color: "#9A9490", border: "1px solid #E0D9CE" }}>
-                      {c.tag}
+                      {isEn ? course.duration.en : course.duration.zh}
                     </span>
                   </div>
 
                   {isEn && <div className="text-xs mb-0.5" style={{ color: "#9A9490" }}>{c.nameEn}</div>}
-                  <h3 className="font-bold text-lg mb-2" style={{ color: "#1C1814" }}>{c.name}</h3>
+                  <h3 className="font-bold text-lg mb-1" style={{ color: "#1C1814" }}>{c.name}</h3>
+
+                  {/* Price */}
+                  <div className="mb-3">
+                    <span className="text-2xl font-bold font-mono" style={{ color: course.accent }}>{course.price}</span>
+                    <span className="text-xs ml-2" style={{ color: "#9A9490" }}>{isEn ? "per person" : "/ 人"}</span>
+                  </div>
+
                   <p className="text-sm mb-5" style={{ color: "#68625C" }}>{c.desc}</p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1.5 gap-x-4 mb-6">
@@ -295,7 +309,7 @@ export default async function CoursesPage() {
                   </div>
 
                   <Link
-                    href={`/apply?course=${courseSlug}`}
+                    href={`/apply?course=${course.slug}`}
                     className="block w-full text-center py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
                     style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
                   >

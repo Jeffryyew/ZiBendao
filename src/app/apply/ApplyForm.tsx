@@ -3,10 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 
-const COURSE_NAMES: Record<string, { zh: string; en: string }> = {
-  "capital-map":  { zh: "资本通 · 阶段一", en: "The Capital Map · Stage 1" },
-  "capital-code": { zh: "启动资本 · 阶段二", en: "The Capital Code · Stage 2" },
-  "capital-dao":  { zh: "资本道 · 阶段三", en: "Capital Dao · Stage 3" },
+const COURSE_META: Record<string, { zh: string; en: string; price: string; duration: { zh: string; en: string } }> = {
+  "capital-map":  { zh: "资本通 · 阶段一", en: "The Capital Map · Stage 1", price: "RM 2,800",  duration: { zh: "2 天线下课程", en: "2-Day Offline" } },
+  "capital-code": { zh: "启动资本 · 阶段二", en: "The Capital Code · Stage 2", price: "RM 7,800",  duration: { zh: "3 天线下课程", en: "3-Day Offline" } },
+  "capital-dao":  { zh: "资本道 · 阶段三",  en: "Capital Dao · Stage 3",     price: "RM 38,000", duration: { zh: "5 天线下课程", en: "5-Day Offline" } },
 };
 
 interface ApplyFormProps {
@@ -69,7 +69,8 @@ type Step = "form" | "confirm";
 export default function ApplyForm({ course, isEn, isLoggedIn, userEmail, callbackUrl }: ApplyFormProps) {
   const lang = isEn ? "en" : "zh";
   const t = tr[lang];
-  const courseLabel = COURSE_NAMES[course]?.[lang] ?? course;
+  const meta = COURSE_META[course] ?? COURSE_META["capital-map"];
+  const courseLabel = meta[lang];
 
   const [form, setForm] = useState({ name: "", email: userEmail, phone: "", company: "" });
   const [step, setStep] = useState<Step>("form");
@@ -139,10 +140,12 @@ export default function ApplyForm({ course, isEn, isLoggedIn, userEmail, callbac
   // ── Confirmation step ──────────────────────────────────────
   if (step === "confirm") {
     const rows = [
-      { label: t.labelCourse, value: courseLabel },
-      { label: t.labelName,   value: form.name },
-      { label: t.labelEmail,  value: form.email },
-      { label: t.labelPhone,  value: form.phone },
+      { label: t.labelCourse,   value: courseLabel },
+      { label: isEn ? "Duration" : "课程时长", value: isEn ? meta.duration.en : meta.duration.zh },
+      { label: isEn ? "Fee" : "课程费用",    value: meta.price, highlight: true },
+      { label: t.labelName,     value: form.name },
+      { label: t.labelEmail,    value: form.email },
+      { label: t.labelPhone,    value: form.phone },
       ...(form.company.trim() ? [{ label: t.labelCompany, value: form.company }] : []),
     ];
 
@@ -158,10 +161,10 @@ export default function ApplyForm({ course, isEn, isLoggedIn, userEmail, callbac
             <div
               key={row.label}
               className="flex items-start gap-4 px-4 py-3"
-              style={{ borderTop: i > 0 ? "1px solid #F0EBE1" : "none" }}
+              style={{ borderTop: i > 0 ? "1px solid #F0EBE1" : "none", backgroundColor: (row as { highlight?: boolean }).highlight ? "#FFFDF7" : undefined }}
             >
               <span className="text-xs flex-shrink-0 w-16" style={{ color: "#9A9490", paddingTop: 1 }}>{row.label}</span>
-              <span className="text-sm font-medium break-all" style={{ color: "#1C1814" }}>{row.value}</span>
+              <span className="text-sm font-medium break-all" style={{ color: (row as { highlight?: boolean }).highlight ? "#8B6514" : "#1C1814" }}>{row.value}</span>
             </div>
           ))}
         </div>
