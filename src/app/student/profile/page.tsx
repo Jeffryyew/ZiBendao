@@ -1,7 +1,8 @@
-﻿import { auth } from "../../../../auth";
+import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getRoleLabel } from "@/lib/roles";
+import ProfileForm from "./ProfileForm";
 
 const ACHIEVEMENTS = [
   { id: "register", icon: "", title: "欢迎加入", desc: "完成注册，开始学习之旅", unlocked: true },
@@ -20,6 +21,7 @@ export default async function StudentProfilePage() {
   let completedCount = 0;
   let totalXP = 0;
   let memberSince = new Date();
+  let profileExtra = { phone: "", company: "", position: "", city: "", bio: "" };
 
   try {
     const [progress, user] = await Promise.all([
@@ -29,17 +31,26 @@ export default async function StudentProfilePage() {
       }),
       prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { createdAt: true },
+        select: { createdAt: true, phone: true, company: true, position: true, city: true, bio: true },
       }),
     ]);
     completedCount = progress.length;
     totalXP = progress.reduce((sum, p) => sum + (p.lesson.points ?? 0), 0);
     if (user?.createdAt) memberSince = user.createdAt;
+    if (user) {
+      profileExtra = {
+        phone:    user.phone    ?? "",
+        company:  user.company  ?? "",
+        position: user.position ?? "",
+        city:     user.city     ?? "",
+        bio:      user.bio      ?? "",
+      };
+    }
   } catch {
     // DB not seeded
   }
 
-  const initials = session.user.name
+  const initials = (session.user.name ?? "?")
     .split(" ")
     .map((w: string) => w[0])
     .join("")
@@ -51,6 +62,12 @@ export default async function StudentProfilePage() {
     month: "long",
     day: "numeric",
   });
+
+  const profileInitial = {
+    name:     session.user.name ?? "",
+    email:    session.user.email ?? "",
+    ...profileExtra,
+  };
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 md:py-10 space-y-6">
@@ -86,7 +103,16 @@ export default async function StudentProfilePage() {
             </span>
           </div>
 
-          <p className="text-xs mt-3" style={{ color: "var(--color-text-muted)" }}>
+          {(profileExtra.position || profileExtra.company || profileExtra.city) && (
+            <p className="text-xs mt-2 space-x-2" style={{ color: "var(--color-text-muted)" }}>
+              {profileExtra.position && <span>{profileExtra.position}</span>}
+              {profileExtra.position && profileExtra.company && <span>·</span>}
+              {profileExtra.company && <span>{profileExtra.company}</span>}
+              {profileExtra.city && <span>· {profileExtra.city}</span>}
+            </p>
+          )}
+
+          <p className="text-xs mt-2" style={{ color: "var(--color-text-muted)" }}>
             加入于 {joinDate}
           </p>
         </div>
@@ -113,6 +139,9 @@ export default async function StudentProfilePage() {
           </div>
         ))}
       </div>
+
+      {/* Profile Form */}
+      <ProfileForm initial={profileInitial} />
 
       {/* Achievements */}
       <div>

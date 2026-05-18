@@ -18,6 +18,11 @@ model User {
   updatedAt         DateTime           @updatedAt
   image             String?
   emailVerified     DateTime?
+  phone             String?
+  company           String?
+  position          String?
+  city              String?
+  bio               String?
   verifyToken       String?            @unique
   verifyTokenExpiry DateTime?
   accounts          Account[]
