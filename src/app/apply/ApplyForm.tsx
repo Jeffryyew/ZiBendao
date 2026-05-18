@@ -24,11 +24,21 @@ const tr = {
     email: "邮箱地址", emailPh: "your@email.com",
     phone: "手机号码", phonePh: "+60 / +86",
     company: "公司名称（可选）", companyPh: "您的公司或企业名称",
-    pay: "立即付款 →",
+    pay: "确认资料，前往付款 →",
     paying: "跳转中…",
     loginBtn: "登录后付款 →",
     required: "请填写姓名、邮箱和手机号码",
     payError: "跳转付款失败，请重试",
+    // Confirm step
+    confirmTitle: "请确认您的报名资料",
+    confirmDesc: "请核对以下资料无误后再进行付款。",
+    labelCourse: "报名课程",
+    labelName: "姓名",
+    labelEmail: "邮箱",
+    labelPhone: "手机",
+    labelCompany: "公司",
+    confirmPay: "资料无误，立即付款 →",
+    goBack: "返回修改",
   },
   en: {
     interestedIn: "Enrolling In",
@@ -36,13 +46,25 @@ const tr = {
     email: "Email Address", emailPh: "your@email.com",
     phone: "Phone Number", phonePh: "+60 / +1",
     company: "Company (optional)", companyPh: "Your company or business name",
-    pay: "Pay Now →",
+    pay: "Review & Pay →",
     paying: "Redirecting…",
     loginBtn: "Log In to Pay →",
     required: "Please enter your name, email and phone number",
     payError: "Payment redirect failed, please try again",
+    // Confirm step
+    confirmTitle: "Please confirm your details",
+    confirmDesc: "Review the information below before proceeding to payment.",
+    labelCourse: "Course",
+    labelName: "Name",
+    labelEmail: "Email",
+    labelPhone: "Phone",
+    labelCompany: "Company",
+    confirmPay: "Confirm & Pay Now →",
+    goBack: "Edit Details",
   },
 };
+
+type Step = "form" | "confirm";
 
 export default function ApplyForm({ course, isEn, isLoggedIn, userEmail, callbackUrl }: ApplyFormProps) {
   const lang = isEn ? "en" : "zh";
@@ -50,6 +72,7 @@ export default function ApplyForm({ course, isEn, isLoggedIn, userEmail, callbac
   const courseLabel = COURSE_NAMES[course]?.[lang] ?? course;
 
   const [form, setForm] = useState({ name: "", email: userEmail, phone: "", company: "" });
+  const [step, setStep] = useState<Step>("form");
   const [paying, setPaying] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -58,22 +81,25 @@ export default function ApplyForm({ course, isEn, isLoggedIn, userEmail, callbac
       setForm((p) => ({ ...p, [field]: e.target.value }));
   }
 
-  async function handlePay(e: React.FormEvent) {
+  function handleReview(e: React.FormEvent) {
     e.preventDefault();
     if (!form.name.trim() || !form.email.trim() || !form.phone.trim()) {
       setErrorMsg(t.required);
       return;
     }
     setErrorMsg("");
+    setStep("confirm");
+  }
+
+  async function handleConfirmPay() {
     setPaying(true);
+    setErrorMsg("");
     try {
-      // Save registration info quietly
       await fetch("/api/apply", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...form, course }),
       });
-      // Redirect to Stripe
       const res = await fetch("/api/payments/create-checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -85,6 +111,7 @@ export default function ApplyForm({ course, isEn, isLoggedIn, userEmail, callbac
     } catch {
       setErrorMsg(t.payError);
       setPaying(false);
+      setStep("confirm");
     }
   }
 
@@ -107,9 +134,71 @@ export default function ApplyForm({ course, isEn, isLoggedIn, userEmail, callbac
     color: "#68625C",
   };
 
+  // ── Confirmation step ──────────────────────────────────────
+  if (step === "confirm") {
+    const rows = [
+      { label: t.labelCourse, value: courseLabel },
+      { label: t.labelName,   value: form.name },
+      { label: t.labelEmail,  value: form.email },
+      { label: t.labelPhone,  value: form.phone },
+      ...(form.company.trim() ? [{ label: t.labelCompany, value: form.company }] : []),
+    ];
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-base font-bold mb-1" style={{ color: "#1C1814" }}>{t.confirmTitle}</h2>
+          <p className="text-xs" style={{ color: "#9A9490" }}>{t.confirmDesc}</p>
+        </div>
+
+        <div className="rounded-xl overflow-hidden" style={{ border: "1px solid #E0D9CE" }}>
+          {rows.map((row, i) => (
+            <div
+              key={row.label}
+              className="flex items-start gap-4 px-4 py-3"
+              style={{ borderTop: i > 0 ? "1px solid #F0EBE1" : "none" }}
+            >
+              <span className="text-xs flex-shrink-0 w-16" style={{ color: "#9A9490", paddingTop: 1 }}>{row.label}</span>
+              <span className="text-sm font-medium break-all" style={{ color: "#1C1814" }}>{row.value}</span>
+            </div>
+          ))}
+        </div>
+
+        {errorMsg && (
+          <p className="text-xs text-center" style={{ color: "#EF4444" }}>{errorMsg}</p>
+        )}
+
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={handleConfirmPay}
+            disabled={paying}
+            className="w-full py-3 rounded-xl text-sm font-semibold transition-opacity"
+            style={{
+              background: "linear-gradient(135deg, #B8943A, #C9A84C)",
+              color: "#1C1814",
+              opacity: paying ? 0.7 : 1,
+            }}
+          >
+            {paying ? t.paying : t.confirmPay}
+          </button>
+          <button
+            type="button"
+            onClick={() => setStep("form")}
+            disabled={paying}
+            className="w-full py-2.5 rounded-xl text-sm transition-opacity"
+            style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", color: "#68625C" }}
+          >
+            {t.goBack}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Form step ──────────────────────────────────────────────
   return (
-    <form onSubmit={handlePay} className="space-y-5">
-      {/* Course badge */}
+    <form onSubmit={handleReview} className="space-y-5">
       <div>
         <label style={labelStyle}>{t.interestedIn}</label>
         <div
@@ -149,15 +238,10 @@ export default function ApplyForm({ course, isEn, isLoggedIn, userEmail, callbac
       {isLoggedIn ? (
         <button
           type="submit"
-          disabled={paying}
-          className="w-full py-3 rounded-xl text-sm font-semibold transition-opacity"
-          style={{
-            background: "linear-gradient(135deg, #B8943A, #C9A84C)",
-            color: "#1C1814",
-            opacity: paying ? 0.7 : 1,
-          }}
+          className="w-full py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
+          style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
         >
-          {paying ? t.paying : t.pay}
+          {t.pay}
         </button>
       ) : (
         <Link
