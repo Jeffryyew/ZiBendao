@@ -341,4 +341,10 @@ export default async function CoursesPage() {
       </section>
 
       <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #E0D9CE", backgroundColor: "#F7F4EF" }}>
-        <p class
+        <p className="text-xs" style={{ color: "#C0B8B0" }}>
+          © 2025 Eutopos Equity Sdn Bhd 保留所有权利
+        </p>
+      </footer>
+    </div>
+  );
+}
