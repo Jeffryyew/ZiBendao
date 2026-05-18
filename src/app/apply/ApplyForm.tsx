@@ -13,6 +13,7 @@ interface ApplyFormProps {
   course: string;
   isEn: boolean;
   isLoggedIn: boolean;
+  userEmail: string;
   callbackUrl: string;
 }
 
@@ -26,7 +27,7 @@ const tr = {
     pay: "立即付款 →",
     paying: "跳转中…",
     loginBtn: "登录后付款 →",
-    required: "请填写姓名和邮箱",
+    required: "请填写姓名、邮箱和手机号码",
     payError: "跳转付款失败，请重试",
   },
   en: {
@@ -38,17 +39,17 @@ const tr = {
     pay: "Pay Now →",
     paying: "Redirecting…",
     loginBtn: "Log In to Pay →",
-    required: "Please enter your name and email",
+    required: "Please enter your name, email and phone number",
     payError: "Payment redirect failed, please try again",
   },
 };
 
-export default function ApplyForm({ course, isEn, isLoggedIn, callbackUrl }: ApplyFormProps) {
+export default function ApplyForm({ course, isEn, isLoggedIn, userEmail, callbackUrl }: ApplyFormProps) {
   const lang = isEn ? "en" : "zh";
   const t = tr[lang];
   const courseLabel = COURSE_NAMES[course]?.[lang] ?? course;
 
-  const [form, setForm] = useState({ name: "", email: "", phone: "", company: "" });
+  const [form, setForm] = useState({ name: "", email: userEmail, phone: "", company: "" });
   const [paying, setPaying] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -59,7 +60,7 @@ export default function ApplyForm({ course, isEn, isLoggedIn, callbackUrl }: App
 
   async function handlePay(e: React.FormEvent) {
     e.preventDefault();
-    if (!form.name.trim() || !form.email.trim()) {
+    if (!form.name.trim() || !form.email.trim() || !form.phone.trim()) {
       setErrorMsg(t.required);
       return;
     }
@@ -132,8 +133,8 @@ export default function ApplyForm({ course, isEn, isLoggedIn, callbackUrl }: App
 
       <div className="grid sm:grid-cols-2 gap-5">
         <div>
-          <label style={labelStyle}>{t.phone}</label>
-          <input type="tel" placeholder={t.phonePh} value={form.phone} onChange={set("phone")} style={inputStyle} />
+          <label style={labelStyle}>{t.phone} <span style={{ color: "#C9A84C" }}>*</span></label>
+          <input type="tel" required placeholder={t.phonePh} value={form.phone} onChange={set("phone")} style={inputStyle} />
         </div>
         <div>
           <label style={labelStyle}>{t.company}</label>

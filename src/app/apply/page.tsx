@@ -55,6 +55,7 @@ export default async function ApplyPage({
             course={course}
             isEn={isEn}
             isLoggedIn={!!session?.user}
+            userEmail={session?.user?.email ?? ""}
             callbackUrl={`/apply?course=${course}`}
           />
         </div>
