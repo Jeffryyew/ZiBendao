@@ -142,7 +142,7 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
   const NAV_LINKS: NavLink[] = [
     { label: t.home, href: "/" },
     { label: t.courses, href: "/courses", dropdown: COURSE_ITEMS },
-    { label: t.tools, href: "/tools", dropdown: TOOLS_ITEMS },
+    { label: t.tools, href: "/tools/guide", dropdown: TOOLS_ITEMS },
     { label: t.community, href: "/community", dropdown: COMMUNITY_ITEMS },
     { label: t.about, href: "/about" },
   ];
