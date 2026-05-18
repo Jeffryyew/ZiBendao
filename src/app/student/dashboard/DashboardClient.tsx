@@ -375,40 +375,8 @@ function LearningTab({
   overallPct: number;
   totalXP: number;
 }) {
-  const level = Math.floor(totalXP / 100) + 1;
-  const levelXP = totalXP % 100;
-  const nextLevelXP = 100;
-
   return (
     <div className="space-y-5">
-      {/* Level Card */}
-      <div
-        className="relative overflow-hidden rounded-2xl p-5"
-        style={{ background: "linear-gradient(135deg, #FFFDF7 0%, #FBF4E4 100%)", border: "1px solid rgba(201,168,76,0.25)" }}
-      >
-        <div className="flex items-center gap-4">
-          <div
-            className="w-16 h-16 rounded-2xl flex flex-col items-center justify-center flex-shrink-0"
-            style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", boxShadow: "0 4px 16px rgba(201,168,76,0.3)" }}
-          >
-            <span className="text-xl font-bold text-white">{level}</span>
-            <span className="text-xs text-white opacity-80">级</span>
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-sm font-semibold" style={{ color: "#1C1814" }}>
-                {level < 3 ? "资本学员" : level < 6 ? "资本进阶者" : level < 10 ? "资本操盘手" : "资本大师"}
-              </span>
-              <span className="text-xs font-mono" style={{ color: "#C9A84C" }}>{totalXP} XP</span>
-            </div>
-            <ProgressBar pct={Math.round((levelXP / nextLevelXP) * 100)} />
-            <div className="text-xs mt-1" style={{ color: "#9A9490" }}>
-              {levelXP} / {nextLevelXP} XP → 升级到 {level + 1} 级
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         {[

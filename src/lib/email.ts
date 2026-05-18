@@ -88,7 +88,7 @@ export async function sendPaymentConfirmationEmail(
     subject: "付款成功 — 你已成为资本道学生会员 ",
     html: wrap(`
       <h2 style="color:#F5F5F0;font-size:20px;margin:0 0 16px;">恭喜，${name}！</h2>
-      <p style="color:#A0A09A;line-height:1.8;margin:0 0 20px;">您的付款已成功处理，您现在是资本道 <strong style="color:#C9A84C;">学生会员（L1）</strong>。</p>
+      <p style="color:#A0A09A;line-height:1.8;margin:0 0 20px;">您的付款已成功处理，您现在是资本道 <strong style="color:#C9A84C;">学生会员</strong>。</p>
       <div style="background:#111111;border-radius:12px;padding:20px;margin:0 0 20px;border:1px solid #1A1A1A;">
         <table style="width:100%;border-collapse:collapse;">
           <tr>
@@ -97,7 +97,7 @@ export async function sendPaymentConfirmationEmail(
           </tr>
           <tr>
             <td style="color:#666660;font-size:13px;padding:6px 0;">会员等级</td>
-            <td style="color:#F5F5F0;font-size:13px;text-align:right;padding:6px 0;">学生 L1</td>
+            <td style="color:#F5F5F0;font-size:13px;text-align:right;padding:6px 0;">学生会员</td>
           </tr>
           <tr>
             <td style="color:#666660;font-size:13px;padding:6px 0;">付款状态</td>
@@ -105,7 +105,7 @@ export async function sendPaymentConfirmationEmail(
           </tr>
         </table>
       </div>
-      <p style="color:#A0A09A;line-height:1.8;margin:0 0 8px;">您现在可以访问完整的课程体系和所有 L1 计算工具。</p>
+      <p style="color:#A0A09A;line-height:1.8;margin:0 0 8px;">您现在可以访问完整的课程体系和所有计算工具。</p>
       ${btn(`${BASE_URL}/student/dashboard`, "开始学习")}
     `),
   });

@@ -1,13 +1,11 @@
 import Link from "next/link";
 import { getLocale } from "@/lib/i18n";
 import { CAPITAL_MODULES, LAYER_META, getModulesByLayer } from "@/lib/capitalModules";
-import { getLevelByXP, getXPProgress } from "@/lib/capitalLevels";
 import { ACHIEVEMENTS } from "@/lib/achievements";
 import AchievementBadge from "@/components/AchievementBadge";
 import NotificationBanner from "@/components/NotificationBanner";
 import type { LayerId } from "@/lib/capitalModules";
 
-const MOCK_XP = 820;
 const MOCK_HEALTH_SCORE = 42;
 const MOCK_TOOLS_USED = 3;
 const MOCK_TODAY_PROGRESS = 72;
@@ -45,7 +43,6 @@ export default async function CapitalDashboardPage() {
   const locale = await getLocale();
   const isEn = locale === "en";
   const layers = [1, 2, 3] as const;
-  const { current, next, progressPct } = getXPProgress(MOCK_XP);
   const featuredAchievements = ACHIEVEMENTS.slice(0, 3);
 
   return (
@@ -165,39 +162,6 @@ export default async function CapitalDashboardPage() {
 
           {/* RIGHT: Progress + Stats Sidebar */}
           <div className="lg:w-72 xl:w-80 flex-shrink-0 space-y-4">
-
-            {/* Level Card */}
-            <div className="p-5 rounded-2xl" style={{ backgroundColor: "#111111", border: "1px solid #1E1E1E" }}>
-              <div className="flex items-center justify-between mb-3">
-                <span
-                  className="text-xs px-2 py-0.5 rounded-full font-mono"
-                  style={{ backgroundColor: `${current.color}15`, color: current.color, border: `1px solid ${current.color}30` }}
-                >
-                  Level {current.level}
-                </span>
-                <span className="text-2xl font-bold font-mono" style={{ color: current.color }}>L{current.level}</span>
-              </div>
-              <h3 className="text-base font-bold mb-0.5" style={{ fontFamily: "var(--font-display)" }}>
-                {isEn ? current.en : current.zh}
-              </h3>
-              <p className="text-xs mb-4" style={{ color: "#555550" }}>
-                {isEn ? current.description_en : current.description_zh}
-              </p>
-              {next && (
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-xs" style={{ color: "#444440" }}>{MOCK_XP} / {next.minXP} XP</span>
-                    <span className="text-xs font-mono" style={{ color: "#C9A84C" }}>{progressPct}%</span>
-                  </div>
-                  <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: "#1A1A1A" }}>
-                    <div className="h-full rounded-full" style={{ width: `${progressPct}%`, backgroundColor: current.color }} />
-                  </div>
-                  <p className="text-xs mt-2" style={{ color: "#3A3A3A" }}>
-                    {isEn ? `→ ${next.en}` : `→ ${next.zh}`} · {next.minXP - MOCK_XP} XP
-                  </p>
-                </div>
-              )}
-            </div>
 
             {/* Capital Health Score */}
             <div className="p-5 rounded-2xl flex items-center gap-4" style={{ backgroundColor: "#111111", border: "1px solid #1E1E1E" }}>

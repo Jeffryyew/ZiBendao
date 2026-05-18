@@ -9,7 +9,6 @@ const ACHIEVEMENTS = [
   { id: "module-done", icon: "", title: "财务启蒙", desc: "完成财务基础模块" },
   { id: "streak-7", icon: "→", title: "学习达人", desc: "连续学习7天" },
   { id: "tools-3", icon: "", title: "工具专家", desc: "使用3种计算工具" },
-  { id: "level-2", icon: "", title: "进阶成就", desc: "升级至 L2 学生" },
 ];
 
 export default async function StudentProfilePage() {
