@@ -51,7 +51,7 @@ export default async function ApplyPage({
           className="rounded-2xl p-7"
           style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
         >
-          <ApplyForm course={course} isEn={isEn} />
+          <ApplyForm course={course} isEn={isEn} isLoggedIn={!!session?.user} />
         </div>
 
         <p className="text-center text-xs mt-6" style={{ color: "#C0B8B0" }}>
