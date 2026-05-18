@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
+import { getLocale } from "@/lib/i18n";
+import SharedNav from "@/components/SharedNav";
 import { CAPITAL_MODULES, LAYER_META, getModulesByLayer } from "@/lib/capitalModules";
 import type { LayerId } from "@/lib/capitalModules";
 
@@ -38,6 +40,7 @@ const layers = [1, 2, 3] as const;
 
 export default async function ToolsGuidePage() {
   const session = await auth();
+  const locale = await getLocale();
   const user = session?.user;
   const role = user?.role as string | undefined;
 
@@ -52,7 +55,9 @@ export default async function ToolsGuidePage() {
 
   return (
     <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814", minHeight: "100vh" }}>
-      <div className="max-w-4xl mx-auto px-4 py-10 md:py-14">
+      <SharedNav locale={locale} activeHref="/tools/guide" isLoggedIn={!!session?.user} />
+
+      <div className="max-w-4xl mx-auto px-4 pt-28 pb-16">
 
         <Link href={backHref} className="inline-flex items-center gap-1.5 text-sm mb-10" style={{ color: "#9A9490" }}>
           ← 返回

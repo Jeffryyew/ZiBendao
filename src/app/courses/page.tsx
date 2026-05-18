@@ -175,11 +175,11 @@ export default async function CoursesPage() {
               : "由 Jeffry Yew（姚国雄）主导设计，融合 25 年商业发展与 13 年融资专业经验，系统教授中小企业主掌握资本运作。"}
           </p>
           <Link
-            href="/login"
+            href={session?.user ? "/student/learn" : "/login"}
             className="inline-block px-8 py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
             style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
           >
-            {isEn ? "Get Started →" : "立即开始 →"}
+            {session?.user ? (isEn ? "Go to Courses →" : "进入课程 →") : (isEn ? "Get Started →" : "立即开始 →")}
           </Link>
         </div>
       </section>
@@ -247,11 +247,11 @@ export default async function CoursesPage() {
 
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/login"
+                href={session?.user ? "/student/learn" : "/login"}
                 className="inline-block text-center py-2.5 px-6 rounded-xl text-sm font-semibold"
                 style={{ backgroundColor: "#7C5FBF", color: "#FFFFFF" }}
               >
-                {isEn ? "Get Started →" : "立即开始 →"}
+                {session?.user ? (isEn ? "Go to Courses →" : "进入课程 →") : (isEn ? "Get Started →" : "立即开始 →")}
               </Link>
             </div>
           </div>
@@ -300,11 +300,11 @@ export default async function CoursesPage() {
                   </div>
 
                   <Link
-                    href="/login"
+                    href={session?.user ? "/student/learn" : "/login"}
                     className="block w-full text-center py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
                     style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
                   >
-                    {isEn ? "Get Started →" : "立即开始 →"}
+                    {session?.user ? (isEn ? "Go to Courses →" : "进入课程 →") : (isEn ? "Get Started →" : "立即开始 →")}
                   </Link>
                 </div>
               );
@@ -326,19 +326,21 @@ export default async function CoursesPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link
-              href="/login"
+              href={session?.user ? "/student/learn" : "/login"}
               className="inline-block px-10 py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
               style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
             >
-              {isEn ? "Get Started →" : "立即开始 →"}
+              {session?.user ? (isEn ? "Go to Courses →" : "进入课程 →") : (isEn ? "Get Started →" : "立即开始 →")}
             </Link>
-            <Link
-              href="/login"
-              className="inline-block px-10 py-3 rounded-xl text-sm"
-              style={{ backgroundColor: "transparent", color: "#9A9490", border: "1px solid #302B26" }}
-            >
-              {isEn ? "Login →" : "登录 →"}
-            </Link>
+            {!session?.user && (
+              <Link
+                href="/login"
+                className="inline-block px-10 py-3 rounded-xl text-sm"
+                style={{ backgroundColor: "transparent", color: "#9A9490", border: "1px solid #302B26" }}
+              >
+                {isEn ? "Login →" : "登录 →"}
+              </Link>
+            )}
           </div>
         </div>
       </section>
