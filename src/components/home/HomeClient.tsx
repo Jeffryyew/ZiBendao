@@ -528,7 +528,6 @@ function WhatIsCapital() {
               onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = "0 4px 20px rgba(28,24,20,0.08)"; }}
               onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.boxShadow = "none"; }}
             >
-              <div className="text-3xl mb-6" style={{ color: "#C9A84C" }}>{p.icon}</div>
               <h3 className="text-base font-semibold mb-3" style={{ color: "#1C1814" }}>{p.title}</h3>
               <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>{p.desc}</p>
             </motion.div>
@@ -574,7 +573,7 @@ function CapitalLearningJourney({ locale }: { locale: string }) {
       stageLabel: "阶段三",
       name: "资本道",
       nameEn: "Capital Dao",
-      desc: "进阶资本策略巅峰。理解 IPO、REIT 路径，建立企业级资本操作体系与投资人沟通能力。",
+      desc: "进阶资本策略巅峰。理解IPO逻辑，建立企业级资本操作体系与投资人沟通能力。",
       href: "/courses#capital-dao",
       accent: "#8B6514",
       accentLight: "#FBF4E4",
@@ -726,7 +725,7 @@ function ToolsPreview({ locale }: { locale: Locale }) {
           {isEn ? "Capital Tools System" : "企业资本工具系统"}
         </h2>
         <p className="text-sm" style={{ color: "#68625C" }}>
-          {isEn ? "All calculations run locally in your browser" : "涵盖商业基础到资本架构的完整工具套件"}
+          {isEn ? "All calculations run locally in your browser" : "涵盖商业基础到资本架构的工具套件"}
         </p>
       </motion.div>
 
@@ -969,3 +968,4 @@ function Footer({ t, isLoggedIn }: { t: Dict["footer"]; isLoggedIn?: boolean }) 
     </footer>
   );
 }
+                                                                                                  
