@@ -19,7 +19,7 @@ const DATA = {
       badge: "关于我们",
       title: "掌握资本之道，",
       title2: "创建可靠、可投、可扩展企业",
-      desc: "资本道由 Eutopos Equity Sdn Bhd 运营，专注于企业资本运作教育的综合平台。我们帮助中小企业主与创业者系统掌握资本运作，从融资到上市，每一步都有清晰方向。",
+      desc: "资本道由 Eutopos Equity Sdn Bhd 运营，是一个结合学习、资本工具与企业数据分析的企业成长平台，帮助企业一步一步建立资本化能力，从经营走向融资与规模化发展。",
     },
     mission: {
       title: "我们的使命",
@@ -175,7 +175,6 @@ export default async function AboutPage() {
       {/* Mission */}
       <section className="py-16 px-4" style={{ backgroundColor: "#EEE9E0" }}>
         <div className="max-w-4xl mx-auto rounded-2xl p-10 text-center" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
-          <div className="text-3xl mb-4" style={{ color: "#C9A84C" }}></div>
           <h2 className="text-2xl font-bold mb-4" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>{d.mission.title}</h2>
           <p className="text-sm leading-loose max-w-2xl mx-auto" style={{ color: "#68625C" }}>
             {d.mission.desc.split(d.mission.highlight).map((part, i, arr) => (
@@ -233,7 +232,6 @@ export default async function AboutPage() {
           <div className="grid md:grid-cols-3 gap-5">
             {d.testimonials.items.map((t) => (
               <div key={t.name} className="rounded-2xl p-6" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
-                <div className="text-lg mb-4" style={{ color: "#C9A84C" }}></div>
                 <p className="text-sm leading-relaxed mb-5" style={{ color: "#68625C" }}>{t.quote}</p>
                 <div>
                   <div className="font-semibold text-sm" style={{ color: "#1C1814" }}>{t.name}</div>
