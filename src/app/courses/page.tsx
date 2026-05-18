@@ -300,11 +300,11 @@ export default async function CoursesPage() {
                   </div>
 
                   <Link
-                    href={session?.user ? "/student/learn" : "/login"}
+                    href={`/apply?course=${courseSlug}`}
                     className="block w-full text-center py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
                     style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
                   >
-                    {session?.user ? (isEn ? "Go to Courses →" : "进入课程 →") : (isEn ? "Get Started →" : "立即开始 →")}
+                    {isEn ? "Apply Now →" : "申请加入 →"}
                   </Link>
                 </div>
               );

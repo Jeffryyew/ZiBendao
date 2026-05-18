@@ -18,6 +18,7 @@ export default auth((req) => {
     pathname === "/register" ||
     pathname === "/courses" ||
     pathname.startsWith("/tools") ||
+    pathname.startsWith("/apply") ||
     pathname === "/community" ||
     pathname === "/pricing" ||
     pathname === "/about" ||
