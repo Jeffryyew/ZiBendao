@@ -245,15 +245,13 @@ export default async function CoursesPage() {
               ))}
             </div>
 
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href={session?.user ? "/student/learn" : "/login"}
-                className="inline-block text-center py-2.5 px-6 rounded-xl text-sm font-semibold"
-                style={{ backgroundColor: "#7C5FBF", color: "#FFFFFF" }}
-              >
-                {session?.user ? (isEn ? "Go to Courses →" : "进入课程 →") : (isEn ? "Get Started →" : "立即开始 →")}
-              </Link>
-            </div>
+            <Link
+              href={session?.user ? "/student/learn" : "/login"}
+              className="block w-full text-center py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
+              style={{ backgroundColor: "#7C5FBF", color: "#FFFFFF" }}
+            >
+              {session?.user ? (isEn ? "Go to Courses →" : "进入课程 →") : (isEn ? "Get Started →" : "立即开始 →")}
+            </Link>
           </div>
         </div>
       </section>
