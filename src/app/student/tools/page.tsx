@@ -1,8 +1,8 @@
 import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { CAPITAL_MODULES, LAYER_META, getModulesByLayer } from "@/lib/capitalModules";
 import type { LayerId } from "@/lib/capitalModules";
+import ToolCard from "./ToolCard";
 
 const LAYER_DISPLAY: Record<LayerId, string> = {
   1: "商业基础层",
@@ -49,31 +49,13 @@ export default async function StudentToolsPage() {
 
               <div className="grid sm:grid-cols-2 gap-3">
                 {modules.map((mod) => (
-                  <Link
+                  <ToolCard
                     key={mod.id}
                     href={mod.href}
-                    className="group block rounded-xl p-4 relative overflow-hidden transition-all duration-200"
-                    style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
-                    onMouseEnter={(e) => {
-                      (e.currentTarget as HTMLAnchorElement).style.borderColor = `${meta.color}60`;
-                      (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#FDFCF9";
-                    }}
-                    onMouseLeave={(e) => {
-                      (e.currentTarget as HTMLAnchorElement).style.borderColor = "#E0D9CE";
-                      (e.currentTarget as HTMLAnchorElement).style.backgroundColor = "#FFFFFF";
-                    }}
-                  >
-                    <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, backgroundColor: meta.color, opacity: 0.4 }} />
-                    <div className="text-sm font-semibold mb-1 mt-0.5" style={{ color: "var(--color-text-primary)" }}>
-                      {mod.zh.name}
-                    </div>
-                    <p className="text-xs leading-relaxed mb-3" style={{ color: "var(--color-text-secondary)" }}>
-                      {mod.zh.desc}
-                    </p>
-                    <span className="text-xs font-medium" style={{ color: meta.color }}>
-                      使用工具 →
-                    </span>
-                  </Link>
+                    name={mod.zh.name}
+                    desc={mod.zh.desc}
+                    accentColor={meta.color}
+                  />
                 ))}
               </div>
             </div>
