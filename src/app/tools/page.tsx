@@ -231,7 +231,7 @@ export default async function ToolsPage() {
                     {modules.map((mod) => (
                       <Link
                         key={mod.id}
-                        href={mod.href}
+                        href={`/tools/guide#${mod.id}`}
                         className="text-xs px-3 py-1 rounded-full transition-colors"
                         style={{ backgroundColor: `${meta.color}10`, color: meta.color, border: `1px solid ${meta.color}25` }}
                         onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.backgroundColor = `${meta.color}20`; }}

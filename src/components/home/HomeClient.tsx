@@ -962,4 +962,10 @@ function Footer({ t, isLoggedIn }: { t: Dict["footer"]; isLoggedIn?: boolean }) 
 
       <div
         className="max-w-6xl mx-auto mt-12 pt-6 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs"
-        
+        style={{ borderTop: "1px solid #E0D9CE", color: "#C0B8B0" }}
+      >
+        <span>{t.copyright}</span>
+      </div>
+    </footer>
+  );
+}

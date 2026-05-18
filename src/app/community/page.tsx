@@ -269,4 +269,39 @@ export default async function CommunityPage() {
           >
             <div
               className="text-xs font-mono px-3 py-1 rounded-full mb-4"
-              style={{ backgroundColor: "#FBF4E4", color: "#8B6514", borde
+              style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.2)" }}
+            >
+              {d.events.coming}
+            </div>
+            <p className="text-sm leading-relaxed max-w-md" style={{ color: "#68625C" }}>
+              {d.events.desc}
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="px-4 py-20">
+        <div className="max-w-2xl mx-auto text-center py-16 px-10 rounded-3xl" style={{ backgroundColor: "#1C1814" }}>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ fontFamily: "var(--font-display)", color: "#F0EBE1" }}>
+            {d.cta.title}
+          </h2>
+          <p className="text-sm mb-8 leading-relaxed" style={{ color: "#9A9490" }}>{d.cta.desc}</p>
+          <Link
+            href={session?.user ? "/dashboard" : "/login"}
+            className="inline-block px-10 py-3 rounded-xl font-semibold text-sm transition-opacity hover:opacity-88"
+            style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
+          >
+            {isEn ? "Join Us →" : "加入我们 →"}
+          </Link>
+        </div>
+      </section>
+
+      <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #E0D9CE" }}>
+        <p className="text-xs" style={{ color: "#9A9490" }}>
+          © 2025 Eutopos Equity Sdn Bhd 保留所有权利
+        </p>
+      </footer>
+    </div>
+  );
+}

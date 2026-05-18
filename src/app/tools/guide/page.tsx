@@ -94,7 +94,8 @@ export default async function ToolsGuidePage() {
                     return (
                       <div
                         key={mod.id}
-                        className="rounded-2xl overflow-hidden"
+                        id={mod.id}
+                        className="rounded-2xl overflow-hidden scroll-mt-24"
                         style={{ backgroundColor: "#FFFFFF", border: `1px solid #E0D9CE` }}
                       >
                         <div style={{ height: 2, background: `linear-gradient(90deg, ${meta.color}00, ${meta.color}, ${meta.color}00)` }} />
