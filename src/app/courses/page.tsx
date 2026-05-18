@@ -134,7 +134,7 @@ const OUTCOMES = {
     { icon: "", text: "掌握企业估值核心方法，知道自己公司值多少钱" },
     { icon: "", text: "设计合理股权架构，避免稀释与纠纷风险" },
     { icon: "", text: "制定融资策略，与投资人建立有效沟通框架" },
-    { icon: "", text: "规划清晰资本退出路径，从并购到 IPO 逐步推进" },
+    { icon: "", text: "规划清晰资本退出机制，从并购到 IPO 逐步推进" },
   ],
   en: [
     { icon: "", text: "Master core valuation methods and know exactly what your company is worth" },
@@ -172,7 +172,7 @@ export default async function CoursesPage() {
           <p className="text-base leading-relaxed mb-8" style={{ color: "#68625C" }}>
             {isEn
               ? "Designed by Jeffry Yew with 25 years of business development and 13 years of fundraising expertise, systematically teaching SME owners to master capital operations."
-              : "由 Jeffry Yew（姚国雄）主导设计，融合 25 年商业发展与 13 年融资专业经验，系统教授中小企业主掌握资本运作。"}
+              : "由 Jeffry Yew（姚国雄）主导设计，融合 25 年商业发展与 13 年融资专业经验，系统传授中小企业主掌握资本运作。"}
           </p>
           <Link
             href={session?.user ? "/student/learn" : "/login"}
@@ -223,14 +223,11 @@ export default async function CoursesPage() {
               <span className="text-xs px-2.5 py-1 rounded-full" style={{ backgroundColor: "#F7F4EF", color: "#9A9490", border: "1px solid #E0D9CE" }}>
                 {onlineCourse.tag}
               </span>
-              <span className="text-xs px-2.5 py-1 rounded-full" style={{ backgroundColor: "#F4F0FC", color: "#7C5FBF", border: "1px solid rgba(124,95,191,0.2)" }}>
-                {onlineCourse.badgeLabel}
-              </span>
             </div>
 
             <div className="mb-1">
-              <span className="text-xs" style={{ color: "#9A9490" }}>{onlineCourse.nameEn}</span>
-              <span className="text-xs ml-2" style={{ color: "#C0B8B0" }}>· {onlineCourse.subtitle}</span>
+              {isEn && <span className="text-xs" style={{ color: "#9A9490" }}>{onlineCourse.nameEn}</span>}
+              {isEn && <span className="text-xs ml-2" style={{ color: "#C0B8B0" }}>· {onlineCourse.subtitle}</span>}
             </div>
             <h3 className="font-bold text-xl mb-0.5" style={{ color: "#1C1814" }}>{onlineCourse.name}</h3>
             {!isEn && <p className="text-xs mb-1" style={{ color: "#9A9490" }}>{onlineCourse.subtitleZh}</p>}
@@ -284,7 +281,7 @@ export default async function CoursesPage() {
                     </span>
                   </div>
 
-                  <div className="text-xs mb-0.5" style={{ color: "#9A9490" }}>{c.nameEn}</div>
+                  {isEn && <div className="text-xs mb-0.5" style={{ color: "#9A9490" }}>{c.nameEn}</div>}
                   <h3 className="font-bold text-lg mb-2" style={{ color: "#1C1814" }}>{c.name}</h3>
                   <p className="text-sm mb-5" style={{ color: "#68625C" }}>{c.desc}</p>
 
@@ -344,10 +341,4 @@ export default async function CoursesPage() {
       </section>
 
       <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #E0D9CE", backgroundColor: "#F7F4EF" }}>
-        <p className="text-xs" style={{ color: "#C0B8B0" }}>
-          © 2025 Eutopos Equity Sdn Bhd 保留所有权利
-        </p>
-      </footer>
-    </div>
-  );
-}
+        <p class
