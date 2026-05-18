@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { motion, useInView } from "framer-motion";
 import { useRef, useEffect, useState } from "react";
@@ -453,7 +453,7 @@ function HeroSection({ t, isLoggedIn }: { t: Dict["hero"]; isLoggedIn?: boolean 
                 {t.cta_primary}
               </Link>
               <Link
-                href="/tools/guide"
+                href="/tools"
                 className="px-8 py-4 rounded-xl font-semibold text-base transition-all"
                 style={{ backgroundColor: "transparent", color: "#68625C", border: "1px solid #E0D9CE" }}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLAnchorElement).style.borderColor = "#B0A898"; (e.currentTarget as HTMLAnchorElement).style.color = "#1C1814"; }}
@@ -968,3 +968,4 @@ function Footer({ t, isLoggedIn }: { t: Dict["footer"]; isLoggedIn?: boolean }) 
     </footer>
   );
 }
+                                                                                            

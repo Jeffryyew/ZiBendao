@@ -1,13 +1,45 @@
-﻿import { Resend } from "resend";
+import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
+// ── Resend (primary) ───────────────────────────────────────────────────────
 function getResend() {
   const key = process.env.RESEND_API_KEY;
   if (!key) return null;
   return new Resend(key);
 }
 
-const FROM = process.env.RESEND_FROM ?? "资本道 ZiBenDao <noreply@zibendao.com>";
+// ── Nodemailer / SMTP (fallback) ───────────────────────────────────────────
+function getSmtpTransport() {
+  const host = process.env.SMTP_HOST;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  if (!host || !user || !pass || user === "your@gmail.com") return null;
+  return nodemailer.createTransport({
+    host,
+    port: Number(process.env.SMTP_PORT ?? 587),
+    secure: process.env.SMTP_SECURE === "true",
+    auth: { user, pass },
+  });
+}
+
+// ── Shared ─────────────────────────────────────────────────────────────────
+const FROM_DISPLAY = process.env.RESEND_FROM ?? process.env.SMTP_FROM ?? "noreply@zibendao.com";
+const FROM = FROM_DISPLAY.includes("<") ? FROM_DISPLAY : `资本道 ZiBenDao <${FROM_DISPLAY}>`;
 const BASE_URL = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+
+async function sendMail(opts: { to: string; subject: string; html: string }): Promise<void> {
+  const resend = getResend();
+  if (resend) {
+    await resend.emails.send({ from: FROM, ...opts });
+    return;
+  }
+  const smtp = getSmtpTransport();
+  if (smtp) {
+    await smtp.sendMail({ from: FROM, ...opts });
+    return;
+  }
+  console.warn("[email] No transport configured. Email not sent:", opts.subject, "->", opts.to);
+}
 
 function wrap(body: string): string {
   return `<!DOCTYPE html>
@@ -35,11 +67,8 @@ function btn(href: string, label: string): string {
 }
 
 export async function sendVerificationEmail(to: string, name: string, token: string): Promise<void> {
-  const resend = getResend();
-  if (!resend) return;
   const link = `${BASE_URL}/verify-email?token=${token}`;
-  await resend.emails.send({
-    from: FROM,
+  await sendMail({
     to,
     subject: "请验证你的资本道账号邮箱",
     html: wrap(`
@@ -53,10 +82,7 @@ export async function sendVerificationEmail(to: string, name: string, token: str
 }
 
 export async function sendWelcomeEmail(to: string, name: string): Promise<void> {
-  const resend = getResend();
-  if (!resend) return;
-  await resend.emails.send({
-    from: FROM,
+  await sendMail({
     to,
     subject: "欢迎加入资本道 — 开启你的金融学习之旅",
     html: wrap(`
@@ -80,12 +106,9 @@ export async function sendPaymentConfirmationEmail(
   amount: string,
   currency: string,
 ): Promise<void> {
-  const resend = getResend();
-  if (!resend) return;
-  await resend.emails.send({
-    from: FROM,
+  await sendMail({
     to,
-    subject: "付款成功 — 你已成为资本道学生会员 ",
+    subject: "付款成功 — 你已成为资本道学生会员",
     html: wrap(`
       <h2 style="color:#F5F5F0;font-size:20px;margin:0 0 16px;">恭喜，${name}！</h2>
       <p style="color:#A0A09A;line-height:1.8;margin:0 0 20px;">您的付款已成功处理，您现在是资本道 <strong style="color:#C9A84C;">学生会员</strong>。</p>
@@ -117,10 +140,7 @@ export async function sendContractEmail(
   docTitle: string,
   docId: string,
 ): Promise<void> {
-  const resend = getResend();
-  if (!resend) return;
-  await resend.emails.send({
-    from: FROM,
+  await sendMail({
     to,
     subject: `合约待签署 — ${docTitle}`,
     html: wrap(`
@@ -138,10 +158,7 @@ export async function sendContractEmail(
 }
 
 export async function sendOtpEmail(to: string, otp: string): Promise<void> {
-  const resend = getResend();
-  if (!resend) return;
-  await resend.emails.send({
-    from: FROM,
+  await sendMail({
     to,
     subject: `${otp} — 资本道登录验证码`,
     html: wrap(`

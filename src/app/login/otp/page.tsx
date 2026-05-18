@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useRef, useState, useTransition, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -10,6 +10,7 @@ function OtpForm() {
   const params = useSearchParams();
   const router = useRouter();
   const email = params.get("email") ?? "";
+  const remember = params.get("remember") !== "0";
 
   const [digits, setDigits] = useState(["", "", "", "", "", ""]);
   const [error, setError] = useState("");
@@ -56,7 +57,7 @@ function OtpForm() {
   function submitOtp(otp: string) {
     setError("");
     startTransition(async () => {
-      const result = await signIn("otp", { email, otp, redirect: false });
+      const result = await signIn("otp", { email, otp, redirect: false, remember });
       if (result?.error) {
         setError("验证码错误或已过期，请重试。");
         setDigits(["", "", "", "", "", ""]);

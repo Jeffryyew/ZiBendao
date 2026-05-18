@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useTransition } from "react";
 import Link from "next/link";
@@ -26,6 +26,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [remember, setRemember] = useState(true);
 
   const inputStyle = {
     backgroundColor: "#FFFFFF",
@@ -45,7 +46,7 @@ export default function RegisterPage() {
       if (result?.error) {
         setError(result.error);
       } else {
-        window.location.href = `/login/otp?email=${encodeURIComponent(email)}`;
+        window.location.href = `/login/otp?email=${encodeURIComponent(email)}&remember=${remember ? "1" : "0"}`;
       }
     });
   }
@@ -166,6 +167,17 @@ export default function RegisterPage() {
                   <span className="flex-shrink-0"></span>{error}
                 </div>
               )}
+              <label className="flex items-center gap-2.5 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className="w-4 h-4 rounded"
+                  style={{ accentColor: "#C9A84C" }}
+                />
+                <span className="text-sm" style={{ color: "#68625C" }}>保持登入</span>
+              </label>
+
               <button
                 type="submit"
                 disabled={isPending}

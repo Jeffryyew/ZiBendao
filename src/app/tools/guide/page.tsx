@@ -41,27 +41,11 @@ const layers = [1, 2, 3] as const;
 export default async function ToolsGuidePage() {
   const session = await auth();
   const locale = await getLocale();
-  const user = session?.user;
-  const role = user?.role as string | undefined;
-
-  const backHref =
-    role === "SUPER_ADMIN" || role === "ADMIN"
-      ? "/admin"
-      : role === "ENTERPRISE_CLIENT"
-      ? "/client/dashboard"
-      : role
-      ? "/student/dashboard"
-      : "/tools";
-
   return (
     <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814", minHeight: "100vh" }}>
       <SharedNav locale={locale} activeHref="/tools/guide" isLoggedIn={!!session?.user} />
 
       <div className="max-w-4xl mx-auto px-4 pt-28 pb-16">
-
-        <Link href={backHref} className="inline-flex items-center gap-1.5 text-sm mb-10" style={{ color: "#9A9490" }}>
-          ← 返回
-        </Link>
 
         {/* Header */}
         <div className="mb-12">
@@ -153,3 +137,4 @@ export default async function ToolsGuidePage() {
     </div>
   );
 }
+                                                                                                                                                         

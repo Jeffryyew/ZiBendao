@@ -1,4 +1,4 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import SharedNav from "@/components/SharedNav";
 import { getLocale } from "@/lib/i18n";
 import { auth } from "@/lib/auth";
@@ -182,13 +182,6 @@ export default async function CoursesPage() {
               ? "Designed by Jeffry Yew with 25 years of business development and 13 years of fundraising expertise, systematically teaching SME owners to master capital operations."
               : "由 Jeffry Yew（姚国雄）主导设计，融合 25 年商业发展与 13 年融资专业经验，系统传授中小企业主掌握资本运作。"}
           </p>
-          <Link
-            href={session?.user ? "/student/learn" : "/login"}
-            className="inline-block px-8 py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
-            style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
-          >
-            {session?.user ? (isEn ? "Go to Courses →" : "进入课程 →") : (isEn ? "Get Started →" : "立即开始 →")}
-          </Link>
         </div>
       </section>
 
@@ -291,13 +284,7 @@ export default async function CoursesPage() {
                   {isEn && <div className="text-xs mb-0.5" style={{ color: "#9A9490" }}>{c.nameEn}</div>}
                   <h3 className="font-bold text-lg mb-1" style={{ color: "#1C1814" }}>{c.name}</h3>
 
-                  {/* Price */}
-                  <div className="mb-3">
-                    <span className="text-2xl font-bold font-mono" style={{ color: course.accent }}>{course.price}</span>
-                    <span className="text-xs ml-2" style={{ color: "#9A9490" }}>{isEn ? "per person" : "/ 人"}</span>
-                  </div>
-
-                  <p className="text-sm mb-5" style={{ color: "#68625C" }}>{c.desc}</p>
+                                    <p className="text-sm mb-5" style={{ color: "#68625C" }}>{c.desc}</p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-1.5 gap-x-4 mb-6">
                     {c.abilities.map((ability) => (
@@ -339,26 +326,4 @@ export default async function CoursesPage() {
               className="inline-block px-10 py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
               style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
             >
-              {session?.user ? (isEn ? "Go to Courses →" : "进入课程 →") : (isEn ? "Get Started →" : "立即开始 →")}
-            </Link>
-            {!session?.user && (
-              <Link
-                href="/login"
-                className="inline-block px-10 py-3 rounded-xl text-sm"
-                style={{ backgroundColor: "transparent", color: "#9A9490", border: "1px solid #302B26" }}
-              >
-                {isEn ? "Login →" : "登录 →"}
-              </Link>
-            )}
-          </div>
-        </div>
-      </section>
-
-      <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #E0D9CE", backgroundColor: "#F7F4EF" }}>
-        <p className="text-xs" style={{ color: "#C0B8B0" }}>
-          © 2025 Eutopos Equity Sdn Bhd 保留所有权利
-        </p>
-      </footer>
-    </div>
-  );
-}
+              {session?.user ? (isEn ? "Go to Courses →" : "进入课程 →") : (isEn ? "Get Started
