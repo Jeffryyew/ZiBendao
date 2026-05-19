@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { sendOtp } from "@/app/actions/auth";
+import LogoImg from "@/components/LogoImg";
 
 const GoogleIcon = () => (
   <svg width="18" height="18" viewBox="0 0 18 18" className="flex-shrink-0">
@@ -59,18 +60,14 @@ export default function LoginClient({ locale }: { locale: string }) {
         className="hidden lg:flex flex-col justify-between w-[440px] flex-shrink-0 px-12 py-14"
         style={{ backgroundColor: "#FFFFFF", borderRight: "1px solid #E0D9CE" }}
       >
-        <Link href="/">
-          <div className="flex items-baseline gap-3">
-            <span className="text-3xl font-bold tracking-wide" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>资本道</span>
-            <span className="text-sm tracking-widest" style={{ color: "#9A9490" }}>ZIBENDAO</span>
-          </div>
-          <p className="text-xs mt-1.5" style={{ color: "#9A9490" }}>{isEn ? "Financial Education · Capital Advisory Platform" : "金融教育 · 资本咨询 一体化平台"}</p>
+        <Link href="/" className="inline-flex flex-col gap-1.5">
+          <LogoImg height={36} onLight />
+          <p className="text-xs" style={{ color: "#9A9490" }}>{isEn ? "Master the way of capital — build reliable, investable, scalable businesses" : "掌握资本之道，创建可靠、可投、可扩展企业"}</p>
         </Link>
         <div className="space-y-6">
           {[
             { icon: "", title: isEn ? "Structured Courses" : "系统化金融课程", desc: isEn ? "Step-by-step capital mastery from fundamentals to advanced" : "从基础财务分析到高级资本运作，分阶段闯关学习" },
             { icon: "", title: isEn ? "Professional Tools" : "专业计算工具", desc: isEn ? "Valuation, KPI tracking, financial roadmap" : "市值估值、KPI追踪、财务路线图，实战导向" },
-            { icon: "", title: isEn ? "Advisory Services" : "一对一咨询服务", desc: isEn ? "Custom consulting with digital contract management" : "企业顾问定制方案，合约在线生成与签署" },
           ].map((f) => (
             <div key={f.title} className="flex gap-4">
               <span className="text-base flex-shrink-0 mt-0.5" style={{ color: "#8B6514" }}>{f.icon}</span>
@@ -90,8 +87,9 @@ export default function LoginClient({ locale }: { locale: string }) {
       {/* Right form panel */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
         <div className="lg:hidden mb-8 text-center">
-          <Link href="/">
-            <span className="text-2xl font-bold" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>资本道</span>
+          <Link href="/" className="inline-flex flex-col items-center gap-1.5">
+            <LogoImg height={34} onLight />
+            <p className="text-xs" style={{ color: "#9A9490" }}>{isEn ? "Master the way of capital — build reliable, investable, scalable businesses" : "掌握资本之道，创建可靠、可投、可扩展企业"}</p>
           </Link>
         </div>
 
