@@ -54,20 +54,12 @@ export default function RegisterClient({ locale }: { locale: string }) {
   }
 
   const benefits = isEn ? [
-    "Free access to first 3 core course lessons",
-    "1 basic capital tool included",
     "Exclusive learning progress tracking & achievement system",
     "Priority updates on new courses and events",
   ] : [
-    "免费体验前3关核心课程内容",
-    "1个基础资本工具使用权",
     "专属学习进度追踪与成就系统",
     "优先了解最新课程与活动资讯",
   ];
-
-  const stats = isEn
-    ? [{ value: "500+", label: "Students" }, { value: "4", label: "Tools" }, { value: "13+", label: "Lessons" }]
-    : [{ value: "500+", label: "学员" }, { value: "4", label: "专业工具" }, { value: "13+", label: "课程内容" }];
 
   return (
     <div className="min-h-screen flex" style={{ backgroundColor: "#F7F4EF" }}>
@@ -91,14 +83,6 @@ export default function RegisterClient({ locale }: { locale: string }) {
           ))}
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
-          {stats.map((s) => (
-            <div key={s.label} className="rounded-xl p-3 text-center" style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(139,101,20,0.12)" }}>
-              <div className="text-lg font-bold font-mono" style={{ color: "#8B6514" }}>{s.value}</div>
-              <div className="text-xs mt-0.5" style={{ color: "#9A9490" }}>{s.label}</div>
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* Right form panel */}
