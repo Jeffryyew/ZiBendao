@@ -473,25 +473,24 @@ function LearningTab({
             </div>
           ))}
         </div>
-        <div className="text-xs font-medium mb-2" style={{ color: "#9A9490" }}>线下课程</div>
         <div className="grid grid-cols-3 gap-3">
           {[
             {
               abbr: "ZBT",
               label: "资本通",
-              desc: "Stage 1 · RM 2,800",
+              desc: "Stage 1",
               unlocked: ["ZIBENTONG_GRAD","QIDONG_GRAD","ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role),
             },
             {
               abbr: "QD",
               label: "启动资本",
-              desc: "Stage 2 · RM 7,800",
+              desc: "Stage 2",
               unlocked: ["QIDONG_GRAD","ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role),
             },
             {
               abbr: "ZBD",
               label: "资本道",
-              desc: "Stage 3 · RM 38,000",
+              desc: "Stage 3",
               unlocked: ["ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role),
             },
           ].map((a) => (
