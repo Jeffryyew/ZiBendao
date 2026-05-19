@@ -103,8 +103,8 @@ export default function RegisterClient({ locale }: { locale: string }) {
 
       {/* Right form panel */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-        <div className="lg:hidden mb-8 text-center">
-          <Link href="/" className="inline-flex flex-col items-center gap-1.5">
+        <div className="lg:hidden mb-8">
+          <Link href="/" className="inline-flex flex-col items-start gap-1.5">
             <LogoImg height={34} onLight />
             <p className="text-xs" style={{ color: "#9A9490" }}>{isEn ? "Master the way of capital — build reliable, investable, scalable businesses" : "掌握资本之道，创建可靠、可投、可扩展企业"}</p>
           </Link>
