@@ -182,7 +182,75 @@ export async function deleteLesson(lessonId: string, moduleId: string): Promise<
   }
 }
 
-//  Tools 
+//  Offline Student Accounts
+
+const COURSE_ROLE: Record<string, string> = {
+  CAPITAL_MAP:  "ZIBENTONG_GRAD",
+  CAPITAL_CODE: "QIDONG_GRAD",
+  CAPITAL_DAO:  "ZIBENDAO_GRAD",
+};
+
+export async function createOfflineStudentAccount(
+  accountNo: string,
+  phone: string,
+  holderName: string,
+  course: string,
+): Promise<ActionResult> {
+  try {
+    await requireAdmin();
+    if (!accountNo || !phone || !holderName || !course) return { error: "所有字段为必填" };
+    const existing = await prisma.offlineStudentAccount.findUnique({ where: { accountNo } });
+    if (existing) return { error: "该学员账号已存在" };
+    await prisma.offlineStudentAccount.create({
+      data: { accountNo, phone, holderName, course: course as never },
+    });
+    revalidatePath("/admin/student-accounts");
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "创建失败" };
+  }
+}
+
+export async function deleteOfflineStudentAccount(id: string): Promise<ActionResult> {
+  try {
+    await requireAdmin();
+    const account = await prisma.offlineStudentAccount.findUnique({ where: { id } });
+    if (!account) return { error: "账号不存在" };
+    if (account.linkedUserId) {
+      await prisma.user.update({
+        where: { id: account.linkedUserId },
+        data: { studentAccountNo: null },
+      });
+    }
+    await prisma.offlineStudentAccount.delete({ where: { id } });
+    revalidatePath("/admin/student-accounts");
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "删除失败" };
+  }
+}
+
+export async function confirmOfflineBadge(accountId: string): Promise<ActionResult> {
+  try {
+    await requireAdmin();
+    const account = await prisma.offlineStudentAccount.findUnique({ where: { id: accountId } });
+    if (!account) return { error: "账号不存在" };
+    if (!account.linkedUserId) return { error: "该学员账号尚未被用户绑定" };
+    const role = COURSE_ROLE[account.course];
+    if (!role) return { error: "未知课程类型" };
+    await prisma.user.update({
+      where: { id: account.linkedUserId },
+      data: { role: role as never, studentLevel: null },
+    });
+    revalidatePath("/admin/student-accounts");
+    revalidatePath("/admin/users");
+    return {};
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "操作失败" };
+  }
+}
+
+//  Tools
 
 export async function createTool(
   name: string,

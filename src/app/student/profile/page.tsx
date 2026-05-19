@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { getLocale } from "@/lib/i18n";
 import { getRoleLabel } from "@/lib/roles";
 import ProfileForm from "./ProfileForm";
+import StudentAccountSection from "./StudentAccountSection";
 
 export default async function StudentProfilePage() {
   const session = await auth();
@@ -31,6 +32,7 @@ export default async function StudentProfilePage() {
   let totalXP = 0;
   let memberSince = new Date();
   let profileExtra = { phone: "", company: "", position: "", city: "", bio: "" };
+  let studentAccountNo: string | null = null;
 
   try {
     const [progress, user] = await Promise.all([
@@ -40,7 +42,7 @@ export default async function StudentProfilePage() {
       }),
       prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { createdAt: true, phone: true, company: true, position: true, city: true, bio: true },
+        select: { createdAt: true, phone: true, company: true, position: true, city: true, bio: true, studentAccountNo: true },
       }),
     ]);
     completedCount = progress.length;
@@ -54,6 +56,7 @@ export default async function StudentProfilePage() {
         city:     user.city     ?? "",
         bio:      user.bio      ?? "",
       };
+      studentAccountNo = user.studentAccountNo ?? null;
     }
   } catch {
     // DB not seeded
@@ -157,6 +160,9 @@ export default async function StudentProfilePage() {
 
       {/* Profile Form */}
       <ProfileForm initial={profileInitial} />
+
+      {/* Student Account */}
+      <StudentAccountSection studentAccountNo={studentAccountNo} />
 
       {/* Achievements */}
       <div>

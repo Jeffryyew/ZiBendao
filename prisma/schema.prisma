@@ -25,12 +25,14 @@ model User {
   bio               String?
   verifyToken       String?            @unique
   verifyTokenExpiry DateTime?
+  studentAccountNo  String?            @unique
   accounts          Account[]
   toolAccess        ClientToolAccess[]
   documents         Document[]
   progress          LessonProgress[]
   payments          Payment[]
   sessions          Session[]
+  offlineAccount    OfflineStudentAccount?
 }
 
 model Account {
@@ -149,6 +151,17 @@ model Payment {
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model OfflineStudentAccount {
+  id           String        @id @default(cuid())
+  accountNo    String        @unique
+  phone        String
+  holderName   String
+  course       OfflineCourse
+  linkedUserId String?       @unique
+  linkedUser   User?         @relation(fields: [linkedUserId], references: [id])
+  createdAt    DateTime      @default(now())
+}
+
 model ContractTemplate {
   id        String   @id @default(cuid())
   title     String
@@ -168,6 +181,12 @@ enum Role {
   ONLINE_STUDENT
   ENTERPRISE_CLIENT
   FREE_MEMBER
+}
+
+enum OfflineCourse {
+  CAPITAL_MAP
+  CAPITAL_CODE
+  CAPITAL_DAO
 }
 
 enum LessonType {

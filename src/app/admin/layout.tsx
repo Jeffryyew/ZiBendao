@@ -6,6 +6,7 @@ import { getRoleLabel } from "@/lib/roles";
 const NAV_ITEMS: NavItem[] = [
   { label: "仪表板", href: "/admin", icon: "⊕" },
   { label: "用户管理", href: "/admin/users" },
+  { label: "线下学员", href: "/admin/student-accounts" },
   { label: "合约管理", href: "/admin/contracts" },
   { label: "课程管理", href: "/admin/courses" },
   { label: "工具管理", href: "/admin/tools" },
