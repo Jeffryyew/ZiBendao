@@ -60,9 +60,9 @@ export default function LoginClient({ locale }: { locale: string }) {
         className="hidden lg:flex flex-col justify-between w-[440px] flex-shrink-0 px-12 py-14"
         style={{ backgroundColor: "#FFFFFF", borderRight: "1px solid #E0D9CE" }}
       >
-        <Link href="/" className="inline-flex flex-col gap-1.5">
+        <Link href="/" className="flex flex-col items-start gap-1.5">
           <LogoImg height={36} onLight />
-          <p className="text-xs" style={{ color: "#9A9490" }}>{isEn ? "Master the way of capital — build reliable, investable, scalable businesses" : "掌握资本之道，创建可靠、可投、可扩展企业"}</p>
+          <p className="text-xs text-left" style={{ color: "#9A9490" }}>{isEn ? "Master the way of capital — build reliable, investable, scalable businesses" : "掌握资本之道，创建可靠、可投、可扩展企业"}</p>
         </Link>
         <div className="space-y-6">
           {[
