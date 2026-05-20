@@ -244,7 +244,7 @@ export default async function CoursesPage() {
             </div>
 
             <Link
-              href={session?.user ? "/student/learn" : "/login"}
+              href={session?.user ? "/online/learn" : "/login"}
               className="block w-full text-center py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
               style={{ backgroundColor: "#7C5FBF", color: "#FFFFFF" }}
             >
@@ -322,7 +322,7 @@ export default async function CoursesPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link
-              href={session?.user ? "/student/learn" : "/login"}
+              href={session?.user ? "/online/learn" : "/login"}
               className="inline-block px-10 py-3 rounded-xl text-sm font-semibold transition-opacity hover:opacity-88"
               style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1C1814" }}
             >

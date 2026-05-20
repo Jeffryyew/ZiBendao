@@ -1,6 +1,7 @@
 import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { CAPITAL_LAUNCH_MODULES } from "@/lib/capitalLaunchCourse";
 import DashboardClient from "./DashboardClient";
 
 export default async function StudentDashboardPage() {
@@ -9,27 +10,28 @@ export default async function StudentDashboardPage() {
 
   const firstName = session.user.name?.split(" ")[0] ?? session.user.name ?? "用户";
 
+  const modules = CAPITAL_LAUNCH_MODULES.map((m) => ({
+    id: m.id,
+    title: m.title,
+    lessons: m.lessons.map((l) => ({ id: l.id, points: l.xpReward })),
+  }));
+
+  const lessonXpMap = new Map(
+    CAPITAL_LAUNCH_MODULES.flatMap((m) => m.lessons.map((l) => [l.id, l.xpReward]))
+  );
+
   let completedIds: string[] = [];
   let totalXP = 0;
-  let modules: { id: string; title: string; lessons: { id: string; points: number | null }[] }[] = [];
 
   try {
-    const [progress, moduleData] = await Promise.all([
-      prisma.lessonProgress.findMany({
-        where: { userId: session.user.id, completed: true },
-        include: { lesson: { select: { points: true } } },
-      }),
-      prisma.module.findMany({
-        where: { isPublished: true },
-        include: { lessons: { select: { id: true, points: true } } },
-        orderBy: { order: "asc" },
-      }),
-    ]);
+    const progress = await prisma.onlineLessonProgress.findMany({
+      where: { userId: session.user.id, completed: true },
+      select: { lessonId: true },
+    });
     completedIds = progress.map((p) => p.lessonId);
-    totalXP = progress.reduce((sum, p) => sum + (p.lesson.points ?? 0), 0);
-    modules = moduleData;
+    totalXP = completedIds.reduce((sum, id) => sum + (lessonXpMap.get(id) ?? 0), 0);
   } catch {
-    // DB might not be seeded yet
+    // DB not migrated yet
   }
 
   return (
