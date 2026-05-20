@@ -77,10 +77,19 @@ export default function OnlineLearnPage() {
           </span>
         </div>
 
-        {/* Progress */}
-        <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
-          {completedCount}/{totalLessons} 关完成
-        </span>
+        {/* Progress + Achievements link */}
+        <div className="flex items-center gap-3">
+          <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+            {completedCount}/{totalLessons} 关完成
+          </span>
+          <Link
+            href="/online/achievements"
+            className="text-xs px-2.5 py-1 rounded-full transition-opacity hover:opacity-80"
+            style={{ background: "rgba(245,158,11,0.15)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.3)" }}
+          >
+            🏆 成就
+          </Link>
+        </div>
       </div>
 
       {/* Hero */}

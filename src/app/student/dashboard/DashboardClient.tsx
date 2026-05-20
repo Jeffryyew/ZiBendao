@@ -2,6 +2,13 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import {
+  ONLINE_BADGES,
+  getEarnedOnlineBadgeIds,
+  getBadgeStates,
+  getCompletedLessons,
+} from "@/lib/badges";
+import { BadgeIcon } from "@/components/badges/BadgeIcon";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -350,6 +357,46 @@ function OverviewTab({
         ) : null}
       </Card>
 
+      {/* 资本启航 Online Course CTA */}
+      <div
+        className="relative overflow-hidden rounded-2xl p-5"
+        style={{ background: "linear-gradient(135deg, #0a0a1a 0%, #0d0d20 100%)", border: "1px solid rgba(99,102,241,0.3)" }}
+      >
+        <div className="absolute top-0 right-0 w-40 h-40 opacity-5 pointer-events-none" aria-hidden>
+          <svg viewBox="0 0 100 100"><circle cx="80" cy="20" r="60" fill="#6366F1"/></svg>
+        </div>
+        <div className="flex items-start gap-3">
+          <div className="text-3xl flex-shrink-0">🌊</div>
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-medium mb-1" style={{ color: "#818CF8" }}>AI 沉浸式线上课程</div>
+            <div className="text-base font-bold mb-1" style={{ color: "#fff" }}>《资本启航》</div>
+            <div className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.45)" }}>
+              24 关 · 11 个模块 · 故事 + 测验 + 模拟器
+            </div>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/online/learn"
+                className="px-4 py-1.5 rounded-xl text-xs font-semibold transition-all"
+                style={{ background: "linear-gradient(135deg, #6366F1, #4F46E5)", color: "#fff" }}
+              >
+                进入学习 →
+              </Link>
+              <Link
+                href="/online/achievements"
+                className="px-3 py-1.5 rounded-xl text-xs font-medium"
+                style={{ background: "rgba(245,158,11,0.15)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.3)" }}
+              >
+                🏆 成就
+              </Link>
+            </div>
+          </div>
+          <div className="text-right flex-shrink-0">
+            <div className="text-xl font-bold font-mono" style={{ color: "#6366F1" }}>{completedCount}</div>
+            <div className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>/{totalLessons} 关</div>
+          </div>
+        </div>
+      </div>
+
       {/* Recent Tools */}
       <Card title="资本工具">
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -507,6 +554,99 @@ function CrestBadge({
   );
 }
 
+// ─── Badge Showcase Card (used in LearningTab) ────────────────────────────────
+
+function BadgeShowcaseCard({ role }: { role: string }) {
+  const [earnedIds, setEarnedIds] = useState<Set<string>>(new Set());
+  const [badgeStates, setBadgeStatesLocal] = useState<Record<string, string>>({});
+  const [hasNew, setHasNew] = useState(false);
+
+  useEffect(() => {
+    try {
+      const completed = getCompletedLessons();
+      const earned = new Set(getEarnedOnlineBadgeIds(completed));
+      setEarnedIds(earned);
+      const states = getBadgeStates();
+      setBadgeStatesLocal(states);
+      setHasNew(Object.values(states).some(s => s === "unlocked_new"));
+    } catch {}
+  }, []);
+
+  const offlineUnlocked = {
+    offline_zibentong: ["ZIBENTONG_GRAD","QIDONG_GRAD","ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role),
+    offline_qidong: ["QIDONG_GRAD","ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role),
+    offline_zibendao: ["ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role),
+  };
+
+  return (
+    <Card
+      title={hasNew ? "🆕 成就徽章" : "成就徽章"}
+      action={{ label: "查看全部 →", href: "/online/achievements" }}
+    >
+      <div>
+        {/* Online badge mini row */}
+        <div className="text-xs mb-3" style={{ color: "#9A9490" }}>线上成长徽章 · {earnedIds.size}/12</div>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+          {ONLINE_BADGES.map(badge => {
+            const earned = earnedIds.has(badge.id);
+            const isNew = badgeStates[badge.id] === "unlocked_new";
+            return (
+              <div
+                key={badge.id}
+                title={badge.name}
+                style={{
+                  width: 32,
+                  height: 32,
+                  clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                  background: earned
+                    ? `linear-gradient(145deg, ${badge.color}88, ${badge.color}44)`
+                    : "rgba(0,0,0,0.08)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "1rem",
+                  filter: earned && isNew
+                    ? `drop-shadow(0 0 6px ${badge.color})`
+                    : "none",
+                  transition: "all 0.2s",
+                }}
+              >
+                <span style={{ opacity: earned ? 1 : 0.2, fontSize: "0.85rem" }}>{badge.icon}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Divider */}
+        <div className="h-px mb-4" style={{ backgroundColor: "#E0D9CE" }} />
+
+        {/* Offline badges */}
+        <div className="text-xs mb-3" style={{ color: "#9A9490" }}>线下课程徽章</div>
+        <div className="flex justify-around pb-2">
+          {[
+            { key: "offline_zibentong", label: "资本通", abbr: "ZBT" },
+            { key: "offline_qidong", label: "启动资本", abbr: "QD" },
+            { key: "offline_zibendao", label: "资本道", abbr: "ZBD" },
+          ].map(b => {
+            const unlocked = offlineUnlocked[b.key as keyof typeof offlineUnlocked];
+            return (
+              <CrestBadge key={b.key} abbr={b.abbr} label={b.label} desc={unlocked ? "已获得" : "线下课程"} unlocked={unlocked} />
+            );
+          })}
+        </div>
+
+        <Link
+          href="/online/achievements"
+          className="mt-3 flex items-center justify-center gap-2 w-full py-2 rounded-xl text-xs font-medium"
+          style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
+        >
+          查看完整成就墙 →
+        </Link>
+      </div>
+    </Card>
+  );
+}
+
 // ─── Learning Tab ─────────────────────────────────────────────────────────────
 
 function LearningTab({
@@ -579,42 +719,7 @@ function LearningTab({
       </Card>
 
       {/* Achievements */}
-      <Card title="成就徽章">
-        <div className="flex justify-around pt-1 pb-5">
-          <ShieldBadge
-            symbol="I" label="起步" desc="完成第 1 关"
-            unlocked={completedCount >= 1}
-            stroke="#A87850" bg="#EDD8C4"
-          />
-          <ShieldBadge
-            symbol="V" label="学习者" desc="完成 5 关"
-            unlocked={completedCount >= 5}
-            stroke="#7890A0" bg="#DDE4EC"
-          />
-          <ShieldBadge
-            symbol="X" label="进阶" desc="完成 10 关"
-            unlocked={completedCount >= 10}
-            stroke="#C9A84C" bg="#FBF4E4"
-          />
-          <ShieldBadge
-            symbol="★" label="资本家" desc="完成全部"
-            unlocked={overallPct === 100}
-            stroke="#8B5E1A" bg="#F0E2C8"
-          />
-        </div>
-        <div className="h-px mb-5" style={{ backgroundColor: "#E0D9CE" }} />
-        <div className="flex justify-around pb-1">
-          <CrestBadge abbr="ZBT" label="资本通" desc="Stage 1"
-            unlocked={["ZIBENTONG_GRAD","QIDONG_GRAD","ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role)}
-          />
-          <CrestBadge abbr="QD" label="启动资本" desc="Stage 2"
-            unlocked={["QIDONG_GRAD","ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role)}
-          />
-          <CrestBadge abbr="ZBD" label="资本道" desc="Stage 3"
-            unlocked={["ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role)}
-          />
-        </div>
-      </Card>
+      <BadgeShowcaseCard role={role} />
     </div>
   );
 }

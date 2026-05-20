@@ -12,6 +12,8 @@ import {
 } from "@/lib/capitalLaunchCourse";
 import { PricingSimulator } from "@/components/online/PricingSimulator";
 import { ValuationSimulator } from "@/components/online/ValuationSimulator";
+import { checkNewBadges, getBadgeStates, setBadgeState } from "@/lib/badges";
+import { useBadge } from "@/context/BadgeContext";
 
 export default function LessonPage({
   params,
@@ -37,20 +39,33 @@ export default function LessonPage({
 function LessonPlayer({ mod, lesson, moduleSlug }: { mod: Module; lesson: Lesson; moduleSlug: string }) {
   const router = useRouter();
   const [completed, setCompleted] = useState(false);
+  const { queueBadges } = useBadge();
 
   const next = getNextLesson(moduleSlug, lesson.slug);
 
   const handleComplete = useCallback(() => {
     setCompleted(true);
     try {
+      // 1. Mark lesson complete
       const raw = localStorage.getItem("zbd_online_completed");
       const ids: string[] = raw ? JSON.parse(raw) : [];
       if (!ids.includes(lesson.id)) {
         ids.push(lesson.id);
         localStorage.setItem("zbd_online_completed", JSON.stringify(ids));
       }
+
+      // 2. Check for newly unlocked badges
+      const currentStates = getBadgeStates();
+      const newBadges = checkNewBadges(ids, currentStates);
+      if (newBadges.length > 0) {
+        // Mark as unlocked_new before queuing
+        for (const badge of newBadges) {
+          setBadgeState(badge.id, "unlocked_new");
+        }
+        queueBadges(newBadges);
+      }
     } catch {}
-  }, [lesson.id]);
+  }, [lesson.id, queueBadges]);
 
   const handleNext = useCallback(() => {
     if (next) {
