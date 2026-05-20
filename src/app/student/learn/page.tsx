@@ -4,6 +4,17 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { CAPITAL_LAUNCH_MODULES } from "@/lib/capitalLaunchCourse";
 
+type Status = "completed" | "current" | "locked";
+
+function getStatus(idx: number, completedIds: Set<string>): Status {
+  const mod = CAPITAL_LAUNCH_MODULES[idx];
+  if (mod.lessons.every((l) => completedIds.has(l.id))) return "completed";
+  if (idx === 0) return "current";
+  const prev = CAPITAL_LAUNCH_MODULES[idx - 1];
+  if (prev.lessons.every((l) => completedIds.has(l.id))) return "current";
+  return "locked";
+}
+
 export default function CapitalLaunchPage() {
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   const [mounted, setMounted] = useState(false);
@@ -26,8 +37,9 @@ export default function CapitalLaunchPage() {
   const overallPct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8 md:py-10">
-      <div className="mb-8">
+    <div className="max-w-lg mx-auto px-4 py-8 md:py-10">
+      {/* Header */}
+      <div className="mb-10">
         <h1
           className="text-2xl font-bold mb-3"
           style={{ fontFamily: "var(--font-display)", color: "var(--color-text-primary)" }}
@@ -36,11 +48,11 @@ export default function CapitalLaunchPage() {
         </h1>
         <div className="flex items-center gap-3">
           <div
-            className="flex-1 h-1.5 rounded-full overflow-hidden"
-            style={{ backgroundColor: "#E0D9CE", maxWidth: 200 }}
+            className="h-1.5 rounded-full overflow-hidden"
+            style={{ width: 180, backgroundColor: "#E0D9CE" }}
           >
             <div
-              className="h-full rounded-full transition-all"
+              className="h-full rounded-full transition-all duration-500"
               style={{
                 width: `${overallPct}%`,
                 background: "linear-gradient(to right, #9A7A32, #C9A84C)",
@@ -53,63 +65,122 @@ export default function CapitalLaunchPage() {
         </div>
       </div>
 
-      <div className="space-y-3">
-        {CAPITAL_LAUNCH_MODULES.map((mod) => {
-          const done = mounted
-            ? mod.lessons.filter((l) => completedIds.has(l.id)).length
-            : 0;
-          const total = mod.lessons.length;
-          const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      {/* Map */}
+      <div className="relative">
+        {/* Spine */}
+        <div
+          className="absolute top-6 bottom-6 w-px"
+          style={{ left: "calc(50% - 0.5px)", backgroundColor: "#E0D9CE" }}
+        />
 
-          return (
-            <Link key={mod.id} href={`/online/learn/${mod.slug}`} className="block">
-              <div
-                className="rounded-2xl p-4 transition-all hover:shadow-sm"
-                style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
-              >
-                <div className="flex items-center gap-3">
+        <div className="space-y-5">
+          {CAPITAL_LAUNCH_MODULES.map((mod, idx) => {
+            const status: Status = mounted
+              ? getStatus(idx, completedIds)
+              : idx === 0
+              ? "current"
+              : "locked";
+            const cardOnRight = idx % 2 === 0;
+            const done = mounted
+              ? mod.lessons.filter((l) => completedIds.has(l.id)).length
+              : 0;
+            const total = mod.lessons.length;
+            const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+            const color = status === "locked" ? "#C8C2BC" : mod.levelColor;
+
+            const nodeEl = (
+              <div className="relative z-10 flex-shrink-0 w-12 h-12">
+                {status === "current" && (
                   <div
-                    className="text-xs font-bold font-mono px-2.5 py-1 rounded-lg flex-shrink-0"
-                    style={{ backgroundColor: `${mod.levelColor}18`, color: mod.levelColor }}
-                  >
-                    {mod.levelLabel}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div
-                      className="text-sm font-semibold truncate"
-                      style={{ color: "var(--color-text-primary)" }}
-                    >
-                      {mod.title}
-                    </div>
-                    <div className="text-xs mt-0.5" style={{ color: "var(--color-text-muted)" }}>
-                      {mod.subtitle} · {total} 关
-                    </div>
-                  </div>
-                  <div
-                    className="text-xs font-mono flex-shrink-0"
-                    style={{ color: pct === 100 ? "#82C8A0" : "var(--color-text-muted)" }}
-                  >
-                    {done}/{total}
-                  </div>
+                    className="absolute rounded-full animate-pulse"
+                    style={{
+                      inset: -5,
+                      backgroundColor: `${color}22`,
+                    }}
+                  />
+                )}
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm relative"
+                  style={{
+                    backgroundColor: status === "locked" ? "#EEEBE6" : color,
+                    color: status === "locked" ? "#A8A29C" : "#FFFFFF",
+                    boxShadow: status === "current" ? `0 0 18px ${color}45` : "none",
+                  }}
+                >
+                  {status === "completed" ? "✓" : mod.order}
                 </div>
-                {pct > 0 && (
+              </div>
+            );
+
+            const cardEl = (
+              <div
+                className="rounded-2xl px-4 py-3"
+                style={{
+                  backgroundColor: status === "locked" ? "#F7F4EF" : "#FFFFFF",
+                  border: `1px solid ${status === "current" ? `${color}40` : "#E0D9CE"}`,
+                  opacity: status === "locked" ? 0.55 : 1,
+                }}
+              >
+                <div className="text-xs font-medium" style={{ color }}>
+                  {mod.levelLabel}
+                </div>
+                <div
+                  className="text-sm font-semibold mt-0.5 leading-snug"
+                  style={{ color: "var(--color-text-primary)" }}
+                >
+                  {mod.title}
+                </div>
+                <div
+                  className="text-xs mt-0.5 truncate"
+                  style={{ color: "var(--color-text-muted)" }}
+                >
+                  {mod.subtitle}
+                </div>
+                {status !== "locked" && pct > 0 && (
                   <div
-                    className="mt-3 h-1 rounded-full overflow-hidden"
+                    className="mt-2 h-0.5 rounded-full overflow-hidden"
                     style={{ backgroundColor: "#E0D9CE" }}
                   >
                     <div
-                      className="h-full rounded-full transition-all"
+                      className="h-full rounded-full"
                       style={{
                         width: `${pct}%`,
-                        backgroundColor: pct === 100 ? "#82C8A0" : "#C9A84C",
+                        backgroundColor: pct === 100 ? "#82C8A0" : color,
                       }}
                     />
                   </div>
                 )}
               </div>
-            </Link>
-          );
-        })}
+            );
+
+            const row = (
+              <div className="flex items-center">
+                {/* Left half */}
+                <div className="flex-1 pr-3 flex justify-end">
+                  {!cardOnRight && cardEl}
+                </div>
+                {/* Node */}
+                {nodeEl}
+                {/* Right half */}
+                <div className="flex-1 pl-3">
+                  {cardOnRight && cardEl}
+                </div>
+              </div>
+            );
+
+            return (
+              <div key={mod.id}>
+                {status === "locked" ? (
+                  row
+                ) : (
+                  <Link href={`/online/learn/${mod.slug}`} className="block">
+                    {row}
+                  </Link>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
