@@ -406,6 +406,30 @@ function LearningTab({
         ))}
       </div>
 
+      {/* 《资本启航》Online Course Entry */}
+      <div
+        className="rounded-2xl p-5 relative overflow-hidden"
+        style={{ background: "linear-gradient(135deg, #0a0a1a 0%, #0d0d20 100%)", border: "1px solid rgba(99,102,241,0.3)" }}
+      >
+        <div className="absolute top-0 right-0 w-32 h-32 rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%)", transform: "translate(30%, -30%)" }} />
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xl">🌊</span>
+            <div>
+              <div className="text-sm font-bold" style={{ color: "#FFFFFF" }}>《资本启航》</div>
+              <div className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>AI 沉浸式资本课程 · 11 个模块</div>
+            </div>
+          </div>
+          <Link
+            href="/online/learn"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-xl transition-all active:scale-95"
+            style={{ background: "rgba(99,102,241,0.25)", color: "#818cf8", border: "1px solid rgba(99,102,241,0.35)" }}
+          >
+            进入学习 →
+          </Link>
+        </div>
+      </div>
+
       {/* Module Progress */}
       <Card title="课程进度">
         {modules.length === 0 ? (

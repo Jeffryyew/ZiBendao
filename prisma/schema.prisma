@@ -26,10 +26,17 @@ model User {
   verifyToken       String?            @unique
   verifyTokenExpiry DateTime?
   studentAccountNo  String?            @unique
+  // Gamification
+  xp                Int                @default(0)
+  capitalLevel      Int                @default(1)
+  streak            Int                @default(0)
+  lastActiveAt      DateTime?
+  badges            Json?
   accounts          Account[]
   toolAccess        ClientToolAccess[]
   documents         Document[]
   progress          LessonProgress[]
+  onlineProgress    OnlineLessonProgress[]
   payments          Payment[]
   sessions          Session[]
   offlineAccount    OfflineStudentAccount?
@@ -194,6 +201,50 @@ enum LessonType {
   READING
   QUIZ
   EXERCISE
+}
+
+// ─── Online Immersive Course System ────────────────────────────────────────
+
+model OnlineModule {
+  id          String               @id @default(cuid())
+  slug        String               @unique
+  order       Int
+  xpReward    Int                  @default(100)
+  isPublished Boolean              @default(true)
+  createdAt   DateTime             @default(now())
+  lessons     OnlineLesson[]
+}
+
+model OnlineLesson {
+  id          String               @id @default(cuid())
+  moduleId    String
+  slug        String               @unique
+  order       Int
+  type        OnlineLessonType     @default(STORY)
+  xpReward    Int                  @default(20)
+  createdAt   DateTime             @default(now())
+  module      OnlineModule         @relation(fields: [moduleId], references: [id])
+  progress    OnlineLessonProgress[]
+}
+
+model OnlineLessonProgress {
+  id          String       @id @default(cuid())
+  userId      String
+  lessonId    String
+  completed   Boolean      @default(false)
+  score       Int?
+  completedAt DateTime?
+  lesson      OnlineLesson @relation(fields: [lessonId], references: [id])
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, lessonId])
+}
+
+enum OnlineLessonType {
+  STORY
+  QUIZ
+  SIMULATION
+  REFLECTION
 }
 
 enum DocStatus {
