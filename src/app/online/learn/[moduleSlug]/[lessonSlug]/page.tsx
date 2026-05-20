@@ -42,13 +42,21 @@ function LessonPlayer({ mod, lesson, moduleSlug }: { mod: Module; lesson: Lesson
 
   const handleComplete = useCallback(() => {
     setCompleted(true);
-  }, []);
+    try {
+      const raw = localStorage.getItem("zbd_online_completed");
+      const ids: string[] = raw ? JSON.parse(raw) : [];
+      if (!ids.includes(lesson.id)) {
+        ids.push(lesson.id);
+        localStorage.setItem("zbd_online_completed", JSON.stringify(ids));
+      }
+    } catch {}
+  }, [lesson.id]);
 
   const handleNext = useCallback(() => {
     if (next) {
       router.push(`/online/learn/${next.module.slug}/${next.lesson.slug}`);
     } else {
-      router.push(`/online/learn/${moduleSlug}/complete`);
+      router.push("/student/learn");
     }
   }, [next, router, moduleSlug]);
 

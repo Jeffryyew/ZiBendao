@@ -5,15 +5,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { getModuleBySlug } from "@/lib/capitalLaunchCourse";
 
-const DEMO_COMPLETED: string[] = [];
-
 export default function ModuleOverviewPage({ params }: { params: Promise<{ moduleSlug: string }> }) {
   const { moduleSlug } = use(params);
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const [completedLessons] = useState<Set<string>>(new Set(DEMO_COMPLETED));
+  const [completedLessons, setCompletedLessons] = useState<Set<string>>(new Set());
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    setMounted(true);
+    try {
+      const raw = localStorage.getItem("zbd_online_completed");
+      if (raw) setCompletedLessons(new Set(JSON.parse(raw) as string[]));
+    } catch {}
+  }, []);
 
   const mod = getModuleBySlug(moduleSlug);
 

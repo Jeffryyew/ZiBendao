@@ -1,27 +1,28 @@
-import { auth } from "../../../../auth";
-import { redirect } from "next/navigation";
-import { prisma } from "@/lib/prisma";
-import { CAPITAL_LAUNCH_MODULES } from "@/lib/capitalLaunchCourse";
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { CAPITAL_LAUNCH_MODULES } from "@/lib/capitalLaunchCourse";
 
-export default async function CapitalLaunchPage() {
-  const session = await auth();
-  if (!session?.user) redirect("/login");
+export default function CapitalLaunchPage() {
+  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+  const [mounted, setMounted] = useState(false);
 
-  let completedIds = new Set<string>();
-  try {
-    const progress = await prisma.onlineLessonProgress.findMany({
-      where: { userId: session.user.id, completed: true },
-      select: { lessonId: true },
-    });
-    completedIds = new Set(progress.map((p) => p.lessonId));
-  } catch {}
+  useEffect(() => {
+    setMounted(true);
+    try {
+      const raw = localStorage.getItem("zbd_online_completed");
+      if (raw) setCompletedIds(new Set(JSON.parse(raw) as string[]));
+    } catch {}
+  }, []);
 
   const totalLessons = CAPITAL_LAUNCH_MODULES.reduce((s, m) => s + m.lessons.length, 0);
-  const completedCount = CAPITAL_LAUNCH_MODULES.reduce(
-    (s, m) => s + m.lessons.filter((l) => completedIds.has(l.id)).length,
-    0
-  );
+  const completedCount = mounted
+    ? CAPITAL_LAUNCH_MODULES.reduce(
+        (s, m) => s + m.lessons.filter((l) => completedIds.has(l.id)).length,
+        0
+      )
+    : 0;
   const overallPct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
   return (
@@ -54,7 +55,9 @@ export default async function CapitalLaunchPage() {
 
       <div className="space-y-3">
         {CAPITAL_LAUNCH_MODULES.map((mod) => {
-          const done = mod.lessons.filter((l) => completedIds.has(l.id)).length;
+          const done = mounted
+            ? mod.lessons.filter((l) => completedIds.has(l.id)).length
+            : 0;
           const total = mod.lessons.length;
           const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
