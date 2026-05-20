@@ -182,31 +182,13 @@ function StoryLesson({
 
   return (
     <div className="flex flex-col h-full max-w-2xl mx-auto px-4 py-6">
-      {/* Character Badge */}
-      {lesson.character && (
-        <div className="flex items-center gap-3 mb-6">
-          <div
-            className="w-12 h-12 rounded-full flex items-center justify-center text-2xl"
-            style={{ background: `${color}18`, border: `1px solid ${color}33` }}
-          >
-            {lesson.character.avatar}
-          </div>
-          <div>
-            <div className="text-sm font-bold" style={{ color: "#FFFFFF" }}>{lesson.character.name}</div>
-            <div className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-              {lesson.character.role} · {lesson.character.era}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Scene Label */}
       {lesson.scene && (
         <div
           className="text-xs px-3 py-1.5 rounded-full inline-flex items-center gap-2 mb-6 self-start"
           style={{ background: "rgba(255,255,255,0.06)", color: "rgba(255,255,255,0.4)", border: "1px solid rgba(255,255,255,0.08)" }}
         >
-          {lesson.scene.icon} {lesson.scene.name}
+          {lesson.scene.name}
         </div>
       )}
 
@@ -224,14 +206,6 @@ function StoryLesson({
       {/* Slide Content */}
       {current && (
         <div className="flex-1">
-          {/* Visual */}
-          <div
-            className="text-5xl mb-6 text-center"
-            style={{ filter: `drop-shadow(0 0 20px ${color}44)` }}
-          >
-            {current.visual}
-          </div>
-
           {/* Text */}
           <div
             className="text-xl md:text-2xl font-medium leading-relaxed mb-6 text-center"
@@ -252,7 +226,7 @@ function StoryLesson({
                 fontWeight: 700,
               }}
             >
-              💡 {current.highlight}
+              {current.highlight}
             </div>
           )}
         </div>
@@ -507,7 +481,6 @@ function ReflectionLesson({
           className="rounded-2xl p-6 mb-8 text-center"
           style={{ background: `${color}10`, border: `1px solid ${color}25` }}
         >
-          <div className="text-3xl mb-3">💡</div>
           <p className="text-base font-medium leading-relaxed" style={{ color: "#FFFFFF" }}>
             {lesson.keyInsight}
           </p>
