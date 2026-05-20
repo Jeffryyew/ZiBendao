@@ -370,6 +370,131 @@ function OverviewTab({
   );
 }
 
+// ─── Badge Components ─────────────────────────────────────────────────────────
+
+function ShieldBadge({
+  symbol, label, desc, unlocked, stroke, bg,
+}: {
+  symbol: string; label: string; desc: string;
+  unlocked: boolean; stroke: string; bg: string;
+}) {
+  const uid = "sh" + symbol.replace(/[^\w]/g, "S");
+  const sk = unlocked ? stroke : "#C4BEB8";
+  const fi = unlocked ? bg : "#EDEAE5";
+  const tx = unlocked ? "#FFFDF5" : "#B0AAA4";
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <svg width="54" height="63" viewBox="0 0 54 63" fill="none">
+        <defs>
+          <linearGradient id={uid + "f"} x1="27" y1="0" x2="27" y2="63" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor={fi} />
+            <stop offset="100%" stopColor={fi} stopOpacity="0.6" />
+          </linearGradient>
+          <linearGradient id={uid + "k"} x1="27" y1="0" x2="27" y2="63" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor={sk} />
+            <stop offset="100%" stopColor={sk} stopOpacity="0.65" />
+          </linearGradient>
+        </defs>
+        {/* Outer shield */}
+        <path d="M27 2 L52 13 L52 35 Q52 51 27 61 Q2 51 2 35 L2 13 Z"
+          fill={`url(#${uid}f)`}
+          stroke={unlocked ? `url(#${uid}k)` : sk}
+          strokeWidth="1.5"
+        />
+        {/* Inner border */}
+        <path d="M27 7 L47 17 L47 35 Q47 47 27 56 Q7 47 7 35 L7 17 Z"
+          fill="none"
+          stroke={sk}
+          strokeWidth="0.65"
+          strokeOpacity={unlocked ? 0.45 : 0.25}
+        />
+        {/* Horizontal divider */}
+        <line x1="10" y1="37" x2="44" y2="37" stroke={sk} strokeWidth="0.65" strokeOpacity={unlocked ? 0.4 : 0.2} />
+        {/* Symbol */}
+        <text
+          x="27" y="28"
+          textAnchor="middle" dominantBaseline="middle"
+          fill={tx}
+          fontSize={symbol === "★" ? 17 : symbol.length > 1 ? 10 : 15}
+          fontWeight="700"
+          fontFamily="Georgia, 'Times New Roman', serif"
+          letterSpacing="0.5"
+        >{symbol}</text>
+        {/* Three ornament dots */}
+        <circle cx="21" cy="44" r="1.8" fill={sk} fillOpacity={unlocked ? 0.55 : 0.3} />
+        <circle cx="27" cy="46.5" r="1.8" fill={sk} fillOpacity={unlocked ? 0.65 : 0.4} />
+        <circle cx="33" cy="44" r="1.8" fill={sk} fillOpacity={unlocked ? 0.55 : 0.3} />
+        {/* Corner ticks */}
+        <line x1="13" y1="22" x2="15" y2="18" stroke={sk} strokeWidth="0.65" strokeOpacity={unlocked ? 0.4 : 0.2} />
+        <line x1="41" y1="22" x2="39" y2="18" stroke={sk} strokeWidth="0.65" strokeOpacity={unlocked ? 0.4 : 0.2} />
+      </svg>
+      <div className="text-center">
+        <div className="text-xs font-semibold" style={{ color: unlocked ? "#5C5650" : "#9A9490" }}>{label}</div>
+        <div className="text-xs" style={{ color: "#9A9490" }}>{desc}</div>
+      </div>
+    </div>
+  );
+}
+
+function CrestBadge({
+  abbr, label, desc, unlocked,
+}: {
+  abbr: string; label: string; desc: string; unlocked: boolean;
+}) {
+  const uid = "cr" + abbr;
+  const sk = unlocked ? "#B8943A" : "#C4BEB8";
+  const fi = unlocked ? "#FBF4E4" : "#EDEAE5";
+  const tx = unlocked ? "#8B6914" : "#B0AAA4";
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <svg width="58" height="58" viewBox="0 0 58 58" fill="none">
+        <defs>
+          <radialGradient id={uid} cx="50%" cy="38%" r="55%">
+            <stop offset="0%" stopColor={fi} />
+            <stop offset="100%" stopColor={fi} stopOpacity="0.5" />
+          </radialGradient>
+        </defs>
+        {/* Outer ring */}
+        <circle cx="29" cy="29" r="27" fill={`url(#${uid})`} stroke={sk} strokeWidth="1.5" />
+        {/* Second ring */}
+        <circle cx="29" cy="29" r="22" fill="none" stroke={sk} strokeWidth="0.65" strokeOpacity={unlocked ? 0.4 : 0.22} />
+        {/* Inner ring */}
+        <circle cx="29" cy="29" r="16" fill="none" stroke={sk} strokeWidth="0.5" strokeOpacity={unlocked ? 0.25 : 0.15} />
+        {/* 8 small studs on second ring */}
+        {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
+          const r = 22;
+          const rad = (deg * Math.PI) / 180;
+          const cx = 29 + r * Math.sin(rad);
+          const cy = 29 - r * Math.cos(rad);
+          return <circle key={deg} cx={cx} cy={cy} r="1.4" fill={sk} fillOpacity={unlocked ? 0.55 : 0.3} />;
+        })}
+        {/* Laurel arcs */}
+        <path d="M12 27 Q29 17 46 27" fill="none" stroke={sk} strokeWidth="0.65" strokeOpacity={unlocked ? 0.4 : 0.22} />
+        <path d="M12 31 Q29 41 46 31" fill="none" stroke={sk} strokeWidth="0.65" strokeOpacity={unlocked ? 0.4 : 0.22} />
+        {/* Cross axis */}
+        <line x1="9" y1="29" x2="49" y2="29" stroke={sk} strokeWidth="0.5" strokeOpacity={unlocked ? 0.22 : 0.12} />
+        <line x1="29" y1="9" x2="29" y2="49" stroke={sk} strokeWidth="0.5" strokeOpacity={unlocked ? 0.22 : 0.12} />
+        {/* Text */}
+        <text
+          x="29" y="29"
+          textAnchor="middle" dominantBaseline="middle"
+          fill={tx}
+          fontSize={abbr.length >= 3 ? 8 : 10}
+          fontWeight="700"
+          fontFamily="Georgia, 'Times New Roman', serif"
+          letterSpacing="0.5"
+        >{abbr}</text>
+      </svg>
+      <div className="text-center">
+        <div className="text-xs font-semibold" style={{ color: unlocked ? "#5C5650" : "#9A9490" }}>{label}</div>
+        <div className="text-xs" style={{ color: "#9A9490" }}>{desc}</div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Learning Tab ─────────────────────────────────────────────────────────────
 
 function LearningTab({
@@ -443,79 +568,39 @@ function LearningTab({
 
       {/* Achievements */}
       <Card title="成就徽章">
-        <div className="grid grid-cols-4 gap-3 mb-4">
-          {[
-            { abbr: "S1", label: "起步", desc: "完成第 1 关", unlocked: completedCount >= 1 },
-            { abbr: "S5", label: "学习者", desc: "完成 5 关", unlocked: completedCount >= 5 },
-            { abbr: "S10", label: "进阶", desc: "完成 10 关", unlocked: completedCount >= 10 },
-            { abbr: "A+", label: "资本家", desc: "完成全部", unlocked: overallPct === 100 },
-          ].map((a) => (
-            <div
-              key={a.label}
-              className="flex flex-col items-center gap-1.5 p-3 rounded-xl text-center"
-              style={{
-                backgroundColor: a.unlocked ? "#FBF4E4" : "#F7F4EF",
-                border: `1px solid ${a.unlocked ? "rgba(201,168,76,0.3)" : "#E0D9CE"}`,
-                opacity: a.unlocked ? 1 : 0.5,
-              }}
-            >
-              <span
-                className="text-xs font-bold font-mono px-2 py-0.5 rounded-md"
-                style={{
-                  backgroundColor: a.unlocked ? "rgba(201,168,76,0.15)" : "rgba(154,148,144,0.1)",
-                  color: a.unlocked ? "#C9A84C" : "#9A9490",
-                }}
-              >
-                {a.abbr}
-              </span>
-              <span className="text-xs font-medium" style={{ color: a.unlocked ? "#C9A84C" : "#9A9490" }}>{a.label}</span>
-              <span className="text-xs" style={{ color: "#9A9490" }}>{a.desc}</span>
-            </div>
-          ))}
+        <div className="flex justify-around pt-1 pb-5">
+          <ShieldBadge
+            symbol="I" label="起步" desc="完成第 1 关"
+            unlocked={completedCount >= 1}
+            stroke="#A87850" bg="#EDD8C4"
+          />
+          <ShieldBadge
+            symbol="V" label="学习者" desc="完成 5 关"
+            unlocked={completedCount >= 5}
+            stroke="#7890A0" bg="#DDE4EC"
+          />
+          <ShieldBadge
+            symbol="X" label="进阶" desc="完成 10 关"
+            unlocked={completedCount >= 10}
+            stroke="#C9A84C" bg="#FBF4E4"
+          />
+          <ShieldBadge
+            symbol="★" label="资本家" desc="完成全部"
+            unlocked={overallPct === 100}
+            stroke="#8B5E1A" bg="#F0E2C8"
+          />
         </div>
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            {
-              abbr: "ZBT",
-              label: "资本通",
-              desc: "Stage 1",
-              unlocked: ["ZIBENTONG_GRAD","QIDONG_GRAD","ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role),
-            },
-            {
-              abbr: "QD",
-              label: "启动资本",
-              desc: "Stage 2",
-              unlocked: ["QIDONG_GRAD","ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role),
-            },
-            {
-              abbr: "ZBD",
-              label: "资本道",
-              desc: "Stage 3",
-              unlocked: ["ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role),
-            },
-          ].map((a) => (
-            <div
-              key={a.label}
-              className="flex flex-col items-center gap-1.5 p-3 rounded-xl text-center"
-              style={{
-                backgroundColor: a.unlocked ? "#FFFDF7" : "#F7F4EF",
-                border: `1px solid ${a.unlocked ? "rgba(184,148,58,0.4)" : "#E0D9CE"}`,
-                opacity: a.unlocked ? 1 : 0.45,
-              }}
-            >
-              <span
-                className="text-xs font-bold font-mono px-2 py-0.5 rounded-md"
-                style={{
-                  backgroundColor: a.unlocked ? "rgba(184,148,58,0.18)" : "rgba(154,148,144,0.1)",
-                  color: a.unlocked ? "#B8943A" : "#9A9490",
-                }}
-              >
-                {a.abbr}
-              </span>
-              <span className="text-xs font-medium" style={{ color: a.unlocked ? "#B8943A" : "#9A9490" }}>{a.label}</span>
-              <span className="text-xs" style={{ color: "#9A9490" }}>{a.desc}</span>
-            </div>
-          ))}
+        <div className="h-px mb-5" style={{ backgroundColor: "#E0D9CE" }} />
+        <div className="flex justify-around pb-1">
+          <CrestBadge abbr="ZBT" label="资本通" desc="Stage 1"
+            unlocked={["ZIBENTONG_GRAD","QIDONG_GRAD","ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role)}
+          />
+          <CrestBadge abbr="QD" label="启动资本" desc="Stage 2"
+            unlocked={["QIDONG_GRAD","ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role)}
+          />
+          <CrestBadge abbr="ZBD" label="资本道" desc="Stage 3"
+            unlocked={["ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role)}
+          />
         </div>
       </Card>
     </div>
