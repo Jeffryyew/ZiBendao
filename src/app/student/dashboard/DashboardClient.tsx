@@ -77,19 +77,31 @@ function useLocalStorage<T>(key: string, initial: T): [T, (val: T) => void] {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function DashboardClient({ data }: { data: DashboardData }) {
-  const { firstName, completedIds, totalXP, modules, role } = data;
-  const completed = new Set(completedIds);
+  const { firstName, completedIds, modules, role } = data;
 
   const [activeTab, setActiveTab] = useLocalStorage<TabId>("zbd_tab", "overview");
   const [companyMode, setCompanyMode] = useLocalStorage<CompanyMode>("zbd_company_mode", null);
   const [singleCompany, setSingleCompany] = useLocalStorage<Company | null>("zbd_single_company", null);
   const [group, setGroup] = useLocalStorage<GroupStructure>("zbd_group", { parent: null, subsidiaries: [] });
 
+  // Sync course progress from localStorage (lesson player persists there)
+  const [completed, setCompleted] = useState<Set<string>>(new Set(completedIds));
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("zbd_online_completed");
+      if (raw) setCompleted(new Set(JSON.parse(raw) as string[]));
+    } catch {}
+  }, []);
+
   const totalLessons = modules.reduce((s, m) => s + m.lessons.length, 0);
   const completedCount = modules.reduce(
     (s, m) => s + m.lessons.filter((l) => completed.has(l.id)).length, 0
   );
   const overallPct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+  const totalXP = modules.reduce(
+    (sum, m) => sum + m.lessons.filter((l) => completed.has(l.id)).reduce((s, l) => s + (l.points ?? 0), 0),
+    0
+  );
 
   const tabs: { id: TabId; label: string }[] = [
     { id: "overview", label: "总览" },
@@ -271,7 +283,7 @@ function OverviewTab({
             <span>剩余 {totalLessons - completedCount} 关</span>
           </div>
           <Link
-            href="/online/learn"
+            href="/student/learn"
             className="flex items-center justify-center gap-2 w-full py-2 rounded-xl text-xs font-medium transition-all"
             style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
           >
@@ -556,7 +568,7 @@ function LearningTab({
               );
             })}
             <Link
-              href="/online/learn"
+              href="/student/learn"
               className="mt-2 flex items-center justify-center gap-2 w-full py-2 rounded-xl text-xs font-medium"
               style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
             >
