@@ -63,14 +63,14 @@ function LessonPlayer({ mod, lesson, moduleSlug }: { mod: Module; lesson: Lesson
         style={{ background: "rgba(0,0,0,0.4)", backdropFilter: "blur(12px)" }}
       >
         <Link
-          href={`/online/learn/${moduleSlug}`}
+          href="/student/learn"
           className="text-sm transition-opacity hover:opacity-70"
           style={{ color: "rgba(255,255,255,0.4)" }}
         >
-          ← {mod.title}
+          ← 资本启航
         </Link>
         <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
-          {mod.icon} {lesson.title}
+          {lesson.title}
         </span>
         <span
           className="text-xs px-2.5 py-1 rounded-full font-mono"

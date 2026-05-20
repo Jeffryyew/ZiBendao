@@ -7,7 +7,7 @@ import { getLocale } from "@/lib/i18n";
 
 const NAV_ITEMS: NavItem[] = [
   { label: "总览", href: "/student/dashboard" },
-  { label: "学习中心", href: "/online/learn" },
+  { label: "资本启航", href: "/student/learn" },
   { label: "资本工具", href: "/student/tools" },
   { label: "个人档案", href: "/student/profile" },
 ];
