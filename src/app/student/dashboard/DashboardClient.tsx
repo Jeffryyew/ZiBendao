@@ -357,46 +357,6 @@ function OverviewTab({
         ) : null}
       </Card>
 
-      {/* 资本启航 Online Course CTA */}
-      <div
-        className="relative overflow-hidden rounded-2xl p-5"
-        style={{ background: "linear-gradient(135deg, #0a0a1a 0%, #0d0d20 100%)", border: "1px solid rgba(99,102,241,0.3)" }}
-      >
-        <div className="absolute top-0 right-0 w-40 h-40 opacity-5 pointer-events-none" aria-hidden>
-          <svg viewBox="0 0 100 100"><circle cx="80" cy="20" r="60" fill="#6366F1"/></svg>
-        </div>
-        <div className="flex items-start gap-3">
-          <div className="text-3xl flex-shrink-0">🌊</div>
-          <div className="flex-1 min-w-0">
-            <div className="text-xs font-medium mb-1" style={{ color: "#818CF8" }}>AI 沉浸式线上课程</div>
-            <div className="text-base font-bold mb-1" style={{ color: "#fff" }}>《资本启航》</div>
-            <div className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.45)" }}>
-              24 关 · 11 个模块 · 故事 + 测验 + 模拟器
-            </div>
-            <div className="flex items-center gap-2">
-              <Link
-                href="/online/learn"
-                className="px-4 py-1.5 rounded-xl text-xs font-semibold transition-all"
-                style={{ background: "linear-gradient(135deg, #6366F1, #4F46E5)", color: "#fff" }}
-              >
-                进入学习 →
-              </Link>
-              <Link
-                href="/online/achievements"
-                className="px-3 py-1.5 rounded-xl text-xs font-medium"
-                style={{ background: "rgba(245,158,11,0.15)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.3)" }}
-              >
-                🏆 成就
-              </Link>
-            </div>
-          </div>
-          <div className="text-right flex-shrink-0">
-            <div className="text-xl font-bold font-mono" style={{ color: "#6366F1" }}>{completedCount}</div>
-            <div className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>/{totalLessons} 关</div>
-          </div>
-        </div>
-      </div>
-
       {/* Recent Tools */}
       <Card title="资本工具">
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
