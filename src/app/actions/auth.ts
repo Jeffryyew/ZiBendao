@@ -128,9 +128,18 @@ export async function sendOtp(email: string): Promise<ActionResult> {
     data: { identifier: `otp_${cleanEmail}`, token: otp, expires },
   });
 
-  // In development, log OTP to console so it can be used without SMTP
+  const hasResend = !!process.env.RESEND_API_KEY;
+  const hasSmtp = !!(
+    process.env.SMTP_HOST &&
+    process.env.SMTP_USER &&
+    process.env.SMTP_PASS &&
+    process.env.SMTP_USER !== "your@gmail.com"
+  );
+
   if (process.env.NODE_ENV === "development") {
     console.log(`\n[DEV OTP] ${cleanEmail} -> ${otp}\n`);
+  } else if (!hasResend && !hasSmtp) {
+    return { error: "邮件服务未配置，请联系管理员" };
   }
 
   sendOtpEmail(cleanEmail, otp).catch(() => {});

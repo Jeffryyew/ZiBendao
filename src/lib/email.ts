@@ -25,7 +25,7 @@ function getSmtpTransport() {
 // ── Shared ─────────────────────────────────────────────────────────────────
 const FROM_DISPLAY = process.env.RESEND_FROM ?? process.env.SMTP_FROM ?? "noreply@zibendao.com";
 const FROM = FROM_DISPLAY.includes("<") ? FROM_DISPLAY : `资本道 ZiBenDao <${FROM_DISPLAY}>`;
-const BASE_URL = process.env.NEXTAUTH_URL ?? "http://localhost:3000";
+const BASE_URL = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
 async function sendMail(opts: { to: string; subject: string; html: string }): Promise<void> {
   const resend = getResend();
