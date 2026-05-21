@@ -4,11 +4,12 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import {
   ONLINE_BADGES,
+  OFFLINE_BADGES,
+  ULTIMATE_BADGE,
   getEarnedOnlineBadgeIds,
   getBadgeStates,
   getCompletedLessons,
 } from "@/lib/badges";
-import { BadgeIcon } from "@/components/badges/BadgeIcon";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -357,6 +358,45 @@ function OverviewTab({
         ) : null}
       </Card>
 
+      {/* 资本启航 Online Course CTA */}
+      <div
+        className="relative overflow-hidden rounded-2xl p-5"
+        style={{ background: "linear-gradient(135deg, #0a0a1a 0%, #0d0d20 100%)", border: "1px solid rgba(99,102,241,0.3)" }}
+      >
+        <div className="absolute top-0 right-0 w-40 h-40 opacity-5 pointer-events-none" aria-hidden>
+          <svg viewBox="0 0 100 100"><circle cx="80" cy="20" r="60" fill="#6366F1"/></svg>
+        </div>
+        <div className="flex items-start gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="text-xs font-medium mb-1" style={{ color: "#818CF8" }}>AI 沉浸式线上课程</div>
+            <div className="text-base font-bold mb-1" style={{ color: "#fff" }}>资本启航</div>
+            <div className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.45)" }}>
+              {totalLessons} 关 · 11 个模块 · 故事 + 测验 + 模拟器
+            </div>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/student/learn"
+                className="px-4 py-1.5 rounded-xl text-xs font-semibold transition-all"
+                style={{ background: "linear-gradient(135deg, #6366F1, #4F46E5)", color: "#fff" }}
+              >
+                进入学习 →
+              </Link>
+              <Link
+                href="/online/achievements"
+                className="px-3 py-1.5 rounded-xl text-xs font-medium"
+                style={{ background: "rgba(245,158,11,0.15)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.3)" }}
+              >
+                成就
+              </Link>
+            </div>
+          </div>
+          <div className="text-right flex-shrink-0">
+            <div className="text-xl font-bold font-mono" style={{ color: "#6366F1" }}>{completedCount}</div>
+            <div className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>/{totalLessons} 关</div>
+          </div>
+        </div>
+      </div>
+
       {/* Recent Tools */}
       <Card title="资本工具">
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -389,131 +429,6 @@ function OverviewTab({
   );
 }
 
-// ─── Badge Components ─────────────────────────────────────────────────────────
-
-function ShieldBadge({
-  symbol, label, desc, unlocked, stroke, bg,
-}: {
-  symbol: string; label: string; desc: string;
-  unlocked: boolean; stroke: string; bg: string;
-}) {
-  const uid = "sh" + symbol.replace(/[^\w]/g, "S");
-  const sk = unlocked ? stroke : "#C4BEB8";
-  const fi = unlocked ? bg : "#EDEAE5";
-  const tx = unlocked ? "#FFFDF5" : "#B0AAA4";
-
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <svg width="54" height="63" viewBox="0 0 54 63" fill="none">
-        <defs>
-          <linearGradient id={uid + "f"} x1="27" y1="0" x2="27" y2="63" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor={fi} />
-            <stop offset="100%" stopColor={fi} stopOpacity="0.6" />
-          </linearGradient>
-          <linearGradient id={uid + "k"} x1="27" y1="0" x2="27" y2="63" gradientUnits="userSpaceOnUse">
-            <stop offset="0%" stopColor={sk} />
-            <stop offset="100%" stopColor={sk} stopOpacity="0.65" />
-          </linearGradient>
-        </defs>
-        {/* Outer shield */}
-        <path d="M27 2 L52 13 L52 35 Q52 51 27 61 Q2 51 2 35 L2 13 Z"
-          fill={`url(#${uid}f)`}
-          stroke={unlocked ? `url(#${uid}k)` : sk}
-          strokeWidth="1.5"
-        />
-        {/* Inner border */}
-        <path d="M27 7 L47 17 L47 35 Q47 47 27 56 Q7 47 7 35 L7 17 Z"
-          fill="none"
-          stroke={sk}
-          strokeWidth="0.65"
-          strokeOpacity={unlocked ? 0.45 : 0.25}
-        />
-        {/* Horizontal divider */}
-        <line x1="10" y1="37" x2="44" y2="37" stroke={sk} strokeWidth="0.65" strokeOpacity={unlocked ? 0.4 : 0.2} />
-        {/* Symbol */}
-        <text
-          x="27" y="28"
-          textAnchor="middle" dominantBaseline="middle"
-          fill={tx}
-          fontSize={symbol === "★" ? 17 : symbol.length > 1 ? 10 : 15}
-          fontWeight="700"
-          fontFamily="Georgia, 'Times New Roman', serif"
-          letterSpacing="0.5"
-        >{symbol}</text>
-        {/* Three ornament dots */}
-        <circle cx="21" cy="44" r="1.8" fill={sk} fillOpacity={unlocked ? 0.55 : 0.3} />
-        <circle cx="27" cy="46.5" r="1.8" fill={sk} fillOpacity={unlocked ? 0.65 : 0.4} />
-        <circle cx="33" cy="44" r="1.8" fill={sk} fillOpacity={unlocked ? 0.55 : 0.3} />
-        {/* Corner ticks */}
-        <line x1="13" y1="22" x2="15" y2="18" stroke={sk} strokeWidth="0.65" strokeOpacity={unlocked ? 0.4 : 0.2} />
-        <line x1="41" y1="22" x2="39" y2="18" stroke={sk} strokeWidth="0.65" strokeOpacity={unlocked ? 0.4 : 0.2} />
-      </svg>
-      <div className="text-center">
-        <div className="text-xs font-semibold" style={{ color: unlocked ? "#5C5650" : "#9A9490" }}>{label}</div>
-        <div className="text-xs" style={{ color: "#9A9490" }}>{desc}</div>
-      </div>
-    </div>
-  );
-}
-
-function CrestBadge({
-  abbr, label, desc, unlocked,
-}: {
-  abbr: string; label: string; desc: string; unlocked: boolean;
-}) {
-  const uid = "cr" + abbr;
-  const sk = unlocked ? "#B8943A" : "#C4BEB8";
-  const fi = unlocked ? "#FBF4E4" : "#EDEAE5";
-  const tx = unlocked ? "#8B6914" : "#B0AAA4";
-
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <svg width="58" height="58" viewBox="0 0 58 58" fill="none">
-        <defs>
-          <radialGradient id={uid} cx="50%" cy="38%" r="55%">
-            <stop offset="0%" stopColor={fi} />
-            <stop offset="100%" stopColor={fi} stopOpacity="0.5" />
-          </radialGradient>
-        </defs>
-        {/* Outer ring */}
-        <circle cx="29" cy="29" r="27" fill={`url(#${uid})`} stroke={sk} strokeWidth="1.5" />
-        {/* Second ring */}
-        <circle cx="29" cy="29" r="22" fill="none" stroke={sk} strokeWidth="0.65" strokeOpacity={unlocked ? 0.4 : 0.22} />
-        {/* Inner ring */}
-        <circle cx="29" cy="29" r="16" fill="none" stroke={sk} strokeWidth="0.5" strokeOpacity={unlocked ? 0.25 : 0.15} />
-        {/* 8 small studs on second ring */}
-        {[0, 45, 90, 135, 180, 225, 270, 315].map((deg) => {
-          const r = 22;
-          const rad = (deg * Math.PI) / 180;
-          const cx = 29 + r * Math.sin(rad);
-          const cy = 29 - r * Math.cos(rad);
-          return <circle key={deg} cx={cx} cy={cy} r="1.4" fill={sk} fillOpacity={unlocked ? 0.55 : 0.3} />;
-        })}
-        {/* Laurel arcs */}
-        <path d="M12 27 Q29 17 46 27" fill="none" stroke={sk} strokeWidth="0.65" strokeOpacity={unlocked ? 0.4 : 0.22} />
-        <path d="M12 31 Q29 41 46 31" fill="none" stroke={sk} strokeWidth="0.65" strokeOpacity={unlocked ? 0.4 : 0.22} />
-        {/* Cross axis */}
-        <line x1="9" y1="29" x2="49" y2="29" stroke={sk} strokeWidth="0.5" strokeOpacity={unlocked ? 0.22 : 0.12} />
-        <line x1="29" y1="9" x2="29" y2="49" stroke={sk} strokeWidth="0.5" strokeOpacity={unlocked ? 0.22 : 0.12} />
-        {/* Text */}
-        <text
-          x="29" y="29"
-          textAnchor="middle" dominantBaseline="middle"
-          fill={tx}
-          fontSize={abbr.length >= 3 ? 8 : 10}
-          fontWeight="700"
-          fontFamily="Georgia, 'Times New Roman', serif"
-          letterSpacing="0.5"
-        >{abbr}</text>
-      </svg>
-      <div className="text-center">
-        <div className="text-xs font-semibold" style={{ color: unlocked ? "#5C5650" : "#9A9490" }}>{label}</div>
-        <div className="text-xs" style={{ color: "#9A9490" }}>{desc}</div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Badge Showcase Card (used in LearningTab) ────────────────────────────────
 
 function BadgeShowcaseCard({ role }: { role: string }) {
@@ -532,69 +447,163 @@ function BadgeShowcaseCard({ role }: { role: string }) {
     } catch {}
   }, []);
 
-  const offlineUnlocked = {
+  const offlineUnlocked: Record<string, boolean> = {
     offline_zibentong: ["ZIBENTONG_GRAD","QIDONG_GRAD","ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role),
     offline_qidong: ["QIDONG_GRAD","ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role),
     offline_zibendao: ["ZIBENDAO_GRAD","ADMIN","SUPER_ADMIN"].includes(role),
   };
 
+  const allOfflineUnlocked = OFFLINE_BADGES.every(b => offlineUnlocked[b.id]);
+  const ultimateUnlocked = earnedIds.size >= ONLINE_BADGES.length && allOfflineUnlocked;
+
   return (
-    <Card
-      title={hasNew ? "🆕 成就徽章" : "成就徽章"}
-      action={undefined}
-    >
+    <Card title={hasNew ? "新成就 成就徽章" : "成就徽章"} action={undefined}>
       <div>
-        {/* Online badge mini row */}
-        <div className="text-xs mb-3" style={{ color: "#9A9490" }}>线上成长徽章 · {earnedIds.size}/12</div>
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+        {/* ── 第一层：线上成长徽章 ─────────────────────────── */}
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-medium" style={{ color: "#68625C" }}>线上成长徽章</span>
+          <span className="text-xs font-mono" style={{ color: "#C9A84C" }}>{earnedIds.size}/{ONLINE_BADGES.length}</span>
+        </div>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(5, 1fr)",
+            gap: 10,
+            marginBottom: 20,
+          }}
+        >
           {ONLINE_BADGES.map(badge => {
             const earned = earnedIds.has(badge.id);
             const isNew = badgeStates[badge.id] === "unlocked_new";
             return (
-              <div
-                key={badge.id}
-                title={badge.name}
-                style={{
-                  width: 32,
-                  height: 32,
-                  clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                  background: earned
-                    ? `linear-gradient(145deg, ${badge.color}88, ${badge.color}44)`
-                    : "rgba(0,0,0,0.08)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "1rem",
-                  filter: earned && isNew
-                    ? `drop-shadow(0 0 6px ${badge.color})`
-                    : "none",
-                  transition: "all 0.2s",
-                }}
-              >
-                <span style={{ opacity: earned ? 1 : 0.2, fontSize: "0.85rem" }}>{badge.icon}</span>
+              <div key={badge.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                <div
+                  title={badge.name}
+                  style={{
+                    width: 52,
+                    height: 52,
+                    borderRadius: "50%",
+                    overflow: "hidden",
+                    position: "relative",
+                    border: earned ? `2px solid ${badge.color}66` : "2px solid #E0D9CE",
+                    boxShadow: isNew ? `0 0 12px ${badge.color}99` : "none",
+                    transition: "all 0.2s",
+                    flexShrink: 0,
+                  }}
+                >
+                  <img
+                    src={badge.image}
+                    alt={badge.name}
+                    width={52}
+                    height={52}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      filter: earned ? "none" : "grayscale(1) brightness(0.55)",
+                      transition: "filter 0.3s",
+                    }}
+                  />
+                  {isNew && (
+                    <div style={{
+                      position: "absolute", top: 0, right: 0,
+                      width: 10, height: 10, borderRadius: "50%",
+                      background: "#C9A84C", border: "1.5px solid #fff",
+                    }} />
+                  )}
+                </div>
+                <span style={{ fontSize: "9px", color: earned ? "#5C5650" : "#B0AAA4", textAlign: "center", lineHeight: 1.2 }}>
+                  {badge.name}
+                </span>
               </div>
             );
           })}
         </div>
 
-        {/* Divider */}
+        {/* ── 分隔线 ─────────────────────────────────────────── */}
         <div className="h-px mb-4" style={{ backgroundColor: "#E0D9CE" }} />
 
-        {/* Offline badges */}
-        <div className="text-xs mb-3" style={{ color: "#9A9490" }}>线下课程徽章</div>
-        <div className="flex justify-around pb-2">
-          {[
-            { key: "offline_zibentong", label: "资本通", abbr: "ZBT" },
-            { key: "offline_qidong", label: "启动资本", abbr: "QD" },
-            { key: "offline_zibendao", label: "资本道", abbr: "ZBD" },
-          ].map(b => {
-            const unlocked = offlineUnlocked[b.key as keyof typeof offlineUnlocked];
+        {/* ── 第二层：线下课程徽章 ─────────────────────────── */}
+        <div className="text-xs font-medium mb-3" style={{ color: "#68625C" }}>线下课程徽章</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 20 }}>
+          {OFFLINE_BADGES.map(badge => {
+            const unlocked = offlineUnlocked[badge.id];
             return (
-              <CrestBadge key={b.key} abbr={b.abbr} label={b.label} desc={unlocked ? "已获得" : "线下课程"} unlocked={unlocked} />
+              <div key={badge.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                <div style={{
+                  width: 68,
+                  height: 68,
+                  borderRadius: "50%",
+                  overflow: "hidden",
+                  border: unlocked ? `2px solid ${badge.color}88` : "2px solid #E0D9CE",
+                  boxShadow: unlocked ? `0 2px 12px ${badge.color}44` : "none",
+                  transition: "all 0.3s",
+                  flexShrink: 0,
+                }}>
+                  <img
+                    src={badge.image}
+                    alt={badge.name}
+                    width={68}
+                    height={68}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      filter: unlocked ? "none" : "grayscale(1) brightness(0.55)",
+                    }}
+                  />
+                </div>
+                <div style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: "11px", fontWeight: 600, color: unlocked ? "#5C5650" : "#B0AAA4" }}>{badge.name}</div>
+                  <div style={{ fontSize: "10px", color: "#9A9490" }}>{unlocked ? "已获得" : "线下课程"}</div>
+                </div>
+              </div>
             );
           })}
         </div>
 
+        {/* ── 分隔线 ─────────────────────────────────────────── */}
+        <div className="h-px mb-4" style={{ backgroundColor: "#E0D9CE" }} />
+
+        {/* ── 终极徽章：资本大师 ──────────────────────────── */}
+        <div className="text-xs font-medium mb-3" style={{ color: "#68625C" }}>终极成就</div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+          <div style={{
+            width: 88,
+            height: 88,
+            borderRadius: "50%",
+            overflow: "hidden",
+            border: ultimateUnlocked ? "3px solid #C9A84C" : "2px solid #E0D9CE",
+            boxShadow: ultimateUnlocked ? "0 4px 20px rgba(201,168,76,0.5)" : "none",
+            transition: "all 0.3s",
+          }}>
+            <img
+              src={ULTIMATE_BADGE.image}
+              alt={ULTIMATE_BADGE.name}
+              width={88}
+              height={88}
+              style={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                filter: ultimateUnlocked ? "none" : "grayscale(1) brightness(0.45)",
+              }}
+            />
+          </div>
+          <div style={{ textAlign: "center" }}>
+            <div style={{
+              fontSize: "13px",
+              fontWeight: 700,
+              color: ultimateUnlocked ? "#C9A84C" : "#B0AAA4",
+              letterSpacing: "0.03em",
+            }}>
+              {ULTIMATE_BADGE.name}
+            </div>
+            <div style={{ fontSize: "11px", color: "#9A9490" }}>
+              {ultimateUnlocked ? "Capital Master" : "完成全部课程解锁"}
+            </div>
+          </div>
+        </div>
       </div>
     </Card>
   );

@@ -178,34 +178,30 @@ export function BadgeUnlockModal() {
                 background: `radial-gradient(circle, ${accentColor}44 0%, transparent 70%)`,
               }} />
 
-              {/* Hex outer */}
+              {/* Badge image */}
               <div style={{
                 position: "absolute",
                 inset: 0,
-                background: isUltimate
-                  ? "linear-gradient(145deg, #78350f, #d97706, #fbbf24)"
-                  : `linear-gradient(145deg, #0f172a, ${accentColor}88, ${accentColor}44)`,
-                clipPath: isUltimate
-                  ? "polygon(50% 0%, 100% 15%, 100% 65%, 50% 100%, 0% 65%, 0% 15%)"
-                  : "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-              }} />
-              {/* Hex inner */}
-              <div style={{
-                position: "absolute",
-                inset: 8,
-                background: isUltimate
-                  ? "linear-gradient(145deg, #1c0a00, #3b1f00)"
-                  : "linear-gradient(145deg, #0a0a1a, #0d0d22)",
-                clipPath: isUltimate
-                  ? "polygon(50% 0%, 100% 15%, 100% 65%, 50% 100%, 0% 65%, 0% 15%)"
-                  : "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                borderRadius: "50%",
+                overflow: "hidden",
+                border: `3px solid ${accentColor}88`,
               }}>
-                <span style={{ fontSize: "3.2rem", lineHeight: 1, userSelect: "none" }}>
-                  {badge.icon}
-                </span>
+                {badge.image ? (
+                  <img
+                    src={badge.image}
+                    alt={badge.name}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                ) : (
+                  <div style={{
+                    width: "100%", height: "100%",
+                    background: `linear-gradient(145deg, #0f172a, ${accentColor}66)`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    fontSize: "3rem", userSelect: "none",
+                  }}>
+                    {badge.icon}
+                  </div>
+                )}
               </div>
 
               {/* Shimmer effect */}
@@ -214,7 +210,7 @@ export function BadgeUnlockModal() {
                   position: "absolute",
                   inset: 0,
                   overflow: "hidden",
-                  clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
+                  borderRadius: "50%",
                   pointerEvents: "none",
                 }}>
                   <div style={{

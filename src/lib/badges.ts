@@ -9,6 +9,7 @@ export interface Badge {
   nameEn: string;
   description: string;
   icon: string;
+  image?: string;
   tier: BadgeTier;
   order: number;
   color: string; // accent color
@@ -31,79 +32,77 @@ export const LESSON_ORDER: string[] = [
   "m11-l1", "m11-l2",             // Module 11 (lessons 23-24)
 ];
 
-// ─── 12 Online Growth Badges (every 2 lessons) ─────────────────────────────────
+// ─── 10 Online Growth Badges ───────────────────────────────────────────────────
 export const ONLINE_BADGES: Badge[] = [
   {
     id: "online_01", name: "启航者", nameEn: "Pioneer",
     description: "完成第1-2关课程，开启资本之旅",
-    icon: "🚀", tier: "online", order: 1, color: "#EF4444",
+    icon: "Pioneer", image: "/badges/badge-online-01.jpg",
+    tier: "online", order: 1, color: "#EF4444",
     requiredLessons: ["m1-l1", "m1-l2"],
   },
   {
     id: "online_02", name: "探索者", nameEn: "Explorer",
     description: "完成第3-4关课程，探索资本运作逻辑",
-    icon: "🧭", tier: "online", order: 2, color: "#F97316",
+    icon: "Explorer", image: "/badges/badge-online-02.jpg",
+    tier: "online", order: 2, color: "#F97316",
     requiredLessons: ["m1-l3", "m2-l1"],
   },
   {
     id: "online_03", name: "洞察者", nameEn: "Insighter",
     description: "完成第5-6关课程，洞察商业本质",
-    icon: "👁️", tier: "online", order: 3, color: "#F59E0B",
+    icon: "Insighter", image: "/badges/badge-online-03.jpg",
+    tier: "online", order: 3, color: "#F59E0B",
     requiredLessons: ["m2-l2", "m3-l1"],
   },
   {
     id: "online_04", name: "构建者", nameEn: "Builder",
     description: "完成第7-8关课程，构建商业模型",
-    icon: "🏗️", tier: "online", order: 4, color: "#EAB308",
+    icon: "Builder", image: "/badges/badge-online-04.jpg",
+    tier: "online", order: 4, color: "#EAB308",
     requiredLessons: ["m3-l2", "m4-l1"],
   },
   {
     id: "online_05", name: "估值者", nameEn: "Valuator",
     description: "完成第9-10关课程，掌握估值方法",
-    icon: "📊", tier: "online", order: 5, color: "#84CC16",
+    icon: "Valuator", image: "/badges/badge-online-05.jpg",
+    tier: "online", order: 5, color: "#84CC16",
     requiredLessons: ["m4-l2", "m4-l3"],
   },
   {
     id: "online_06", name: "结构师", nameEn: "Architect",
     description: "完成第11-12关课程，设计资本结构",
-    icon: "🏛️", tier: "online", order: 6, color: "#22C55E",
+    icon: "Architect", image: "/badges/badge-online-06.jpg",
+    tier: "online", order: 6, color: "#22C55E",
     requiredLessons: ["m5-l1", "m5-l2"],
   },
   {
     id: "online_07", name: "策略家", nameEn: "Strategist",
     description: "完成第13-14关课程，制定资本策略",
-    icon: "♟️", tier: "online", order: 7, color: "#10B981",
+    icon: "Strategist", image: "/badges/badge-online-07.jpg",
+    tier: "online", order: 7, color: "#10B981",
     requiredLessons: ["m6-l1", "m6-l2"],
   },
   {
     id: "online_08", name: "融资家", nameEn: "Fundraiser",
     description: "完成第15-16关课程，融资实战演练",
-    icon: "💰", tier: "online", order: 8, color: "#3B82F6",
+    icon: "Fundraiser", image: "/badges/badge-online-08.jpg",
+    tier: "online", order: 8, color: "#3B82F6",
     requiredLessons: ["m7-l1", "m7-l2"],
   },
   {
     id: "online_09", name: "资本家", nameEn: "Capitalist",
     description: "完成第17-18关课程，运用资本思维",
-    icon: "💎", tier: "online", order: 9, color: "#6366F1",
+    icon: "Capitalist", image: "/badges/badge-online-09.jpg",
+    tier: "online", order: 9, color: "#6366F1",
     requiredLessons: ["m8-l1", "m8-l2"],
   },
   {
     id: "online_10", name: "扩张者", nameEn: "Expander",
     description: "完成第19-20关课程，掌握扩张之道",
-    icon: "🌐", tier: "online", order: 10, color: "#8B5CF6",
+    icon: "Expander", image: "/badges/badge-online-10.jpg",
+    tier: "online", order: 10, color: "#8B5CF6",
     requiredLessons: ["m9-l1", "m9-l2"],
-  },
-  {
-    id: "online_11", name: "价值创造者", nameEn: "Value Creator",
-    description: "完成第21-22关课程，创造持续价值",
-    icon: "👑", tier: "online", order: 11, color: "#A855F7",
-    requiredLessons: ["m10-l1", "m10-l2"],
-  },
-  {
-    id: "online_12", name: "资本精英", nameEn: "Capital Elite",
-    description: "完成全部24关课程，成为资本精英",
-    icon: "⚡", tier: "online", order: 12, color: "#EC4899",
-    requiredLessons: ["m11-l1", "m11-l2"],
   },
 ];
 
@@ -112,19 +111,22 @@ export const OFFLINE_BADGES: Badge[] = [
   {
     id: "offline_zibentong", name: "资本通", nameEn: "Capital Pro",
     description: "完成《资本通》线下课程，掌握资本认知与价值估值",
-    icon: "🏦", tier: "offline", order: 13, color: "#F59E0B",
+    icon: "ZBT", image: "/badges/badge-offline-zibentong.jpg",
+    tier: "offline", order: 11, color: "#F59E0B",
     requiredRole: "ZIBENTONG_GRAD",
   },
   {
     id: "offline_qidong", name: "启动资本", nameEn: "Capital Launch",
     description: "完成《启动资本》线下课程，掌握企业融资与资本架构",
-    icon: "⚡", tier: "offline", order: 14, color: "#3B82F6",
+    icon: "QD", image: "/badges/badge-offline-qidong.jpg",
+    tier: "offline", order: 12, color: "#3B82F6",
     requiredRole: "QIDONG_GRAD",
   },
   {
     id: "offline_zibendao", name: "资本道", nameEn: "Capital Way",
     description: "完成《资本道》线下课程，掌握资本运营与上市路径",
-    icon: "🌟", tier: "offline", order: 15, color: "#8B5CF6",
+    icon: "ZBD", image: "/badges/badge-offline-zibendao.jpg",
+    tier: "offline", order: 13, color: "#8B5CF6",
     requiredRole: "ZIBENDAO_GRAD",
   },
 ];
@@ -135,9 +137,9 @@ export const ULTIMATE_BADGE: Badge = {
   name: "资本大师",
   nameEn: "Capital Master",
   description: "完成全部线上与线下课程，成为真正的资本大师",
-  icon: "🏆",
+  icon: "CM", image: "/badges/badge-ultimate.jpg",
   tier: "ultimate",
-  order: 16,
+  order: 14,
   color: "#F59E0B",
 };
 
