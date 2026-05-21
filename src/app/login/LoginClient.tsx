@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { sendOtp } from "@/app/actions/auth";
@@ -22,8 +23,19 @@ const EmailIcon = () => (
   </svg>
 );
 
-export default function LoginClient({ locale }: { locale: string }) {
+const OAUTH_ERROR_MESSAGES: Record<string, { zh: string; en: string }> = {
+  OAuthCallbackError: { zh: "Google 登录失败，请重试", en: "Google sign-in failed, please try again" },
+  OAuthAccountNotLinked: { zh: "此邮箱已用其他方式注册，请用邮箱验证码登录", en: "This email is registered differently. Use email code instead." },
+  Callback: { zh: "登录回调出错，请重试", en: "Auth callback error, please try again" },
+  AccessDenied: { zh: "访问被拒绝", en: "Access denied" },
+  Default: { zh: "登录出现问题，请重试", en: "Login error, please try again" },
+};
+
+function LoginForm({ locale }: { locale: string }) {
   const isEn = locale === "en";
+  const searchParams = useSearchParams();
+  const oauthError = searchParams.get("error");
+
   const [step, setStep] = useState<"buttons" | "email">("buttons");
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
@@ -102,6 +114,16 @@ export default function LoginClient({ locale }: { locale: string }) {
               {isEn ? "Sign in to your ZiBenDao account" : "登录你的资本道账号"}
             </p>
           </div>
+
+          {/* OAuth error banner */}
+          {oauthError && (
+            <div className="flex items-start gap-2 rounded-xl px-4 py-3 text-sm mb-4" style={{ backgroundColor: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", color: "#DC2626" }}>
+              <span className="flex-shrink-0">⚠</span>
+              {isEn
+                ? (OAUTH_ERROR_MESSAGES[oauthError] ?? OAUTH_ERROR_MESSAGES.Default).en
+                : (OAUTH_ERROR_MESSAGES[oauthError] ?? OAUTH_ERROR_MESSAGES.Default).zh}
+            </div>
+          )}
 
           {step === "buttons" && (
             <div className="space-y-3">
@@ -218,5 +240,13 @@ export default function LoginClient({ locale }: { locale: string }) {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginClient({ locale }: { locale: string }) {
+  return (
+    <Suspense>
+      <LoginForm locale={locale} />
+    </Suspense>
   );
 }
