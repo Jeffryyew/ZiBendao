@@ -541,7 +541,7 @@ function BadgeShowcaseCard({ role }: { role: string }) {
   return (
     <Card
       title={hasNew ? "🆕 成就徽章" : "成就徽章"}
-      action={{ label: "查看全部 →", href: "/online/achievements" }}
+      action={undefined}
     >
       <div>
         {/* Online badge mini row */}
@@ -595,13 +595,6 @@ function BadgeShowcaseCard({ role }: { role: string }) {
           })}
         </div>
 
-        <Link
-          href="/online/achievements"
-          className="mt-3 flex items-center justify-center gap-2 w-full py-2 rounded-xl text-xs font-medium"
-          style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
-        >
-          查看完整成就墙 →
-        </Link>
       </div>
     </Card>
   );

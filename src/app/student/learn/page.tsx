@@ -170,13 +170,7 @@ export default function CapitalLaunchPage() {
 
             return (
               <div key={mod.id}>
-                {status === "locked" ? (
-                  row
-                ) : (
-                  <Link href={`/online/learn/${mod.slug}`} className="block">
-                    {row}
-                  </Link>
-                )}
+                {row}
               </div>
             );
           })}
