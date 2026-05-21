@@ -198,6 +198,82 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
   );
 }
 
+// ─── Company Picker Modal (for group mode tool access) ────────────────────────
+
+function CompanyPickerModal({
+  group, toolHref, onClose,
+}: {
+  group: GroupStructure;
+  toolHref: string;
+  onClose: () => void;
+}) {
+  const companies: { id: string; name: string; type: string; isParent: boolean }[] = [];
+  if (group.parent) companies.push({ ...group.parent, isParent: true });
+  group.subsidiaries.forEach(s => companies.push({ ...s, isParent: false }));
+
+  const handleSelect = (company: typeof companies[0]) => {
+    try {
+      localStorage.setItem("zbd_active_company", JSON.stringify({ id: company.id, name: company.name }));
+    } catch {}
+    window.location.href = toolHref;
+  };
+
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: "fixed", inset: 0, zIndex: 200,
+        background: "rgba(0,0,0,0.35)", backdropFilter: "blur(4px)",
+        display: "flex", alignItems: "flex-end", justifyContent: "center",
+      }}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        style={{
+          width: "100%", maxWidth: 480, borderRadius: "20px 20px 0 0",
+          backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE",
+          padding: "20px 20px 32px",
+        }}
+      >
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <div className="text-sm font-semibold" style={{ color: "#1C1814" }}>选择企业</div>
+            <div className="text-xs mt-0.5" style={{ color: "#9A9490" }}>请选择要分析的企业</div>
+          </div>
+          <button onClick={onClose} className="text-xs px-3 py-1 rounded-lg" style={{ color: "#9A9490", backgroundColor: "#F7F4EF" }}>
+            取消
+          </button>
+        </div>
+        <div className="space-y-2">
+          {companies.map(co => (
+            <button
+              key={co.id}
+              onClick={() => handleSelect(co)}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all hover:shadow-sm"
+              style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE" }}
+            >
+              <div
+                className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0"
+                style={{
+                  backgroundColor: co.isParent ? "#EFF4FF" : "#FBF4E4",
+                  color: co.isParent ? "#6B9BD2" : "#C9A84C",
+                }}
+              >
+                {co.name.slice(0, 2).toUpperCase()}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium truncate" style={{ color: "#1C1814" }}>{co.name}</div>
+                <div className="text-xs" style={{ color: "#9A9490" }}>{co.isParent ? "母公司" : "子公司"} · {co.type}</div>
+              </div>
+              <span className="text-xs" style={{ color: "#C9A84C" }}>→</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Overview Tab ─────────────────────────────────────────────────────────────
 
 function OverviewTab({
@@ -218,6 +294,13 @@ function OverviewTab({
 }) {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "早上好" : hour < 18 ? "下午好" : "晚上好";
+  const [pendingToolHref, setPendingToolHref] = useState<string | null>(null);
+
+  const handleToolClick = (href: string) => {
+    if (companyMode === null) { onGoToEnterprise(); return; }
+    if (companyMode === "group") { setPendingToolHref(href); return; }
+    window.location.href = href;
+  };
 
   return (
     <div className="space-y-5">
@@ -398,33 +481,64 @@ function OverviewTab({
       </div>
 
       {/* Recent Tools */}
-      <Card title="资本工具">
+      <Card
+        title="资本工具"
+        action={companyMode === null ? { label: "设置企业 →", onClick: onGoToEnterprise } : undefined}
+      >
+        {companyMode === null && (
+          <div
+            className="flex items-center gap-2 px-3 py-2 rounded-xl mb-3 text-xs"
+            style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(201,168,76,0.25)", color: "#9A7A32" }}
+          >
+            <span style={{ flexShrink: 0 }}>!</span>
+            请先完成企业架构设置，解锁工具使用
+          </div>
+        )}
+        {companyMode === "group" && (
+          <div
+            className="flex items-center gap-2 px-3 py-2 rounded-xl mb-3 text-xs"
+            style={{ backgroundColor: "#EFF4FF", border: "1px solid rgba(107,155,210,0.25)", color: "#6B9BD2" }}
+          >
+            <span style={{ flexShrink: 0 }}>i</span>
+            集团模式：使用工具时将提示选择企业
+          </div>
+        )}
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
           {TOOLS.slice(0, 8).map((tool) => (
-            <Link
+            <button
               key={tool.href}
-              href={tool.href}
+              onClick={() => handleToolClick(tool.href)}
               className="flex flex-col items-center gap-1.5 p-3 rounded-xl text-center transition-all hover:shadow-sm"
-              style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE" }}
+              style={{
+                backgroundColor: "#F7F4EF",
+                border: "1px solid #E0D9CE",
+                cursor: "pointer",
+                opacity: companyMode === null ? 0.6 : 1,
+              }}
             >
-              <span
-                className="text-xs font-mono font-bold"
-                style={{ color: "#C9A84C" }}
-              >
+              <span className="text-xs font-mono font-bold" style={{ color: "#C9A84C" }}>
                 {tool.icon}
               </span>
               <span className="text-xs leading-snug" style={{ color: "#68625C" }}>{tool.label}</span>
-            </Link>
+            </button>
           ))}
         </div>
-        <Link
-          href="/student/tools"
+        <button
+          onClick={() => companyMode === null ? onGoToEnterprise() : (window.location.href = "/student/tools")}
           className="mt-3 flex items-center justify-center gap-2 w-full py-2 rounded-xl text-xs font-medium"
-          style={{ color: "#9A9490", backgroundColor: "#F7F4EF", border: "1px dashed #E0D9CE" }}
+          style={{ color: "#9A9490", backgroundColor: "#F7F4EF", border: "1px dashed #E0D9CE", cursor: "pointer" }}
         >
           查看全部 {TOOLS.length} 个工具 →
-        </Link>
+        </button>
       </Card>
+
+      {pendingToolHref && companyMode === "group" && (
+        <CompanyPickerModal
+          group={group}
+          toolHref={pendingToolHref}
+          onClose={() => setPendingToolHref(null)}
+        />
+      )}
     </div>
   );
 }
