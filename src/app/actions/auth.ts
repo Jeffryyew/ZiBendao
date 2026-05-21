@@ -128,6 +128,11 @@ export async function sendOtp(email: string): Promise<ActionResult> {
     data: { identifier: `otp_${cleanEmail}`, token: otp, expires },
   });
 
+  // In development, log OTP to console so it can be used without SMTP
+  if (process.env.NODE_ENV === "development") {
+    console.log(`\n[DEV OTP] ${cleanEmail} -> ${otp}\n`);
+  }
+
   sendOtpEmail(cleanEmail, otp).catch(() => {});
 
   return { success: "otp_sent" };
