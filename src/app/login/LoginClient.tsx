@@ -24,9 +24,13 @@ const EmailIcon = () => (
 );
 
 const OAUTH_ERROR_MESSAGES: Record<string, { zh: string; en: string }> = {
+  OAuthSignin: { zh: "Google 登录启动失败，请重试", en: "Failed to start Google sign-in, please try again" },
+  OAuthCallback: { zh: "Google 登录失败，请重试", en: "Google sign-in failed, please try again" },
   OAuthCallbackError: { zh: "Google 登录失败，请重试", en: "Google sign-in failed, please try again" },
+  OAuthCreateAccount: { zh: "创建账号失败，请稍后重试", en: "Failed to create account, please try again" },
   OAuthAccountNotLinked: { zh: "此邮箱已用其他方式注册，请用邮箱验证码登录", en: "This email is registered differently. Use email code instead." },
   Callback: { zh: "登录回调出错，请重试", en: "Auth callback error, please try again" },
+  Configuration: { zh: "登录配置错误，请联系管理员", en: "Auth configuration error, please contact support" },
   AccessDenied: { zh: "访问被拒绝", en: "Access denied" },
   Default: { zh: "登录出现问题，请重试", en: "Login error, please try again" },
 };
@@ -118,7 +122,6 @@ function LoginForm({ locale }: { locale: string }) {
           {/* OAuth error banner */}
           {oauthError && (
             <div className="flex items-start gap-2 rounded-xl px-4 py-3 text-sm mb-4" style={{ backgroundColor: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", color: "#DC2626" }}>
-              <span className="flex-shrink-0">⚠</span>
               {isEn
                 ? (OAUTH_ERROR_MESSAGES[oauthError] ?? OAUTH_ERROR_MESSAGES.Default).en
                 : (OAUTH_ERROR_MESSAGES[oauthError] ?? OAUTH_ERROR_MESSAGES.Default).zh}
@@ -186,7 +189,7 @@ function LoginForm({ locale }: { locale: string }) {
               </div>
               {error && (
                 <div className="flex items-start gap-2 rounded-xl px-4 py-3 text-sm" style={{ backgroundColor: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", color: "#DC2626" }}>
-                  <span className="flex-shrink-0"></span>{error}
+                  {error}
                 </div>
               )}
               <label className="flex items-center gap-2.5 cursor-pointer select-none">

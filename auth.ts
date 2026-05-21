@@ -8,7 +8,7 @@ import { authConfig } from "./auth.config";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  debug: true,
+  debug: process.env.NODE_ENV === "development",
   adapter: PrismaAdapter(prisma),
   providers: [
     Google({
