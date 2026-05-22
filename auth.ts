@@ -6,6 +6,17 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { authConfig } from "./auth.config";
 
+// Fix AUTH_URL for Vercel production — NEXTAUTH_URL in .env is localhost,
+// which gets copied to Vercel env vars and breaks redirect_uri sent to Google.
+if (process.env.VERCEL) {
+  const currentUrl = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "";
+  if (!currentUrl.startsWith("https://")) {
+    const host =
+      process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;
+    if (host) process.env.AUTH_URL = `https://${host}`;
+  }
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   debug: process.env.NODE_ENV === "development",
