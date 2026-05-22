@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(npx tsc *)",
-      "Bash(rm -rf \"/c/Users/Dell/Desktop/zibendao/.claire\")"
-    ]
-  }
-}
