@@ -27,7 +27,8 @@ export default auth((req) => {
     pathname.startsWith("/login/otp") ||
     pathname.startsWith("/verify-email") ||
     pathname.startsWith("/api/db-test") ||
-    pathname.startsWith("/api/auth-debug");
+    pathname.startsWith("/api/auth-debug") ||
+    pathname.startsWith("/api/env-check");
 
   if (isPublic) return NextResponse.next();
 
