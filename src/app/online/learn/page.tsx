@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { CAPITAL_LAUNCH_MODULES, LEVEL_COLORS, LEVEL_LABELS, XP_PER_LEVEL, getUserLevel } from "@/lib/capitalLaunchCourse";
+import { CAPITAL_LAUNCH_MODULES, LEVEL_COLORS, LEVEL_LABELS, XP_PER_LEVEL, getUserLevel, phases } from "@/lib/capitalLaunchCourse";
 
 const DEMO_XP = 0;
 const DEMO_COMPLETED: string[] = [];
@@ -53,20 +53,20 @@ export default function OnlineLearnPage() {
           className="text-sm transition-opacity hover:opacity-70"
           style={{ color: "rgba(255,255,255,0.4)" }}
         >
-          &larr; 返回总览
+          返回总览
         </Link>
 
         <div className="flex items-center gap-3">
           <div
             className="px-2.5 py-1 rounded-full text-xs font-bold"
-            style={{ background: `${levelColor}22`, color: levelColor, border: `1px solid ${levelColor}44` }}
+            style={{ background: levelColor + "22", color: levelColor, border: "1px solid " + levelColor + "44" }}
           >
             {LEVEL_LABELS[level - 1]}
           </div>
           <div className="w-32 h-1.5 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.1)" }}>
             <div
               className="h-full rounded-full transition-all duration-700"
-              style={{ width: `${xpProgress}%`, background: `linear-gradient(90deg, ${levelColor}, ${levelColor}cc)` }}
+              style={{ width: xpProgress + "%", background: "linear-gradient(90deg, " + levelColor + ", " + levelColor + "cc)" }}
             />
           </div>
           <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.4)" }}>
@@ -97,7 +97,7 @@ export default function OnlineLearnPage() {
           资本启航
         </h1>
         <p className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>
-          从 0 开始理解资本运作 · 11个模块 · AI沉浸式体验
+          从 0 开始理解资本运作 · 13章 · 100关 · AI沉浸式体验
         </p>
       </div>
 
@@ -116,31 +116,43 @@ export default function OnlineLearnPage() {
               const inProgress = !isCompleted && mod.lessons.some((l) => completedLessons.has(l.id));
               const completedInMod = mod.lessons.filter((l) => completedLessons.has(l.id)).length;
               const isLeft = idx % 2 === 0;
+              const phaseBanner = phases.find((p) => p.chapterOrders[0] === mod.order);
 
               return (
-                <div
-                  key={mod.id}
-                  className={`relative flex ${isLeft ? "justify-start" : "justify-end"}`}
-                >
-                  <div
-                    className="absolute left-1/2 top-8 w-3 h-3 rounded-full border-2"
-                    style={{
-                      transform: "translateX(-50%)",
-                      background: isCompleted ? mod.levelColor : isUnlocked ? "#1a1a3a" : "#0d0d20",
-                      borderColor: isCompleted ? mod.levelColor : isUnlocked ? `${mod.levelColor}44` : "rgba(255,255,255,0.08)",
-                      boxShadow: isCompleted ? `0 0 12px ${mod.levelColor}88` : "none",
-                      zIndex: 2,
-                    }}
-                  />
-
-                  <div className="w-[calc(50%-24px)]">
-                    {isUnlocked ? (
-                      <Link href={`/online/learn/${mod.slug}`}>
+                <div key={mod.id}>
+                  {phaseBanner && (
+                    <div className={"w-full rounded-2xl p-4 mb-4 bg-gradient-to-r " + phaseBanner.color + " text-white"}>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-sm font-bold">
+                          {phaseBanner.id}
+                        </div>
+                        <div>
+                          <div className="font-bold text-sm">{"第" + phaseBanner.id + "阶段 · " + phaseBanner.title}</div>
+                          <div className="text-xs opacity-80">{phaseBanner.subtitle + " · 共" + phaseBanner.chapterOrders.length + "章"}</div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                  <div className={"relative flex " + (isLeft ? "justify-start" : "justify-end")}>
+                    <div
+                      className="absolute left-1/2 top-8 w-3 h-3 rounded-full border-2"
+                      style={{
+                        transform: "translateX(-50%)",
+                        background: isCompleted ? mod.levelColor : isUnlocked ? "#1a1a3a" : "#0d0d20",
+                        borderColor: isCompleted ? mod.levelColor : isUnlocked ? mod.levelColor + "44" : "rgba(255,255,255,0.08)",
+                        boxShadow: isCompleted ? "0 0 12px " + mod.levelColor + "88" : "none",
+                        zIndex: 2,
+                      }}
+                    />
+                    <div className="w-[calc(50%-24px)]">
+                      {isUnlocked ? (
+                        <Link href={"/online/learn/" + mod.slug}>
+                          <ModuleCard mod={mod} isCompleted={isCompleted} inProgress={inProgress} isUnlocked={isUnlocked} completedInMod={completedInMod} />
+                        </Link>
+                      ) : (
                         <ModuleCard mod={mod} isCompleted={isCompleted} inProgress={inProgress} isUnlocked={isUnlocked} completedInMod={completedInMod} />
-                      </Link>
-                    ) : (
-                      <ModuleCard mod={mod} isCompleted={isCompleted} inProgress={inProgress} isUnlocked={isUnlocked} completedInMod={completedInMod} />
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               );
@@ -172,30 +184,30 @@ function ModuleCard({
           ? "linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.02) 100%)"
           : "rgba(255,255,255,0.015)",
         border: isCompleted
-          ? `1px solid ${color}55`
+          ? "1px solid " + color + "55"
           : inProgress
-          ? `1px solid ${color}33`
+          ? "1px solid " + color + "33"
           : isUnlocked
           ? "1px solid rgba(255,255,255,0.08)"
           : "1px solid rgba(255,255,255,0.04)",
         opacity: isUnlocked ? 1 : 0.4,
         cursor: isUnlocked ? "pointer" : "default",
-        boxShadow: isCompleted ? `0 0 20px ${color}22` : "none",
+        boxShadow: isCompleted ? "0 0 20px " + color + "22" : "none",
       }}
     >
       <div className="flex items-start justify-between mb-3">
         <div
           className="w-10 h-10 rounded-xl flex items-center justify-center text-xl"
           style={{
-            background: isUnlocked ? `${color}15` : "rgba(255,255,255,0.04)",
-            border: `1px solid ${color}${isUnlocked ? "30" : "10"}`,
+            background: isUnlocked ? color + "15" : "rgba(255,255,255,0.04)",
+            border: "1px solid " + color + (isUnlocked ? "30" : "10"),
           }}
         >
           {isUnlocked ? mod.icon : "-"}
         </div>
         <div className="flex items-center gap-1.5">
           {isCompleted && (
-            <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: `${color}20`, color }}>
+            <span className="text-xs px-2 py-0.5 rounded-full font-medium" style={{ background: color + "20", color }}>
               完成
             </span>
           )}
@@ -204,14 +216,14 @@ function ModuleCard({
               进行中
             </span>
           )}
-          <span className="text-xs font-mono" style={{ color: `${color}88` }}>
+          <span className="text-xs font-mono" style={{ color: color + "88" }}>
             +{mod.xpReward}XP
           </span>
         </div>
       </div>
 
       <div className="mb-1">
-        <div className="text-xs font-medium mb-0.5" style={{ color: `${color}aa` }}>
+        <div className="text-xs font-medium mb-0.5" style={{ color: color + "aa" }}>
           {mod.levelLabel} · 模块{mod.order}
         </div>
         <h3 className="text-sm font-bold leading-snug" style={{ color: isUnlocked ? "#FFFFFF" : "rgba(255,255,255,0.3)" }}>
@@ -226,7 +238,7 @@ function ModuleCard({
         <div className="flex-1 h-1 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.06)" }}>
           <div
             className="h-full rounded-full transition-all"
-            style={{ width: `${(completedInMod / total) * 100}%`, background: color }}
+            style={{ width: ((completedInMod / total) * 100) + "%", background: color }}
           />
         </div>
         <span className="text-xs font-mono flex-shrink-0" style={{ color: "rgba(255,255,255,0.3)" }}>
