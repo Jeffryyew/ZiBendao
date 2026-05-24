@@ -26,7 +26,9 @@ export default auth((req) => {
     pathname.startsWith("/payment") ||
     pathname.startsWith("/login/otp") ||
     pathname.startsWith("/verify-email") ||
-    pathname.startsWith("/api/db-test");
+    pathname.startsWith("/api/db-test") ||
+    pathname.startsWith("/api/auth-debug") ||
+    pathname.startsWith("/api/env-check");
 
   if (isPublic) return NextResponse.next();
 
@@ -50,5 +52,5 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\.(png|jpg|jpeg|gif|webp|svg|ico)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon\\.ico).*)"],
 };
