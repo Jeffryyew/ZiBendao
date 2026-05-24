@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ENTERPRISE_KEYS } from "@/lib/enterprise";
+import type { CompanyMode } from "@/lib/enterprise";
 
 interface ToolShellProps {
   icon: string;
@@ -12,66 +14,112 @@ interface ToolShellProps {
   children: React.ReactNode;
 }
 
-type CompanyMode = "single" | "group" | null;
+interface CompanyState {
+  mode: CompanyMode;
+  companyName: string | null;
+  hasActiveCompany: boolean;
+  ready: boolean;
+}
 
-function useCompanyMode(): { mode: CompanyMode; companyName: string | null; ready: boolean } {
+function useCompanyState(): CompanyState {
   const [mode, setMode] = useState<CompanyMode>(null);
   const [companyName, setCompanyName] = useState<string | null>(null);
+  const [hasActiveCompany, setHasActiveCompany] = useState(false);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("zbd_company_mode");
-      if (raw === "single" || raw === "group") {
-        setMode(raw);
-        if (raw === "single") {
-          const sc = localStorage.getItem("zbd_single_company");
-          if (sc) {
-            const parsed = JSON.parse(sc);
-            setCompanyName(parsed.name || null);
-          }
+      const raw = localStorage.getItem(ENTERPRISE_KEYS.MODE) as CompanyMode;
+      if (raw === "single") {
+        setMode("single");
+        const sc = localStorage.getItem(ENTERPRISE_KEYS.SINGLE);
+        if (sc) setCompanyName(JSON.parse(sc).name || null);
+        setHasActiveCompany(true);
+      } else if (raw === "group") {
+        setMode("group");
+        const ac = localStorage.getItem(ENTERPRISE_KEYS.ACTIVE_COMPANY);
+        if (ac) {
+          const parsed = JSON.parse(ac);
+          setCompanyName(parsed.name || null);
+          setHasActiveCompany(true);
         } else {
-          const grp = localStorage.getItem("zbd_group");
+          // No active company selected — try to show parent name as fallback
+          const grp = localStorage.getItem(ENTERPRISE_KEYS.GROUP);
           if (grp) {
             const parsed = JSON.parse(grp);
-            setCompanyName(parsed.parentName || null);
+            setCompanyName(parsed.parent?.name || null);
           }
+          setHasActiveCompany(false);
         }
       }
     } catch {}
     setReady(true);
   }, []);
 
-  return { mode, companyName, ready };
+  return { mode, companyName, hasActiveCompany, ready };
 }
 
 export default function ToolShell({
   icon,
   title,
   desc,
-  backHref = "/student/dashboard",
+  backHref = "/student/tools",
   children,
 }: ToolShellProps) {
-  const { mode, companyName, ready } = useCompanyMode();
+  const { mode, companyName, hasActiveCompany, ready } = useCompanyState();
 
-  // Gate: company mode not set up yet
+  // Gate: no enterprise mode configured
   if (ready && !mode) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: "var(--color-bg-primary)" }}>
         <div className="max-w-sm w-full rounded-2xl p-8 text-center" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
-          <div className="text-4xl mb-4">🏢</div>
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center text-sm font-bold mx-auto mb-5"
+            style={{ backgroundColor: "#FBF4E4", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.25)" }}
+          >
+            企业
+          </div>
           <h2 className="text-lg font-bold mb-2" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
             请先设置企业架构
           </h2>
           <p className="text-sm mb-6 leading-relaxed" style={{ color: "#68625C" }}>
-            使用工具前，需先在总览页面选择企业模式（单一公司或集团模式），以便工具以正确的企业身份运算。
+            资本工具需要先确认你的企业主体，才能正确计算估值、股权、融资路径与企业数据。
           </p>
           <Link
-            href="/student/dashboard"
+            href="/student/dashboard?tab=enterprise"
             className="inline-block px-6 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-80"
-            style={{ backgroundColor: "#1C1814", color: "#F7F4EF" }}
+            style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#FFFFFF" }}
           >
             前往设置企业架构 →
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Gate: group mode but no company selected
+  if (ready && mode === "group" && !hasActiveCompany) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: "var(--color-bg-primary)" }}>
+        <div className="max-w-sm w-full rounded-2xl p-8 text-center" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
+          <div
+            className="w-14 h-14 rounded-2xl flex items-center justify-center text-sm font-bold mx-auto mb-5"
+            style={{ backgroundColor: "#EFF4FF", color: "#6B9BD2", border: "1px solid rgba(107,155,210,0.25)" }}
+          >
+            集团
+          </div>
+          <h2 className="text-lg font-bold mb-2" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
+            请先选择企业主体
+          </h2>
+          <p className="text-sm mb-6 leading-relaxed" style={{ color: "#68625C" }}>
+            集团模式下，请先从公司列表中选择要操作的企业，工具数据将按企业独立记录。
+          </p>
+          <Link
+            href="/student/tools"
+            className="inline-block px-6 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-80"
+            style={{ background: "linear-gradient(135deg, #5A8AC0, #6B9BD2)", color: "#FFFFFF" }}
+          >
+            返回选择企业 →
           </Link>
         </div>
       </div>
@@ -106,7 +154,7 @@ export default function ToolShell({
               className="text-xs px-2.5 py-1 rounded-full flex-shrink-0"
               style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.15)" }}
             >
-              {mode === "group" ? "母公司 · " : ""}{companyName}
+              {mode === "group" ? "集团 · " : ""}{companyName}
             </span>
           )}
         </div>

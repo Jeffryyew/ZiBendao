@@ -13,11 +13,6 @@ import {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
-interface LessonProgress {
-  lessonId: string;
-  points: number;
-}
-
 interface ModuleData {
   id: string;
   title: string;
@@ -43,6 +38,9 @@ interface Company {
   isParent?: boolean;
   parentId?: string | null;
   shareholding?: number;
+  industry?: string;
+  equityStructure?: string;
+  notes?: string;
 }
 
 interface GroupStructure {
@@ -92,13 +90,25 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
   const [singleCompany, setSingleCompany] = useLocalStorage<Company | null>("zbd_single_company", null);
   const [group, setGroup] = useLocalStorage<GroupStructure>("zbd_group", { parent: null, subsidiaries: [] });
 
-  // Sync course progress from localStorage (lesson player persists there)
+  // Sync course progress from localStorage
   const [completed, setCompleted] = useState<Set<string>>(new Set(completedIds));
   useEffect(() => {
     try {
       const raw = localStorage.getItem("zbd_online_completed");
       if (raw) setCompleted(new Set(JSON.parse(raw) as string[]));
     } catch {}
+  }, []);
+
+  // Auto-switch to tab from URL param (?tab=enterprise etc.)
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get("tab");
+      if (tab === "enterprise" || tab === "learning" || tab === "overview") {
+        setActiveTab(tab as TabId);
+      }
+    } catch {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const totalLessons = modules.reduce((s, m) => s + m.lessons.length, 0);
@@ -198,82 +208,6 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
   );
 }
 
-// ─── Company Picker Modal (for group mode tool access) ────────────────────────
-
-function CompanyPickerModal({
-  group, toolHref, onClose,
-}: {
-  group: GroupStructure;
-  toolHref: string;
-  onClose: () => void;
-}) {
-  const companies: { id: string; name: string; type: string; isParent: boolean }[] = [];
-  if (group.parent) companies.push({ ...group.parent, isParent: true });
-  group.subsidiaries.forEach(s => companies.push({ ...s, isParent: false }));
-
-  const handleSelect = (company: typeof companies[0]) => {
-    try {
-      localStorage.setItem("zbd_active_company", JSON.stringify({ id: company.id, name: company.name }));
-    } catch {}
-    window.location.href = toolHref;
-  };
-
-  return (
-    <div
-      onClick={onClose}
-      style={{
-        position: "fixed", inset: 0, zIndex: 200,
-        background: "rgba(0,0,0,0.35)", backdropFilter: "blur(4px)",
-        display: "flex", alignItems: "flex-end", justifyContent: "center",
-      }}
-    >
-      <div
-        onClick={e => e.stopPropagation()}
-        style={{
-          width: "100%", maxWidth: 480, borderRadius: "20px 20px 0 0",
-          backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE",
-          padding: "20px 20px 32px",
-        }}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <div className="text-sm font-semibold" style={{ color: "#1C1814" }}>选择企业</div>
-            <div className="text-xs mt-0.5" style={{ color: "#9A9490" }}>请选择要分析的企业</div>
-          </div>
-          <button onClick={onClose} className="text-xs px-3 py-1 rounded-lg" style={{ color: "#9A9490", backgroundColor: "#F7F4EF" }}>
-            取消
-          </button>
-        </div>
-        <div className="space-y-2">
-          {companies.map(co => (
-            <button
-              key={co.id}
-              onClick={() => handleSelect(co)}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left transition-all hover:shadow-sm"
-              style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE" }}
-            >
-              <div
-                className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0"
-                style={{
-                  backgroundColor: co.isParent ? "#EFF4FF" : "#FBF4E4",
-                  color: co.isParent ? "#6B9BD2" : "#C9A84C",
-                }}
-              >
-                {co.name.slice(0, 2).toUpperCase()}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-medium truncate" style={{ color: "#1C1814" }}>{co.name}</div>
-                <div className="text-xs" style={{ color: "#9A9490" }}>{co.isParent ? "母公司" : "子公司"} · {co.type}</div>
-              </div>
-              <span className="text-xs" style={{ color: "#C9A84C" }}>→</span>
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 // ─── Overview Tab ─────────────────────────────────────────────────────────────
 
 function OverviewTab({
@@ -294,11 +228,14 @@ function OverviewTab({
 }) {
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "早上好" : hour < 18 ? "下午好" : "晚上好";
-  const [pendingToolHref, setPendingToolHref] = useState<string | null>(null);
 
   const handleToolClick = (href: string) => {
     if (companyMode === null) { onGoToEnterprise(); return; }
-    if (companyMode === "group") { setPendingToolHref(href); return; }
+    if (companyMode === "group") {
+      // Group mode: go to tools page to select company first
+      window.location.href = "/student/tools";
+      return;
+    }
     window.location.href = href;
   };
 
@@ -441,49 +378,15 @@ function OverviewTab({
         ) : null}
       </Card>
 
-      {/* 资本启航 Online Course CTA */}
-      <div
-        className="relative overflow-hidden rounded-2xl p-5"
-        style={{ background: "linear-gradient(135deg, #0a0a1a 0%, #0d0d20 100%)", border: "1px solid rgba(99,102,241,0.3)" }}
-      >
-        <div className="absolute top-0 right-0 w-40 h-40 opacity-5 pointer-events-none" aria-hidden>
-          <svg viewBox="0 0 100 100"><circle cx="80" cy="20" r="60" fill="#6366F1"/></svg>
-        </div>
-        <div className="flex items-start gap-3">
-          <div className="flex-1 min-w-0">
-            <div className="text-xs font-medium mb-1" style={{ color: "#818CF8" }}>AI 沉浸式线上课程</div>
-            <div className="text-base font-bold mb-1" style={{ color: "#fff" }}>资本启航</div>
-            <div className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.45)" }}>
-              {totalLessons} 关 · 11 个模块 · 故事 + 测验 + 模拟器
-            </div>
-            <div className="flex items-center gap-2">
-              <Link
-                href="/student/learn"
-                className="px-4 py-1.5 rounded-xl text-xs font-semibold transition-all"
-                style={{ background: "linear-gradient(135deg, #6366F1, #4F46E5)", color: "#fff" }}
-              >
-                进入学习 →
-              </Link>
-              <Link
-                href="/online/achievements"
-                className="px-3 py-1.5 rounded-xl text-xs font-medium"
-                style={{ background: "rgba(245,158,11,0.15)", color: "#F59E0B", border: "1px solid rgba(245,158,11,0.3)" }}
-              >
-                成就
-              </Link>
-            </div>
-          </div>
-          <div className="text-right flex-shrink-0">
-            <div className="text-xl font-bold font-mono" style={{ color: "#6366F1" }}>{completedCount}</div>
-            <div className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>/{totalLessons} 关</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Tools */}
+      {/* Capital Tools */}
       <Card
         title="资本工具"
-        action={companyMode === null ? { label: "设置企业 →", onClick: onGoToEnterprise } : undefined}
+        action={companyMode === null
+          ? { label: "设置企业 →", onClick: onGoToEnterprise }
+          : companyMode === "group"
+          ? { label: "前往工具页 →", href: "/student/tools" }
+          : undefined
+        }
       >
         {companyMode === null && (
           <div
@@ -500,7 +403,7 @@ function OverviewTab({
             style={{ backgroundColor: "#EFF4FF", border: "1px solid rgba(107,155,210,0.25)", color: "#6B9BD2" }}
           >
             <span style={{ flexShrink: 0 }}>i</span>
-            集团模式：使用工具时将提示选择企业
+            集团模式：请先前往工具页面选择企业主体
           </div>
         )}
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -523,27 +426,19 @@ function OverviewTab({
             </button>
           ))}
         </div>
-        <button
-          onClick={() => companyMode === null ? onGoToEnterprise() : (window.location.href = "/student/tools")}
+        <Link
+          href="/student/tools"
           className="mt-3 flex items-center justify-center gap-2 w-full py-2 rounded-xl text-xs font-medium"
-          style={{ color: "#9A9490", backgroundColor: "#F7F4EF", border: "1px dashed #E0D9CE", cursor: "pointer" }}
+          style={{ color: "#9A9490", backgroundColor: "#F7F4EF", border: "1px dashed #E0D9CE" }}
         >
           查看全部 {TOOLS.length} 个工具 →
-        </button>
+        </Link>
       </Card>
-
-      {pendingToolHref && companyMode === "group" && (
-        <CompanyPickerModal
-          group={group}
-          toolHref={pendingToolHref}
-          onClose={() => setPendingToolHref(null)}
-        />
-      )}
     </div>
   );
 }
 
-// ─── Badge Showcase Card (used in LearningTab) ────────────────────────────────
+// ─── Badge Showcase Card ──────────────────────────────────────────────────────
 
 function BadgeShowcaseCard({ role }: { role: string }) {
   const [earnedIds, setEarnedIds] = useState<Set<string>>(new Set());
@@ -573,19 +468,11 @@ function BadgeShowcaseCard({ role }: { role: string }) {
   return (
     <Card title={hasNew ? "新成就 成就徽章" : "成就徽章"} action={undefined}>
       <div>
-        {/* ── 第一层：线上成长徽章 ─────────────────────────── */}
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs font-medium" style={{ color: "#68625C" }}>线上成长徽章</span>
           <span className="text-xs font-mono" style={{ color: "#C9A84C" }}>{earnedIds.size}/{ONLINE_BADGES.length}</span>
         </div>
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(5, 1fr)",
-            gap: 10,
-            marginBottom: 20,
-          }}
-        >
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10, marginBottom: 20 }}>
           {ONLINE_BADGES.map(badge => {
             const earned = earnedIds.has(badge.id);
             const isNew = badgeStates[badge.id] === "unlocked_new";
@@ -594,36 +481,17 @@ function BadgeShowcaseCard({ role }: { role: string }) {
                 <div
                   title={badge.name}
                   style={{
-                    width: 52,
-                    height: 52,
-                    borderRadius: "50%",
-                    overflow: "hidden",
-                    position: "relative",
+                    width: 52, height: 52, borderRadius: "50%", overflow: "hidden", position: "relative",
                     border: earned ? `2px solid ${badge.color}66` : "2px solid #E0D9CE",
                     boxShadow: isNew ? `0 0 12px ${badge.color}99` : "none",
-                    transition: "all 0.2s",
-                    flexShrink: 0,
+                    transition: "all 0.2s", flexShrink: 0,
                   }}
                 >
-                  <img
-                    src={badge.image}
-                    alt={badge.name}
-                    width={52}
-                    height={52}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      filter: earned ? "none" : "grayscale(1) brightness(0.55)",
-                      transition: "filter 0.3s",
-                    }}
+                  <img src={badge.image} alt={badge.name} width={52} height={52}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", filter: earned ? "none" : "grayscale(1) brightness(0.55)", transition: "filter 0.3s" }}
                   />
                   {isNew && (
-                    <div style={{
-                      position: "absolute", top: 0, right: 0,
-                      width: 10, height: 10, borderRadius: "50%",
-                      background: "#C9A84C", border: "1.5px solid #fff",
-                    }} />
+                    <div style={{ position: "absolute", top: 0, right: 0, width: 10, height: 10, borderRadius: "50%", background: "#C9A84C", border: "1.5px solid #fff" }} />
                   )}
                 </div>
                 <span style={{ fontSize: "9px", color: earned ? "#5C5650" : "#B0AAA4", textAlign: "center", lineHeight: 1.2 }}>
@@ -634,37 +502,17 @@ function BadgeShowcaseCard({ role }: { role: string }) {
           })}
         </div>
 
-        {/* ── 分隔线 ─────────────────────────────────────────── */}
         <div className="h-px mb-4" style={{ backgroundColor: "#E0D9CE" }} />
 
-        {/* ── 第二层：线下课程徽章 ─────────────────────────── */}
         <div className="text-xs font-medium mb-3" style={{ color: "#68625C" }}>线下课程徽章</div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 20 }}>
           {OFFLINE_BADGES.map(badge => {
             const unlocked = offlineUnlocked[badge.id];
             return (
               <div key={badge.id} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                <div style={{
-                  width: 68,
-                  height: 68,
-                  borderRadius: "50%",
-                  overflow: "hidden",
-                  border: unlocked ? `2px solid ${badge.color}88` : "2px solid #E0D9CE",
-                  boxShadow: unlocked ? `0 2px 12px ${badge.color}44` : "none",
-                  transition: "all 0.3s",
-                  flexShrink: 0,
-                }}>
-                  <img
-                    src={badge.image}
-                    alt={badge.name}
-                    width={68}
-                    height={68}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      objectFit: "cover",
-                      filter: unlocked ? "none" : "grayscale(1) brightness(0.55)",
-                    }}
+                <div style={{ width: 68, height: 68, borderRadius: "50%", overflow: "hidden", border: unlocked ? `2px solid ${badge.color}88` : "2px solid #E0D9CE", boxShadow: unlocked ? `0 2px 12px ${badge.color}44` : "none", transition: "all 0.3s", flexShrink: 0 }}>
+                  <img src={badge.image} alt={badge.name} width={68} height={68}
+                    style={{ width: "100%", height: "100%", objectFit: "cover", filter: unlocked ? "none" : "grayscale(1) brightness(0.55)" }}
                   />
                 </div>
                 <div style={{ textAlign: "center" }}>
@@ -676,41 +524,17 @@ function BadgeShowcaseCard({ role }: { role: string }) {
           })}
         </div>
 
-        {/* ── 分隔线 ─────────────────────────────────────────── */}
         <div className="h-px mb-4" style={{ backgroundColor: "#E0D9CE" }} />
 
-        {/* ── 终极徽章：资本大师 ──────────────────────────── */}
         <div className="text-xs font-medium mb-3" style={{ color: "#68625C" }}>终极成就</div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-          <div style={{
-            width: 88,
-            height: 88,
-            borderRadius: "50%",
-            overflow: "hidden",
-            border: ultimateUnlocked ? "3px solid #C9A84C" : "2px solid #E0D9CE",
-            boxShadow: ultimateUnlocked ? "0 4px 20px rgba(201,168,76,0.5)" : "none",
-            transition: "all 0.3s",
-          }}>
-            <img
-              src={ULTIMATE_BADGE.image}
-              alt={ULTIMATE_BADGE.name}
-              width={88}
-              height={88}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-                filter: ultimateUnlocked ? "none" : "grayscale(1) brightness(0.45)",
-              }}
+          <div style={{ width: 88, height: 88, borderRadius: "50%", overflow: "hidden", border: ultimateUnlocked ? "3px solid #C9A84C" : "2px solid #E0D9CE", boxShadow: ultimateUnlocked ? "0 4px 20px rgba(201,168,76,0.5)" : "none", transition: "all 0.3s" }}>
+            <img src={ULTIMATE_BADGE.image} alt={ULTIMATE_BADGE.name} width={88} height={88}
+              style={{ width: "100%", height: "100%", objectFit: "cover", filter: ultimateUnlocked ? "none" : "grayscale(1) brightness(0.45)" }}
             />
           </div>
           <div style={{ textAlign: "center" }}>
-            <div style={{
-              fontSize: "13px",
-              fontWeight: 700,
-              color: ultimateUnlocked ? "#C9A84C" : "#B0AAA4",
-              letterSpacing: "0.03em",
-            }}>
+            <div style={{ fontSize: "13px", fontWeight: 700, color: ultimateUnlocked ? "#C9A84C" : "#B0AAA4", letterSpacing: "0.03em" }}>
               {ULTIMATE_BADGE.name}
             </div>
             <div style={{ fontSize: "11px", color: "#9A9490" }}>
@@ -738,18 +562,13 @@ function LearningTab({
 }) {
   return (
     <div className="space-y-5">
-      {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: "已完成", value: completedCount, unit: "关" },
           { label: "总进度", value: `${overallPct}%`, unit: "" },
           { label: "成长积分", value: totalXP, unit: "XP" },
         ].map((s) => (
-          <div
-            key={s.label}
-            className="rounded-2xl p-4 text-center"
-            style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
-          >
+          <div key={s.label} className="rounded-2xl p-4 text-center" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
             <div className="text-xl font-bold font-mono mb-0.5" style={{ color: "#C9A84C" }}>
               {s.value}
               {s.unit && <span className="text-xs font-normal ml-0.5" style={{ color: "#9A9490" }}>{s.unit}</span>}
@@ -759,7 +578,6 @@ function LearningTab({
         ))}
       </div>
 
-      {/* Module Progress */}
       <Card title="课程进度">
         {modules.length === 0 ? (
           <div className="text-center py-8">
@@ -794,7 +612,6 @@ function LearningTab({
         )}
       </Card>
 
-      {/* Achievements */}
       <BadgeShowcaseCard role={role} />
     </div>
   );
@@ -822,14 +639,13 @@ function EnterpriseTab({
       <SingleCompanyView
         company={singleCompany}
         onSetSingle={onSetSingle}
-        onSwitchMode={() => { onSetMode(null); onSetSingle(null); }}
+        onSwitchMode={() => onSetMode(null)}
         onSwitchToGroup={() => {
-          if (singleCompany) {
+          // Only pre-fill group parent if none exists yet
+          if (!group.parent && singleCompany) {
             onSetGroup({ parent: { ...singleCompany, isParent: true }, subsidiaries: [] });
-            onSetMode("group");
-          } else {
-            onSetMode("group");
           }
+          onSetMode("group");
         }}
       />
     );
@@ -839,14 +655,13 @@ function EnterpriseTab({
     <GroupView
       group={group}
       onSetGroup={onSetGroup}
-      onSwitchMode={() => { onSetMode(null); onSetGroup({ parent: null, subsidiaries: [] }); }}
+      onSwitchMode={() => onSetMode(null)}
       onSwitchToSingle={() => {
-        if (group.parent) {
+        // Only pre-fill single if none exists yet
+        if (!singleCompany && group.parent) {
           onSetSingle({ ...group.parent, isParent: false });
-          onSetMode("single");
-        } else {
-          onSetMode("single");
         }
+        onSetMode("single");
       }}
     />
   );
@@ -863,50 +678,36 @@ function CompanySetup({ onSetMode }: { onSetMode: (m: CompanyMode) => void }) {
       </div>
 
       <div className="grid sm:grid-cols-2 gap-4">
-        {/* Single Company */}
         <button
           onClick={() => onSetMode("single")}
-          className="text-left p-6 rounded-2xl transition-all hover:shadow-md group"
+          className="text-left p-6 rounded-2xl transition-all hover:shadow-md"
           style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
         >
-          <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center text-xs font-bold mb-4"
-            style={{ backgroundColor: "#FBF4E4", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}
-          >
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xs font-bold mb-4" style={{ backgroundColor: "#FBF4E4", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}>
             单一
           </div>
           <h3 className="text-base font-semibold mb-2" style={{ color: "#1C1814" }}>单一公司</h3>
           <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>
             我只有一家公司，统一管理所有资本工具数据与 AI 分析
           </p>
-          <div
-            className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg"
-            style={{ backgroundColor: "#FBF4E4", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}
-          >
+          <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg" style={{ backgroundColor: "#FBF4E4", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}>
             选择此模式 →
           </div>
         </button>
 
-        {/* Group */}
         <button
           onClick={() => onSetMode("group")}
-          className="text-left p-6 rounded-2xl transition-all hover:shadow-md group"
+          className="text-left p-6 rounded-2xl transition-all hover:shadow-md"
           style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
         >
-          <div
-            className="w-12 h-12 rounded-2xl flex items-center justify-center text-xs font-bold mb-4"
-            style={{ backgroundColor: "#EFF4FF", color: "#6B9BD2", border: "1px solid rgba(107,155,210,0.2)" }}
-          >
+          <div className="w-12 h-12 rounded-2xl flex items-center justify-center text-xs font-bold mb-4" style={{ backgroundColor: "#EFF4FF", color: "#6B9BD2", border: "1px solid rgba(107,155,210,0.2)" }}>
             集团
           </div>
           <h3 className="text-base font-semibold mb-2" style={{ color: "#1C1814" }}>集团模式</h3>
           <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>
             我拥有母公司与多家子公司，需要集团合并数据与独立分析
           </p>
-          <div
-            className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg"
-            style={{ backgroundColor: "#EFF4FF", color: "#6B9BD2", border: "1px solid rgba(107,155,210,0.2)" }}
-          >
+          <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg" style={{ backgroundColor: "#EFF4FF", color: "#6B9BD2", border: "1px solid rgba(107,155,210,0.2)" }}>
             选择此模式 →
           </div>
         </button>
@@ -930,6 +731,8 @@ function SingleCompanyView({
     name: company?.name ?? "",
     type: company?.type ?? "私人有限公司",
     status: (company?.status ?? "active") as "active" | "inactive",
+    industry: company?.industry ?? "",
+    notes: company?.notes ?? "",
   });
 
   const save = () => {
@@ -939,6 +742,8 @@ function SingleCompanyView({
       name: form.name.trim(),
       type: form.type,
       status: form.status,
+      industry: form.industry.trim() || undefined,
+      notes: form.notes.trim() || undefined,
     });
     setEditing(false);
   };
@@ -954,26 +759,17 @@ function SingleCompanyView({
             <p className="text-xs mt-0.5" style={{ color: "#9A9490" }}>单一公司模式</p>
           </div>
           {company && (
-            <button onClick={() => setEditing(false)} className="text-xs" style={{ color: "#9A9490" }}>
-              取消
-            </button>
+            <button onClick={() => setEditing(false)} className="text-xs" style={{ color: "#9A9490" }}>取消</button>
           )}
         </div>
         <CompanyForm form={form} setForm={setForm} onSave={save} />
-        <button
-          onClick={onSwitchMode}
-          className="text-xs"
-          style={{ color: "#9A9490" }}
-        >
-          ← 重新选择企业架构
-        </button>
+        <button onClick={onSwitchMode} className="text-xs" style={{ color: "#9A9490" }}>← 重新选择企业架构</button>
       </div>
     );
   }
 
   return (
     <div className="space-y-5">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-base font-semibold" style={{ color: "#1C1814" }}>企业数据</h2>
@@ -997,11 +793,7 @@ function SingleCompanyView({
         </div>
       </div>
 
-      {/* Company Card */}
-      <div
-        className="rounded-2xl p-5"
-        style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
-      >
+      <div className="rounded-2xl p-5" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
         <div className="flex items-center gap-4 mb-5">
           <div
             className="w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-bold flex-shrink-0"
@@ -1011,18 +803,19 @@ function SingleCompanyView({
           </div>
           <div className="flex-1">
             <h3 className="text-base font-bold" style={{ color: "#1C1814" }}>{company.name}</h3>
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex items-center gap-2 mt-1 flex-wrap">
               <span className="text-xs" style={{ color: "#9A9490" }}>{company.type}</span>
+              {company.industry && <span className="text-xs" style={{ color: "#9A9490" }}>· {company.industry}</span>}
               <StatusBadge status={company.status} />
             </div>
           </div>
         </div>
-
-        {/* Growth Status */}
         <GrowthStatusBar label="企业成长状态" level={2} />
+        {company.notes && (
+          <p className="mt-3 text-xs leading-relaxed" style={{ color: "#68625C" }}>{company.notes}</p>
+        )}
       </div>
 
-      {/* AI Analysis */}
       <AIAnalysisCard
         title="AI 企业分析"
         lines={[
@@ -1032,8 +825,7 @@ function SingleCompanyView({
         ]}
       />
 
-      {/* Tools */}
-      <Card title="绑定资本工具">
+      <Card title="资本工具">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           {TOOLS.map((tool) => (
             <Link
@@ -1065,13 +857,33 @@ function GroupView({
 }) {
   const [addingSub, setAddingSub] = useState(false);
   const [editingParent, setEditingParent] = useState(group.parent === null);
-  const [subForm, setSubForm] = useState({ name: "", type: "私人有限公司", shareholding: 100 });
+  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [editingSub, setEditingSub] = useState<string | null>(null);
+
+  const [subForm, setSubForm] = useState({
+    name: "",
+    type: "私人有限公司",
+    shareholding: 100,
+    industry: "",
+    notes: "",
+  });
+
   const [parentForm, setParentForm] = useState({
     name: group.parent?.name ?? "",
     type: group.parent?.type ?? "控股公司",
     status: (group.parent?.status ?? "active") as "active" | "inactive",
+    industry: group.parent?.industry ?? "",
   });
-  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+
+  const [editSubForm, setEditSubForm] = useState({
+    name: "",
+    type: "私人有限公司",
+    shareholding: 100,
+    industry: "",
+    equityStructure: "",
+    notes: "",
+  });
 
   const saveParent = () => {
     if (!parentForm.name.trim()) return;
@@ -1083,6 +895,7 @@ function GroupView({
         type: parentForm.type,
         status: parentForm.status,
         isParent: true,
+        industry: parentForm.industry.trim() || undefined,
       },
     });
     setEditingParent(false);
@@ -1097,15 +910,52 @@ function GroupView({
       status: "active",
       parentId: group.parent.id,
       shareholding: subForm.shareholding,
+      industry: subForm.industry.trim() || undefined,
+      notes: subForm.notes.trim() || undefined,
     };
     onSetGroup({ ...group, subsidiaries: [...group.subsidiaries, newSub] });
-    setSubForm({ name: "", type: "私人有限公司", shareholding: 100 });
+    setSubForm({ name: "", type: "私人有限公司", shareholding: 100, industry: "", notes: "" });
     setAddingSub(false);
+  };
+
+  const startEditSub = (sub: Company) => {
+    setEditSubForm({
+      name: sub.name,
+      type: sub.type,
+      shareholding: sub.shareholding ?? 100,
+      industry: sub.industry ?? "",
+      equityStructure: sub.equityStructure ?? "",
+      notes: sub.notes ?? "",
+    });
+    setEditingSub(sub.id);
+  };
+
+  const saveSubEdit = () => {
+    if (!editSubForm.name.trim()) return;
+    onSetGroup({
+      ...group,
+      subsidiaries: group.subsidiaries.map((s) =>
+        s.id === editingSub
+          ? {
+              ...s,
+              name: editSubForm.name.trim(),
+              type: editSubForm.type,
+              shareholding: editSubForm.shareholding,
+              industry: editSubForm.industry.trim() || undefined,
+              equityStructure: editSubForm.equityStructure.trim() || undefined,
+              notes: editSubForm.notes.trim() || undefined,
+            }
+          : s
+      ),
+    });
+    setEditingSub(null);
   };
 
   const removeSub = (id: string) => {
     onSetGroup({ ...group, subsidiaries: group.subsidiaries.filter((s) => s.id !== id) });
     if (selectedCompany === id) setSelectedCompany(null);
+    setConfirmDeleteId(null);
+    setEditingSub(null);
   };
 
   const toggleSubStatus = (id: string) => {
@@ -1139,6 +989,9 @@ function GroupView({
           <FormField label="公司类型">
             <CompanyTypeSelect value={parentForm.type} onChange={(v) => setParentForm({ ...parentForm, type: v })} />
           </FormField>
+          <FormField label="所属行业（可选）">
+            <IndustrySelect value={parentForm.industry} onChange={(v) => setParentForm({ ...parentForm, industry: v })} />
+          </FormField>
           <button
             onClick={saveParent}
             disabled={!parentForm.name.trim()}
@@ -1148,9 +1001,7 @@ function GroupView({
             确认母公司
           </button>
         </div>
-        <button onClick={onSwitchMode} className="text-xs" style={{ color: "#9A9490" }}>
-          ← 重新选择企业架构
-        </button>
+        <button onClick={onSwitchMode} className="text-xs" style={{ color: "#9A9490" }}>← 重新选择企业架构</button>
       </div>
     );
   }
@@ -1185,11 +1036,8 @@ function GroupView({
         </div>
       </div>
 
-      {/* Group Structure Visualization */}
-      <div
-        className="rounded-2xl p-5"
-        style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
-      >
+      {/* Architecture Diagram */}
+      <div className="rounded-2xl p-5" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
         <div className="text-xs font-medium mb-4" style={{ color: "#9A9490" }}>集团架构图</div>
 
         {/* Parent Node */}
@@ -1203,10 +1051,7 @@ function GroupView({
               boxShadow: selectedCompany === null ? "0 2px 12px rgba(107,155,210,0.2)" : "none",
             }}
           >
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold"
-              style={{ backgroundColor: "#6B9BD2", color: "#FFFFFF" }}
-            >
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold" style={{ backgroundColor: "#6B9BD2", color: "#FFFFFF" }}>
               {group.parent!.name.slice(0, 2).toUpperCase()}
             </div>
             <div>
@@ -1216,35 +1061,43 @@ function GroupView({
           </div>
         </div>
 
-        {/* Connection Lines & Subsidiaries */}
+        {/* Connecting lines and subsidiaries */}
         {group.subsidiaries.length > 0 && (
           <>
-            {/* Vertical stem */}
             <div className="flex justify-center">
               <div className="w-px h-4" style={{ backgroundColor: "#D0DCF0" }} />
             </div>
 
-            {/* Horizontal bar */}
             {group.subsidiaries.length > 1 && (
               <div className="relative flex justify-center">
-                <div
-                  className="h-px"
-                  style={{
-                    backgroundColor: "#D0DCF0",
-                    width: `${Math.min(group.subsidiaries.length * 180, 600)}px`,
-                    maxWidth: "100%",
-                  }}
-                />
+                <div className="h-px" style={{ backgroundColor: "#D0DCF0", width: `${Math.min(group.subsidiaries.length * 180, 600)}px`, maxWidth: "100%" }} />
               </div>
             )}
 
-            {/* Sub nodes */}
             <div className={`grid gap-3 mt-0 ${group.subsidiaries.length === 1 ? "grid-cols-1 max-w-xs mx-auto" : group.subsidiaries.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3"}`}>
               {group.subsidiaries.map((sub) => (
                 <div key={sub.id} className="flex flex-col items-center">
-                  <div className="w-px h-4" style={{ backgroundColor: "#D0DCF0" }} />
+                  {/* Connecting line with shareholding % */}
+                  <div className="flex flex-col items-center">
+                    <div className="w-px h-2" style={{ backgroundColor: "#D0DCF0" }} />
+                    {sub.shareholding !== undefined && (
+                      <span style={{
+                        fontSize: 9,
+                        color: "#6B9BD2",
+                        backgroundColor: "#EFF4FF",
+                        border: "1px solid rgba(107,155,210,0.2)",
+                        borderRadius: 3,
+                        padding: "0 4px",
+                        lineHeight: "14px",
+                        userSelect: "none",
+                      }}>
+                        {sub.shareholding}%
+                      </span>
+                    )}
+                    <div className="w-px h-2" style={{ backgroundColor: "#D0DCF0" }} />
+                  </div>
                   <button
-                    onClick={() => setSelectedCompany(sub.id === selectedCompany ? null : sub.id)}
+                    onClick={() => { setSelectedCompany(sub.id === selectedCompany ? null : sub.id); setEditingSub(null); }}
                     className="w-full text-left p-3 rounded-xl transition-all"
                     style={{
                       backgroundColor: sub.status === "inactive" ? "#F7F4EF" : "#FAFEFF",
@@ -1254,21 +1107,18 @@ function GroupView({
                     }}
                   >
                     <div className="flex items-center gap-2 mb-1.5">
-                      <div
-                        className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0"
-                        style={{ backgroundColor: "#FBF4E4", color: "#C9A84C" }}
-                      >
+                      <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ backgroundColor: "#FBF4E4", color: "#C9A84C" }}>
                         {sub.name.slice(0, 2).toUpperCase()}
                       </div>
                       <StatusBadge status={sub.status} small />
                     </div>
                     <div className="text-xs font-semibold truncate mb-0.5" style={{ color: "#1C1814" }}>{sub.name}</div>
                     <div className="text-xs" style={{ color: "#9A9490" }}>{sub.type}</div>
+                    {sub.industry && (
+                      <div className="text-xs mt-0.5 truncate" style={{ color: "#B0AAA4" }}>{sub.industry}</div>
+                    )}
                     {sub.shareholding !== undefined && (
-                      <div
-                        className="mt-1.5 text-xs font-mono px-1.5 py-0.5 rounded-md inline-block"
-                        style={{ backgroundColor: "rgba(201,168,76,0.1)", color: "#C9A84C" }}
-                      >
+                      <div className="mt-1.5 text-xs font-mono px-1.5 py-0.5 rounded-md inline-block" style={{ backgroundColor: "rgba(201,168,76,0.1)", color: "#C9A84C" }}>
                         {sub.shareholding}% 持股
                       </div>
                     )}
@@ -1279,7 +1129,7 @@ function GroupView({
           </>
         )}
 
-        {/* Add Subsidiary Button */}
+        {/* Add subsidiary button */}
         {!addingSub && (
           <button
             onClick={() => setAddingSub(true)}
@@ -1290,7 +1140,7 @@ function GroupView({
           </button>
         )}
 
-        {/* Add Subsidiary Form */}
+        {/* Add subsidiary form */}
         {addingSub && (
           <div className="mt-4 rounded-xl p-4 space-y-3" style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE" }}>
             <div className="text-xs font-semibold" style={{ color: "#1C1814" }}>新增子公司</div>
@@ -1308,11 +1158,21 @@ function GroupView({
             </FormField>
             <FormField label="持股比例 (%)">
               <input
-                type="number"
-                min={1}
-                max={100}
+                type="number" min={1} max={100}
                 value={subForm.shareholding}
                 onChange={(e) => setSubForm({ ...subForm, shareholding: Number(e.target.value) })}
+                className="w-full px-3 py-2 rounded-xl text-sm outline-none"
+                style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", color: "#1C1814" }}
+              />
+            </FormField>
+            <FormField label="所属行业（可选）">
+              <IndustrySelect value={subForm.industry} onChange={(v) => setSubForm({ ...subForm, industry: v })} />
+            </FormField>
+            <FormField label="备注（可选）">
+              <input
+                value={subForm.notes}
+                onChange={(e) => setSubForm({ ...subForm, notes: e.target.value })}
+                placeholder="简短描述"
                 className="w-full px-3 py-2 rounded-xl text-sm outline-none"
                 style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", color: "#1C1814" }}
               />
@@ -1340,58 +1200,165 @@ function GroupView({
 
       {/* Selected Company Detail */}
       {viewedCompany && (
-        <div
-          className="rounded-2xl p-5 space-y-4"
-          style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(201,168,76,0.3)" }}
-        >
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-sm font-bold" style={{ color: "#1C1814" }}>{viewedCompany.name}</h3>
-              <p className="text-xs" style={{ color: "#9A9490" }}>子公司数据 · {viewedCompany.shareholding}% 持股</p>
-            </div>
-            <div className="flex items-center gap-2">
+        <div className="rounded-2xl p-5 space-y-4" style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(201,168,76,0.3)" }}>
+          {editingSub === viewedCompany.id ? (
+            /* Edit form */
+            <div className="space-y-3">
+              <div className="flex items-center justify-between mb-1">
+                <div className="text-sm font-semibold" style={{ color: "#1C1814" }}>编辑子公司</div>
+                <button onClick={() => setEditingSub(null)} className="text-xs" style={{ color: "#9A9490" }}>取消</button>
+              </div>
+              <FormField label="公司名称">
+                <input
+                  value={editSubForm.name}
+                  onChange={(e) => setEditSubForm({ ...editSubForm, name: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl text-sm outline-none"
+                  style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE", color: "#1C1814" }}
+                />
+              </FormField>
+              <FormField label="公司类型">
+                <CompanyTypeSelect value={editSubForm.type} onChange={(v) => setEditSubForm({ ...editSubForm, type: v })} />
+              </FormField>
+              <FormField label="持股比例 (%)">
+                <input
+                  type="number" min={1} max={100}
+                  value={editSubForm.shareholding}
+                  onChange={(e) => setEditSubForm({ ...editSubForm, shareholding: Number(e.target.value) })}
+                  className="w-full px-3 py-2 rounded-xl text-sm outline-none"
+                  style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE", color: "#1C1814" }}
+                />
+              </FormField>
+              <FormField label="所属行业（可选）">
+                <IndustrySelect value={editSubForm.industry} onChange={(v) => setEditSubForm({ ...editSubForm, industry: v })} />
+              </FormField>
+              <FormField label="股权结构（可选）">
+                <input
+                  value={editSubForm.equityStructure}
+                  onChange={(e) => setEditSubForm({ ...editSubForm, equityStructure: e.target.value })}
+                  placeholder="例：普通股 60%，优先股 40%"
+                  className="w-full px-3 py-2 rounded-xl text-sm outline-none"
+                  style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE", color: "#1C1814" }}
+                />
+              </FormField>
+              <FormField label="备注（可选）">
+                <input
+                  value={editSubForm.notes}
+                  onChange={(e) => setEditSubForm({ ...editSubForm, notes: e.target.value })}
+                  placeholder="简短描述"
+                  className="w-full px-3 py-2 rounded-xl text-sm outline-none"
+                  style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE", color: "#1C1814" }}
+                />
+              </FormField>
               <button
-                onClick={() => toggleSubStatus(viewedCompany.id)}
-                className="text-xs px-2.5 py-1 rounded-lg"
-                style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
+                onClick={saveSubEdit}
+                disabled={!editSubForm.name.trim()}
+                className="w-full py-2.5 rounded-xl text-sm font-semibold disabled:opacity-40"
+                style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#FFFFFF" }}
               >
-                {viewedCompany.status === "active" ? "停用" : "启用"}
-              </button>
-              <button
-                onClick={() => removeSub(viewedCompany.id)}
-                className="text-xs px-2.5 py-1 rounded-lg"
-                style={{ backgroundColor: "#FFF0F0", color: "#E57373", border: "1px solid rgba(229,115,115,0.3)" }}
-              >
-                删除
+                保存更改
               </button>
             </div>
-          </div>
-          <GrowthStatusBar label="子公司成长状态" level={1} />
-          <AIAnalysisCard
-            title="AI 子公司分析"
-            lines={[
-              `${viewedCompany.name} 作为集团子公司，建议与母公司同步制定资本战略。`,
-              `${viewedCompany.shareholding}% 持股结构清晰，可考虑引入策略投资者优化股权。`,
-            ]}
-          />
+          ) : (
+            /* Display mode */
+            <>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-bold" style={{ color: "#1C1814" }}>{viewedCompany.name}</h3>
+                  <p className="text-xs" style={{ color: "#9A9490" }}>子公司 · {viewedCompany.shareholding}% 持股</p>
+                  {viewedCompany.industry && (
+                    <p className="text-xs mt-0.5" style={{ color: "#9A9490" }}>{viewedCompany.industry}</p>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => startEditSub(viewedCompany)}
+                    className="text-xs px-2.5 py-1 rounded-lg"
+                    style={{ backgroundColor: "#FBF4E4", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.25)" }}
+                  >
+                    编辑
+                  </button>
+                  <button
+                    onClick={() => toggleSubStatus(viewedCompany.id)}
+                    className="text-xs px-2.5 py-1 rounded-lg"
+                    style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
+                  >
+                    {viewedCompany.status === "active" ? "停用" : "启用"}
+                  </button>
+                  <button
+                    onClick={() => setConfirmDeleteId(viewedCompany.id)}
+                    className="text-xs px-2.5 py-1 rounded-lg"
+                    style={{ backgroundColor: "#FFF0F0", color: "#E57373", border: "1px solid rgba(229,115,115,0.3)" }}
+                  >
+                    删除
+                  </button>
+                </div>
+              </div>
+              {viewedCompany.equityStructure && (
+                <div className="text-xs px-3 py-2 rounded-lg" style={{ backgroundColor: "#F7F4EF", color: "#68625C" }}>
+                  股权结构：{viewedCompany.equityStructure}
+                </div>
+              )}
+              {viewedCompany.notes && (
+                <p className="text-xs" style={{ color: "#68625C" }}>{viewedCompany.notes}</p>
+              )}
+              <GrowthStatusBar label="子公司成长状态" level={1} />
+              <AIAnalysisCard
+                title="AI 子公司分析"
+                lines={[
+                  `${viewedCompany.name} 作为集团子公司，建议与母公司同步制定资本战略。`,
+                  `${viewedCompany.shareholding}% 持股结构清晰，可考虑引入策略投资者优化股权。`,
+                ]}
+              />
+            </>
+          )}
         </div>
       )}
 
-      {/* Group Overview (shown when no sub selected) */}
+      {/* Delete confirmation */}
+      {confirmDeleteId && (
+        <div
+          onClick={() => setConfirmDeleteId(null)}
+          style={{ position: "fixed", inset: 0, zIndex: 200, background: "rgba(0,0,0,0.35)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: "0 16px" }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-sm rounded-2xl p-6 text-center"
+            style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
+          >
+            <h3 className="text-base font-bold mb-2" style={{ color: "#1C1814" }}>确认删除子公司？</h3>
+            <p className="text-sm mb-5" style={{ color: "#68625C" }}>
+              删除后，该子公司的所有资料将无法恢复。
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setConfirmDeleteId(null)}
+                className="flex-1 py-2 rounded-xl text-sm"
+                style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
+              >
+                取消
+              </button>
+              <button
+                onClick={() => removeSub(confirmDeleteId)}
+                className="flex-1 py-2 rounded-xl text-sm font-semibold"
+                style={{ backgroundColor: "#FFF0F0", color: "#E57373", border: "1px solid rgba(229,115,115,0.3)" }}
+              >
+                确认删除
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Group overview when no subsidiary selected */}
       {!viewedCompany && (
         <>
-          {/* Consolidated Stats */}
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {[
               { label: "集团公司", value: `${1 + group.subsidiaries.length}`, unit: "家" },
               { label: "活跃子公司", value: `${group.subsidiaries.filter(s => s.status === "active").length}`, unit: "家" },
               { label: "集团规模", value: "成长期", unit: "" },
             ].map((s) => (
-              <div
-                key={s.label}
-                className="rounded-2xl p-4 text-center"
-                style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
-              >
+              <div key={s.label} className="rounded-2xl p-4 text-center" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
                 <div className="text-xl font-bold font-mono mb-0.5" style={{ color: "#6B9BD2" }}>
                   {s.value}
                   {s.unit && <span className="text-xs font-normal ml-0.5" style={{ color: "#9A9490" }}>{s.unit}</span>}
@@ -1494,7 +1461,7 @@ function GrowthStatusBar({ label, level }: { label: string; level: number }) {
       </div>
       <div className="flex justify-between mt-1">
         {stages.map((s) => (
-          <span key={s} className="text-xs" style={{ color: "#9A9490", fontSize: "9px" }}>{s}</span>
+          <span key={s} style={{ color: "#9A9490", fontSize: "9px" }}>{s}</span>
         ))}
       </div>
     </div>
@@ -1503,15 +1470,9 @@ function GrowthStatusBar({ label, level }: { label: string; level: number }) {
 
 function AIAnalysisCard({ title, lines }: { title: string; lines: string[] }) {
   return (
-    <div
-      className="rounded-xl p-4"
-      style={{ backgroundColor: "#FFFDF7", border: "1px solid rgba(201,168,76,0.2)" }}
-    >
+    <div className="rounded-xl p-4" style={{ backgroundColor: "#FFFDF7", border: "1px solid rgba(201,168,76,0.2)" }}>
       <div className="flex items-center gap-2 mb-2.5">
-        <span
-          className="w-5 h-5 rounded-md flex items-center justify-center text-xs flex-shrink-0"
-          style={{ backgroundColor: "rgba(201,168,76,0.15)", color: "#C9A84C" }}
-        >
+        <span className="w-5 h-5 rounded-md flex items-center justify-center text-xs flex-shrink-0" style={{ backgroundColor: "rgba(201,168,76,0.15)", color: "#C9A84C" }}>
           ✦
         </span>
         <span className="text-xs font-semibold" style={{ color: "#C9A84C" }}>{title}</span>
@@ -1548,11 +1509,31 @@ function CompanyTypeSelect({ value, onChange }: { value: string; onChange: (v: s
   );
 }
 
+function IndustrySelect({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const industries = [
+    "", "科技 / 软件", "金融 / 保险", "制造业", "零售 / 电商", "餐饮 / 酒店",
+    "房地产 / 建筑", "教育 / 培训", "医疗 / 健康", "物流 / 运输", "农业 / 食品",
+    "媒体 / 广告", "咨询 / 专业服务", "能源 / 环保", "其他",
+  ];
+  return (
+    <select
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full px-3 py-2 rounded-xl text-sm outline-none"
+      style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", color: value ? "#1C1814" : "#9A9490" }}
+    >
+      {industries.map((ind) => (
+        <option key={ind} value={ind}>{ind || "请选择行业（可选）"}</option>
+      ))}
+    </select>
+  );
+}
+
 function CompanyForm({
   form, setForm, onSave,
 }: {
-  form: { name: string; type: string; status: "active" | "inactive" };
-  setForm: (f: { name: string; type: string; status: "active" | "inactive" }) => void;
+  form: { name: string; type: string; status: "active" | "inactive"; industry: string; notes: string };
+  setForm: (f: { name: string; type: string; status: "active" | "inactive"; industry: string; notes: string }) => void;
   onSave: () => void;
 }) {
   return (
@@ -1568,6 +1549,18 @@ function CompanyForm({
       </FormField>
       <FormField label="公司类型">
         <CompanyTypeSelect value={form.type} onChange={(v) => setForm({ ...form, type: v })} />
+      </FormField>
+      <FormField label="所属行业（可选）">
+        <IndustrySelect value={form.industry} onChange={(v) => setForm({ ...form, industry: v })} />
+      </FormField>
+      <FormField label="备注（可选）">
+        <input
+          value={form.notes}
+          onChange={(e) => setForm({ ...form, notes: e.target.value })}
+          placeholder="简短描述公司"
+          className="w-full px-3 py-2 rounded-xl text-sm outline-none"
+          style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE", color: "#1C1814" }}
+        />
       </FormField>
       <button
         onClick={onSave}
