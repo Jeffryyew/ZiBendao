@@ -29,7 +29,8 @@ function useCompanyState(): CompanyState {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(ENTERPRISE_KEYS.MODE) as CompanyMode;
+      const rawMode = localStorage.getItem(ENTERPRISE_KEYS.MODE);
+      const raw = rawMode ? JSON.parse(rawMode) as CompanyMode : null;
       if (raw === "single") {
         setMode("single");
         const sc = localStorage.getItem(ENTERPRISE_KEYS.SINGLE);

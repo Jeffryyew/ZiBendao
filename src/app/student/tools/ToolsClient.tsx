@@ -209,8 +209,8 @@ export default function ToolsClient() {
 
   useEffect(() => {
     try {
-      const rawMode = localStorage.getItem(ENTERPRISE_KEYS.MODE) as CompanyMode;
-      setMode(rawMode || null);
+      const rawMode = localStorage.getItem(ENTERPRISE_KEYS.MODE);
+      setMode(rawMode ? JSON.parse(rawMode) as CompanyMode : null);
 
       const rawSingle = localStorage.getItem(ENTERPRISE_KEYS.SINGLE);
       if (rawSingle) setSingle(JSON.parse(rawSingle));

@@ -41,6 +41,7 @@ interface Company {
   industry?: string;
   equityStructure?: string;
   notes?: string;
+  netProfit?: number;
 }
 
 interface GroupStructure {
@@ -357,7 +358,7 @@ function OverviewTab({
               </div>
               <StatusBadge status={singleCompany.status} />
             </div>
-            <GrowthStatusBar label="企业成长状态" level={2} />
+            <GrowthStatusBar label="企业成长状态" netProfit={singleCompany.netProfit ?? 0} />
           </div>
         ) : companyMode === "group" && group.parent ? (
           <div className="space-y-3">
@@ -373,7 +374,7 @@ function OverviewTab({
                 <div className="text-xs" style={{ color: "#9A9490" }}>母公司 · {group.subsidiaries.length} 家子公司</div>
               </div>
             </div>
-            <GrowthStatusBar label="集团成长状态" level={3} />
+            <GrowthStatusBar label="集团成长状态" netProfit={(group.parent?.netProfit ?? 0) + group.subsidiaries.reduce((s, c) => s + (c.netProfit ?? 0), 0)} />
           </div>
         ) : null}
       </Card>
@@ -733,6 +734,7 @@ function SingleCompanyView({
     status: (company?.status ?? "active") as "active" | "inactive",
     industry: company?.industry ?? "",
     notes: company?.notes ?? "",
+    netProfit: company?.netProfit ?? 0,
   });
 
   const save = () => {
@@ -744,6 +746,7 @@ function SingleCompanyView({
       status: form.status,
       industry: form.industry.trim() || undefined,
       notes: form.notes.trim() || undefined,
+      netProfit: form.netProfit || undefined,
     });
     setEditing(false);
   };
@@ -810,7 +813,7 @@ function SingleCompanyView({
             </div>
           </div>
         </div>
-        <GrowthStatusBar label="企业成长状态" level={2} />
+        <GrowthStatusBar label="企业成长状态" netProfit={company.netProfit ?? 0} />
         {company.notes && (
           <p className="mt-3 text-xs leading-relaxed" style={{ color: "#68625C" }}>{company.notes}</p>
         )}
@@ -824,23 +827,6 @@ function SingleCompanyView({
           "完成财务路线图可解锁更多资本成长建议。",
         ]}
       />
-
-      <Card title="资本工具">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-          {TOOLS.map((tool) => (
-            <Link
-              key={tool.href}
-              href={tool.href}
-              className="flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-medium transition-all"
-              style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE", color: "#68625C" }}
-            >
-              <span className="text-xs font-mono font-bold flex-shrink-0" style={{ color: "#C9A84C" }}>{tool.icon}</span>
-              <span className="flex-1 leading-snug">{tool.label}</span>
-              <span style={{ color: "#C9A84C" }}>→</span>
-            </Link>
-          ))}
-        </div>
-      </Card>
     </div>
   );
 }
@@ -867,6 +853,7 @@ function GroupView({
     shareholding: 100,
     industry: "",
     notes: "",
+    netProfit: 0,
   });
 
   const [parentForm, setParentForm] = useState({
@@ -874,6 +861,7 @@ function GroupView({
     type: group.parent?.type ?? "控股公司",
     status: (group.parent?.status ?? "active") as "active" | "inactive",
     industry: group.parent?.industry ?? "",
+    netProfit: group.parent?.netProfit ?? 0,
   });
 
   const [editSubForm, setEditSubForm] = useState({
@@ -881,8 +869,8 @@ function GroupView({
     type: "私人有限公司",
     shareholding: 100,
     industry: "",
-    equityStructure: "",
     notes: "",
+    netProfit: 0,
   });
 
   const saveParent = () => {
@@ -896,6 +884,7 @@ function GroupView({
         status: parentForm.status,
         isParent: true,
         industry: parentForm.industry.trim() || undefined,
+        netProfit: parentForm.netProfit || undefined,
       },
     });
     setEditingParent(false);
@@ -912,9 +901,10 @@ function GroupView({
       shareholding: subForm.shareholding,
       industry: subForm.industry.trim() || undefined,
       notes: subForm.notes.trim() || undefined,
+      netProfit: subForm.netProfit || undefined,
     };
     onSetGroup({ ...group, subsidiaries: [...group.subsidiaries, newSub] });
-    setSubForm({ name: "", type: "私人有限公司", shareholding: 100, industry: "", notes: "" });
+    setSubForm({ name: "", type: "私人有限公司", shareholding: 100, industry: "", notes: "", netProfit: 0 });
     setAddingSub(false);
   };
 
@@ -924,8 +914,8 @@ function GroupView({
       type: sub.type,
       shareholding: sub.shareholding ?? 100,
       industry: sub.industry ?? "",
-      equityStructure: sub.equityStructure ?? "",
       notes: sub.notes ?? "",
+      netProfit: sub.netProfit ?? 0,
     });
     setEditingSub(sub.id);
   };
@@ -942,8 +932,8 @@ function GroupView({
               type: editSubForm.type,
               shareholding: editSubForm.shareholding,
               industry: editSubForm.industry.trim() || undefined,
-              equityStructure: editSubForm.equityStructure.trim() || undefined,
               notes: editSubForm.notes.trim() || undefined,
+              netProfit: editSubForm.netProfit || undefined,
             }
           : s
       ),
@@ -991,6 +981,16 @@ function GroupView({
           </FormField>
           <FormField label="所属行业（可选）">
             <IndustrySelect value={parentForm.industry} onChange={(v) => setParentForm({ ...parentForm, industry: v })} />
+          </FormField>
+          <FormField label="净利润（RM，可选）">
+            <input
+              type="number" min={0}
+              value={parentForm.netProfit || ""}
+              onChange={(e) => setParentForm({ ...parentForm, netProfit: Number(e.target.value) })}
+              placeholder="0"
+              className="w-full px-3 py-2 rounded-xl text-sm outline-none"
+              style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", color: "#1C1814" }}
+            />
           </FormField>
           <button
             onClick={saveParent}
@@ -1168,6 +1168,16 @@ function GroupView({
             <FormField label="所属行业（可选）">
               <IndustrySelect value={subForm.industry} onChange={(v) => setSubForm({ ...subForm, industry: v })} />
             </FormField>
+            <FormField label="净利润（RM，可选）">
+              <input
+                type="number" min={0}
+                value={subForm.netProfit || ""}
+                onChange={(e) => setSubForm({ ...subForm, netProfit: Number(e.target.value) })}
+                placeholder="0"
+                className="w-full px-3 py-2 rounded-xl text-sm outline-none"
+                style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", color: "#1C1814" }}
+              />
+            </FormField>
             <FormField label="备注（可选）">
               <input
                 value={subForm.notes}
@@ -1231,11 +1241,12 @@ function GroupView({
               <FormField label="所属行业（可选）">
                 <IndustrySelect value={editSubForm.industry} onChange={(v) => setEditSubForm({ ...editSubForm, industry: v })} />
               </FormField>
-              <FormField label="股权结构（可选）">
+              <FormField label="净利润（RM，可选）">
                 <input
-                  value={editSubForm.equityStructure}
-                  onChange={(e) => setEditSubForm({ ...editSubForm, equityStructure: e.target.value })}
-                  placeholder="例：普通股 60%，优先股 40%"
+                  type="number" min={0}
+                  value={editSubForm.netProfit || ""}
+                  onChange={(e) => setEditSubForm({ ...editSubForm, netProfit: Number(e.target.value) })}
+                  placeholder="0"
                   className="w-full px-3 py-2 rounded-xl text-sm outline-none"
                   style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE", color: "#1C1814" }}
                 />
@@ -1293,15 +1304,10 @@ function GroupView({
                   </button>
                 </div>
               </div>
-              {viewedCompany.equityStructure && (
-                <div className="text-xs px-3 py-2 rounded-lg" style={{ backgroundColor: "#F7F4EF", color: "#68625C" }}>
-                  股权结构：{viewedCompany.equityStructure}
-                </div>
-              )}
               {viewedCompany.notes && (
                 <p className="text-xs" style={{ color: "#68625C" }}>{viewedCompany.notes}</p>
               )}
-              <GrowthStatusBar label="子公司成长状态" level={1} />
+              <GrowthStatusBar label="子公司成长状态" netProfit={viewedCompany.netProfit ?? 0} />
               <AIAnalysisCard
                 title="AI 子公司分析"
                 lines={[
@@ -1368,7 +1374,7 @@ function GroupView({
             ))}
           </div>
 
-          <GrowthStatusBar label="集团成长状态" level={3} />
+          <GrowthStatusBar label="集团成长状态" netProfit={(group.parent?.netProfit ?? 0) + group.subsidiaries.reduce((s, c) => s + (c.netProfit ?? 0), 0)} />
 
           <AIAnalysisCard
             title="AI 集团分析"
@@ -1439,13 +1445,22 @@ function StatusBadge({ status, small }: { status: "active" | "inactive"; small?:
   );
 }
 
-function GrowthStatusBar({ label, level }: { label: string; level: number }) {
-  const stages = ["起步", "成长", "扩张", "成熟", "上市"];
+function getGrowthLevel(netProfit: number): number {
+  if (netProfit >= 3_000_000) return 4;
+  if (netProfit >= 2_000_000) return 3;
+  if (netProfit >= 1_500_000) return 2;
+  if (netProfit >= 1_000_000) return 1;
+  return 0;
+}
+
+function GrowthStatusBar({ label, netProfit }: { label: string; netProfit: number }) {
+  const stages = ["起步", "成长", "扩张", "成熟", "准上市"];
+  const level = getGrowthLevel(netProfit);
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
         <span className="text-xs" style={{ color: "#9A9490" }}>{label}</span>
-        <span className="text-xs font-medium" style={{ color: "#C9A84C" }}>{stages[Math.min(level, 4)]}</span>
+        <span className="text-xs font-medium" style={{ color: "#C9A84C" }}>{stages[level]}</span>
       </div>
       <div className="flex gap-1">
         {stages.map((s, i) => (
@@ -1532,8 +1547,8 @@ function IndustrySelect({ value, onChange }: { value: string; onChange: (v: stri
 function CompanyForm({
   form, setForm, onSave,
 }: {
-  form: { name: string; type: string; status: "active" | "inactive"; industry: string; notes: string };
-  setForm: (f: { name: string; type: string; status: "active" | "inactive"; industry: string; notes: string }) => void;
+  form: { name: string; type: string; status: "active" | "inactive"; industry: string; notes: string; netProfit: number };
+  setForm: (f: { name: string; type: string; status: "active" | "inactive"; industry: string; notes: string; netProfit: number }) => void;
   onSave: () => void;
 }) {
   return (
@@ -1552,6 +1567,16 @@ function CompanyForm({
       </FormField>
       <FormField label="所属行业（可选）">
         <IndustrySelect value={form.industry} onChange={(v) => setForm({ ...form, industry: v })} />
+      </FormField>
+      <FormField label="净利润（RM，可选）">
+        <input
+          type="number" min={0}
+          value={form.netProfit || ""}
+          onChange={(e) => setForm({ ...form, netProfit: Number(e.target.value) })}
+          placeholder="0"
+          className="w-full px-3 py-2 rounded-xl text-sm outline-none"
+          style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE", color: "#1C1814" }}
+        />
       </FormField>
       <FormField label="备注（可选）">
         <input

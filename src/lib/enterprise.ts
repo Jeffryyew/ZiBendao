@@ -11,6 +11,7 @@ export interface Company {
   industry?: string;
   equityStructure?: string;
   notes?: string;
+  netProfit?: number;
 }
 
 export interface GroupStructure {
