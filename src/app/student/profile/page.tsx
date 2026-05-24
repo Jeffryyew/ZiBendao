@@ -14,39 +14,15 @@ export default async function StudentProfilePage() {
   const isEn = locale === "en";
   const role = session.user.role as string;
 
-  const ACHIEVEMENTS = isEn ? [
-    { id: "register", icon: "", title: "Welcome", desc: "Completed registration and started your journey", unlocked: true },
-    { id: "first-lesson", icon: "", title: "First Step", desc: "Completed the first lesson" },
-    { id: "module-done", icon: "", title: "Finance Basics", desc: "Completed the financial fundamentals module" },
-    { id: "streak-7", icon: "→", title: "Dedicated Learner", desc: "7 consecutive days of learning" },
-    { id: "tools-3", icon: "", title: "Tool Expert", desc: "Used 3 different capital tools" },
-  ] : [
-    { id: "register", icon: "", title: "欢迎加入", desc: "完成注册，开始学习之旅", unlocked: true },
-    { id: "first-lesson", icon: "", title: "第一步", desc: "完成第一关课程" },
-    { id: "module-done", icon: "", title: "财务启蒙", desc: "完成财务基础模块" },
-    { id: "streak-7", icon: "→", title: "学习达人", desc: "连续学习7天" },
-    { id: "tools-3", icon: "", title: "工具专家", desc: "使用3种计算工具" },
-  ];
-
-  let completedCount = 0;
-  let totalXP = 0;
   let memberSince = new Date();
   let profileExtra = { phone: "", company: "", position: "", city: "", bio: "" };
   let studentAccountNo: string | null = null;
 
   try {
-    const [progress, user] = await Promise.all([
-      prisma.lessonProgress.findMany({
-        where: { userId: session.user.id, completed: true },
-        include: { lesson: { select: { points: true } } },
-      }),
-      prisma.user.findUnique({
-        where: { id: session.user.id },
-        select: { createdAt: true, phone: true, company: true, position: true, city: true, bio: true, studentAccountNo: true },
-      }),
-    ]);
-    completedCount = progress.length;
-    totalXP = progress.reduce((sum, p) => sum + (p.lesson.points ?? 0), 0);
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { createdAt: true, phone: true, company: true, position: true, city: true, bio: true, studentAccountNo: true },
+    });
     if (user?.createdAt) memberSince = user.createdAt;
     if (user) {
       profileExtra = {
@@ -80,16 +56,6 @@ export default async function StudentProfilePage() {
     email:    session.user.email ?? "",
     ...profileExtra,
   };
-
-  const stats = isEn ? [
-    { label: "Lessons Done", value: completedCount, unit: "", icon: "" },
-    { label: "Total XP", value: totalXP, unit: "XP", icon: "XP" },
-    { label: "Tools Available", value: "22", unit: "", icon: "" },
-  ] : [
-    { label: "完成课程", value: completedCount, unit: "关", icon: "" },
-    { label: "累计积分", value: totalXP, unit: "XP", icon: "XP" },
-    { label: "可用工具", value: "22", unit: "个", icon: "" },
-  ];
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 md:py-10 space-y-6">
@@ -140,62 +106,11 @@ export default async function StudentProfilePage() {
         </div>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        {stats.map((s) => (
-          <div
-            key={s.label}
-            className="p-4 rounded-2xl text-center"
-            style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
-          >
-            <div className="text-base mb-1" style={{ color: "var(--color-text-muted)" }}>{s.icon}</div>
-            <div className="text-xl font-bold font-mono" style={{ color: "#C9A84C" }}>
-              {s.value}
-              {s.unit && <span className="text-xs font-normal ml-0.5" style={{ color: "var(--color-text-muted)" }}>{s.unit}</span>}
-            </div>
-            <div className="text-xs mt-1" style={{ color: "var(--color-text-muted)" }}>{s.label}</div>
-          </div>
-        ))}
-      </div>
-
       {/* Profile Form */}
       <ProfileForm initial={profileInitial} />
 
       {/* Student Account */}
       <StudentAccountSection studentAccountNo={studentAccountNo} />
-
-      {/* Achievements */}
-      <div>
-        <h2 className="text-base font-semibold mb-4" style={{ color: "var(--color-text-primary)" }}>
-          {isEn ? "Achievement Badges" : "成就徽章"}
-        </h2>
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-          {ACHIEVEMENTS.map((ach) => {
-            const unlocked = ach.unlocked === true || (ach.id === "first-lesson" && completedCount > 0);
-            return (
-              <div
-                key={ach.id}
-                className="flex flex-col items-center text-center p-3 rounded-xl"
-                title={`${ach.title}: ${ach.desc}`}
-                style={{
-                  backgroundColor: unlocked ? "#FBF4E4" : "#F0EDE7",
-                  border: `1px solid ${unlocked ? "rgba(201,168,76,0.3)" : "#E0D9CE"}`,
-                  opacity: unlocked ? 1 : 0.5,
-                  cursor: "help",
-                }}
-              >
-                <span className="text-2xl mb-1.5">{ach.icon}</span>
-                <span className="text-xs font-medium leading-snug" style={{ color: unlocked ? "#1C1814" : "#9A9490" }}>
-                  {ach.title}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-        <p className="text-xs text-center mt-3" style={{ color: "var(--color-text-muted)" }}>
-          {isEn ? "Hover to view achievement details" : "悬停查看成就详情"}
-        </p>
-      </div>
 
     </div>
   );

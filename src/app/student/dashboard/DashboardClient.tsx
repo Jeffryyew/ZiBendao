@@ -49,21 +49,6 @@ interface GroupStructure {
   subsidiaries: Company[];
 }
 
-const TOOLS = [
-  { label: "财务路线图", href: "/tools/financial-roadmap", icon: "FV" },
-  { label: "智能报价", href: "/tools/pricing-system", icon: "QT" },
-  { label: "企业估值", href: "/tools/market-cap", icon: "PE" },
-  { label: "绩效分析", href: "/tools/pat-kpi", icon: "KPI" },
-  { label: "现金流", href: "/tools/cash-flow", icon: "CF" },
-  { label: "资产负债表", href: "/tools/balance-sheet", icon: "BS" },
-  { label: "利润表", href: "/tools/income-statement", icon: "IS" },
-  { label: "损益平衡", href: "/tools/breakeven-analysis", icon: "BE" },
-  { label: "尽职调查", href: "/tools/due-diligence", icon: "DD" },
-  { label: "数据室", href: "/tools/data-room", icon: "DR" },
-  { label: "销售预测", href: "/tools/sales-forecast", icon: "SF" },
-  { label: "创业费用", href: "/tools/startup-expense", icon: "SE" },
-];
-
 // ─── Utils ────────────────────────────────────────────────────────────────────
 
 function useLocalStorage<T>(key: string, initial: T): [T, (val: T) => void] {
@@ -230,16 +215,6 @@ function OverviewTab({
   const hour = new Date().getHours();
   const greeting = hour < 12 ? "早上好" : hour < 18 ? "下午好" : "晚上好";
 
-  const handleToolClick = (href: string) => {
-    if (companyMode === null) { onGoToEnterprise(); return; }
-    if (companyMode === "group") {
-      // Group mode: go to tools page to select company first
-      window.location.href = "/student/tools";
-      return;
-    }
-    window.location.href = href;
-  };
-
   return (
     <div className="space-y-5">
       {/* AI Summary Banner */}
@@ -269,28 +244,6 @@ function OverviewTab({
             </p>
           </div>
         </div>
-      </div>
-
-      {/* Stats Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        {[
-          { label: "课程完成", value: completedCount, unit: `/ ${totalLessons}`, color: "#C9A84C" },
-          { label: "总进度", value: `${overallPct}%`, unit: "", color: "#C9A84C" },
-          { label: "成长积分", value: totalXP, unit: "XP", color: "#6B9BD2" },
-          { label: "工具", value: TOOLS.length, unit: "个", color: "#82C8A0" },
-        ].map((s) => (
-          <div
-            key={s.label}
-            className="rounded-2xl p-4 text-center"
-            style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
-          >
-            <div className="text-xl font-bold font-mono mb-0.5" style={{ color: s.color }}>
-              {s.value}
-              {s.unit && <span className="text-xs font-normal ml-0.5" style={{ color: "#9A9490" }}>{s.unit}</span>}
-            </div>
-            <div className="text-xs" style={{ color: "#9A9490" }}>{s.label}</div>
-          </div>
-        ))}
       </div>
 
       {/* Learning Summary */}
@@ -379,62 +332,6 @@ function OverviewTab({
         ) : null}
       </Card>
 
-      {/* Capital Tools */}
-      <Card
-        title="资本工具"
-        action={companyMode === null
-          ? { label: "设置企业 →", onClick: onGoToEnterprise }
-          : companyMode === "group"
-          ? { label: "前往工具页 →", href: "/student/tools" }
-          : undefined
-        }
-      >
-        {companyMode === null && (
-          <div
-            className="flex items-center gap-2 px-3 py-2 rounded-xl mb-3 text-xs"
-            style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(201,168,76,0.25)", color: "#9A7A32" }}
-          >
-            <span style={{ flexShrink: 0 }}>!</span>
-            请先完成企业架构设置，解锁工具使用
-          </div>
-        )}
-        {companyMode === "group" && (
-          <div
-            className="flex items-center gap-2 px-3 py-2 rounded-xl mb-3 text-xs"
-            style={{ backgroundColor: "#EFF4FF", border: "1px solid rgba(107,155,210,0.25)", color: "#6B9BD2" }}
-          >
-            <span style={{ flexShrink: 0 }}>i</span>
-            集团模式：请先前往工具页面选择企业主体
-          </div>
-        )}
-        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-          {TOOLS.slice(0, 8).map((tool) => (
-            <button
-              key={tool.href}
-              onClick={() => handleToolClick(tool.href)}
-              className="flex flex-col items-center gap-1.5 p-3 rounded-xl text-center transition-all hover:shadow-sm"
-              style={{
-                backgroundColor: "#F7F4EF",
-                border: "1px solid #E0D9CE",
-                cursor: "pointer",
-                opacity: companyMode === null ? 0.6 : 1,
-              }}
-            >
-              <span className="text-xs font-mono font-bold" style={{ color: "#C9A84C" }}>
-                {tool.icon}
-              </span>
-              <span className="text-xs leading-snug" style={{ color: "#68625C" }}>{tool.label}</span>
-            </button>
-          ))}
-        </div>
-        <Link
-          href="/student/tools"
-          className="mt-3 flex items-center justify-center gap-2 w-full py-2 rounded-xl text-xs font-medium"
-          style={{ color: "#9A9490", backgroundColor: "#F7F4EF", border: "1px dashed #E0D9CE" }}
-        >
-          查看全部 {TOOLS.length} 个工具 →
-        </Link>
-      </Card>
     </div>
   );
 }
