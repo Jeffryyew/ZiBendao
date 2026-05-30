@@ -77,7 +77,7 @@ const dict = {
     },
     footer: {
       tagline: "掌握资本之道，创建可靠、可投、可扩展企业",
-      copyright: "© 2025 Eutopos Equity Sdn Bhd 保留所有权利",
+      copyright: "© 2026 Eutopos Equity Sdn Bhd. 保留所有权利。",
       platform: "平台",
       address_title: "地址",
     },
@@ -156,7 +156,7 @@ const dict = {
     },
     footer: {
       tagline: "Master Capital Strategy. Build Reliable, Investable, Scalable Enterprises.",
-      copyright: "© 2025 Eutopos Equity Sdn Bhd All Rights Reserved",
+      copyright: "© 2026 Eutopos Equity Sdn Bhd. All Rights Reserved.",
       platform: "Platform",
       address_title: "Address",
     },

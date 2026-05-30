@@ -4,6 +4,7 @@ import { getLocale } from "@/lib/i18n";
 import SharedNav from "@/components/SharedNav";
 import { CAPITAL_MODULES, LAYER_META, getModulesByLayer } from "@/lib/capitalModules";
 import type { LayerId } from "@/lib/capitalModules";
+import UseToolButton from "./UseToolButton";
 
 const LAYER_DISPLAY: Record<LayerId, { zh: string; en: string }> = {
   1: { zh: "资本基础", en: "Capital Foundations" },
@@ -67,6 +68,7 @@ export default async function ToolsGuidePage() {
   const session = await auth();
   const locale = await getLocale();
   const isEn = locale === "en";
+  const isLoggedIn = !!session?.user;
 
   return (
     <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814", minHeight: "100vh" }}>
@@ -128,13 +130,21 @@ export default async function ToolsGuidePage() {
                                 {t.desc}
                               </p>
                             </div>
-                            <Link
-                              href={mod.href}
-                              className="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-opacity hover:opacity-85"
-                              style={{ backgroundColor: meta.color + "15", color: meta.color, border: `1px solid ${meta.color}30` }}
-                            >
-                              {isEn ? "Use Tool →" : "使用工具 →"}
-                            </Link>
+                            {isLoggedIn ? (
+                              <UseToolButton
+                                href={mod.href}
+                                label={isEn ? "Use Tool →" : "使用工具 →"}
+                                color={meta.color}
+                              />
+                            ) : (
+                              <Link
+                                href="/login"
+                                className="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium transition-opacity hover:opacity-85"
+                                style={{ backgroundColor: meta.color + "15", color: meta.color, border: `1px solid ${meta.color}30` }}
+                              >
+                                {isEn ? "Use Tool →" : "使用工具 →"}
+                              </Link>
+                            )}
                           </div>
 
                           {usecases.length > 0 && (
@@ -160,11 +170,6 @@ export default async function ToolsGuidePage() {
           })}
         </div>
 
-        <p className="text-center text-xs mt-12" style={{ color: "#C0B8B0" }}>
-          {isEn
-            ? "All calculations run locally in your browser · No data uploaded · Supports PDF / CSV export"
-            : "所有计算在浏览器本地完成 · 数据不上传服务器 · 支持导出 PDF / CSV"}
-        </p>
       </div>
     </div>
   );

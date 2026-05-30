@@ -170,7 +170,7 @@ export default async function CoursesPage() {
             className="inline-block text-xs font-medium px-4 py-1.5 rounded-full mb-6"
             style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.15)" }}
           >
-            {isEn ? "3 Offline Programmes + 1 Online Course" : "3 阶段线下课程 + 1 线上课程"}
+            {isEn ? "Capital Growth Path" : "资本成长路径"}
           </div>
           <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>
             {isEn ? "Enterprise Capital" : "企业资本运作"}

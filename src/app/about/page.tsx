@@ -55,7 +55,7 @@ const DATA = {
     },
     contact: {
       title: "联系我们",
-      desc: "如需咨询课程、企业合作或一对一顾问服务，欢迎通过社交媒体与我们联系。",
+      desc: "如需咨询课程、企业资本规划、企业融资策略、资本架构设计或商务合作，欢迎联系我们。",
       address_label: " 地址",
       cta_register: "注册 →",
       cta_contact: "联系我们",
@@ -112,7 +112,7 @@ const DATA = {
     },
     contact: {
       title: "Contact Us",
-      desc: "For course enquiries, corporate partnerships, or one-to-one advisory services, please reach us via social media.",
+      desc: "For course enquiries, enterprise capital planning, fundraising strategy, capital structure design, or business collaboration, please contact us.",
       address_label: " Address",
       cta_register: "Register →",
       cta_contact: "Contact Us",
@@ -248,7 +248,13 @@ export default async function AboutPage() {
         <div className="max-w-3xl mx-auto">
           <div className="rounded-2xl p-10" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
             <h2 className="text-2xl font-bold mb-2" style={{ fontFamily: "var(--font-display)", color: "#1C1814" }}>{d.contact.title}</h2>
-            <p className="text-xs mb-8" style={{ color: "#9A9490" }}>{d.contact.desc}</p>
+            <p className="text-xs mb-6" style={{ color: "#9A9490" }}>{d.contact.desc}</p>
+            <div className="mb-6 space-y-0.5 text-sm" style={{ color: "#68625C" }}>
+              <div className="font-semibold">Eutopos Equity Sdn Bhd</div>
+              <div className="text-xs" style={{ color: "#9A9490" }}>Company No. 1235369-U</div>
+              <div className="text-xs" style={{ color: "#9A9490" }}>Malaysia</div>
+              <div className="text-xs mt-2" style={{ color: "#9A9490" }}>Email:</div>
+            </div>
             <div className="flex gap-3">
               {[
                 {
@@ -286,7 +292,7 @@ export default async function AboutPage() {
 
       <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #E0D9CE" }}>
         <p className="text-xs" style={{ color: "#C0B8B0" }}>
-          {isEn ? "© 2025 Eutopos Equity Sdn Bhd All Rights Reserved" : "© 2025 Eutopos Equity Sdn Bhd 保留所有权利"}
+          {isEn ? "© 2026 Eutopos Equity Sdn Bhd. All Rights Reserved." : "© 2026 Eutopos Equity Sdn Bhd. 保留所有权利。"}
         </p>
       </footer>
     </div>

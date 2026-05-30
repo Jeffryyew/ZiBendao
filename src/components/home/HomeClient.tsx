@@ -78,16 +78,8 @@ function Navbar({ t, locale, isLoggedIn }: { t: Dict["nav"]; locale: Locale; isL
       ];
 
   const COMMUNITY_ITEMS: DropdownItem[] = locale === "zh"
-    ? [
-        { label: "Investor Friday", href: "/community" },
-        { label: "Asian Circle", href: "/community" },
-        { label: "活动", href: "/community" },
-      ]
-    : [
-        { label: "Investor Friday", href: "/community" },
-        { label: "Asian Circle", href: "/community" },
-        { label: "Events", href: "/community" },
-      ];
+    ? [{ label: "活动", href: "/community" }]
+    : [{ label: "Events", href: "/community" }];
 
   const NAV_LINKS: NavLink[] = [
     { label: t.home, href: "/" },
@@ -561,7 +553,7 @@ function CapitalLearningJourney({ locale }: { locale: string }) {
   const inView = useInView(ref, { once: true, margin: "-60px" });
 
   return (
-    <section ref={ref} className="px-4 py-24 max-w-6xl mx-auto">
+    <section ref={ref} className="px-4 pt-24 pb-12 max-w-6xl mx-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -685,7 +677,7 @@ function ToolsPreview({ locale }: { locale: Locale }) {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <section ref={ref} className="px-4 py-24 max-w-6xl mx-auto">
+    <section ref={ref} className="px-4 pt-12 pb-24 max-w-6xl mx-auto">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={inView ? { opacity: 1, y: 0 } : {}}

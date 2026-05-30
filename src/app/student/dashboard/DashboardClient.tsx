@@ -123,13 +123,6 @@ export default function DashboardClient({ data }: { data: DashboardData }) {
             {firstName}
           </h1>
         </div>
-        <div
-          className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium flex-shrink-0"
-          style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(201,168,76,0.3)", color: "#C9A84C" }}
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-current" />
-          Capital OS
-        </div>
       </div>
 
       {/* Tab Switcher */}
@@ -233,7 +226,7 @@ function OverviewTab({
             ✦
           </div>
           <div>
-            <div className="text-xs font-medium mb-1" style={{ color: "#C9A84C" }}>AI 数据总结</div>
+            <div className="text-xs font-medium mb-1" style={{ color: "#C9A84C" }}>小资总结</div>
             <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>
               {greeting}，{firstName}，你已完成 <span className="font-semibold" style={{ color: "#1C1814" }}>{completedCount}</span> 个课程，
               累计 <span className="font-semibold" style={{ color: "#C9A84C" }}>{totalXP} XP</span>。
@@ -287,7 +280,7 @@ function OverviewTab({
             >
               企业
             </div>
-            <p className="text-sm mb-4" style={{ color: "#68625C" }}>绑定企业，解锁资本 AI 分析</p>
+            <p className="text-sm mb-4" style={{ color: "#68625C" }}>绑定企业，解锁资本小资分析</p>
             <button
               onClick={onGoToEnterprise}
               className="px-5 py-2 rounded-xl text-xs font-semibold transition-all"
@@ -299,12 +292,6 @@ function OverviewTab({
         ) : companyMode === "single" && singleCompany ? (
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0"
-                style={{ backgroundColor: "#FBF4E4", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.25)" }}
-              >
-                {singleCompany.name.slice(0, 2).toUpperCase()}
-              </div>
               <div>
                 <div className="text-sm font-semibold" style={{ color: "#1C1814" }}>{singleCompany.name}</div>
                 <div className="text-xs" style={{ color: "#9A9490" }}>{singleCompany.type} · 独立公司</div>
@@ -316,12 +303,6 @@ function OverviewTab({
         ) : companyMode === "group" && group.parent ? (
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-xs font-bold flex-shrink-0"
-                style={{ backgroundColor: "#EFF4FF", color: "#6B9BD2", border: "1px solid rgba(107,155,210,0.25)" }}
-              >
-                {group.parent.name.slice(0, 2).toUpperCase()}
-              </div>
               <div>
                 <div className="text-sm font-semibold" style={{ color: "#1C1814" }}>{group.parent.name}</div>
                 <div className="text-xs" style={{ color: "#9A9490" }}>母公司 · {group.subsidiaries.length} 家子公司</div>
@@ -586,7 +567,7 @@ function CompanySetup({ onSetMode }: { onSetMode: (m: CompanyMode) => void }) {
           </div>
           <h3 className="text-base font-semibold mb-2" style={{ color: "#1C1814" }}>单一公司</h3>
           <p className="text-sm leading-relaxed" style={{ color: "#68625C" }}>
-            我只有一家公司，统一管理所有资本工具数据与 AI 分析
+            我只有一家公司，统一管理所有资本工具数据与小资分析
           </p>
           <div className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-lg" style={{ backgroundColor: "#FBF4E4", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}>
             选择此模式 →
@@ -717,10 +698,10 @@ function SingleCompanyView({
       </div>
 
       <AIAnalysisCard
-        title="AI 企业分析"
+        title="小资分析"
         lines={[
           `${company.name} 目前处于成长阶段，建议优先完善现金流与利润结构。`,
-          "资本工具使用率将影响系统 AI 分析精准度，建议持续录入数据。",
+          "资本工具使用率将影响小资分析精准度，建议持续录入数据。",
           "完成财务路线图可解锁更多资本成长建议。",
         ]}
       />
@@ -948,9 +929,6 @@ function GroupView({
               boxShadow: selectedCompany === null ? "0 2px 12px rgba(107,155,210,0.2)" : "none",
             }}
           >
-            <div className="w-9 h-9 rounded-xl flex items-center justify-center text-xs font-bold" style={{ backgroundColor: "#6B9BD2", color: "#FFFFFF" }}>
-              {group.parent!.name.slice(0, 2).toUpperCase()}
-            </div>
             <div>
               <div className="text-sm font-bold" style={{ color: "#1C1814" }}>{group.parent!.name}</div>
               <div className="text-xs" style={{ color: "#6B9BD2" }}>母公司 · {group.parent!.type}</div>
@@ -1004,9 +982,6 @@ function GroupView({
                     }}
                   >
                     <div className="flex items-center gap-2 mb-1.5">
-                      <div className="w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold flex-shrink-0" style={{ backgroundColor: "#FBF4E4", color: "#C9A84C" }}>
-                        {sub.name.slice(0, 2).toUpperCase()}
-                      </div>
                       <StatusBadge status={sub.status} small />
                     </div>
                     <div className="text-xs font-semibold truncate mb-0.5" style={{ color: "#1C1814" }}>{sub.name}</div>
@@ -1206,7 +1181,7 @@ function GroupView({
               )}
               <GrowthStatusBar label="子公司成长状态" netProfit={viewedCompany.netProfit ?? 0} />
               <AIAnalysisCard
-                title="AI 子公司分析"
+                title="小资分析"
                 lines={[
                   `${viewedCompany.name} 作为集团子公司，建议与母公司同步制定资本战略。`,
                   `${viewedCompany.shareholding}% 持股结构清晰，可考虑引入策略投资者优化股权。`,
@@ -1255,26 +1230,10 @@ function GroupView({
       {/* Group overview when no subsidiary selected */}
       {!viewedCompany && (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {[
-              { label: "集团公司", value: `${1 + group.subsidiaries.length}`, unit: "家" },
-              { label: "活跃子公司", value: `${group.subsidiaries.filter(s => s.status === "active").length}`, unit: "家" },
-              { label: "集团规模", value: "成长期", unit: "" },
-            ].map((s) => (
-              <div key={s.label} className="rounded-2xl p-4 text-center" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
-                <div className="text-xl font-bold font-mono mb-0.5" style={{ color: "#6B9BD2" }}>
-                  {s.value}
-                  {s.unit && <span className="text-xs font-normal ml-0.5" style={{ color: "#9A9490" }}>{s.unit}</span>}
-                </div>
-                <div className="text-xs" style={{ color: "#9A9490" }}>{s.label}</div>
-              </div>
-            ))}
-          </div>
-
           <GrowthStatusBar label="集团成长状态" netProfit={(group.parent?.netProfit ?? 0) + group.subsidiaries.reduce((s, c) => s + (c.netProfit ?? 0), 0)} />
 
           <AIAnalysisCard
-            title="AI 集团分析"
+            title="小资分析"
             lines={[
               `${group.parent!.name} 集团目前拥有 ${group.subsidiaries.length} 家子公司，建议建立统一资本管理策略。`,
               "集团模式下，母公司应优先完善资本架构与持股结构规划。",

@@ -140,8 +140,8 @@ export default function SharedNav({ locale, activeHref, isLoggedIn }: SharedNavP
       ];
 
   const COMMUNITY_ITEMS: DropdownItem[] = isZh
-    ? [{ label: "Investor Friday", href: "/community" }, { label: "Asian Circle", href: "/community" }, { label: "活动", href: "/community" }]
-    : [{ label: "Investor Friday", href: "/community" }, { label: "Asian Circle", href: "/community" }, { label: "Events", href: "/community" }];
+    ? [{ label: "活动", href: "/community" }]
+    : [{ label: "Events", href: "/community" }];
 
   const links: NavLink[] = [
     { label: isZh ? "首页" : "Home", href: "/" },

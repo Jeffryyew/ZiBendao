@@ -2,7 +2,6 @@ import { auth } from "../../../../auth";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { getLocale } from "@/lib/i18n";
-import { getRoleLabel } from "@/lib/roles";
 import ProfileForm from "./ProfileForm";
 import StudentAccountSection from "./StudentAccountSection";
 
@@ -12,8 +11,6 @@ export default async function StudentProfilePage() {
 
   const locale = await getLocale();
   const isEn = locale === "en";
-  const role = session.user.role as string;
-
   let memberSince = new Date();
   let profileExtra = { phone: "", company: "", position: "", city: "", bio: "" };
   let studentAccountNo: string | null = null;
@@ -38,13 +35,6 @@ export default async function StudentProfilePage() {
     // DB not seeded
   }
 
-  const initials = (session.user.name ?? "?")
-    .split(" ")
-    .map((w: string) => w[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
-
   const joinDate = memberSince.toLocaleDateString(isEn ? "en-MY" : "zh-CN", {
     year: "numeric",
     month: "long",
@@ -62,34 +52,14 @@ export default async function StudentProfilePage() {
 
       {/* Profile Card */}
       <div
-        className="rounded-2xl p-6 flex flex-col sm:flex-row items-center sm:items-start gap-5"
+        className="rounded-2xl p-6"
         style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}
       >
-        <div
-          className="w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-bold flex-shrink-0"
-          style={{
-            backgroundColor: "#FBF4E4",
-            border: "2px solid rgba(201,168,76,0.3)",
-            color: "#C9A84C",
-          }}
-        >
-          {initials}
-        </div>
-
-        <div className="flex-1 min-w-0 text-center sm:text-left">
+        <div className="flex-1 min-w-0">
           <h1 className="text-xl font-bold mb-0.5" style={{ fontFamily: "var(--font-display)", color: "var(--color-text-primary)" }}>
             {session.user.name}
           </h1>
-          <p className="text-sm mb-3" style={{ color: "var(--color-text-secondary)" }}>{session.user.email}</p>
-
-          <div
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl"
-            style={{ backgroundColor: "#FBF4E4", border: "1px solid rgba(201,168,76,0.25)" }}
-          >
-            <span className="text-xs font-medium" style={{ color: "#C9A84C" }}>
-              {getRoleLabel(role)}
-            </span>
-          </div>
+          <p className="text-sm mb-2" style={{ color: "var(--color-text-secondary)" }}>{session.user.email}</p>
 
           {(profileExtra.position || profileExtra.company || profileExtra.city) && (
             <p className="text-xs mt-2 space-x-2" style={{ color: "var(--color-text-muted)" }}>

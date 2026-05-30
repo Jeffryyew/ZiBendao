@@ -142,8 +142,8 @@ export default async function ToolsPage() {
           </h1>
           <p className="text-base leading-relaxed mb-8 max-w-2xl mx-auto" style={{ color: "#68625C" }}>
             {isEn
-              ? "From financial statements to SPV structure — 22 professional tools that cover every stage of enterprise capitalisation. All calculations run locally in your browser."
-              : "从财务报表到 SPV 架构，22 个专业工具覆盖企业资本化的每一个关键环节。所有计算在浏览器本地完成，数据安全可控。"}
+              ? "From financial statements to SPV structure — 22 professional tools that cover every stage of enterprise capitalisation."
+              : "从财务报表到 SPV 架构，22 个专业工具覆盖企业资本化的每一个关键环节。"}
           </p>
           <Link
             href={session?.user ? "/dashboard/capital" : "/login"}
@@ -256,8 +256,8 @@ export default async function ToolsPage() {
           </h2>
           <p className="mb-8 text-sm" style={{ color: "#9A9490" }}>
             {isEn
-              ? "22 tools, all running locally in your browser. Start with the foundation layer and build up."
-              : "22 个工具，全部在浏览器本地运行。从商业基础层开始，逐步建立完整资本能力。"}
+              ? "22 tools. Start with the foundation layer and build up."
+              : "22 个工具，从商业基础层开始，逐步建立完整资本能力。"}
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Link
@@ -280,7 +280,7 @@ export default async function ToolsPage() {
 
       <footer className="py-8 px-6 text-center" style={{ borderTop: "1px solid #E0D9CE", backgroundColor: "#F7F4EF" }}>
         <p className="text-xs" style={{ color: "#C0B8B0" }}>
-          © 2025 Eutopos Equity Sdn Bhd 保留所有权利
+          {isEn ? "© 2026 Eutopos Equity Sdn Bhd. All Rights Reserved." : "© 2026 Eutopos Equity Sdn Bhd. 保留所有权利。"}
         </p>
       </footer>
     </div>
