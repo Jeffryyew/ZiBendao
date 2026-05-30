@@ -1,4 +1,14 @@
 import NextAuth from "next-auth";
+
+// Fix AUTH_URL for Vercel: NEXTAUTH_URL in .env is localhost which breaks Google OAuth.
+// Only override when the current value is not already a production https URL.
+if (process.env.VERCEL) {
+  const currentUrl = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "";
+  if (!currentUrl.startsWith("https://")) {
+    const host = process.env.VERCEL_PROJECT_PRODUCTION_URL ?? process.env.VERCEL_URL;
+    if (host) process.env.AUTH_URL = `https://${host}`;
+  }
+}
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@auth/prisma-adapter";
@@ -6,10 +16,25 @@ import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { authConfig } from "./auth.config";
 
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  debug: process.env.NODE_ENV === "development",
+  trustHost: true,
   adapter: PrismaAdapter(prisma),
+  callbacks: {
+    ...authConfig.callbacks,
+    async signIn({ user, account }) {
+      // Google has already verified the user's email — mark it verified for
+      // existing accounts that were created before this logic existed.
+      if (account?.provider === "google" && user.email) {
+        await prisma.user.updateMany({
+          where: { email: user.email, emailVerified: null },
+          data: { emailVerified: new Date() },
+        });
+      }
+      return true;
+    },
+  },
   providers: [
     Google({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -21,6 +46,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           id: profile.sub,
           name: (profile.name as string | undefined) ?? (profile.email as string).split("@")[0],
           email: profile.email,
+          // Google verifies emails on their end; new users created via Google
+          // should always have emailVerified set.
+          emailVerified: new Date(),
           role: "FREE_MEMBER" as const,
           studentLevel: null,
         };
