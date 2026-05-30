@@ -675,13 +675,7 @@ function SingleCompanyView({
       </div>
 
       <div className="rounded-2xl p-5" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
-        <div className="flex items-center gap-4 mb-5">
-          <div
-            className="w-14 h-14 rounded-2xl flex items-center justify-center text-lg font-bold flex-shrink-0"
-            style={{ background: "linear-gradient(135deg, #FBF4E4, #EEE5CB)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.2)" }}
-          >
-            {company.name.slice(0, 2).toUpperCase()}
-          </div>
+        <div className="mb-5">
           <div className="flex-1">
             <h3 className="text-base font-bold" style={{ color: "#1C1814" }}>{company.name}</h3>
             <div className="flex items-center gap-2 mt-1 flex-wrap">

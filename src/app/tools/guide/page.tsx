@@ -71,7 +71,7 @@ export default async function ToolsGuidePage() {
   const isLoggedIn = !!session?.user;
 
   return (
-    <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814", minHeight: "100vh" }}>
+    <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814" }}>
       <SharedNav locale={locale} activeHref="/tools/guide" isLoggedIn={!!session?.user} />
 
       <div className="max-w-4xl mx-auto px-4 pt-28 pb-16">

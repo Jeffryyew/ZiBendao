@@ -18,7 +18,7 @@ interface Props {
 
 export default function HomeClient({ t, locale, isLoggedIn }: Props) {
   return (
-    <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814", minHeight: "100vh", overflowX: "hidden" }}>
+    <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814", overflowX: "hidden" }}>
       <Navbar t={t.nav} locale={locale} isLoggedIn={isLoggedIn} />
       <HeroSection t={t.hero} locale={locale} isLoggedIn={isLoggedIn} />
       <WhatIsCapital locale={locale} />

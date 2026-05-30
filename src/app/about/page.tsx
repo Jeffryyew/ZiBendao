@@ -127,7 +127,7 @@ export default async function AboutPage() {
   const d = isEn ? DATA.en : DATA.zh;
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#F7F4EF", color: "#1C1814" }}>
+    <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814" }}>
       <SharedNav locale={locale} activeHref="/about" isLoggedIn={!!session?.user} />
 
       {/* Hero */}

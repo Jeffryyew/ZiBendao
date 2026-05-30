@@ -142,7 +142,7 @@ export default async function CommunityPage() {
   const d = isEn ? DATA.en : DATA.zh;
 
   return (
-    <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814", minHeight: "100vh" }}>
+    <div style={{ backgroundColor: "#F7F4EF", color: "#1C1814" }}>
       <SharedNav locale={locale} activeHref="/community" isLoggedIn={!!session?.user} />
 
       {/* Hero */}

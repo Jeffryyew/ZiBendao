@@ -36,14 +36,8 @@ function CompanyCard({
 
   return (
     <div className="rounded-2xl p-5" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
-      <div className="flex items-start gap-3 mb-4">
-        <div
-          className="w-12 h-12 rounded-2xl flex items-center justify-center text-sm font-bold flex-shrink-0"
-          style={{ backgroundColor: color + "18", color, border: `1.5px solid ${color}35` }}
-        >
-          {company.name.slice(0, 2).toUpperCase()}
-        </div>
-        <div className="flex-1 min-w-0">
+      <div className="mb-4">
+        <div className="min-w-0">
           <div className="text-sm font-bold mb-1 truncate" style={{ color: "#1C1814" }}>
             {company.name}
           </div>
@@ -248,12 +242,6 @@ export default function ToolsClient() {
     </div>
   );
 
-  const footer = (
-    <p className="text-center text-xs mt-10" style={{ color: "var(--color-text-muted)" }}>
-      所有计算在浏览器本地完成 · 数据不上传服务器
-    </p>
-  );
-
   // Gate: no enterprise mode set
   if (mode === null) {
     return (
@@ -290,7 +278,6 @@ export default function ToolsClient() {
       <div className="max-w-4xl mx-auto px-4 py-8 md:py-10">
         {pageHeader}
         <ToolGrid companyName={companyName} isGroup={false} />
-        {footer}
       </div>
     );
   }
@@ -355,7 +342,6 @@ export default function ToolsClient() {
         isGroup={true}
         onChangeCompany={handleChangeCompany}
       />
-      {footer}
     </div>
   );
 }

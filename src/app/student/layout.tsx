@@ -32,7 +32,7 @@ export default async function StudentLayout({ children }: { children: React.Reac
         showFooterActions={false}
         hideBrand={true}
       />
-      <main className="md:ml-60 pt-14 md:pt-16 min-h-screen">
+      <main className="md:ml-60 pt-14 md:pt-16">
         {children}
       </main>
     </div>

@@ -155,9 +155,6 @@ export default async function CapitalDashboardPage() {
               );
             })}
 
-            <p className="text-center text-xs pb-4" style={{ color: "#2A2A2A" }}>
-              {isEn ? "All calculations run locally · Data never uploaded" : "所有计算在浏览器本地完成 · 数据不上传服务器"}
-            </p>
           </div>
 
           {/* RIGHT: Progress + Stats Sidebar */}
