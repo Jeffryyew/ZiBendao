@@ -1,0 +1,12 @@
+Unstaged changes after reset:
+M	auth.ts
+M	migrate-online.bat
+M	next.config.ts
+M	package.json
+M	push.ps1
+rm 'src/app/admin/board/page.tsx'
+[main c3e798a] revert: remove /admin/board page
+ 1 file changed, 514 deletions(-)
+ delete mode 100644 src/app/admin/board/page.tsx
+To https://github.com/Jeffryyew/ZiBendao.git
+   e7aa547..c3e798a  main -> main

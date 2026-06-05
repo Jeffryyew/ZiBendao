@@ -1,0 +1,11 @@
+Unstaged changes after reset:
+M	auth.ts
+M	migrate-online.bat
+M	next.config.ts
+M	package.json
+M	push.ps1
+warning: in the working copy of 'auth.ts', LF will be replaced by CRLF the next time Git touches it
+[main 44ce5b7] fix: set emailVerified on Google OAuth login
+ 1 file changed, 29 insertions(+), 1 deletion(-)
+To https://github.com/Jeffryyew/ZiBendao.git
+   c3e798a..44ce5b7  main -> main

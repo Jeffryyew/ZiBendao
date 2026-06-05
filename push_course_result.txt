@@ -1,0 +1,19 @@
+Unstaged changes after reset:
+M	migrate-online.bat
+M	next.config.ts
+M	package.json
+M	push.ps1
+M	scripts/seed.ts
+warning: in the working copy of 'scripts/seed.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/CLAUDE.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/资本启航课程开发计划.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/资本道AI开发原则.md', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'docs/资本道网站开发总看板.md', LF will be replaced by CRLF the next time Git touches it
+[main abcd969] feat: èµ„æœ¬å¯èˆª 13æ¨¡å—100å…³è¯¾ç¨‹å†…å®¹å…¨éƒ¨å®šç¨¿ï¼Œé—¸é—¨Aè§£é”
+ 5 files changed, 699 insertions(+), 23 deletions(-)
+ create mode 100644 docs/CLAUDE.md
+ create mode 100644 "docs/\350\265\204\346\234\254\345\220\257\350\210\252\350\257\276\347\250\213\345\274\200\345\217\221\350\256\241\345\210\222.md"
+ create mode 100644 "docs/\350\265\204\346\234\254\351\201\223AI\345\274\200\345\217\221\345\216\237\345\210\231.md"
+ create mode 100644 "docs/\350\265\204\346\234\254\351\201\223\347\275\221\347\253\231\345\274\200\345\217\221\346\200\273\347\234\213\346\235\277.md"
+To https://github.com/Jeffryyew/ZiBendao.git
+   a42af01..abcd969  main -> main

@@ -1,0 +1,11 @@
+Unstaged changes after reset:
+M	CLAUDE.md
+M	migrate-online.bat
+M	next.config.ts
+M	package.json
+M	push.ps1
+warning: in the working copy of 'CLAUDE.md', LF will be replaced by CRLF the next time Git touches it
+[main a42af01] docs: update CLAUDE.md with full project conventions
+ 1 file changed, 77 insertions(+), 1 deletion(-)
+To https://github.com/Jeffryyew/ZiBendao.git
+   44ce5b7..a42af01  main -> main

@@ -40,6 +40,7 @@ model User {
   payments          Payment[]
   sessions          Session[]
   offlineAccount    OfflineStudentAccount?
+  toolSnapshots     ToolSnapshot[]
 }
 
 model Account {
@@ -252,6 +253,21 @@ enum DocStatus {
   SENT
   SIGNED
 }
+
+// ─── Capital Tools ──────────────────────────────────────────────────────────
+
+model ToolSnapshot {
+  id          String   @id @default(cuid())
+  userId      String
+  companyId   String   // localStorage company key (e.g. "single_ABC" or "group_XYZ")
+  toolSlug    String
+  data        Json
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, companyId, toolSlug])
+}
+
 
 enum PayStatus {
   PENDING

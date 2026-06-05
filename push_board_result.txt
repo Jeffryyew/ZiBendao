@@ -1,0 +1,12 @@
+Unstaged changes after reset:
+M	auth.ts
+M	migrate-online.bat
+M	next.config.ts
+M	package.json
+M	push.ps1
+warning: in the working copy of 'src/app/admin/board/page.tsx', LF will be replaced by CRLF the next time Git touches it
+[main e7aa547] feat: add /admin/board project kanban page
+ 1 file changed, 514 insertions(+)
+ create mode 100644 src/app/admin/board/page.tsx
+To https://github.com/Jeffryyew/ZiBendao.git
+   6c2d99b..e7aa547  main -> main

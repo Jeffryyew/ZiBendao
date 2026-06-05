@@ -1,0 +1,38 @@
+Unstaged changes after reset:
+M	auth.ts
+M	migrate-online.bat
+M	next.config.ts
+M	package.json
+M	push.ps1
+M	src/app/about/page.tsx
+M	src/app/community/page.tsx
+M	src/app/courses/page.tsx
+M	src/app/student/dashboard/DashboardClient.tsx
+M	src/app/student/profile/page.tsx
+M	src/app/tools/guide/page.tsx
+M	src/app/tools/page.tsx
+M	src/components/SharedNav.tsx
+M	src/components/home/HomeClient.tsx
+M	src/lib/i18n.ts
+M	src/lib/prisma.ts
+warning: in the working copy of 'src/app/about/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/community/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/courses/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/dashboard/DashboardClient.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/profile/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/guide/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/home/HomeClient.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/prisma.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/auth-debug/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/env-check/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/learn/page_fixed.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/guide/UseToolButton.tsx', LF will be replaced by CRLF the next time Git touches it
+[main 29490b9] feat: UI adjustments - remove Capital OS labels, rebrand AI to Zibo, remove icons, update About/footer/courses/community/tools
+ 15 files changed, 376 insertions(+), 121 deletions(-)
+ create mode 100644 src/app/api/auth-debug/route.ts
+ create mode 100644 src/app/api/env-check/route.ts
+ create mode 100644 src/app/student/learn/page_fixed.tsx
+ create mode 100644 src/app/tools/guide/UseToolButton.tsx
+To https://github.com/Jeffryyew/ZiBendao.git
+   56c72f2..29490b9  main -> main

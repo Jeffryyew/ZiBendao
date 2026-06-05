@@ -1,0 +1,30 @@
+Unstaged changes after reset:
+M	auth.ts
+M	migrate-online.bat
+M	next.config.ts
+M	package.json
+M	push.ps1
+M	src/app/about/page.tsx
+M	src/app/community/page.tsx
+M	src/app/courses/page.tsx
+M	src/app/dashboard/capital/page.tsx
+M	src/app/student/dashboard/DashboardClient.tsx
+M	src/app/student/layout.tsx
+M	src/app/student/tools/ToolsClient.tsx
+M	src/app/tools/guide/page.tsx
+M	src/app/tools/page.tsx
+M	src/components/home/HomeClient.tsx
+warning: in the working copy of 'src/app/about/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/community/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/courses/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/dashboard/capital/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/dashboard/DashboardClient.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/layout.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/tools/ToolsClient.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/guide/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/home/HomeClient.tsx', LF will be replaced by CRLF the next time Git touches it
+[main 6c2d99b] fix: remove bottom whitespace, remove tool disclaimers, remove company icons
+ 10 files changed, 10 insertions(+), 33 deletions(-)
+To https://github.com/Jeffryyew/ZiBendao.git
+   29490b9..6c2d99b  main -> main

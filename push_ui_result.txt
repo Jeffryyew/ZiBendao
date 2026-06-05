@@ -1,0 +1,335 @@
+warning: in the working copy of 'src/app/about/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/actions/admin.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/actions/auth.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/actions/locale.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/actions/student.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/contracts/new/ContractForm.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/contracts/new/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/contracts/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/courses/ModuleActions.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/courses/NewModuleForm.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/courses/[moduleId]/LessonActions.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/courses/[moduleId]/NewLessonForm.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/courses/[moduleId]/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/courses/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/layout.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/payments/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/reports/ReportCharts.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/reports/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/student-accounts/StudentAccountsClient.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/student-accounts/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/tools/ToolsPanel.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/tools/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/users/CreateClientDialog.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/users/UserTable.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/admin/users/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/apply/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/auth-debug/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/auth/[...nextauth]/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/contracts/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/db-test/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/documents/[id]/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/documents/[id]/sign/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/env-check/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/payments/create-checkout/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/payments/webhook/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/profile/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/student-account/confirm/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/api/student-account/verify/route.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/apply/ApplyForm.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/apply/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/client/dashboard/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/client/documents/[id]/PrintButton.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/client/documents/[id]/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/client/documents/[id]/sign/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/client/documents/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/client/layout.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/client/tools/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/community/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/courses/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/dashboard/capital/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/dashboard/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/globals.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/layout.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/login/LoginClient.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/login/otp/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/login/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/member/dashboard/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/member/layout.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/member/learn/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/online/achievements/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/online/layout.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/online/learn/[moduleSlug]/[lessonSlug]/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/online/learn/[moduleSlug]/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/online/learn/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/payment/cancel/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/payment/success/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/pricing/CheckoutButton.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/pricing/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/register/RegisterClient.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/register/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/dashboard/DashboardClient.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/dashboard/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/layout.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/learn/[lessonId]/CompleteButton.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/learn/[lessonId]/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/learn/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/learn/page_fixed.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/profile/ProfileForm.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/profile/StudentAccountSection.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/profile/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/tools/ToolCard.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/tools/ToolsClient.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/student/tools/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/balance-sheet/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/breakeven-analysis/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/capital-roadmap/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/capital-structure/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/cash-flow/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/data-room/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/deal-flow/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/due-diligence/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/equity-structure/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/financial-roadmap/FinancialRoadmapTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/financial-roadmap/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/fundraising-system/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/guide/UseToolButton.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/guide/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/income-statement/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/investment-committee/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/investor-relations/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/market-cap/MarketCapTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/market-cap/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/pat-kpi/PatKpiTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/pat-kpi/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/portfolio-management/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/pricing-system/PricingSystemTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/pricing-system/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/risk-control/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/sales-forecast/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/spv-structure/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/tools/startup-expense/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/verify-email/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/app/verify-email/resend/page.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/AchievementBadge.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/BackNav.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/LanguageSwitcher.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/LogoImg.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/NotificationBanner.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/Sidebar.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/SignatureCanvas.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/badges/BadgeIcon.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/badges/BadgeUnlockModal.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/home/HomeClient.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/online/PricingSimulator.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/online/ValuationSimulator.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/BalanceSheetTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/BreakevenAnalysisTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/CapitalRoadmapTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/CapitalStructureTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/CashFlowTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/DataRoomTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/DealFlowTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/DueDiligenceTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/EquityStructureTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/FundraisingSystemTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/IncomeStatementTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/InvestmentCommitteeTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/InvestorRelationsTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/PortfolioManagementTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/RiskControlTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/SalesForecastTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/SpvStructureTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/StartupExpenseTool.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/components/tools/ToolShell.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/context/BadgeContext.tsx', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/achievements.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/auth.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/badges.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/capitalLaunchCourse.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/capitalLevels.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/capitalModules.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/contracts.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/email.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/enterprise.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/featureFlags.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/prisma.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/roles.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/lib/sms.ts', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/types/next-auth.d.ts', LF will be replaced by CRLF the next time Git touches it
+[main 1baa7e1] feat: UI adjustments - remove Capital OS labels, rebrand AI to Zibo/Xiaoze, remove icons, update About/footer/courses/community/tools
+ 109 files changed, 2170 insertions(+), 129 deletions(-)
+ create mode 100644 14/WhatsApp Image 2026-05-21 at 7.30.46 PM (1).jpeg
+ create mode 100644 14/WhatsApp Image 2026-05-21 at 7.30.46 PM (2).jpeg
+ create mode 100644 14/WhatsApp Image 2026-05-21 at 7.30.46 PM (3).jpeg
+ create mode 100644 14/WhatsApp Image 2026-05-21 at 7.30.46 PM.jpeg
+ create mode 100644 14/WhatsApp Image 2026-05-21 at 7.30.47 PM (1).jpeg
+ create mode 100644 14/WhatsApp Image 2026-05-21 at 7.30.47 PM (2).jpeg
+ create mode 100644 14/WhatsApp Image 2026-05-21 at 7.30.47 PM (3).jpeg
+ create mode 100644 14/WhatsApp Image 2026-05-21 at 7.30.47 PM.jpeg
+ create mode 100644 14/WhatsApp Image 2026-05-21 at 7.30.48 PM (1).jpeg
+ create mode 100644 14/WhatsApp Image 2026-05-21 at 7.30.48 PM (2).jpeg
+ create mode 100644 14/WhatsApp Image 2026-05-21 at 7.30.48 PM (3).jpeg
+ create mode 100644 14/WhatsApp Image 2026-05-21 at 7.30.48 PM (4).jpeg
+ create mode 100644 14/WhatsApp Image 2026-05-21 at 7.30.48 PM.jpeg
+ create mode 100644 14/WhatsApp Image 2026-05-21 at 7.30.49 PM.jpeg
+ create mode 100644 auth-debug-result.txt
+ create mode 100644 build_log.txt
+ create mode 100644 check-auth-debug.bat
+ create mode 100644 check-auth-runtime.ps1
+ create mode 100644 check-build.bat
+ create mode 100644 check-deploy2.bat
+ create mode 100644 check-env.bat
+ create mode 100644 check-env2.bat
+ create mode 100644 check-env3.bat
+ create mode 100644 check-vercel-auth.bat
+ create mode 100644 check-vercel.bat
+ create mode 100644 check-vercel2.bat
+ create mode 100644 check_deploy.bat
+ create mode 100644 check_git_log.vbs
+ create mode 100644 check_latest_deploy.vbs
+ create mode 100644 check_new_deploy.vbs
+ create mode 100644 check_vercel_api.vbs
+ create mode 100644 commit-badges.bat
+ create mode 100644 commit-online-course.bat
+ create mode 100644 commit-phases.bat
+ create mode 100644 debug-result.txt
+ create mode 100644 delete-auth-url.ps1
+ create mode 100644 deploy-high-mem.bat
+ create mode 100644 deploy-result.txt
+ create mode 100644 deploy-vercel.bat
+ create mode 100644 deploy-with-memory.bat
+ create mode 100644 deploy-with-token.bat
+ create mode 100644 do-push.bat
+ create mode 100644 do-push2.bat
+ create mode 100644 do-push4.bat
+ create mode 100644 do-push5.bat
+ create mode 100644 fetch-debug.bat
+ create mode 100644 final_push.bat
+ create mode 100644 find-vercel-auth.bat
+ create mode 100644 get-deploy-logs.ps1
+ create mode 100644 get-google-client-id.ps1
+ create mode 100644 get-vercel-info.bat
+ create mode 100644 get-vercel-logs.bat
+ create mode 100644 get-vercel-logs.ps1
+ create mode 100644 get-vercel-token.bat
+ create mode 100644 get_build_log.vbs
+ create mode 100644 get_deploys_silent.vbs
+ create mode 100644 git_fix_push.vbs
+ create mode 100644 git_push_log.txt
+ create mode 100644 git_push_silent.vbs
+ create mode 100644 ipcheck.bat
+ create mode 100644 latest_deploy.txt
+ create mode 100644 new_deploy_status.txt
+ create mode 100644 open-debug.bat
+ create mode 100644 open-google-console.bat
+ create mode 100644 open-vercel.bat
+ create mode 100644 push-direct.bat
+ create mode 100644 push_deploy.bat
+ create mode 100644 push_fix.vbs
+ create mode 100644 push_fix_result.txt
+ create mode 100644 redeploy.vbs
+ create mode 100644 redeploy_result.txt
+ create mode 100644 run-check-auth.bat
+ create mode 100644 run-db-push.bat
+ create mode 100644 run-delete-auth.bat
+ create mode 100644 run-get-logs.bat
+ create mode 100644 run-ps1.bat
+ create mode 100644 run-set-env.bat
+ create mode 100644 run_deploy_check.bat
+ create mode 100644 set-vercel-env.ps1
+ create mode 100644 src/app/api/auth-debug/route.ts
+ create mode 100644 src/app/api/env-check/route.ts
+ create mode 100644 src/app/student/learn/page_fixed.tsx
+ create mode 100644 src/app/tools/guide/UseToolButton.tsx
+ create mode 100644 ssh-diag.bat
+ create mode 100644 ssh-fix.ps1
+ create mode 100644 start-dev.bat
+ create mode 100644 test-auth-endpoints.ps1
+ create mode 100644 unlock-git.bat
+ create mode 100644 unlock_git.bat
+ create mode 100644 vercel-auth-auto.ps1
+ create mode 100644 vercel-login.bat
+ create mode 100644 vercel_oauth_callback.vbs
+ create mode 100644 vercel_status.txt
+remote: error: GH013: Repository rule violations found for refs/heads/main.        
+remote: 
+remote: - GITHUB PUSH PROTECTION        
+remote:   —————————————————————————————————————————        
+remote:     Resolve the following violations before pushing again        
+remote: 
+remote:     - Push cannot contain secrets        
+remote: 
+remote:             
+remote:      (?) Learn how to resolve a blocked push        
+remote:      https://docs.github.com/code-security/secret-scanning/working-with-secret-scanning-and-push-protection/working-with-push-protection-from-the-command-line#resolving-a-blocked-push        
+remote:             
+remote:             
+remote:       —— Vercel Personal Access Token ——————————————————————        
+remote:        locations:        
+remote:          - commit: 1baa7e17a0df75f174ad0fbc22c5e245c470b2c7        
+remote:            path: check_new_deploy.vbs:3        
+remote:          - commit: 1baa7e17a0df75f174ad0fbc22c5e245c470b2c7        
+remote:            path: deploy-with-token.bat:4        
+remote:          - commit: 1baa7e17a0df75f174ad0fbc22c5e245c470b2c7        
+remote:            path: get-deploy-logs.ps1:1        
+remote:          - commit: 1baa7e17a0df75f174ad0fbc22c5e245c470b2c7        
+remote:            path: get-vercel-logs.bat:4        
+remote:          - commit: 1baa7e17a0df75f174ad0fbc22c5e245c470b2c7        
+remote:            path: redeploy.vbs:3        
+remote:             
+remote:        (?) To push, remove secret from commit(s) or follow this URL to allow the secret.        
+remote:        https://github.com/Jeffryyew/ZiBendao/security/secret-scanning/unblock-secret/3EQCy1iExXXWLHGx2piIgFzscPc        
+remote:             
+remote: 
+remote: 
+To https://github.com/Jeffryyew/ZiBendao.git
+ ! [remote rejected] main -> main (push declined due to repository rule violations)
+error: failed to push some refs to 'https://github.com/Jeffryyew/ZiBendao.git'
+On branch main
+Your branch is ahead of 'origin/main' by 4 commits.
+  (use "git push" to publish your local commits)
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	push_ui_changes.vbs
+	push_ui_result.txt
+
+nothing added to commit but untracked files present (use "git add" to track)
+remote: error: GH013: Repository rule violations found for refs/heads/main.        
+remote: 
+remote: - GITHUB PUSH PROTECTION        
+remote:   —————————————————————————————————————————        
+remote:     Resolve the following violations before pushing again        
+remote: 
+remote:     - Push cannot contain secrets        
+remote: 
+remote:             
+remote:      (?) Learn how to resolve a blocked push        
+remote:      https://docs.github.com/code-security/secret-scanning/working-with-secret-scanning-and-push-protection/working-with-push-protection-from-the-command-line#resolving-a-blocked-push        
+remote:             
+remote:             
+remote:       —— Vercel Personal Access Token ——————————————————————        
+remote:        locations:        
+remote:          - commit: 1baa7e17a0df75f174ad0fbc22c5e245c470b2c7        
+remote:            path: delete-auth-url.ps1:1        
+remote:          - commit: 1baa7e17a0df75f174ad0fbc22c5e245c470b2c7        
+remote:            path: get-google-client-id.ps1:1        
+remote:          - commit: 1baa7e17a0df75f174ad0fbc22c5e245c470b2c7        
+remote:            path: get-vercel-logs.ps1:1        
+remote:          - commit: 1baa7e17a0df75f174ad0fbc22c5e245c470b2c7        
+remote:            path: get_build_log.vbs:2        
+remote:          - commit: 1baa7e17a0df75f174ad0fbc22c5e245c470b2c7        
+remote:            path: redeploy.vbs:3        
+remote:             
+remote:        (?) To push, remove secret from commit(s) or follow this URL to allow the secret.        
+remote:        https://github.com/Jeffryyew/ZiBendao/security/secret-scanning/unblock-secret/3EQCy1iExXXWLHGx2piIgFzscPc        
+remote:             
+remote: 
+remote: 
+To https://github.com/Jeffryyew/ZiBendao.git
+ ! [remote rejected] main -> main (push declined due to repository rule violations)
+error: failed to push some refs to 'https://github.com/Jeffryyew/ZiBendao.git'

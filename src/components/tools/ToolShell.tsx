@@ -11,6 +11,7 @@ interface ToolShellProps {
   desc: string;
   levelRequired?: number;
   backHref?: string;
+  guideButton?: React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -65,6 +66,7 @@ export default function ToolShell({
   title,
   desc,
   backHref = "/student/tools",
+  guideButton,
   children,
 }: ToolShellProps) {
   const { mode, companyName, hasActiveCompany, ready } = useCompanyState();
@@ -158,6 +160,7 @@ export default function ToolShell({
               {mode === "group" ? "集团 · " : ""}{companyName}
             </span>
           )}
+          {guideButton && <div className="flex-shrink-0">{guideButton}</div>}
         </div>
       </div>
 
