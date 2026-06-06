@@ -1,402 +1,482 @@
-﻿"use client";
+"use client";
 
-import { useState } from "react";
-import ToolShell from "@/components/tools/ToolShell";
-import type { Locale } from "@/lib/i18n";
+import { useState, useMemo, useEffect } from "react";
 import {
   PieChart,
   Pie,
   Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
   Tooltip,
-  Legend,
   ResponsiveContainer,
+  CartesianGrid,
 } from "recharts";
+import ToolShell from "@/components/tools/ToolShell";
+import ToolGuide from "@/components/tools/ToolGuide";
+import { useToolSnapshot } from "@/lib/useToolSnapshot";
+import type { FinancialCore } from "@/lib/financialCore";
+import { ENTERPRISE_KEYS } from "@/lib/enterprise";
 
-const PURPLE = "#8B5CF6";
-const GOLD = "#C9A84C";
-
-const inputSt: React.CSSProperties = {
-  backgroundColor: "#0D0D0D",
-  border: "1px solid #2A2A2A",
-  color: "#F5F5F0",
-  borderRadius: "10px",
-  fontSize: "13px",
-  fontFamily: "var(--font-mono)",
-  outline: "none",
-  width: "100%",
-  padding: "8px 10px",
-};
-
-const PIE_COLORS = [PURPLE, GOLD, "#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899"];
-const SHAREHOLDER_TYPES = ["Founder", "Investor", "Employee", "Advisor"] as const;
-const SHARE_CLASSES = ["Ordinary", "Preference", "Options"] as const;
-
-type ShareholderType = (typeof SHAREHOLDER_TYPES)[number];
-type ShareClass = (typeof SHARE_CLASSES)[number];
+// ── Types ──────────────────────────────────────────────────────────────────
 
 interface Shareholder {
   id: string;
   name: string;
-  type: ShareholderType;
-  shares: number;
-  shareClass: ShareClass;
+  shares: string;
+  type: "founder" | "investor" | "esop" | "other";
 }
 
-interface Round {
-  id: string;
-  name: string;
-  newShares: number;
+interface T09Form {
+  shareholders: Shareholder[];
+  totalAuthorizedShares: string;
+  postRoundFounderPct: string;
+  postRoundLabel: string;
 }
 
-let _id = 1;
-const uid = () => String(_id++);
+const SHAREHOLDER_TYPES = [
+  { value: "founder", label: "创始人" },
+  { value: "investor", label: "投资人" },
+  { value: "esop", label: "ESOP" },
+  { value: "other", label: "其他" },
+] as const;
 
-function fmtRM(n: number) {
-  if (n >= 1e6) return `RM ${(n / 1e6).toFixed(2)}M`;
-  return `RM ${n.toLocaleString("en-MY", { maximumFractionDigits: 0 })}`;
+const TYPE_COLORS: Record<string, string> = {
+  founder: "#C9A84C",
+  investor: "#4CAF50",
+  esop: "#6B9FD4",
+  other: "#A0A09A",
+};
+
+const DEFAULT_SHAREHOLDERS: Shareholder[] = [
+  { id: "s1", name: "创始人甲", shares: "600000", type: "founder" },
+  { id: "s2", name: "创始人乙", shares: "200000", type: "founder" },
+  { id: "s3", name: "ESOP 池", shares: "100000", type: "esop" },
+  { id: "s4", name: "天使投资人", shares: "100000", type: "investor" },
+];
+
+const DEFAULT_FORM: T09Form = {
+  shareholders: DEFAULT_SHAREHOLDERS,
+  totalAuthorizedShares: "1000000",
+  postRoundFounderPct: "",
+  postRoundLabel: "",
+};
+
+// ── Guide steps ────────────────────────────────────────────────────────────
+
+const GUIDE_STEPS = [
+  {
+    title: "股权结构是公司治理的基础",
+    body: "清晰的股权结构表让你一眼看出：谁控股、谁是投资人、ESOP 池有多大。这也是 Due Diligence（尽职调查）时投资人必看的文件之一。",
+  },
+  {
+    title: "第一步：录入所有股东",
+    body: "逐行填入每位股东姓名、持股数量与类型（创始人 / 投资人 / ESOP / 其他）。系统将自动计算各自持股比例。",
+  },
+  {
+    title: "第二步：查看当前股权饼图",
+    body: "饼图直观呈现当前股权分布。金色为创始人，绿色为投资人，蓝色为 ESOP，灰色为其他。",
+  },
+  {
+    title: "第三步：对比融资后股权",
+    body: "如果你已完成融资规划（T08），可以填入融资后创始人持股比例，与当前对比，看清稀释幅度。",
+  },
+  {
+    title: "第四步：股东权益分布柱状图",
+    body: "柱状图按股东类型汇总持股比例，方便你快速判断创始团队是否仍保有多数控制权（>50%）。",
+  },
+];
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function pct(n: number): string {
+  if (!isFinite(n) || isNaN(n)) return "—";
+  return n.toFixed(2) + "%";
 }
 
-function pct(n: number, total: number) {
-  return total > 0 ? ((n / total) * 100).toFixed(2) : "0.00";
+function uid() {
+  return Math.random().toString(36).slice(2, 8);
 }
 
-export default function EquityStructureTool({ locale }: { locale: Locale }) {
-  const isEn = locale === "en";
+// ── Sub-components ─────────────────────────────────────────────────────────
 
-  const [shareholders, setShareholders] = useState<Shareholder[]>([
-    { id: uid(), name: isEn ? "Founder A" : "创始人 A", type: "Founder", shares: 600000, shareClass: "Ordinary" },
-    { id: uid(), name: isEn ? "Founder B" : "创始人 B", type: "Founder", shares: 300000, shareClass: "Ordinary" },
-    { id: uid(), name: isEn ? "Investor X" : "投资人 X", type: "Investor", shares: 100000, shareClass: "Preference" },
-  ]);
-  const [rounds, setRounds] = useState<Round[]>([]);
-  const [esopEnabled, setEsopEnabled] = useState(false);
-  const [esopPct, setEsopPct] = useState("10");
-  const [fullyDiluted, setFullyDiluted] = useState(true);
-  const [exitValue, setExitValue] = useState("10000000");
-  const [tab, setTab] = useState<"captable" | "waterfall">("captable");
+function Card({ children, accent = false }: { children: React.ReactNode; accent?: boolean }) {
+  return (
+    <div
+      className="rounded-2xl p-5"
+      style={{ backgroundColor: "#141414", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#1E1E1E"}` }}
+    >
+      {children}
+    </div>
+  );
+}
 
-  // New shareholder form
-  const [newSh, setNewSh] = useState({ name: "", type: "Founder" as ShareholderType, shares: "", shareClass: "Ordinary" as ShareClass });
-  const [newRound, setNewRound] = useState({ name: "", newShares: "" });
+function SLabel({ children }: { children: React.ReactNode }) {
+  return <p className="text-xs font-mono mb-3" style={{ color: "#555550" }}>{children}</p>;
+}
 
-  const baseShares = shareholders
-    .filter((s) => fullyDiluted || s.shareClass !== "Options")
-    .reduce((sum, s) => sum + s.shares, 0);
+const RADIAN = Math.PI / 180;
+function PieLabel({
+  cx, cy, midAngle, innerRadius, outerRadius, percent,
+}: {
+  cx: number; cy: number; midAngle: number; innerRadius: number; outerRadius: number; percent: number; name: string;
+}) {
+  if (percent < 0.04) return null;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.6;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  return (
+    <text x={x} y={y} fill="#F5F5F0" textAnchor="middle" dominantBaseline="central" style={{ fontSize: 11 }}>
+      {(percent * 100).toFixed(1)}%
+    </text>
+  );
+}
 
-  const roundShares = rounds.reduce((sum, r) => sum + r.newShares, 0);
+// ── Main component ─────────────────────────────────────────────────────────
 
-  const esopShares = esopEnabled
-    ? Math.round((baseShares + roundShares) * (parseFloat(esopPct) / 100) / (1 - parseFloat(esopPct) / 100))
-    : 0;
+export default function EquityStructureTool({ locale }: { locale: "zh" | "en" }) {
+  const { savedData, saving, lastSaved, save } = useToolSnapshot<T09Form>("equity-structure");
+  const [form, setForm] = useState<T09Form>(DEFAULT_FORM);
+  const [loaded, setLoaded] = useState(false);
+  const [coreData, setCoreData] = useState<FinancialCore | null>(null);
 
-  const totalShares = baseShares + roundShares + esopShares;
+  // ── Load saved ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (savedData && !loaded) {
+      setForm({ ...DEFAULT_FORM, ...savedData });
+      setLoaded(true);
+    }
+  }, [savedData, loaded]);
 
-  const addShareholder = () => {
-    if (!newSh.name || !newSh.shares) return;
-    setShareholders((p) => [...p, { id: uid(), name: newSh.name, type: newSh.type, shares: parseInt(newSh.shares) || 0, shareClass: newSh.shareClass }]);
-    setNewSh({ name: "", type: "Founder", shares: "", shareClass: "Ordinary" });
-  };
+  // ── Load FinancialCore ──────────────────────────────────────────────────
+  useEffect(() => {
+    try {
+      const mode = localStorage.getItem(ENTERPRISE_KEYS.MODE);
+      let companyId = "no_company";
+      if (mode === "single") {
+        const sc = localStorage.getItem(ENTERPRISE_KEYS.SINGLE);
+        if (sc) companyId = `single_${JSON.parse(sc).id ?? "default"}`;
+      } else if (mode === "group") {
+        const ac = localStorage.getItem(ENTERPRISE_KEYS.ACTIVE_COMPANY);
+        if (ac) companyId = `group_${JSON.parse(ac).id ?? "default"}`;
+      }
+      if (companyId !== "no_company") {
+        fetch(`/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(companyId)}`)
+          .then((r) => r.json())
+          .then((snap) => {
+            if (snap?.data) {
+              const d: FinancialCore = snap.data;
+              setCoreData(d);
+              if (d.latestRoundType) {
+                setForm((p) => ({
+                  ...p,
+                  postRoundLabel: p.postRoundLabel || `${d.latestRoundType} 完成后`,
+                }));
+              }
+            }
+          })
+          .catch(() => {});
+      }
+    } catch {}
+  }, []);
 
-  const removeShareholder = (id: string) => setShareholders((p) => p.filter((s) => s.id !== id));
+  const pf = (v: string | number) => parseFloat(String(v)) || 0;
 
-  const addRound = () => {
-    if (!newRound.name || !newRound.newShares) return;
-    setRounds((p) => [...p, { id: uid(), name: newRound.name, newShares: parseInt(newRound.newShares) || 0 }]);
-    setNewRound({ name: "", newShares: "" });
-  };
+  // ── Calculations ──────────────────────────────────────────────────────
 
-  const removeRound = (id: string) => setRounds((p) => p.filter((r) => r.id !== id));
+  const calc = useMemo(() => {
+    const totalIssued = form.shareholders.reduce((s, sh) => s + pf(sh.shares), 0);
+    const authorized = pf(form.totalAuthorizedShares);
 
-  const pieData = [
-    ...shareholders
-      .filter((s) => fullyDiluted || s.shareClass !== "Options")
-      .map((s) => ({ name: s.name, value: s.shares })),
-    ...rounds.map((r) => ({ name: r.name, value: r.newShares })),
-    ...(esopEnabled && esopShares > 0 ? [{ name: isEn ? "ESOP Pool" : "ESOP池", value: esopShares }] : []),
-  ];
+    const shareholders = form.shareholders.map((sh) => ({
+      ...sh,
+      sharesNum: pf(sh.shares),
+      pct: totalIssued > 0 ? (pf(sh.shares) / totalIssued) * 100 : 0,
+    }));
 
-  const exitVal = parseFloat(exitValue) || 0;
+    const byType: Record<string, number> = { founder: 0, investor: 0, esop: 0, other: 0 };
+    for (const sh of shareholders) {
+      byType[sh.type] = (byType[sh.type] ?? 0) + sh.pct;
+    }
 
-  const selectSt: React.CSSProperties = { ...inputSt, cursor: "pointer" };
+    const pieData = shareholders
+      .filter((sh) => sh.sharesNum > 0)
+      .map((sh) => ({
+        name: sh.name,
+        value: sh.pct,
+        fill: TYPE_COLORS[sh.type] ?? "#A0A09A",
+      }));
+
+    const typeBarData = SHAREHOLDER_TYPES.map(({ value, label }) => ({
+      name: label,
+      pct: byType[value] ?? 0,
+      fill: TYPE_COLORS[value],
+    }));
+
+    const founderPct = byType.founder ?? 0;
+    const unissuedPct = authorized > 0 ? Math.max(0, ((authorized - totalIssued) / authorized) * 100) : 0;
+    const postRoundFounderPct = pf(form.postRoundFounderPct);
+
+    return { shareholders, totalIssued, authorized, byType, pieData, typeBarData, founderPct, unissuedPct, postRoundFounderPct };
+  }, [form]);
+
+  // ── Shareholder CRUD ──────────────────────────────────────────────────
+
+  function addShareholder() {
+    setForm((p) => ({
+      ...p,
+      shareholders: [
+        ...p.shareholders,
+        { id: uid(), name: "", shares: "", type: "investor" },
+      ],
+    }));
+  }
+
+  function updateShareholder(id: string, field: keyof Shareholder, value: string) {
+    setForm((p) => ({
+      ...p,
+      shareholders: p.shareholders.map((sh) =>
+        sh.id === id ? { ...sh, [field]: value } : sh
+      ),
+    }));
+  }
+
+  function removeShareholder(id: string) {
+    setForm((p) => ({
+      ...p,
+      shareholders: p.shareholders.filter((sh) => sh.id !== id),
+    }));
+  }
+
+  // ── Save handler ──────────────────────────────────────────────────────
+
+  async function handleSave() {
+    await save(form);
+    try {
+      const mode = localStorage.getItem(ENTERPRISE_KEYS.MODE);
+      let companyId = "no_company";
+      if (mode === "single") {
+        const sc = localStorage.getItem(ENTERPRISE_KEYS.SINGLE);
+        if (sc) companyId = `single_${JSON.parse(sc).id ?? "default"}`;
+      } else if (mode === "group") {
+        const ac = localStorage.getItem(ENTERPRISE_KEYS.ACTIVE_COMPANY);
+        if (ac) companyId = `group_${JSON.parse(ac).id ?? "default"}`;
+      }
+      if (companyId === "no_company") return;
+
+      const existing = await fetch(
+        `/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(companyId)}`
+      ).then((r) => r.json());
+      const core = existing?.data ?? {};
+
+      await fetch("/api/tools/snapshot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          toolSlug: "_financial_core",
+          companyId,
+          data: {
+            ...core,
+            founderPct: calc.founderPct,
+            totalShares: calc.totalIssued,
+            updatedBy: { ...(core.updatedBy ?? {}), "equity-structure": new Date().toISOString() },
+          },
+        }),
+      });
+    } catch {}
+  }
+
+  const guide = <ToolGuide toolSlug="equity-structure" steps={GUIDE_STEPS} />;
+
+  // ── Render ────────────────────────────────────────────────────────────
 
   return (
     <ToolShell
       icon=""
-      title={isEn ? "Equity Structure" : "股权架构"}
-      desc={isEn ? "Build your cap table, model dilution, and visualize equity distribution." : "构建股权表，模拟稀释，可视化股权分配。"}
-      levelRequired={3}
+      title={locale === "en" ? "Equity Structure" : "股权结构"}
+      desc={locale === "en" ? "Cap table with ownership charts and dilution comparison" : "股权分配表，含持股图表与稀释对比"}
       backHref="/student/dashboard"
+      guideButton={guide}
     >
-      {/* Tabs */}
-      <div className="flex gap-2 mb-6">
-        {(["captable", "waterfall"] as const).map((t) => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className="px-4 py-2 rounded-xl text-sm font-medium transition-all"
-            style={{
-              backgroundColor: tab === t ? PURPLE : "#141414",
-              color: tab === t ? "#fff" : "#666660",
-              border: `1px solid ${tab === t ? PURPLE : "#1E1E1E"}`,
-            }}
-          >
-            {t === "captable" ? (isEn ? "Cap Table" : "股权表") : (isEn ? "Exit Waterfall" : "退出瀑布")}
-          </button>
-        ))}
-        <div className="ml-auto flex gap-3 items-center">
-          <label className="flex items-center gap-2 text-xs cursor-pointer" style={{ color: "#A0A09A" }}>
-            <input type="checkbox" checked={esopEnabled} onChange={(e) => setEsopEnabled(e.target.checked)} className="accent-purple-500" />
-            {isEn ? "ESOP Pool" : "ESOP池"}
-          </label>
-          {esopEnabled && (
-            <div className="relative w-20">
-              <input
-                type="number"
-                value={esopPct}
-                onChange={(e) => setEsopPct(e.target.value)}
-                style={{ ...inputSt, paddingRight: "20px", fontSize: "12px" }}
-              />
-              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs" style={{ color: "#555550" }}>%</span>
-            </div>
-          )}
-          <label className="flex items-center gap-2 text-xs cursor-pointer" style={{ color: "#A0A09A" }}>
-            <input type="checkbox" checked={fullyDiluted} onChange={(e) => setFullyDiluted(e.target.checked)} className="accent-purple-500" />
-            {isEn ? "Fully Diluted" : "全稀释"}
-          </label>
-        </div>
-      </div>
+      <div className="space-y-5">
 
-      {tab === "captable" ? (
-        <div className="grid lg:grid-cols-5 gap-6">
-          {/* Left: Add shareholders + rounds */}
-          <div className="lg:col-span-2 space-y-4">
-            {/* Add Shareholder */}
-            <div className="rounded-2xl p-5" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-              <p className="text-xs font-mono mb-4" style={{ color: "#666660" }}>{isEn ? "ADD SHAREHOLDER" : "添加股东"}</p>
-              <div className="space-y-3">
-                <input
-                  type="text"
-                  placeholder={isEn ? "Name" : "姓名"}
-                  value={newSh.name}
-                  onChange={(e) => setNewSh((p) => ({ ...p, name: e.target.value }))}
-                  style={inputSt}
-                  onFocus={(e) => (e.target.style.borderColor = PURPLE)}
-                  onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
-                />
-                <div className="grid grid-cols-2 gap-2">
-                  <select value={newSh.type} onChange={(e) => setNewSh((p) => ({ ...p, type: e.target.value as ShareholderType }))} style={selectSt}>
-                    {SHAREHOLDER_TYPES.map((t) => <option key={t} value={t} style={{ backgroundColor: "#1A1A1A" }}>{t}</option>)}
-                  </select>
-                  <select value={newSh.shareClass} onChange={(e) => setNewSh((p) => ({ ...p, shareClass: e.target.value as ShareClass }))} style={selectSt}>
-                    {SHARE_CLASSES.map((c) => <option key={c} value={c} style={{ backgroundColor: "#1A1A1A" }}>{c}</option>)}
-                  </select>
-                </div>
+        {/* ── Authorized shares ────────────────────────────────────────── */}
+        <Card>
+          <SLabel>股本结构基础</SLabel>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <p className="text-xs mb-1" style={{ color: "#888880" }}>授权总股数</p>
+              <div className="relative">
                 <input
                   type="number"
-                  placeholder={isEn ? "Number of shares" : "股份数量"}
-                  value={newSh.shares}
-                  onChange={(e) => setNewSh((p) => ({ ...p, shares: e.target.value }))}
-                  style={inputSt}
-                  onFocus={(e) => (e.target.style.borderColor = PURPLE)}
+                  value={form.totalAuthorizedShares}
+                  onChange={(e) => setForm((p) => ({ ...p, totalAuthorizedShares: e.target.value }))}
+                  className="w-full py-1.5 px-3 rounded-lg text-xs text-right outline-none font-mono"
+                  style={{ backgroundColor: "#0D0D0D", border: "1px solid #2A2A2A", color: "#F5F5F0", paddingRight: "2.5rem" }}
+                  onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
                   onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
                 />
-                <button onClick={addShareholder} className="w-full py-2 rounded-xl text-xs font-semibold" style={{ backgroundColor: "rgba(139,92,246,0.15)", color: "#A78BFA", border: "1px solid rgba(139,92,246,0.3)" }}>
-                  + {isEn ? "Add Shareholder" : "添加股东"}
-                </button>
+                <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>股</span>
               </div>
             </div>
-
-            {/* Add Round */}
-            <div className="rounded-2xl p-5" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-              <p className="text-xs font-mono mb-4" style={{ color: "#666660" }}>{isEn ? "ADD FUNDING ROUND" : "添加融资轮次"}</p>
-              <div className="space-y-3">
-                <input
-                  type="text"
-                  placeholder={isEn ? "Round name (e.g. Series A)" : "轮次名称（如A轮）"}
-                  value={newRound.name}
-                  onChange={(e) => setNewRound((p) => ({ ...p, name: e.target.value }))}
-                  style={inputSt}
-                  onFocus={(e) => (e.target.style.borderColor = PURPLE)}
-                  onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
-                />
-                <input
-                  type="number"
-                  placeholder={isEn ? "New shares issued" : "新增股份数量"}
-                  value={newRound.newShares}
-                  onChange={(e) => setNewRound((p) => ({ ...p, newShares: e.target.value }))}
-                  style={inputSt}
-                  onFocus={(e) => (e.target.style.borderColor = PURPLE)}
-                  onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
-                />
-                <button onClick={addRound} className="w-full py-2 rounded-xl text-xs font-semibold" style={{ backgroundColor: "rgba(59,130,246,0.12)", color: "#93C5FD", border: "1px solid rgba(59,130,246,0.25)" }}>
-                  + {isEn ? "Add Round" : "添加轮次"}
-                </button>
-              </div>
-              {rounds.length > 0 && (
-                <div className="mt-3 space-y-2">
-                  {rounds.map((r) => (
-                    <div key={r.id} className="flex justify-between items-center py-1.5 text-xs" style={{ borderTop: "1px solid #1E1E1E" }}>
-                      <span style={{ color: "#A0A09A" }}>{r.name}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="font-mono" style={{ color: "#3B82F6" }}>+{r.newShares.toLocaleString()}</span>
-                        <button onClick={() => removeRound(r.id)} className="text-xs" style={{ color: "#444440" }}>×</button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            <div
+              className="flex flex-col justify-center px-3 py-2.5 rounded-xl"
+              style={{ backgroundColor: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)" }}
+            >
+              <p className="text-xs" style={{ color: "#888880" }}>已发行股数</p>
+              <p className="text-base font-bold font-mono" style={{ color: "#C9A84C" }}>
+                {calc.totalIssued.toLocaleString("en-MY")} 股
+              </p>
+              {calc.unissuedPct > 0 && (
+                <p className="text-xs mt-0.5 font-mono" style={{ color: "#555550" }}>
+                  未发行 {calc.unissuedPct.toFixed(1)}%
+                </p>
               )}
             </div>
+          </div>
+        </Card>
 
-            {/* Totals */}
-            <div className="rounded-xl p-4 text-center" style={{ backgroundColor: "rgba(139,92,246,0.07)", border: "1px solid rgba(139,92,246,0.2)" }}>
-              <div className="text-2xl font-bold font-mono" style={{ color: PURPLE }}>{totalShares.toLocaleString()}</div>
-              <div className="text-xs mt-1" style={{ color: "#666660" }}>{isEn ? "Total Shares (fully diluted)" : "总股份（全稀释）"}</div>
-            </div>
+        {/* ── Shareholder table ─────────────────────────────────────────── */}
+        <Card>
+          <div className="flex items-center justify-between mb-3">
+            <SLabel>股东名册</SLabel>
+            <button
+              onClick={addShareholder}
+              className="text-xs px-3 py-1 rounded-lg transition-opacity hover:opacity-70"
+              style={{ backgroundColor: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.2)", color: "#C9A84C" }}
+            >
+              + 添加股东
+            </button>
           </div>
 
-          {/* Right: Cap table + pie */}
-          <div className="lg:col-span-3 space-y-5">
-            {/* Cap Table */}
-            <div className="rounded-2xl p-5" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-              <p className="text-xs font-mono mb-4" style={{ color: "#666660" }}>{isEn ? "CAP TABLE" : "股权表"}</p>
-              <div className="overflow-x-auto">
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr style={{ borderBottom: "1px solid #2A2A2A" }}>
-                      {[isEn ? "Shareholder" : "股东", isEn ? "Type" : "类型", isEn ? "Class" : "类别", isEn ? "Shares" : "股份", "%"].map((h) => (
-                        <th key={h} className="text-left pb-2 pr-3 font-mono" style={{ color: "#555550" }}>{h}</th>
-                      ))}
-                      <th />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {shareholders.filter((s) => fullyDiluted || s.shareClass !== "Options").map((s, i) => (
-                      <tr key={s.id} style={{ borderBottom: "1px solid #1E1E1E" }}>
-                        <td className="py-2 pr-3" style={{ color: "#F5F5F0" }}>{s.name}</td>
-                        <td className="py-2 pr-3" style={{ color: "#A0A09A" }}>{s.type}</td>
-                        <td className="py-2 pr-3" style={{ color: "#A0A09A" }}>{s.shareClass}</td>
-                        <td className="py-2 pr-3 font-mono" style={{ color: "#F5F5F0" }}>{s.shares.toLocaleString()}</td>
-                        <td className="py-2 pr-3 font-mono" style={{ color: PIE_COLORS[i % PIE_COLORS.length] }}>
-                          {pct(s.shares, totalShares)}%
-                        </td>
-                        <td className="py-2">
-                          <button onClick={() => removeShareholder(s.id)} className="text-xs" style={{ color: "#444440" }}>×</button>
-                        </td>
-                      </tr>
-                    ))}
-                    {rounds.map((r, i) => (
-                      <tr key={r.id} style={{ borderBottom: "1px solid #1E1E1E" }}>
-                        <td className="py-2 pr-3" style={{ color: "#F5F5F0" }}>{r.name}</td>
-                        <td className="py-2 pr-3" style={{ color: "#3B82F6" }}>Round</td>
-                        <td className="py-2 pr-3" style={{ color: "#A0A09A" }}>Ordinary</td>
-                        <td className="py-2 pr-3 font-mono" style={{ color: "#F5F5F0" }}>{r.newShares.toLocaleString()}</td>
-                        <td className="py-2 pr-3 font-mono" style={{ color: PIE_COLORS[(shareholders.length + i) % PIE_COLORS.length] }}>
-                          {pct(r.newShares, totalShares)}%
-                        </td>
-                        <td className="py-2">
-                          <button onClick={() => removeRound(r.id)} className="text-xs" style={{ color: "#444440" }}>×</button>
-                        </td>
-                      </tr>
-                    ))}
-                    {esopEnabled && esopShares > 0 && (
-                      <tr style={{ borderBottom: "1px solid #1E1E1E" }}>
-                        <td className="py-2 pr-3" style={{ color: "#F5F5F0" }}>{isEn ? "ESOP Pool" : "ESOP池"}</td>
-                        <td className="py-2 pr-3" style={{ color: "#10B981" }}>ESOP</td>
-                        <td className="py-2 pr-3" style={{ color: "#A0A09A" }}>Options</td>
-                        <td className="py-2 pr-3 font-mono" style={{ color: "#F5F5F0" }}>{esopShares.toLocaleString()}</td>
-                        <td className="py-2 pr-3 font-mono" style={{ color: "#10B981" }}>{pct(esopShares, totalShares)}%</td>
-                        <td />
-                      </tr>
-                    )}
-                    <tr style={{ borderTop: "1px solid #2A2A2A" }}>
-                      <td colSpan={3} className="pt-2 text-xs font-semibold" style={{ color: "#666660" }}>{isEn ? "Total" : "合计"}</td>
-                      <td className="pt-2 font-mono font-semibold" style={{ color: GOLD }}>{totalShares.toLocaleString()}</td>
-                      <td className="pt-2 font-mono font-semibold" style={{ color: GOLD }}>100%</td>
-                      <td />
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
+          <div
+            className="grid items-center gap-2 mb-1 px-1"
+            style={{ gridTemplateColumns: "2fr 1.2fr 1fr 1fr 36px" }}
+          >
+            {["股东姓名", "持股数量", "类型", "占比", ""].map((h, i) => (
+              <p key={i} className="text-xs font-mono" style={{ color: "#555550" }}>{h}</p>
+            ))}
+          </div>
 
-            {/* Pie Chart */}
-            {pieData.length > 0 && (
-              <div className="rounded-2xl p-5" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-                <p className="text-xs font-mono mb-4" style={{ color: "#666660" }}>{isEn ? "EQUITY DISTRIBUTION" : "股权分配"}</p>
-                <ResponsiveContainer width="100%" height={220}>
+          <div className="space-y-1">
+            {form.shareholders.map((sh) => {
+              const shCalc = calc.shareholders.find((s) => s.id === sh.id);
+              return (
+                <div
+                  key={sh.id}
+                  className="grid items-center gap-2 px-1 py-1.5 rounded-lg"
+                  style={{ gridTemplateColumns: "2fr 1.2fr 1fr 1fr 36px", backgroundColor: "#0D0D0D" }}
+                >
+                  <input
+                    type="text"
+                    value={sh.name}
+                    onChange={(e) => updateShareholder(sh.id, "name", e.target.value)}
+                    placeholder="姓名"
+                    className="px-2 py-1 rounded text-xs outline-none"
+                    style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", color: "#F5F5F0" }}
+                    onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
+                    onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                  />
+                  <input
+                    type="number"
+                    value={sh.shares}
+                    onChange={(e) => updateShareholder(sh.id, "shares", e.target.value)}
+                    placeholder="0"
+                    className="px-2 py-1 rounded text-xs text-right font-mono outline-none"
+                    style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", color: "#F5F5F0" }}
+                    onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
+                    onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                  />
+                  <select
+                    value={sh.type}
+                    onChange={(e) => updateShareholder(sh.id, "type", e.target.value)}
+                    className="px-2 py-1 rounded text-xs outline-none cursor-pointer"
+                    style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", color: TYPE_COLORS[sh.type] ?? "#A0A09A" }}
+                  >
+                    {SHAREHOLDER_TYPES.map(({ value, label }) => (
+                      <option key={value} value={value} style={{ color: TYPE_COLORS[value] }}>{label}</option>
+                    ))}
+                  </select>
+                  <span className="text-xs text-right font-mono px-1" style={{ color: "#C9A84C" }}>
+                    {shCalc ? pct(shCalc.pct) : "—"}
+                  </span>
+                  <button
+                    onClick={() => removeShareholder(sh.id)}
+                    className="flex items-center justify-center w-7 h-7 rounded-lg transition-opacity hover:opacity-70"
+                    style={{ backgroundColor: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", color: "#EF4444", fontSize: 14 }}
+                  >
+                    x
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+
+        {/* ── Summary KPIs ─────────────────────────────────────────────── */}
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+          {[
+            { label: "创始团队持股", value: pct(calc.byType.founder ?? 0), color: "#C9A84C", key: "founder" },
+            { label: "投资人持股", value: pct(calc.byType.investor ?? 0), color: "#4CAF50", key: "investor" },
+            { label: "ESOP 池", value: pct(calc.byType.esop ?? 0), color: "#6B9FD4", key: "esop" },
+            { label: "其他", value: pct(calc.byType.other ?? 0), color: "#A0A09A", key: "other" },
+          ].map(({ label, value, color, key }) => {
+            const isFounder = key === "founder";
+            const controlled = isFounder && (calc.byType.founder ?? 0) >= 50;
+            return (
+              <div
+                key={label}
+                className="flex flex-col items-center px-4 py-4 rounded-2xl"
+                style={{
+                  backgroundColor: "#141414",
+                  border: `1px solid ${isFounder ? (controlled ? "rgba(34,197,94,0.2)" : "rgba(239,68,68,0.15)") : "#1E1E1E"}`,
+                }}
+              >
+                <span className="text-xs mb-1.5" style={{ color: "#555550" }}>{label}</span>
+                <span className="text-xl font-bold font-mono" style={{ color }}>{value}</span>
+                {isFounder && (
+                  <span className="text-xs mt-1" style={{ color: controlled ? "#22C55E" : "#EF4444" }}>
+                    {controlled ? "多数控制权" : "已失去多数控制权"}
+                  </span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── Charts row ────────────────────────────────────────────────── */}
+        <div className="grid lg:grid-cols-2 gap-5">
+
+          {/* Pie chart */}
+          {calc.pieData.length > 0 && (
+            <Card>
+              <SLabel>当前股权分布饼图</SLabel>
+              <div className="flex items-center gap-4">
+                <ResponsiveContainer width="58%" height={200}>
                   <PieChart>
-                    <Pie data={pieData} cx="50%" cy="50%" outerRadius={80} dataKey="value" label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(1)}%`} labelLine={false}>
-                      {pieData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />)}
+                    <Pie
+                      data={calc.pieData}
+                      cx="50%"
+                      cy="50%"
+                      innerRadius={50}
+                      outerRadius={88}
+                      paddingAngle={2}
+                      dataKey="value"
+                      labelLine={false}
+                      label={PieLabel as unknown as boolean}
+                    >
+                      {calc.pieData.map((entry, i) => (
+                        <Cell key={i} fill={entry.fill} />
+                      ))}
                     </Pie>
                     <Tooltip
-                      contentStyle={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: "10px", fontSize: "12px" }}
-                      formatter={(v) => [typeof v === "number" ? v.toLocaleString() + " shares" : "—", undefined]}
+                      contentStyle={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: 8 }}
+                      formatter={(v: number) => [v.toFixed(2) + "%", "持股比例"]}
                     />
-                    <Legend wrapperStyle={{ fontSize: "11px", color: "#888880" }} />
                   </PieChart>
                 </ResponsiveContainer>
-              </div>
-            )}
-          </div>
-        </div>
-      ) : (
-        /* Waterfall tab */
-        <div className="max-w-2xl space-y-5">
-          <div className="rounded-2xl p-5" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-            <p className="text-xs font-mono mb-4" style={{ color: "#666660" }}>{isEn ? "EXIT VALUE" : "退出价值"}</p>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-mono" style={{ color: "#555550" }}>RM</span>
-              <input
-                type="number"
-                value={exitValue}
-                onChange={(e) => setExitValue(e.target.value)}
-                style={{ ...inputSt, paddingLeft: "44px" }}
-                onFocus={(e) => (e.target.style.borderColor = PURPLE)}
-                onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
-              />
-            </div>
-          </div>
-
-          <div className="rounded-2xl p-5" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-            <p className="text-xs font-mono mb-4" style={{ color: "#666660" }}>{isEn ? "DISTRIBUTION (PRO-RATA)" : "分配（按比例）"}</p>
-            <table className="w-full text-sm">
-              <thead>
-                <tr style={{ borderBottom: "1px solid #2A2A2A" }}>
-                  {[isEn ? "Shareholder" : "股东", "%", isEn ? "Payout (RM)" : "应得金额"].map((h) => (
-                    <th key={h} className="text-left pb-2 pr-4 text-xs font-mono" style={{ color: "#555550" }}>{h}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {[
-                  ...shareholders.filter((s) => fullyDiluted || s.shareClass !== "Options").map((s, i) => ({
-                    name: s.name,
-                    shares: s.shares,
-                    color: PIE_COLORS[i % PIE_COLORS.length],
-                  })),
-                  ...rounds.map((r, i) => ({ name: r.name, shares: r.newShares, color: PIE_COLORS[(shareholders.length + i) % PIE_COLORS.length] })),
-                  ...(esopEnabled && esopShares > 0 ? [{ name: isEn ? "ESOP Pool" : "ESOP池", shares: esopShares, color: "#10B981" }] : []),
-                ].map((row) => {
-                  const share = totalShares > 0 ? row.shares / totalShares : 0;
-                  const payout = exitVal * share;
-                  return (
-                    <tr key={row.name} style={{ borderBottom: "1px solid #1E1E1E" }}>
-                      <td className="py-2 pr-4" style={{ color: "#F5F5F0" }}>{row.name}</td>
-                      <td className="py-2 pr-4 font-mono" style={{ color: row.color }}>{(share * 100).toFixed(2)}%</td>
-                      <td className="py-2 font-mono" style={{ color: GOLD }}>{fmtRM(payout)}</td>
-                    </tr>
-                  );
-                })}
-                <tr style={{ borderTop: "1px solid #2A2A2A" }}>
-                  <td className="pt-2 font-semibold text-xs" style={{ color: "#666660" }}>{isEn ? "Total" : "合计"}</td>
-                  <td className="pt-2 font-mono font-semibold" style={{ color: GOLD }}>100%</td>
-                  <td className="pt-2 font-mono font-semibold" style={{ color: GOLD }}>{fmtRM(exitVal)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
-    </ToolShell>
-  );
-}
+                <div className="flex-1 space-y-1.5">
+                  {calc.pieData.slice(0, 6).map((d) => (
+                    <div key={d.name} className="flex items-center justify-between">
+                      

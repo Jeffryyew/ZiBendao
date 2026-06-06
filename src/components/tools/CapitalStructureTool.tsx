@@ -1,274 +1,314 @@
-﻿"use client";
+"use client";
 
-import { useState, useMemo } from "react";
-import ToolShell from "@/components/tools/ToolShell";
-import type { Locale } from "@/lib/i18n";
+import { useState, useMemo, useEffect } from "react";
 import {
+  PieChart,
+  Pie,
+  Cell,
   BarChart,
   Bar,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
-  Cell,
+  CartesianGrid,
 } from "recharts";
+import ToolShell from "@/components/tools/ToolShell";
+import ToolGuide from "@/components/tools/ToolGuide";
+import { useToolSnapshot } from "@/lib/useToolSnapshot";
+import type { FinancialCore } from "@/lib/financialCore";
+import { ENTERPRISE_KEYS } from "@/lib/enterprise";
 
-const PURPLE = "#8B5CF6";
-const GOLD = "#C9A84C";
-const BLUE = "#3B82F6";
+// ── Types ──────────────────────────────────────────────────────────────────
 
-const inputSt: React.CSSProperties = {
-  backgroundColor: "#0D0D0D",
-  border: "1px solid #2A2A2A",
-  color: "#F5F5F0",
-  borderRadius: "10px",
-  fontSize: "13px",
-  fontFamily: "var(--font-mono)",
-  outline: "none",
-  width: "100%",
-  padding: "10px 12px",
+interface DebtItem {
+  id: string;
+  name: string;
+  principal: string;
+  interestRate: string;
+  annualPayment: string;
+  type: "bank_loan" | "bond" | "shareholder_loan" | "other";
+}
+
+interface T11Form {
+  // Equity
+  paidUpCapital: string;
+  retainedEarnings: string;
+  // Debt items
+  debts: DebtItem[];
+  // WACC inputs
+  costOfEquity: string;
+  riskFreeRate: string;
+  equityRiskPremium: string;
+  beta: string;
+  // Override tax rate (if not imported)
+  taxRateOverride: string;
+}
+
+const DEBT_TYPES = [
+  { value: "bank_loan", label: "银行贷款" },
+  { value: "bond", label: "债券" },
+  { value: "shareholder_loan", label: "股东贷款" },
+  { value: "other", label: "其他" },
+] as const;
+
+function uid() {
+  return Math.random().toString(36).slice(2, 8);
+}
+
+const DEFAULT_FORM: T11Form = {
+  paidUpCapital: "1000000",
+  retainedEarnings: "500000",
+  debts: [
+    { id: uid(), name: "银行定期贷款", principal: "800000", interestRate: "5.5", annualPayment: "120000", type: "bank_loan" },
+  ],
+  costOfEquity: "",
+  riskFreeRate: "3.5",
+  equityRiskPremium: "6.0",
+  beta: "1.0",
+  taxRateOverride: "",
 };
 
-function computeWacc(equityPct: number, costEq: number, costDebt: number, taxRate: number) {
-  const debtPct = 100 - equityPct;
-  return (equityPct / 100) * (costEq / 100) + (debtPct / 100) * (costDebt / 100) * (1 - taxRate / 100);
+// ── Guide steps ────────────────────────────────────────────────────────────
+
+const GUIDE_STEPS = [
+  {
+    title: "资本结构决定企业融资成本",
+    body: "债务 vs 股权的比例，直接影响 WACC（加权平均资本成本）。WACC 越低，企业估值越高。合理的资本结构是资本化的核心。",
+  },
+  {
+    title: "第一步：录入股权部分",
+    body: "填入实收资本和留存收益。系统将自动从资产负债表（T02）导入数据，你也可以手动调整。",
+  },
+  {
+    title: "第二步：录入所有债务",
+    body: "逐笔录入贷款：名称、本金、利率、年还款额。系统将计算加权平均债务成本（Kd）和债务覆盖率（DSCR）。",
+  },
+  {
+    title: "第三步：WACC 计算",
+    body: "系统用 CAPM 模型（风险无利率 + Beta × 股权风险溢价）计算股权成本（Ke），再加权计算 WACC。税盾效应已纳入计算。",
+  },
+  {
+    title: "第四步：DSCR 债务覆盖率",
+    body: "DSCR = EBIT ÷ 年还债总额。DSCR > 1.25 为健康，< 1.0 意味着无法覆盖债务，银行会视为高风险。",
+  },
+];
+
+// ── Helpers ────────────────────────────────────────────────────────────────
+
+function fmt(n: number, sym: string): string {
+  if (!isFinite(n) || isNaN(n) || n === 0) return "—";
+  const abs = Math.abs(n);
+  if (abs >= 1_000_000) return sym + " " + (abs / 1_000_000).toFixed(2) + "M";
+  if (abs >= 1_000) return sym + " " + (abs / 1_000).toFixed(0) + "K";
+  return sym + " " + abs.toLocaleString("en-MY", { maximumFractionDigits: 0 });
 }
 
-function fmtRM(n: number) {
-  if (n >= 1e6) return `RM ${(n / 1e6).toFixed(2)}M`;
-  return `RM ${n.toLocaleString("en-MY", { maximumFractionDigits: 0 })}`;
+const RADIAN = Math.PI / 180;
+function PieLabel({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }: {
+  cx: number; cy: number; midAngle: number; innerRadius: number; outerRadius: number; percent: number; name: string;
+}) {
+  if (percent < 0.08) return null;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.6;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+  return (
+    <text x={x} y={y} fill="#F5F5F0" textAnchor="middle" dominantBaseline="central" style={{ fontSize: 11 }}>
+      {(percent * 100).toFixed(0)}%
+    </text>
+  );
 }
 
-export default function CapitalStructureTool({ locale }: { locale: Locale }) {
-  const isEn = locale === "en";
+// ── Sub-components ─────────────────────────────────────────────────────────
 
-  const [totalCapital, setTotalCapital] = useState("10000000");
-  const [equityPct, setEquityPct] = useState(50);
-  const [costOfEquity, setCostOfEquity] = useState("15");
-  const [costOfDebt, setCostOfDebt] = useState("6");
-  const [taxRate, setTaxRate] = useState("24");
+function Card({ children, accent = false }: { children: React.ReactNode; accent?: boolean }) {
+  return (
+    <div
+      className="rounded-2xl p-5"
+      style={{ backgroundColor: "#141414", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#1E1E1E"}` }}
+    >
+      {children}
+    </div>
+  );
+}
 
-  const debtPct = 100 - equityPct;
-  const total = parseFloat(totalCapital) || 0;
-  const ceq = parseFloat(costOfEquity) || 0;
-  const cdebt = parseFloat(costOfDebt) || 0;
-  const tax = parseFloat(taxRate) || 0;
+function SLabel({ children }: { children: React.ReactNode }) {
+  return <p className="text-xs font-mono mb-3" style={{ color: "#555550" }}>{children}</p>;
+}
 
-  const equityAmt = total * (equityPct / 100);
-  const debtAmt = total * (debtPct / 100);
-  const wacc = computeWacc(equityPct, ceq, cdebt, tax);
-  const annualInterest = debtAmt * (cdebt / 100);
-  const taxShield = debtAmt * (cdebt / 100) * (tax / 100);
-  const netCostOfCapital = total * wacc;
+function NumInput({
+  label, value, onChange, prefix, suffix,
+}: {
+  label: string; value: string; onChange: (v: string) => void; prefix?: string; suffix?: string;
+}) {
+  return (
+    <div className="py-1" style={{ borderBottom: "1px solid #1A1A1A" }}>
+      <p className="text-xs mb-1" style={{ color: "#888880" }}>{label}</p>
+      <div className="relative">
+        {prefix && <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>{prefix}</span>}
+        <input
+          type="number"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full py-1.5 rounded-lg text-xs text-right outline-none font-mono"
+          style={{ backgroundColor: "#0D0D0D", border: "1px solid #2A2A2A", color: "#F5F5F0", paddingLeft: prefix ? "2rem" : "0.5rem", paddingRight: suffix ? "2rem" : "0.5rem" }}
+          onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
+          onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+        />
+        {suffix && <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>{suffix}</span>}
+      </div>
+    </div>
+  );
+}
 
-  const SCENARIOS = useMemo(() => [
-    { label: isEn ? "Conservative" : "保守型", labelSub: "70E / 30D", eq: 70, color: GOLD },
-    { label: isEn ? "Balanced" : "均衡型", labelSub: "50E / 50D", eq: 50, color: PURPLE },
-    { label: isEn ? "Aggressive" : "激进型", labelSub: "30E / 70D", eq: 30, color: BLUE },
-  ], [isEn]);
+// ── Main component ─────────────────────────────────────────────────────────
 
-  const scenarioData = SCENARIOS.map((s) => ({
-    name: s.label,
-    WACC: parseFloat((computeWacc(s.eq, ceq, cdebt, tax) * 100).toFixed(2)),
-    fill: s.color,
-  }));
+export default function CapitalStructureTool({ locale }: { locale: "zh" | "en" }) {
+  const { savedData, saving, lastSaved, save } = useToolSnapshot<T11Form>("capital-structure");
+  const [form, setForm] = useState<T11Form>(DEFAULT_FORM);
+  const [loaded, setLoaded] = useState(false);
+  const [coreData, setCoreData] = useState<FinancialCore | null>(null);
+
+  // ── Load saved ──────────────────────────────────────────────────────────
+  useEffect(() => {
+    if (savedData && !loaded) {
+      setForm({ ...DEFAULT_FORM, ...savedData });
+      setLoaded(true);
+    }
+  }, [savedData, loaded]);
+
+  // ── Load FinancialCore ──────────────────────────────────────────────────
+  useEffect(() => {
+    try {
+      const mode = localStorage.getItem(ENTERPRISE_KEYS.MODE);
+      let companyId = "no_company";
+      if (mode === "single") {
+        const sc = localStorage.getItem(ENTERPRISE_KEYS.SINGLE);
+        if (sc) companyId = `single_${JSON.parse(sc).id ?? "default"}`;
+      } else if (mode === "group") {
+        const ac = localStorage.getItem(ENTERPRISE_KEYS.ACTIVE_COMPANY);
+        if (ac) companyId = `group_${JSON.parse(ac).id ?? "default"}`;
+      }
+      if (companyId !== "no_company") {
+        fetch(`/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(companyId)}`)
+          .then((r) => r.json())
+          .then((snap) => {
+            if (snap?.data) {
+              const d: FinancialCore = snap.data;
+              setCoreData(d);
+              // Pre-fill equity from T02 balance sheet data
+              setForm((p) => ({
+                ...p,
+                paidUpCapital: d.totalEquity ? String(Math.round(d.totalEquity * 0.6)) : p.paidUpCapital,
+                retainedEarnings: d.totalEquity ? String(Math.round(d.totalEquity * 0.4)) : p.retainedEarnings,
+                taxRateOverride: d.taxRate ? String(d.taxRate) : p.taxRateOverride,
+                debts: d.totalLoans && p.debts.length === 1
+                  ? [{ ...p.debts[0], principal: String(Math.round(d.totalLoans)) }]
+                  : p.debts,
+              }));
+            }
+          })
+          .catch(() => {});
+      }
+    } catch {}
+  }, []);
+
+  const sym = coreData?.currencySymbol ?? "RM";
+  const pf = (v: string | number) => parseFloat(String(v)) || 0;
+
+  // ── Calculations ──────────────────────────────────────────────────────
+
+  const calc = useMemo(() => {
+    const equity = pf(form.paidUpCapital) + pf(form.retainedEarnings);
+    const totalDebt = form.debts.reduce((s, d) => s + pf(d.principal), 0);
+    const totalCapital = equity + totalDebt;
+    const equityWeight = totalCapital > 0 ? equity / totalCapital : 0.5;
+    const debtWeight = totalCapital > 0 ? totalDebt / totalCapital : 0.5;
+    const deRatio = equity > 0 ? totalDebt / equity : 0;
+
+    // Tax rate: from T01 (coreData), override field, or default 24%
+    const taxRate = pf(form.taxRateOverride) || coreData?.taxRate || 24;
+
+    // Cost of debt (weighted average)
+    const weightedDebtCost = totalDebt > 0
+      ? form.debts.reduce((s, d) => s + pf(d.principal) * pf(d.interestRate), 0) / totalDebt
+      : 0;
+    const kdAfterTax = weightedDebtCost * (1 - taxRate / 100);
+
+    // Cost of equity: CAPM or manual
+    const rf = pf(form.riskFreeRate);
+    const erp = pf(form.equityRiskPremium);
+    const beta = pf(form.beta);
+    const keCAP = rf + beta * erp;
+    const ke = pf(form.costOfEquity) || keCAP;
+
+    // WACC
+    const wacc = equityWeight * ke + debtWeight * kdAfterTax;
+
+    // DSCR
+    const ebit = coreData?.ebit ?? 0;
+    const totalAnnualPayment = form.debts.reduce((s, d) => s + pf(d.annualPayment), 0);
+    const dscr = totalAnnualPayment > 0 ? ebit / totalAnnualPayment : null;
+
+    // Pie chart data
+    const pieData = [
+      { name: "股权", value: equity, fill: "#C9A84C" },
+      { name: "债务", value: totalDebt, fill: "#4CAF50" },
+    ].filter((d) => d.value > 0);
+
+    // WACC breakdown bar
+    const waccBreakdown = [
+      { name: "股权成本 Ke", value: parseFloat(ke.toFixed(2)) },
+      { name: "债务成本 Kd", value: parseFloat(kdAfterTax.toFixed(2)) },
+      { name: "WACC", value: parseFloat(wacc.toFixed(2)) },
+    ];
+
+    return {
+      equity, totalDebt, totalCapital, equityWeight, debtWeight, deRatio,
+      taxRate, weightedDebtCost, kdAfterTax, ke, keCAP, wacc,
+      ebit, totalAnnualPayment, dscr,
+      pieData, waccBreakdown,
+    };
+  }, [form, coreData]);
+
+  // ── Debt CRUD ─────────────────────────────────────────────────────────
+
+  function addDebt() {
+    setForm((p) => ({
+      ...p,
+      debts: [...p.debts, { id: uid(), name: "", principal: "", interestRate: "", annualPayment: "", type: "bank_loan" }],
+    }));
+  }
+
+  function updateDebt(id: string, field: keyof DebtItem, value: string) {
+    setForm((p) => ({
+      ...p,
+      debts: p.debts.map((d) => d.id === id ? { ...d, [field]: value } : d),
+    }));
+  }
+
+  function removeDebt(id: string) {
+    setForm((p) => ({ ...p, debts: p.debts.filter((d) => d.id !== id) }));
+  }
+
+  // ── Save handler ──────────────────────────────────────────────────────
+
+  async function handleSave() {
+    await save(form);
+  }
+
+  const guide = <ToolGuide toolSlug="capital-structure" steps={GUIDE_STEPS} />;
+
+  // ── Render ────────────────────────────────────────────────────────────
 
   return (
     <ToolShell
       icon=""
-      title={isEn ? "Capital Structure Optimizer" : "资本架构优化器"}
-      desc={isEn ? "Optimize your debt-equity mix and calculate WACC and tax shield benefits." : "优化债务与股权组合，计算WACC与税盾效益。"}
-      levelRequired={3}
+      title={locale === "en" ? "Capital Structure" : "资本结构"}
+      desc={locale === "en" ? "Debt vs equity mix, WACC calculation, and DSCR analysis" : "债务与股权比例、WACC 加权资本成本与偿债覆盖率分析"}
       backHref="/student/dashboard"
+      guideButton={guide}
     >
-      <div className="grid lg:grid-cols-5 gap-6">
-        {/* Inputs */}
-        <div className="lg:col-span-2 space-y-4">
-          <div className="rounded-2xl p-6" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-            <p className="text-xs font-mono mb-5" style={{ color: "#666660" }}>CAPITAL MIX / 资本组合</p>
+      <div className="space-y-5">
 
-            <div className="space-y-4">
-              {/* Total capital */}
-              <div>
-                <label className="block text-xs mb-1.5" style={{ color: "#A0A09A" }}>
-                  {isEn ? "Total Capital Needed (RM)" : "所需总资本 (RM)"}
-                </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs font-mono" style={{ color: "#555550" }}>RM</span>
-                  <input
-                    type="number"
-                    value={totalCapital}
-                    onChange={(e) => setTotalCapital(e.target.value)}
-                    style={{ ...inputSt, paddingLeft: "44px" }}
-                    onFocus={(e) => (e.target.style.borderColor = PURPLE)}
-                    onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
-                  />
-                </div>
-              </div>
-
-              {/* Equity % slider */}
-              <div>
-                <div className="flex justify-between mb-2">
-                  <label className="text-xs" style={{ color: "#A0A09A" }}>{isEn ? "Equity Portion" : "股权比例"}</label>
-                  <div className="flex gap-2 text-xs font-mono">
-                    <span style={{ color: GOLD }}>{isEn ? "Equity" : "股权"} {equityPct}%</span>
-                    <span style={{ color: "#3A3A3A" }}>|</span>
-                    <span style={{ color: BLUE }}>{isEn ? "Debt" : "债务"} {debtPct}%</span>
-                  </div>
-                </div>
-                <input
-                  type="range"
-                  min={0}
-                  max={100}
-                  value={equityPct}
-                  onChange={(e) => setEquityPct(parseInt(e.target.value))}
-                  className="w-full accent-purple-500"
-                />
-              </div>
-
-              {/* Cost inputs */}
-              {[
-                { label: isEn ? "Cost of Equity (%)" : "股权成本 (%)", val: costOfEquity, set: setCostOfEquity },
-                { label: isEn ? "Cost of Debt (%)" : "债务成本 (%)", val: costOfDebt, set: setCostOfDebt },
-                { label: isEn ? "Tax Rate (%)" : "企业税率 (%)", val: taxRate, set: setTaxRate },
-              ].map(({ label, val, set }) => (
-                <div key={label}>
-                  <label className="block text-xs mb-1.5" style={{ color: "#A0A09A" }}>{label}</label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      value={val}
-                      onChange={(e) => set(e.target.value)}
-                      style={{ ...inputSt, paddingRight: "32px" }}
-                      onFocus={(e) => (e.target.style.borderColor = PURPLE)}
-                      onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
-                    />
-                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-mono" style={{ color: "#555550" }}>%</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Capital Stack diagram */}
-          <div className="rounded-2xl p-5" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-            <p className="text-xs font-mono mb-4" style={{ color: "#666660" }}>{isEn ? "CAPITAL STACK" : "资本层级"}</p>
-            <div className="flex gap-3 items-end h-40">
-              <div className="flex-1 flex flex-col rounded-xl overflow-hidden" style={{ height: "100%" }}>
-                <div
-                  className="flex items-center justify-center text-xs font-semibold transition-all duration-300"
-                  style={{ height: `${equityPct}%`, backgroundColor: `${GOLD}25`, border: `1px solid ${GOLD}50`, color: GOLD, minHeight: "24px" }}
-                >
-                  {equityPct}% {isEn ? "Equity" : "股权"}
-                </div>
-                <div
-                  className="flex items-center justify-center text-xs font-semibold transition-all duration-300"
-                  style={{ height: `${debtPct}%`, backgroundColor: `${BLUE}25`, border: `1px solid ${BLUE}50`, color: BLUE, minHeight: "24px" }}
-                >
-                  {debtPct}% {isEn ? "Debt" : "债务"}
-                </div>
-              </div>
-              <div className="text-xs space-y-2 flex-shrink-0" style={{ color: "#666660" }}>
-                <div>
-                  <div className="font-mono" style={{ color: GOLD }}>{fmtRM(equityAmt)}</div>
-                  <div>{isEn ? "Equity" : "股权"}</div>
-                </div>
-                <div>
-                  <div className="font-mono" style={{ color: BLUE }}>{fmtRM(debtAmt)}</div>
-                  <div>{isEn ? "Debt" : "债务"}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Outputs */}
-        <div className="lg:col-span-3 space-y-5">
-          {/* Key metrics */}
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { label: "WACC", value: `${(wacc * 100).toFixed(2)}%`, accent: true },
-              { label: isEn ? "Net Cost of Capital" : "净资本成本", value: fmtRM(netCostOfCapital), accent: false },
-              { label: isEn ? "Annual Interest" : "年度利息支出", value: fmtRM(annualInterest), accent: false },
-              { label: isEn ? "Tax Shield" : "税盾效益", value: fmtRM(taxShield), accent: false, green: true },
-            ].map((m) => (
-              <div
-                key={m.label}
-                className="rounded-xl p-4"
-                style={{
-                  backgroundColor: m.accent ? "rgba(139,92,246,0.07)" : "#141414",
-                  border: `1px solid ${m.accent ? "rgba(139,92,246,0.25)" : "#1E1E1E"}`,
-                }}
-              >
-                <div className="text-xs mb-1" style={{ color: "#666660" }}>{m.label}</div>
-                <div className="text-xl font-bold font-mono" style={{ color: m.accent ? PURPLE : m.green ? "#10B981" : GOLD }}>
-                  {m.value}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* WACC formula */}
-          <div className="rounded-xl p-4" style={{ backgroundColor: "#0D0D0D", border: "1px solid #1E1E1E" }}>
-            <p className="text-xs mb-2" style={{ color: "#555550" }}>WACC = (E% × Ke) + (D% × Kd × (1 − t))</p>
-            <p className="text-xs font-mono" style={{ color: "#444440" }}>
-              = ({equityPct}% × {ceq}%) + ({debtPct}% × {cdebt}% × (1 − {tax}%)) = {(wacc * 100).toFixed(2)}%
-            </p>
-          </div>
-
-          {/* Scenario comparison */}
-          <div className="rounded-2xl p-5" style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}>
-            <p className="text-xs font-mono mb-4" style={{ color: "#666660" }}>{isEn ? "SCENARIO COMPARISON" : "情景对比"}</p>
-            <div className="grid grid-cols-3 gap-3 mb-5">
-              {SCENARIOS.map((s) => {
-                const w = computeWacc(s.eq, ceq, cdebt, tax);
-                return (
-                  <div
-                    key={s.label}
-                    className="rounded-xl p-3 text-center cursor-pointer transition-all"
-                    style={{
-                      backgroundColor: s.eq === equityPct ? `${s.color}15` : "#0D0D0D",
-                      border: `1px solid ${s.eq === equityPct ? s.color + "50" : "#1E1E1E"}`,
-                    }}
-                    onClick={() => setEquityPct(s.eq)}
-                  >
-                    <div className="text-xs font-semibold mb-0.5" style={{ color: s.color }}>{s.label}</div>
-                    <div className="text-xs mb-1" style={{ color: "#555550" }}>{s.labelSub}</div>
-                    <div className="text-base font-bold font-mono" style={{ color: s.color }}>{(w * 100).toFixed(2)}%</div>
-                    <div className="text-xs" style={{ color: "#444440" }}>WACC</div>
-                  </div>
-                );
-              })}
-            </div>
-            <ResponsiveContainer width="100%" height={160}>
-              <BarChart data={scenarioData} margin={{ top: 5, right: 5, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1E1E1E" vertical={false} />
-                <XAxis dataKey="name" tick={{ fontSize: 11, fill: "#666660" }} axisLine={false} tickLine={false} />
-                <YAxis tickFormatter={(v) => `${v}%`} tick={{ fontSize: 10, fill: "#555550" }} axisLine={false} tickLine={false} width={36} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: "10px", fontSize: "12px" }}
-                  formatter={(v) => [typeof v === "number" ? `${v}%` : "—", "WACC"]}
-                />
-                <Bar dataKey="WACC" radius={[4, 4, 0, 0]}>
-                  {scenarioData.map((d, i) => <Cell key={i} fill={d.fill} />)}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Insight */}
-          <div className="rounded-xl p-4 flex gap-3" style={{ backgroundColor: "rgba(139,92,246,0.06)", border: "1px solid rgba(139,92,246,0.2)" }}>
-            <span className="text-lg"></span>
-            <p className="text-sm" style={{ color: "#A0A09A" }}>
-              {isEn
-                ? `With ${equityPct}%/${debtPct}% E/D mix, your WACC is ${(wacc * 100).toFixed(2)}%. Debt creates a tax shield of ${fmtRM(taxShield)}/year. Lower WACC = cheaper capital.`
-                : `当前${equityPct}%/${debtPct}%股债比，WACC为${(wacc * 100).toFixed(2)}%。债务带来年度税盾${fmtRM(taxShield)}。WACC越低，资本成本越低。`}
-            </p>
-          </div>
-        </div>
-      </div>
-    </ToolShell>
-  );
-}
+        {/* ── Equity inputs ──────────────────────────────────────────────
