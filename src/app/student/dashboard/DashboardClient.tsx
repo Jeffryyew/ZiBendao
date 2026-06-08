@@ -700,8 +700,6 @@ function SingleCompanyView({
 
       <EnterpriseCoreSummary companyId={`single_${company.id}`} />
 
-      <DebugPanelWrapper companyId={`single_${company.id}`} />
-
       <AIAnalysisCard
         title="小资分析"
         lines={[
@@ -1359,9 +1357,7 @@ function StatusBadge({ status, small }: { status: "active" | "inactive"; small?:
 
 function fmtMoney(n: number | undefined, sym = "RM"): string {
   if (n == null || isNaN(n)) return "—";
-  if (Math.abs(n) >= 1_000_000) return sym + " " + (n / 1_000_000).toFixed(2) + "M";
-  if (Math.abs(n) >= 1_000) return sym + " " + (n / 1_000).toFixed(0) + "K";
-  return sym + " " + n.toFixed(0);
+  return sym + " " + Math.round(n).toLocaleString("en-US");
 }
 
 function fmtPct(n: number | undefined): string {
@@ -1392,110 +1388,15 @@ function CoreSection({ title, children }: { title: string; children: React.React
   );
 }
 
-
-
-// ─── DebugPanelWrapper — reads fresh from localStorage ───────────────────────
-function DebugPanelWrapper({ companyId }: { companyId: string }) {
-  const [td, setTd] = useState<AllToolData>({});
-  useEffect(() => {
-    function reload() { setTd(loadCompanyToolData(companyId)); }
-    reload();
-    window.addEventListener("toolDataUpdated", reload);
-    return () => window.removeEventListener("toolDataUpdated", reload);
-  }, [companyId]);
-  return <DebugPanel companyId={companyId} toolData={td} />;
-}
-
-// ─── Debug Panel (TEMPORARY — remove after confirming data flow) ──────────────
-function DebugPanel({ companyId, toolData }: { companyId: string; toolData: AllToolData }) {
-  const [lsItems, setLsItems] = useState<{ key: string; parsed: unknown }[]>([]);
-
-  useEffect(() => {
-    try {
-      const items: { key: string; parsed: unknown }[] = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const k = localStorage.key(i);
-        if (k && k.includes("zibendao_toolData")) {
-          try {
-            items.push({ key: k, parsed: JSON.parse(localStorage.getItem(k) || "null") });
-          } catch {
-            items.push({ key: k, parsed: "(parse error)" });
-          }
-        }
-      }
-      setLsItems(items);
-    } catch {}
-  }, [companyId]);
-
-  const t01Raw = toolData.T01;
-  const expectedKey = `zibendao_toolData_${companyId}_T01`;
-  const lsT01 = lsItems.find(i => i.key === expectedKey);
-
-  const rows = [
-    ["Dashboard companyId", companyId],
-    ["Expected T01 key", expectedKey],
-    ["T01 in localStorage?", lsT01 ? "✅ YES" : "❌ NOT FOUND"],
-    ["T01 in toolData?", t01Raw ? "✅ YES" : "❌ NO"],
-    ["T01 calculatedOutput", t01Raw ? JSON.stringify(t01Raw.calculatedOutput, null, 2) : "—"],
-  ] as [string, string][];
-
-  return (
-    <div
-      className="rounded-2xl p-4 space-y-3"
-      style={{ backgroundColor: "#FFF8E7", border: "2px dashed #F0A445", fontSize: "11px" }}
-    >
-      <p className="font-bold" style={{ color: "#7A5C1E" }}>🔍 Debug Panel（确认后移除）</p>
-
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <tbody>
-          {rows.map(([label, val]) => (
-            <tr key={label} style={{ borderBottom: "1px solid rgba(240,164,69,0.2)" }}>
-              <td style={{ padding: "4px 8px 4px 0", color: "#7A5C1E", fontWeight: 600, whiteSpace: "nowrap", verticalAlign: "top" }}>
-                {label}
-              </td>
-              <td style={{ padding: "4px 0", color: "#1C1814", wordBreak: "break-all", whiteSpace: "pre-wrap" }}>
-                {val}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <div>
-        <p className="font-semibold mb-1" style={{ color: "#7A5C1E" }}>
-          All zibendao_toolData keys in localStorage ({lsItems.length}):
-        </p>
-        {lsItems.length === 0 ? (
-          <p style={{ color: "#EF4444" }}>❌ 没有任何 zibendao_toolData 项目！T01 尚未保存或 key 不匹配。</p>
-        ) : (
-          lsItems.map(item => (
-            <div key={item.key} className="mb-2 p-2 rounded" style={{ backgroundColor: "rgba(240,164,69,0.1)" }}>
-              <p className="font-mono font-semibold" style={{ color: "#7A5C1E", marginBottom: 4 }}>
-                {item.key === expectedKey ? "✅" : "⚠️"} {item.key}
-              </p>
-              <pre style={{ color: "#1C1814", fontSize: "10px", overflow: "auto", maxHeight: 120 }}>
-                {JSON.stringify(item.parsed, null, 2)}
-              </pre>
-            </div>
-          ))
-        )}
-      </div>
-    </div>
-  );
-}
-
 function EnterpriseCoreSummary({ companyId }: { companyId: string }) {
   const [toolData, setToolData] = useState<AllToolData>({});
   const [dbCore, setDbCore] = useState<FinancialCore | null>(null);
-  console.log(`[Dashboard] EnterpriseCoreSummary mounted/rendered | companyId=${companyId}`);
 
   useEffect(() => {
     if (!companyId) return;
 
     function reload() {
-      console.log(`[Dashboard] EnterpriseCoreSummary reload | companyId=${companyId}`);
       const ld = loadCompanyToolData(companyId);
-      console.log(`[Dashboard] toolData keys loaded: [${Object.keys(ld).join(", ")}]`);
       setToolData(ld);
     }
 
@@ -1506,7 +1407,6 @@ function EnterpriseCoreSummary({ companyId }: { companyId: string }) {
     function onToolDataUpdated(e: Event) {
       const ev = e as CustomEvent<{ companyId: string; toolId: string }>;
       if (ev.detail.companyId !== companyId) return;
-      console.log(`[Dashboard] toolDataUpdated event | toolId=${ev.detail.toolId}`);
       reload();
     }
     window.addEventListener("toolDataUpdated", onToolDataUpdated);
@@ -1866,3 +1766,4 @@ function CompanyForm({
     </div>
   );
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
