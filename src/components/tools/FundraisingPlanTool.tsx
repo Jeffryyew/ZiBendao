@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import {
   ComposedChart,
   Bar,
@@ -94,8 +94,6 @@ const GUIDE_STEPS = [
 function fmt(n: number, sym: string): string {
   if (!isFinite(n) || isNaN(n) || n === 0) return "—";
   const abs = Math.abs(n);
-  if (abs >= 1_000_000) return sym + " " + (abs / 1_000_000).toFixed(2) + "M";
-  if (abs >= 1_000) return sym + " " + (abs / 1_000).toFixed(0) + "K";
   return sym + " " + abs.toLocaleString("en-MY", { maximumFractionDigits: 0 });
 }
 
@@ -120,7 +118,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
   return (
     <div
       className="rounded-2xl p-5"
-      style={{ backgroundColor: "#141414", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#1E1E1E"}` }}
+      style={{ backgroundColor: "#FFFFFF", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#E8DFCF"}` }}
     >
       {children}
     </div>
@@ -128,7 +126,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
 }
 
 function SLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-mono mb-3" style={{ color: "#555550" }}>{children}</p>;
+  return <p className="text-xs font-mono mb-3" style={{ color: "#7A7A7A" }}>{children}</p>;
 }
 
 function NumInput({
@@ -147,11 +145,11 @@ function NumInput({
   placeholder?: string;
 }) {
   return (
-    <div className="py-1.5" style={{ borderBottom: "1px solid #1A1A1A" }}>
-      <p className="text-xs mb-1" style={{ color: "#888880" }}>{label}</p>
+    <div className="py-1.5" style={{ borderBottom: "1px solid #E8DFCF" }}>
+      <p className="text-xs mb-1" style={{ color: "#7A7A7A" }}>{label}</p>
       <div className="relative">
         {prefix && (
-          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>
+          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>
             {prefix}
           </span>
         )}
@@ -162,17 +160,17 @@ function NumInput({
           placeholder={placeholder}
           className="w-full py-1.5 rounded-lg text-xs text-right outline-none font-mono"
           style={{
-            backgroundColor: "#0D0D0D",
-            border: "1px solid #2A2A2A",
-            color: "#F5F5F0",
+            backgroundColor: "#F8F6F1",
+            border: "1px solid #E8DFCF",
+            color: "#2B2B2B",
             paddingLeft: prefix ? "2rem" : "0.5rem",
             paddingRight: suffix ? "2rem" : "0.5rem",
           }}
-          onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-          onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+          onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+          onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
         />
         {suffix && (
-          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>
             {suffix}
           </span>
         )}
@@ -196,6 +194,17 @@ export default function FundraisingPlanTool({ locale }: { locale: "zh" | "en" })
       setLoaded(true);
     }
   }, [savedData, loaded]);
+
+  // ── Auto-save (1.5s debounce) ─────────────────────────────────────────
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!loaded) return;
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => { handleSave(); }, 1500);
+    return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
+
 
   // ── Load FinancialCore ──────────────────────────────────────────────────
   useEffect(() => {
@@ -422,7 +431,7 @@ export default function FundraisingPlanTool({ locale }: { locale: "zh" | "en" })
             className="mt-3 flex items-center justify-between px-3 py-2 rounded-lg"
             style={{ backgroundColor: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)" }}
           >
-            <span className="text-xs" style={{ color: "#888880" }}>融资前创始人持股比例</span>
+            <span className="text-xs" style={{ color: "#7A7A7A" }}>融资前创始人持股比例</span>
             <span className="text-sm font-bold font-mono" style={{ color: "#C9A84C" }}>
               {pct(calc.founderPctInitial)}
             </span>
@@ -437,7 +446,7 @@ export default function FundraisingPlanTool({ locale }: { locale: "zh" | "en" })
                 className="flex items-center justify-between px-4 py-2.5 rounded-xl"
                 style={{ backgroundColor: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.15)" }}
               >
-                <span className="text-xs" style={{ color: "#888880" }}>
+                <span className="text-xs" style={{ color: "#7A7A7A" }}>
                   当前估值（T05）：{fmt(coreData.currentValuation, sym)}
                 </span>
                 <button
@@ -454,7 +463,7 @@ export default function FundraisingPlanTool({ locale }: { locale: "zh" | "en" })
                 className="flex items-center justify-between px-4 py-2.5 rounded-xl"
                 style={{ backgroundColor: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.15)" }}
               >
-                <span className="text-xs" style={{ color: "#888880" }}>
+                <span className="text-xs" style={{ color: "#7A7A7A" }}>
                   路线图第 1 年估值（T06）：{fmt(coreData.roadmapYear1PAT * coreData.valuationPEMultiple, sym)}
                 </span>
                 <button
@@ -476,7 +485,7 @@ export default function FundraisingPlanTool({ locale }: { locale: "zh" | "en" })
                 className="flex items-center justify-between px-4 py-2.5 rounded-xl"
                 style={{ backgroundColor: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.15)" }}
               >
-                <span className="text-xs" style={{ color: "#888880" }}>
+                <span className="text-xs" style={{ color: "#7A7A7A" }}>
                   门店扩张资本需求（T07）：{fmt(pf(form.importedExpansionCapital), sym)}
                 </span>
                 <button
@@ -511,24 +520,24 @@ export default function FundraisingPlanTool({ locale }: { locale: "zh" | "en" })
                     />
                     <span
                       className="text-sm font-semibold"
-                      style={{ color: r.enabled ? "#F5F5F0" : "#555550" }}
+                      style={{ color: r.enabled ? "#2B2B2B" : "#9A9490" }}
                     >
                       {r.type}
                     </span>
                   </div>
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <span className="text-xs" style={{ color: "#555550" }}>
+                    <span className="text-xs" style={{ color: "#7A7A7A" }}>
                       {r.enabled ? "已启用" : "未启用"}
                     </span>
                     <div
                       className="relative w-9 h-5 rounded-full transition-colors"
-                      style={{ backgroundColor: r.enabled ? "rgba(201,168,76,0.3)" : "#2A2A2A" }}
+                      style={{ backgroundColor: r.enabled ? "rgba(201,168,76,0.3)" : "#F8F6F1" }}
                       onClick={() => updateRound(idx, "enabled", !r.enabled)}
                     >
                       <div
                         className="absolute top-0.5 w-4 h-4 rounded-full transition-transform"
                         style={{
-                          backgroundColor: r.enabled ? "#C9A84C" : "#555550",
+                          backgroundColor: r.enabled ? "#C9A84C" : "#D0C8BC",
                           transform: r.enabled ? "translateX(18px)" : "translateX(2px)",
                         }}
                       />
@@ -561,15 +570,15 @@ export default function FundraisingPlanTool({ locale }: { locale: "zh" | "en" })
                       <div className="grid grid-cols-3 gap-2 mb-4">
                         {[
                           { label: "融资后估值", value: fmt(waterfallEntry.postMoney, sym), color: "#C9A84C" },
-                          { label: "新投资人持股", value: pct(waterfallEntry.newSharesPct), color: "#A0A09A" },
+                          { label: "新投资人持股", value: pct(waterfallEntry.newSharesPct), color: "#9A9490" },
                           { label: "创始人剩余股权", value: pct(waterfallEntry.founderPctAfter), color: waterfallEntry.founderPctAfter >= 50 ? "#22C55E" : waterfallEntry.founderPctAfter >= 30 ? "#F59E0B" : "#EF4444" },
                         ].map(({ label, value, color }) => (
                           <div
                             key={label}
                             className="flex flex-col items-center px-3 py-2.5 rounded-xl"
-                            style={{ backgroundColor: "#1A1A1A", border: "1px solid #252525" }}
+                            style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
                           >
-                            <span className="text-xs mb-1" style={{ color: "#555550" }}>{label}</span>
+                            <span className="text-xs mb-1" style={{ color: "#7A7A7A" }}>{label}</span>
                             <span className="text-sm font-bold font-mono" style={{ color }}>{value}</span>
                           </div>
                         ))}
@@ -578,7 +587,7 @@ export default function FundraisingPlanTool({ locale }: { locale: "zh" | "en" })
 
                     {/* Fund use split */}
                     <div>
-                      <p className="text-xs mb-2" style={{ color: "#555550" }}>
+                      <p className="text-xs mb-2" style={{ color: "#7A7A7A" }}>
                         资金用途分配
                         {Math.abs(useSum - 100) > 1 && (
                           <span className="ml-2" style={{ color: "#EF4444" }}>
@@ -594,7 +603,7 @@ export default function FundraisingPlanTool({ locale }: { locale: "zh" | "en" })
                           { label: "团队建设", field: "useTeam" as keyof Round },
                         ].map(({ label, field }) => (
                           <div key={field}>
-                            <p className="text-xs mb-1" style={{ color: "#888880" }}>{label}</p>
+                            <p className="text-xs mb-1" style={{ color: "#7A7A7A" }}>{label}</p>
                             <div className="relative">
                               <input
                                 type="number"
@@ -602,16 +611,16 @@ export default function FundraisingPlanTool({ locale }: { locale: "zh" | "en" })
                                 onChange={(e) => updateRound(idx, field, e.target.value)}
                                 className="w-full py-1.5 rounded-lg text-xs text-right outline-none font-mono"
                                 style={{
-                                  backgroundColor: "#0D0D0D",
-                                  border: "1px solid #2A2A2A",
-                                  color: "#F5F5F0",
+                                  backgroundColor: "#F8F6F1",
+                                  border: "1px solid #E8DFCF",
+                                  color: "#2B2B2B",
                                   paddingLeft: "0.5rem",
                                   paddingRight: "1.8rem",
                                 }}
-                                onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                                onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                                onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+                                onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
                               />
-                              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>%</span>
+                              <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>%</span>
                             </div>
                           </div>
                         ))}
@@ -636,9 +645,9 @@ export default function FundraisingPlanTool({ locale }: { locale: "zh" | "en" })
               <div
                 key={label}
                 className="flex flex-col items-center px-4 py-4 rounded-2xl"
-                style={{ backgroundColor: "#141414", border: "1px solid rgba(201,168,76,0.15)" }}
+                style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(201,168,76,0.15)" }}
               >
-                <span className="text-xs mb-1.5" style={{ color: "#555550" }}>{label}</span>
+                <span className="text-xs mb-1.5" style={{ color: "#7A7A7A" }}>{label}</span>
                 <span className="text-xl font-bold font-mono" style={{ color: "#C9A84C" }}>{value}</span>
               </div>
             ))}
@@ -651,18 +660,18 @@ export default function FundraisingPlanTool({ locale }: { locale: "zh" | "en" })
             <SLabel>创始人股权稀释瀑布图</SLabel>
             <ResponsiveContainer width="100%" height={220}>
               <ComposedChart data={calc.dilutionChart} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1E1E1E" vertical={false} />
-                <XAxis dataKey="label" tick={{ fill: "#555550", fontSize: 11 }} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E8DFCF" vertical={false} />
+                <XAxis dataKey="label" tick={{ fill: "#7A7A7A", fontSize: 11 }} axisLine={false} tickLine={false} />
                 <YAxis
                   tickFormatter={(v) => v + "%"}
-                  tick={{ fill: "#555550", fontSize: 11 }}
+                  tick={{ fill: "#7A7A7A", fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                   domain={[0, 100]}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: 8 }}
-                  labelStyle={{ color: "#F5F5F0", fontSize: 12 }}
+                  contentStyle={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", borderRadius: 8 }}
+                  labelStyle={{ color: "#2B2B2B", fontSize: 12 }}
                   itemStyle={{ color: "#C9A84C", fontSize: 12 }}
                   formatter={(v: number) => [v.toFixed(1) + "%", "创始人持股"]}
                 />
@@ -693,21 +702,21 @@ export default function FundraisingPlanTool({ locale }: { locale: "zh" | "en" })
             <SLabel>各轮次估值增长图</SLabel>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={calc.valuationChart} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#1E1E1E" vertical={false} />
-                <XAxis dataKey="label" tick={{ fill: "#555550", fontSize: 11 }} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="#E8DFCF" vertical={false} />
+                <XAxis dataKey="label" tick={{ fill: "#7A7A7A", fontSize: 11 }} axisLine={false} tickLine={false} />
                 <YAxis
                   tickFormatter={(v) => {
                     if (v >= 1_000_000) return (v / 1_000_000).toFixed(1) + "M";
                     if (v >= 1_000) return (v / 1_000).toFixed(0) + "K";
                     return String(v);
                   }}
-                  tick={{ fill: "#555550", fontSize: 11 }}
+                  tick={{ fill: "#7A7A7A", fontSize: 11 }}
                   axisLine={false}
                   tickLine={false}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: 8 }}
-                  labelStyle={{ color: "#F5F5F0", fontSize: 12 }}
+                  contentStyle={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", borderRadius: 8 }}
+                  labelStyle={{ color: "#2B2B2B", fontSize: 12 }}
                   formatter={(v: number) => [fmt(v, sym), "Post-money 估值"]}
                 />
                 <Bar dataKey="valuation" radius={[4, 4, 0, 0]} maxBarSize={48}>
@@ -728,22 +737,22 @@ export default function FundraisingPlanTool({ locale }: { locale: "zh" | "en" })
               {[
                 { label: "产品研发", amount: calc.useProduct, color: "#C9A84C" },
                 { label: "业务扩张", amount: calc.useExpansion, color: "#4CAF50" },
-                { label: "运营资金", amount: calc.useOperations, color: "#A0A09A" },
+                { label: "运营资金", amount: calc.useOperations, color: "#9A9490" },
                 { label: "团队建设", amount: calc.useTeam, color: "#6B9FD4" },
               ].map(({ label, amount, color }) => (
                 <div
                   key={label}
                   className="flex flex-col px-4 py-3.5 rounded-xl"
-                  style={{ backgroundColor: "#1A1A1A", border: "1px solid #252525" }}
+                  style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: color }} />
-                    <span className="text-xs" style={{ color: "#888880" }}>{label}</span>
+                    <span className="text-xs" style={{ color: "#7A7A7A" }}>{label}</span>
                   </div>
                   <span className="text-base font-bold font-mono" style={{ color }}>
                     {fmt(amount, sym)}
                   </span>
-                  <span className="text-xs font-mono mt-0.5" style={{ color: "#555550" }}>
+                  <span className="text-xs font-mono mt-0.5" style={{ color: "#7A7A7A" }}>
                     {calc.totalFundingForUse > 0 ? ((amount / calc.totalFundingForUse) * 100).toFixed(1) + "%" : "—"}
                   </span>
                 </div>
@@ -755,18 +764,10 @@ export default function FundraisingPlanTool({ locale }: { locale: "zh" | "en" })
         {/* ── Save button ───────────────────────────────────────────────── */}
         <div className="flex items-center justify-between pt-2">
           {lastSaved && (
-            <p className="text-xs" style={{ color: "#555550" }}>
+            <p className="text-xs" style={{ color: "#7A7A7A" }}>
               上次保存：{new Date(lastSaved).toLocaleString("zh-CN")}
             </p>
           )}
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="ml-auto px-6 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-50"
-            style={{ backgroundColor: "#C9A84C", color: "#0A0A0A" }}
-          >
-            {saving ? "保存中..." : "保存融资规划"}
-          </button>
         </div>
 
       </div>

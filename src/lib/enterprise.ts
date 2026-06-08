@@ -1,10 +1,13 @@
 export type CompanyMode = "single" | "group" | null;
 
+export type CountryCode = "malaysia" | "singapore" | "indonesia" | "thailand" | "taiwan" | "japan";
+
 export interface Company {
   id: string;
   name: string;
   type: string;
   status: "active" | "inactive";
+  country?: CountryCode;
   isParent?: boolean;
   parentId?: string | null;
   shareholding?: number;

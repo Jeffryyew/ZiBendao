@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import {
   ComposedChart,
   Bar,
@@ -84,8 +84,6 @@ const GUIDE_STEPS = [
 function fmt(n: number, sym: string): string {
   if (!isFinite(n) || isNaN(n)) return "—";
   const abs = Math.abs(n);
-  if (abs >= 1_000_000) return sym + " " + (abs / 1_000_000).toFixed(2) + "M";
-  if (abs >= 1_000) return sym + " " + (abs / 1_000).toFixed(0) + "K";
   return sym + " " + abs.toLocaleString("en-MY", { maximumFractionDigits: 0 });
 }
 
@@ -103,7 +101,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
   return (
     <div
       className="rounded-2xl p-5"
-      style={{ backgroundColor: "#141414", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#1E1E1E"}` }}
+      style={{ backgroundColor: "#FFFFFF", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#E8DFCF"}` }}
     >
       {children}
     </div>
@@ -111,7 +109,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
 }
 
 function SLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-mono mb-3" style={{ color: "#555550" }}>{children}</p>;
+  return <p className="text-xs font-mono mb-3" style={{ color: "#7A7A7A" }}>{children}</p>;
 }
 
 // ── Main component ─────────────────────────────────────────────────────────
@@ -131,6 +129,17 @@ export default function FinancialForecastTool({ locale }: { locale: "zh" | "en" 
       setLoaded(true);
     }
   }, [savedData, loaded]);
+
+  // ── Auto-save (1.5s debounce) ─────────────────────────────────────────
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!loaded) return;
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => { handleSave(); }, 1500);
+    return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
+
 
   // ── Load FinancialCore ──────────────────────────────────────────────────
   useEffect(() => {
@@ -330,7 +339,7 @@ export default function FinancialForecastTool({ locale }: { locale: "zh" | "en" 
               className="mb-3 flex flex-wrap gap-2 items-center px-4 py-2.5 rounded-xl"
               style={{ backgroundColor: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.15)" }}
             >
-              <span className="text-xs flex-1" style={{ color: "#888880" }}>
+              <span className="text-xs flex-1" style={{ color: "#7A7A7A" }}>
                 已从 T01/T03 读取基准：
                 {coreData.monthlyRevenue ? ` 月收入 ${fmt(coreData.monthlyRevenue, sym)}` : ""}
                 {coreData.grossMargin ? ` · 毛利率 ${coreData.grossMargin}%` : ""}
@@ -350,25 +359,25 @@ export default function FinancialForecastTool({ locale }: { locale: "zh" | "en" 
               { label: "可变成本率", field: "variableCostPct" as keyof GrowthAssumptions, suffix: "%" },
             ].map(({ label, field, prefix, suffix }) => (
               <div key={field}>
-                <p className="text-xs mb-1" style={{ color: "#888880" }}>{label}</p>
+                <p className="text-xs mb-1" style={{ color: "#7A7A7A" }}>{label}</p>
                 <div className="relative">
-                  {prefix && <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>{prefix}</span>}
+                  {prefix && <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>{prefix}</span>}
                   <input
                     type="number"
                     value={form.assumptions[field]}
                     onChange={(e) => setAssumption(field, e.target.value)}
                     className="w-full py-1.5 rounded-lg text-xs text-right outline-none font-mono"
                     style={{
-                      backgroundColor: "#0D0D0D",
-                      border: "1px solid #2A2A2A",
-                      color: "#F5F5F0",
+                      backgroundColor: "#F8F6F1",
+                      border: "1px solid #E8DFCF",
+                      color: "#2B2B2B",
                       paddingLeft: prefix ? "2rem" : "0.5rem",
                       paddingRight: suffix ? "2rem" : "0.5rem",
                     }}
-                    onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                    onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                    onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+                    onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
                   />
-                  {suffix && <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>{suffix}</span>}
+                  {suffix && <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>{suffix}</span>}
                 </div>
               </div>
             ))}
@@ -388,11 +397,11 @@ export default function FinancialForecastTool({ locale }: { locale: "zh" | "en" 
               <div
                 key={label}
                 className="flex flex-col px-4 py-4 rounded-2xl"
-                style={{ backgroundColor: "#141414", border: `1px solid ${onTrack === null ? "rgba(201,168,76,0.15)" : onTrack ? "rgba(34,197,94,0.2)" : "rgba(239,68,68,0.15)"}` }}
+                style={{ backgroundColor: "#FFFFFF", border: `1px solid ${onTrack === null ? "rgba(201,168,76,0.15)" : onTrack ? "rgba(34,197,94,0.2)" : "rgba(239,68,68,0.15)"}` }}
               >
-                <span className="text-xs mb-1.5" style={{ color: "#555550" }}>{label}</span>
+                <span className="text-xs mb-1.5" style={{ color: "#7A7A7A" }}>{label}</span>
                 <span className="text-lg font-bold font-mono" style={{ color }}>{value}</span>
-                <span className="text-xs mt-1 font-mono" style={{ color: "#888880" }}>{sub}</span>
+                <span className="text-xs mt-1 font-mono" style={{ color: "#7A7A7A" }}>{sub}</span>
                 {roadmap && (
                   <span className="text-xs mt-1" style={{ color: onTrack ? "#22C55E" : "#EF4444" }}>
                     路线图 PAT: {fmt(roadmap, sym)} {onTrack ? "达标" : "未达标"}
@@ -415,9 +424,9 @@ export default function FinancialForecastTool({ locale }: { locale: "zh" | "en" 
               onClick={() => setViewMode(key)}
               className="px-4 py-2 rounded-xl text-xs font-semibold transition-all"
               style={{
-                backgroundColor: viewMode === key ? "rgba(201,168,76,0.15)" : "#141414",
-                border: `1px solid ${viewMode === key ? "rgba(201,168,76,0.4)" : "#2A2A2A"}`,
-                color: viewMode === key ? "#C9A84C" : "#555550",
+                backgroundColor: viewMode === key ? "rgba(201,168,76,0.15)" : "#F8F6F1",
+                border: `1px solid ${viewMode === key ? "rgba(201,168,76,0.4)" : "#E8DFCF"}`,
+                color: viewMode === key ? "#C9A84C" : "#7A7A7A",
               }}
             >
               {label}
@@ -433,23 +442,23 @@ export default function FinancialForecastTool({ locale }: { locale: "zh" | "en" 
           </SLabel>
           <ResponsiveContainer width="100%" height={260}>
             <ComposedChart data={activeData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#1E1E1E" vertical={false} />
-              <XAxis dataKey="label" tick={{ fill: "#555550", fontSize: 11 }} axisLine={false} tickLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#E8DFCF" vertical={false} />
+              <XAxis dataKey="label" tick={{ fill: "#7A7A7A", fontSize: 11 }} axisLine={false} tickLine={false} />
               <YAxis
                 tickFormatter={fmtShort}
-                tick={{ fill: "#555550", fontSize: 11 }}
+                tick={{ fill: "#7A7A7A", fontSize: 11 }}
                 axisLine={false}
                 tickLine={false}
               />
               <Tooltip
-                contentStyle={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: 8 }}
-                labelStyle={{ color: "#F5F5F0", fontSize: 12 }}
+                contentStyle={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", borderRadius: 8 }}
+                labelStyle={{ color: "#2B2B2B", fontSize: 12 }}
                 formatter={(v: number, name: string) => [fmt(v, sym), name]}
               />
-              <Legend wrapperStyle={{ fontSize: 11, color: "#555550" }} />
+              <Legend wrapperStyle={{ fontSize: 11, color: "#7A7A7A" }} />
               <Bar dataKey="revenue" name="预测营收" fill="#C9A84C" fillOpacity={0.5} radius={[3, 3, 0, 0]} maxBarSize={32} />
               {viewMode === "year1_monthly" && (
-                <Bar dataKey="actual" name="实际营收" fill="#F5F5F0" fillOpacity={0.8} radius={[3, 3, 0, 0]} maxBarSize={32} />
+                <Bar dataKey="actual" name="实际营收" fill="#2B2B2B" fillOpacity={0.8} radius={[3, 3, 0, 0]} maxBarSize={32} />
               )}
               <Line type="monotone" dataKey="grossProfit" name="毛利润" stroke="#4CAF50" strokeWidth={2} dot={false} />
               <Line type="monotone" dataKey="netProfit" name="净利润" stroke="#6B9FD4" strokeWidth={2} dot={false} />
@@ -472,7 +481,7 @@ export default function FinancialForecastTool({ locale }: { locale: "zh" | "en" 
             <div className="grid grid-cols-4 lg:grid-cols-6 gap-2">
               {forecast.year1Months.map((m) => (
                 <div key={m.key}>
-                  <p className="text-xs mb-1" style={{ color: "#888880" }}>{m.label}</p>
+                  <p className="text-xs mb-1" style={{ color: "#7A7A7A" }}>{m.label}</p>
                   <div className="relative">
                     <input
                       type="number"
@@ -488,9 +497,9 @@ export default function FinancialForecastTool({ locale }: { locale: "zh" | "en" 
                       }}
                       placeholder={String(Math.round(m.forecastRevenue))}
                       className="w-full py-1.5 px-2 rounded-lg text-xs text-right outline-none font-mono"
-                      style={{ backgroundColor: "#0D0D0D", border: "1px solid #2A2A2A", color: "#F5F5F0" }}
-                      onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                      onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                      style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}
+                      onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+                      onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
                     />
                   </div>
                   <p className="text-xs mt-0.5 text-right font-mono" style={{ color: "#333330" }}>
@@ -505,18 +514,10 @@ export default function FinancialForecastTool({ locale }: { locale: "zh" | "en" 
         {/* ── Save button ───────────────────────────────────────────────── */}
         <div className="flex items-center justify-between pt-2">
           {lastSaved && (
-            <p className="text-xs" style={{ color: "#555550" }}>
+            <p className="text-xs" style={{ color: "#7A7A7A" }}>
               上次保存：{new Date(lastSaved).toLocaleString("zh-CN")}
             </p>
           )}
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="ml-auto px-6 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-50"
-            style={{ backgroundColor: "#C9A84C", color: "#0A0A0A" }}
-          >
-            {saving ? "保存中..." : "保存财务预测"}
-          </button>
         </div>
 
       </div>

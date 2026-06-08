@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -129,7 +129,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
   return (
     <div
       className="rounded-2xl p-5"
-      style={{ backgroundColor: "#141414", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#1E1E1E"}` }}
+      style={{ backgroundColor: "#FFFFFF", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#E8DFCF"}` }}
     >
       {children}
     </div>
@@ -137,7 +137,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
 }
 
 function SLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-mono mb-3" style={{ color: "#555550" }}>{children}</p>;
+  return <p className="text-xs font-mono mb-3" style={{ color: "#7A7A7A" }}>{children}</p>;
 }
 
 const LIKELIHOOD_OPTS: { value: Likelihood; label: string }[] = [
@@ -177,6 +177,17 @@ export default function RiskControlTool({ locale }: { locale: "zh" | "en" }) {
       setLoaded(true);
     }
   }, [savedData, loaded]);
+
+  // ── Auto-save (1.5s debounce) ─────────────────────────────────────────
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!loaded) return;
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => { handleSave(); }, 1500);
+    return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
+
 
   // ── Load FinancialCore ──────────────────────────────────────────────────
   useEffect(() => {
@@ -335,9 +346,9 @@ export default function RiskControlTool({ locale }: { locale: "zh" | "en" }) {
             <div
               key={label}
               className="flex flex-col items-center px-4 py-4 rounded-2xl"
-              style={{ backgroundColor: "#141414", border: "1px solid rgba(201,168,76,0.15)" }}
+              style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(201,168,76,0.15)" }}
             >
-              <span className="text-xs mb-1.5" style={{ color: "#555550" }}>{label}</span>
+              <span className="text-xs mb-1.5" style={{ color: "#7A7A7A" }}>{label}</span>
               <span className="text-xl font-bold font-mono" style={{ color }}>{value}</span>
             </div>
           ))}
@@ -357,7 +368,7 @@ export default function RiskControlTool({ locale }: { locale: "zh" | "en" }) {
                     border: `1px solid ${ok ? "rgba(34,197,94,0.2)" : "rgba(239,68,68,0.2)"}`,
                   }}
                 >
-                  <span className="text-xs mb-1" style={{ color: "#888880" }}>{label}</span>
+                  <span className="text-xs mb-1" style={{ color: "#7A7A7A" }}>{label}</span>
                   <span className="text-base font-bold font-mono" style={{ color: ok ? "#22C55E" : "#EF4444" }}>{value}</span>
                   <span className="text-xs mt-0.5" style={{ color: ok ? "#22C55E" : "#EF4444" }}>
                     {ok ? "正常" : "需关注"}
@@ -397,7 +408,7 @@ export default function RiskControlTool({ locale }: { locale: "zh" | "en" }) {
                     <div
                       key={r.id}
                       className="rounded-xl p-3"
-                      style={{ backgroundColor: "#0D0D0D", border: `1px solid ${color}22` }}
+                      style={{ backgroundColor: "#F8F6F1", border: `1px solid ${color}22` }}
                     >
                       <div className="flex items-start gap-3 mb-2">
                         {/* Score badge */}
@@ -415,14 +426,14 @@ export default function RiskControlTool({ locale }: { locale: "zh" | "en" }) {
                             onChange={(e) => updateRisk(r.id, "title", e.target.value)}
                             placeholder="风险描述"
                             className="w-full bg-transparent text-xs outline-none"
-                            style={{ color: "#F5F5F0", borderBottom: "1px solid #2A2A2A", paddingBottom: 4 }}
+                            style={{ color: "#2B2B2B", borderBottom: "1px solid #E8DFCF", paddingBottom: 4 }}
                           />
                         </div>
                         {/* Remove */}
                         <button
-                          onClick={() => removeRisk(r.id)}
+                          onClick={() => { if (window.confirm("确认删除？")) removeRisk(r.id); }}
                           className="flex-shrink-0 text-xs px-2 py-1 rounded transition-opacity hover:opacity-70"
-                          style={{ color: "#555550" }}
+                          style={{ color: "#7A7A7A" }}
                         >
                           x
                         </button>
@@ -430,23 +441,23 @@ export default function RiskControlTool({ locale }: { locale: "zh" | "en" }) {
 
                       <div className="grid grid-cols-3 gap-3 mb-2">
                         <div>
-                          <p className="text-xs mb-1" style={{ color: "#555550" }}>发生概率</p>
+                          <p className="text-xs mb-1" style={{ color: "#7A7A7A" }}>发生概率</p>
                           <select
                             value={r.likelihood}
                             onChange={(e) => updateRisk(r.id, "likelihood", e.target.value)}
                             className="w-full px-2 py-1 rounded text-xs outline-none cursor-pointer"
-                            style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", color: "#A0A09A" }}
+                            style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#9A9490" }}
                           >
                             {LIKELIHOOD_OPTS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                           </select>
                         </div>
                         <div>
-                          <p className="text-xs mb-1" style={{ color: "#555550" }}>影响程度</p>
+                          <p className="text-xs mb-1" style={{ color: "#7A7A7A" }}>影响程度</p>
                           <select
                             value={r.impact}
                             onChange={(e) => updateRisk(r.id, "impact", e.target.value)}
                             className="w-full px-2 py-1 rounded text-xs outline-none cursor-pointer"
-                            style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", color: "#A0A09A" }}
+                            style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#9A9490" }}
                           >
                             {IMPACT_OPTS.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
                           </select>
@@ -459,16 +470,16 @@ export default function RiskControlTool({ locale }: { locale: "zh" | "en" }) {
                       </div>
 
                       <div>
-                        <p className="text-xs mb-1" style={{ color: "#555550" }}>应对措施</p>
+                        <p className="text-xs mb-1" style={{ color: "#7A7A7A" }}>应对措施</p>
                         <textarea
                           value={r.mitigation}
                           onChange={(e) => updateRisk(r.id, "mitigation", e.target.value)}
                           rows={2}
                           placeholder="填入应对或缓解措施"
                           className="w-full px-2 py-1.5 rounded-lg text-xs outline-none resize-none"
-                          style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", color: "#888880" }}
-                          onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                          onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                          style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#7A7A7A" }}
+                          onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+                          onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
                         />
                       </div>
                     </div>
@@ -489,12 +500,12 @@ export default function RiskControlTool({ locale }: { locale: "zh" | "en" }) {
           {/* Progress bar */}
           <div className="mb-4">
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs" style={{ color: "#888880" }}>整体就绪率</span>
+              <span className="text-xs" style={{ color: "#7A7A7A" }}>整体就绪率</span>
               <span className="text-xs font-mono" style={{ color: "#C9A84C" }}>
                 {calc.checklistDone} / {calc.checklistTotal} 项已完成
               </span>
             </div>
-            <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: "#1A1A1A" }}>
+            <div className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: "#F8F6F1" }}>
               <div
                 className="h-full rounded-full transition-all"
                 style={{
@@ -514,7 +525,7 @@ export default function RiskControlTool({ locale }: { locale: "zh" | "en" }) {
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
                   <span className="text-xs font-semibold" style={{ color }}>{label}</span>
-                  <span className="text-xs ml-auto" style={{ color: "#555550" }}>{done}/{items.length}</span>
+                  <span className="text-xs ml-auto" style={{ color: "#7A7A7A" }}>{done}/{items.length}</span>
                 </div>
                 <div className="space-y-1">
                   {items.map((item) => (
@@ -522,15 +533,15 @@ export default function RiskControlTool({ locale }: { locale: "zh" | "en" }) {
                       key={item.id}
                       className="flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors"
                       style={{
-                        backgroundColor: item.done ? "rgba(34,197,94,0.04)" : "#0D0D0D",
-                        border: `1px solid ${item.done ? "rgba(34,197,94,0.15)" : "#1E1E1E"}`,
+                        backgroundColor: item.done ? "rgba(34,197,94,0.04)" : "#F8F6F1",
+                        border: `1px solid ${item.done ? "rgba(34,197,94,0.15)" : "#E8DFCF"}`,
                       }}
                     >
                       <div
                         className="w-4 h-4 rounded flex-shrink-0 flex items-center justify-center transition-colors"
                         style={{
                           backgroundColor: item.done ? "#22C55E" : "transparent",
-                          border: `1.5px solid ${item.done ? "#22C55E" : "#555550"}`,
+                          border: `1.5px solid ${item.done ? "#22C55E" : "#D0C8BC"}`,
                         }}
                         onClick={() => toggleChecklist(item.id)}
                       >
@@ -542,7 +553,7 @@ export default function RiskControlTool({ locale }: { locale: "zh" | "en" }) {
                       </div>
                       <span
                         className="text-xs"
-                        style={{ color: item.done ? "#555550" : "#C0C0BA", textDecoration: item.done ? "line-through" : "none" }}
+                        style={{ color: item.done ? "#9A9490" : "#2B2B2B", textDecoration: item.done ? "line-through" : "none" }}
                         onClick={() => toggleChecklist(item.id)}
                       >
                         {item.label}
@@ -558,18 +569,10 @@ export default function RiskControlTool({ locale }: { locale: "zh" | "en" }) {
         {/* ── Save button ───────────────────────────────────────────────── */}
         <div className="flex items-center justify-between pt-2">
           {lastSaved && (
-            <p className="text-xs" style={{ color: "#555550" }}>
+            <p className="text-xs" style={{ color: "#7A7A7A" }}>
               上次保存：{new Date(lastSaved).toLocaleString("zh-CN")}
             </p>
           )}
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="ml-auto px-6 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-50"
-            style={{ backgroundColor: "#C9A84C", color: "#0A0A0A" }}
-          >
-            {saving ? "保存中..." : "保存风险管控"}
-          </button>
         </div>
 
       </div>

@@ -4,9 +4,12 @@
 export interface FinancialCore {
   // From T01 Income Statement
   annualRevenue?: number;
+  grossProfit?: number;
   annualPAT?: number;
+  taxAmt?: number;
   grossMargin?: number;
   netMargin?: number;
+  patMargin?: number;
   ebit?: number;
   totalOpEx?: number;
   currencySymbol?: string;

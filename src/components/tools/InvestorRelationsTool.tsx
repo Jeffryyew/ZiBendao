@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -42,11 +42,11 @@ const STAGES: InvestorStage[] = ["潜在", "接触中", "尽调", "谈判", "已
 
 const STAGE_COLORS: Record<InvestorStage, string> = {
   "潜在": "#333330",
-  "接触中": "#555550",
+  "接触中": "#7A7A7A",
   "尽调": "#C9A84C",
   "谈判": "#F59E0B",
   "已承诺": "#22C55E",
-  "已关闭": "#555550",
+  "已关闭": "#9A9490",
 };
 
 const INVESTOR_TYPES = ["VC", "Angel", "PE", "Strategic", "Family Office", "Other"] as const;
@@ -92,7 +92,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
   return (
     <div
       className="rounded-2xl p-5"
-      style={{ backgroundColor: "#141414", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#1E1E1E"}` }}
+      style={{ backgroundColor: "#FFFFFF", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#E8DFCF"}` }}
     >
       {children}
     </div>
@@ -100,14 +100,12 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
 }
 
 function SLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-mono mb-3" style={{ color: "#555550" }}>{children}</p>;
+  return <p className="text-xs font-mono mb-3" style={{ color: "#7A7A7A" }}>{children}</p>;
 }
 
 function fmt(n: number, sym: string): string {
   if (!isFinite(n) || isNaN(n) || n === 0) return "—";
   const abs = Math.abs(n);
-  if (abs >= 1_000_000) return sym + " " + (abs / 1_000_000).toFixed(2) + "M";
-  if (abs >= 1_000) return sym + " " + (abs / 1_000).toFixed(0) + "K";
   return sym + " " + abs.toLocaleString("en-MY", { maximumFractionDigits: 0 });
 }
 
@@ -126,6 +124,17 @@ export default function InvestorRelationsTool({ locale }: { locale: "zh" | "en" 
       setLoaded(true);
     }
   }, [savedData, loaded]);
+
+  // ── Auto-save (1.5s debounce) ─────────────────────────────────────────
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!loaded) return;
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => { handleSave(); }, 1500);
+    return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
+
 
   // ── Load FinancialCore ──────────────────────────────────────────────────
   useEffect(() => {
@@ -246,10 +255,10 @@ export default function InvestorRelationsTool({ locale }: { locale: "zh" | "en" 
               { label: "目标投资人数", field: "targetInvestorCount" as keyof T10Form, type: "number", suffix: "位" },
             ].map(({ label, field, type, prefix, suffix, placeholder }) => (
               <div key={field}>
-                <p className="text-xs mb-1" style={{ color: "#888880" }}>{label}</p>
+                <p className="text-xs mb-1" style={{ color: "#7A7A7A" }}>{label}</p>
                 <div className="relative">
                   {prefix && (
-                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>
                       {prefix}
                     </span>
                   )}
@@ -260,17 +269,17 @@ export default function InvestorRelationsTool({ locale }: { locale: "zh" | "en" 
                     placeholder={placeholder}
                     className="w-full py-1.5 rounded-lg text-xs text-right outline-none font-mono"
                     style={{
-                      backgroundColor: "#0D0D0D",
-                      border: "1px solid #2A2A2A",
-                      color: "#F5F5F0",
+                      backgroundColor: "#F8F6F1",
+                      border: "1px solid #E8DFCF",
+                      color: "#2B2B2B",
                       paddingLeft: prefix ? "2rem" : "0.5rem",
                       paddingRight: suffix ? "2rem" : "0.5rem",
                     }}
-                    onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                    onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                    onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+                    onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
                   />
                   {suffix && (
-                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>
                       {suffix}
                     </span>
                   )}
@@ -285,7 +294,7 @@ export default function InvestorRelationsTool({ locale }: { locale: "zh" | "en" 
               className="mt-3 flex items-center justify-between px-4 py-2.5 rounded-xl"
               style={{ backgroundColor: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.15)" }}
             >
-              <span className="text-xs" style={{ color: "#888880" }}>
+              <span className="text-xs" style={{ color: "#7A7A7A" }}>
                 T08 最新规划轮次：{coreData.latestRoundType}
                 {coreData.latestRoundPostMoney ? `  |  Post-money: ${fmt(coreData.latestRoundPostMoney, sym)}` : ""}
               </span>
@@ -311,9 +320,9 @@ export default function InvestorRelationsTool({ locale }: { locale: "zh" | "en" 
             <div
               key={label}
               className="flex flex-col items-center px-4 py-4 rounded-2xl"
-              style={{ backgroundColor: "#141414", border: "1px solid rgba(201,168,76,0.15)" }}
+              style={{ backgroundColor: "#FFFFFF", border: "1px solid rgba(201,168,76,0.15)" }}
             >
-              <span className="text-xs mb-1.5" style={{ color: "#555550" }}>{label}</span>
+              <span className="text-xs mb-1.5" style={{ color: "#7A7A7A" }}>{label}</span>
               <span className="text-xl font-bold font-mono" style={{ color }}>{value}</span>
             </div>
           ))}
@@ -324,12 +333,12 @@ export default function InvestorRelationsTool({ locale }: { locale: "zh" | "en" 
           <Card>
             <SLabel>融资进度</SLabel>
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs" style={{ color: "#888880" }}>已承诺 / 目标</span>
+              <span className="text-xs" style={{ color: "#7A7A7A" }}>已承诺 / 目标</span>
               <span className="text-xs font-mono" style={{ color: "#C9A84C" }}>
                 {fmt(calc.committedAmount, sym)} / {fmt(calc.targetRaise, sym)}
               </span>
             </div>
-            <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: "#1A1A1A" }}>
+            <div className="h-3 rounded-full overflow-hidden" style={{ backgroundColor: "#F8F6F1" }}>
               <div
                 className="h-full rounded-full transition-all"
                 style={{
@@ -339,7 +348,7 @@ export default function InvestorRelationsTool({ locale }: { locale: "zh" | "en" 
               />
             </div>
             {calc.inProgressAmount > 0 && (
-              <p className="text-xs mt-2" style={{ color: "#555550" }}>
+              <p className="text-xs mt-2" style={{ color: "#7A7A7A" }}>
                 另有 {fmt(calc.inProgressAmount, sym)} 在洽谈中（含尽调 / 谈判阶段）
               </p>
             )}
@@ -364,7 +373,7 @@ export default function InvestorRelationsTool({ locale }: { locale: "zh" | "en" 
             style={{ gridTemplateColumns: "2fr 1fr 1.2fr 1.2fr 1.5fr 36px" }}
           >
             {["投资人名称", "类型", "目标金额", "进展阶段", "备注", ""].map((h, i) => (
-              <p key={i} className="text-xs font-mono" style={{ color: "#555550" }}>{h}</p>
+              <p key={i} className="text-xs font-mono" style={{ color: "#7A7A7A" }}>{h}</p>
             ))}
           </div>
 
@@ -373,7 +382,7 @@ export default function InvestorRelationsTool({ locale }: { locale: "zh" | "en" 
               <div
                 key={inv.id}
                 className="grid items-center gap-2 px-1 py-1.5 rounded-lg"
-                style={{ gridTemplateColumns: "2fr 1fr 1.2fr 1.2fr 1.5fr 36px", backgroundColor: "#0D0D0D" }}
+                style={{ gridTemplateColumns: "2fr 1fr 1.2fr 1.2fr 1.5fr 36px", backgroundColor: "#F8F6F1" }}
               >
                 <input
                   type="text"
@@ -381,15 +390,15 @@ export default function InvestorRelationsTool({ locale }: { locale: "zh" | "en" 
                   onChange={(e) => updateInvestor(inv.id, "name", e.target.value)}
                   placeholder="投资人名称"
                   className="px-2 py-1 rounded text-xs outline-none"
-                  style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", color: "#F5F5F0" }}
-                  onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                  onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                  style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}
+                  onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+                  onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
                 />
                 <select
                   value={inv.type}
                   onChange={(e) => updateInvestor(inv.id, "type", e.target.value)}
                   className="px-1 py-1 rounded text-xs outline-none cursor-pointer"
-                  style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", color: "#A0A09A" }}
+                  style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#9A9490" }}
                 >
                   {INVESTOR_TYPES.map((t) => (
                     <option key={t} value={t}>{t}</option>
@@ -401,17 +410,17 @@ export default function InvestorRelationsTool({ locale }: { locale: "zh" | "en" 
                   onChange={(e) => updateInvestor(inv.id, "targetAmount", e.target.value)}
                   placeholder="0"
                   className="px-2 py-1 rounded text-xs text-right font-mono outline-none"
-                  style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", color: "#F5F5F0" }}
-                  onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                  onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                  style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}
+                  onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+                  onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
                 />
                 <select
                   value={inv.stage}
                   onChange={(e) => updateInvestor(inv.id, "stage", e.target.value)}
                   className="px-1 py-1 rounded text-xs outline-none cursor-pointer font-semibold"
                   style={{
-                    backgroundColor: "#1A1A1A",
-                    border: "1px solid #2A2A2A",
+                    backgroundColor: "#F8F6F1",
+                    border: "1px solid #E8DFCF",
                     color: STAGE_COLORS[inv.stage],
                   }}
                 >
@@ -425,12 +434,12 @@ export default function InvestorRelationsTool({ locale }: { locale: "zh" | "en" 
                   onChange={(e) => updateInvestor(inv.id, "notes", e.target.value)}
                   placeholder="备注"
                   className="px-2 py-1 rounded text-xs outline-none"
-                  style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", color: "#888880" }}
-                  onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                  onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                  style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#7A7A7A" }}
+                  onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+                  onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
                 />
                 <button
-                  onClick={() => removeInvestor(inv.id)}
+                  onClick={() => { if (window.confirm("确认删除？")) removeInvestor(inv.id); }}
                   className="flex items-center justify-center w-7 h-7 rounded-lg transition-opacity hover:opacity-70"
                   style={{ backgroundColor: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.15)", color: "#EF4444", fontSize: 14 }}
                 >
@@ -449,4 +458,75 @@ export default function InvestorRelationsTool({ locale }: { locale: "zh" | "en" 
             <SLabel>各阶段潜在金额</SLabel>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={calc.stageBarData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke=
+                <CartesianGrid strokeDasharray="3 3" stroke="#E8DFCF" vertical={false} />
+                <XAxis dataKey="name" tick={{ fill: "#7A7A7A", fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis
+                  tickFormatter={(v) => {
+                    if (v >= 1_000_000) return (v / 1_000_000).toFixed(1) + "M";
+                    if (v >= 1_000) return (v / 1_000).toFixed(0) + "K";
+                    return String(v);
+                  }}
+                  tick={{ fill: "#7A7A7A", fontSize: 11 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <Tooltip
+                  contentStyle={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", borderRadius: 8 }}
+                  formatter={(v: number) => [fmt(v, sym), "潜在金额"]}
+                />
+                <Bar dataKey="amount" radius={[4, 4, 0, 0]} maxBarSize={48}>
+                  {calc.stageBarData.map((entry, i) => (
+                    <Cell key={i} fill={entry.fill} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+
+          {/* Stage counts */}
+          <Card>
+            <SLabel>投资人漏斗（按阶段人数）</SLabel>
+            <div className="space-y-2 pt-2">
+              {STAGES.slice(0, 5).map((stage) => {
+                const count = calc.stageCounts[stage] ?? 0;
+                const maxCount = Math.max(...STAGES.slice(0, 5).map((s) => calc.stageCounts[s] ?? 0), 1);
+                return (
+                  <div key={stage} className="flex items-center gap-3">
+                    <span className="text-xs w-16 text-right flex-shrink-0" style={{ color: "#7A7A7A" }}>{stage}</span>
+                    <div className="flex-1 h-6 rounded-lg overflow-hidden" style={{ backgroundColor: "#F8F6F1" }}>
+                      <div
+                        className="h-full rounded-lg flex items-center px-2 transition-all"
+                        style={{
+                          width: `${(count / maxCount) * 100}%`,
+                          backgroundColor: STAGE_COLORS[stage],
+                          minWidth: count > 0 ? 32 : 0,
+                        }}
+                      >
+                        {count > 0 && (
+                          <span className="text-xs font-mono font-bold" style={{ color: "#2B2B2B" }}>{count}</span>
+                        )}
+                      </div>
+                    </div>
+                    <span className="text-xs font-mono w-16 flex-shrink-0" style={{ color: "#7A7A7A" }}>
+                      {fmt(calc.stageAmounts[stage] ?? 0, sym)}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        </div>
+
+        {/* ── Save button ───────────────────────────────────────────────── */}
+        <div className="flex items-center justify-between pt-2">
+          {lastSaved && (
+            <p className="text-xs" style={{ color: "#7A7A7A" }}>
+              上次保存：{new Date(lastSaved).toLocaleString("zh-CN")}
+            </p>
+          )}
+        </div>
+
+      </div>
+    </ToolShell>
+  );
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import ToolShell from "@/components/tools/ToolShell";
 import ToolGuide from "@/components/tools/ToolGuide";
 import { useToolSnapshot } from "@/lib/useToolSnapshot";
@@ -72,7 +72,7 @@ const SIG: Record<Signal, { text: string; bg: string; border: string }> = {
   green: { text: "#22C55E", bg: "rgba(34,197,94,0.05)", border: "rgba(34,197,94,0.2)" },
   yellow: { text: "#F0A445", bg: "rgba(240,164,69,0.05)", border: "rgba(240,164,69,0.2)" },
   red: { text: "#EF4444", bg: "rgba(239,68,68,0.05)", border: "rgba(239,68,68,0.2)" },
-  neutral: { text: "#A0A09A", bg: "#141414", border: "#2A2A2A" },
+  neutral: { text: "#9A9490", bg: "#F8F6F1", border: "#E8DFCF" },
 };
 
 // ── Sub-components ─────────────────────────────────────────────────────────
@@ -81,7 +81,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
   return (
     <div
       className="rounded-2xl p-5"
-      style={{ backgroundColor: "#141414", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#1E1E1E"}` }}
+      style={{ backgroundColor: "#FFFFFF", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#E8DFCF"}` }}
     >
       {children}
     </div>
@@ -89,7 +89,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
 }
 
 function SLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-mono mb-3" style={{ color: "#555550" }}>{children}</p>;
+  return <p className="text-xs font-mono mb-3" style={{ color: "#7A7A7A" }}>{children}</p>;
 }
 
 function InputRow({
@@ -108,14 +108,17 @@ function InputRow({
   hint?: string;
 }) {
   return (
-    <div className="flex items-center gap-3 py-2" style={{ borderBottom: "1px solid #1A1A1A" }}>
-      <div className="flex-1">
-        <span className="text-xs" style={{ color: "#888880" }}>{label}</span>
-        {hint && <p className="text-xs mt-0.5" style={{ color: "#444440" }}>{hint}</p>}
+    <div
+      className="grid items-center py-2"
+      style={{ gridTemplateColumns: "1fr 155px", borderBottom: "1px solid #E8DFCF", gap: "8px" }}
+    >
+      <div style={{ minWidth: 0 }}>
+        <span className="text-xs" style={{ color: "#7A7A7A" }}>{label}</span>
+        {hint && <p className="text-xs mt-0.5" style={{ color: "#2B2B2B" }}>{hint}</p>}
       </div>
-      <div className="relative w-36 flex-shrink-0">
+      <div className="relative">
         {prefix && (
-          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>
+          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>
             {prefix}
           </span>
         )}
@@ -125,17 +128,17 @@ function InputRow({
           onChange={(e) => onChange(e.target.value)}
           className="w-full py-1.5 rounded-lg text-xs text-right outline-none font-mono"
           style={{
-            backgroundColor: "#0D0D0D",
-            border: "1px solid #2A2A2A",
-            color: "#F5F5F0",
+            backgroundColor: "#F8F6F1",
+            border: "1px solid #E8DFCF",
+            color: "#2B2B2B",
             paddingLeft: prefix ? "2rem" : "0.5rem",
             paddingRight: suffix ? "1.8rem" : "0.5rem",
           }}
-          onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-          onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+          onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+          onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
         />
         {suffix && (
-          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>
             {suffix}
           </span>
         )}
@@ -162,13 +165,13 @@ function KPICard({
   const c = SIG[signal];
   return (
     <div className="rounded-2xl p-5" style={{ backgroundColor: c.bg, border: `1px solid ${c.border}` }}>
-      <p className="text-xs font-semibold mb-3" style={{ color: "#A0A09A" }}>{label}</p>
+      <p className="text-xs font-semibold mb-3" style={{ color: "#9A9490" }}>{label}</p>
       <p className="text-2xl font-bold font-mono mb-1" style={{ color: c.text }}>
         {target}
         {unit && <span className="text-sm ml-1" style={{ color: c.text, opacity: 0.7 }}>{unit}</span>}
       </p>
       {actual !== null && (
-        <p className="text-xs mb-2" style={{ color: "#555550" }}>
+        <p className="text-xs mb-2" style={{ color: "#7A7A7A" }}>
           当前实际：<span style={{ color: signal === "green" ? "#22C55E" : "#F0A445" }}>{actual}</span>
         </p>
       )}
@@ -193,6 +196,17 @@ export default function PATKPITool({ locale }: { locale: "zh" | "en" }) {
       setLoaded(true);
     }
   }, [savedData, loaded]);
+
+  // ── Auto-save (1.5s debounce) ─────────────────────────────────────────
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!loaded) return;
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => { handleSave(); }, 1500);
+    return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
+
 
   // Load FinancialCore
   useEffect(() => {
@@ -343,7 +357,7 @@ export default function PATKPITool({ locale }: { locale: "zh" | "en" }) {
             <div className="flex-1 relative">
               <span
                 className="absolute left-3 top-1/2 -translate-y-1/2 text-sm font-mono pointer-events-none"
-                style={{ color: "#555550" }}
+                style={{ color: "#7A7A7A" }}
               >
                 {sym}
               </span>
@@ -352,18 +366,18 @@ export default function PATKPITool({ locale }: { locale: "zh" | "en" }) {
                 value={form.targetPAT}
                 onChange={set("targetPAT")}
                 className="w-full pl-10 pr-3 py-3 rounded-xl text-lg font-bold font-mono outline-none text-right"
-                style={{ backgroundColor: "#0D0D0D", border: "1px solid #2A2A2A", color: "#C9A84C" }}
-                onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#C9A84C" }}
+                onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+                onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
               />
             </div>
-            <span className="text-xs pb-3" style={{ color: "#555550" }}>/ 年</span>
+            <span className="text-xs pb-3" style={{ color: "#7A7A7A" }}>/ 年</span>
           </div>
 
           {/* Roadmap import buttons */}
           {roadmapYears.length > 0 && (
             <div className="flex flex-wrap gap-2 mb-3">
-              <span className="text-xs py-1" style={{ color: "#555550" }}>从财务路线图导入：</span>
+              <span className="text-xs py-1" style={{ color: "#7A7A7A" }}>从财务路线图导入：</span>
               {roadmapYears.map(({ year, pat }) => (
                 <button
                   key={year}
@@ -391,7 +405,7 @@ export default function PATKPITool({ locale }: { locale: "zh" | "en" }) {
               }}
             >
               <div>
-                <p className="text-xs font-semibold" style={{ color: "#A0A09A" }}>
+                <p className="text-xs font-semibold" style={{ color: "#9A9490" }}>
                   当前实际 PAT（利润表）
                 </p>
                 <p className="text-lg font-bold font-mono mt-0.5" style={{ color: calc.patAchieved ? "#22C55E" : "#F0A445" }}>
@@ -399,7 +413,7 @@ export default function PATKPITool({ locale }: { locale: "zh" | "en" }) {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-xs" style={{ color: "#555550" }}>
+                <p className="text-xs" style={{ color: "#7A7A7A" }}>
                   {calc.patAchieved ? "已达成" : "缺口"}
                 </p>
                 <p
@@ -411,7 +425,7 @@ export default function PATKPITool({ locale }: { locale: "zh" | "en" }) {
                     : "—"}
                 </p>
                 {calc.patGrowthPct !== null && !calc.patAchieved && (
-                  <p className="text-xs" style={{ color: "#555550" }}>
+                  <p className="text-xs" style={{ color: "#7A7A7A" }}>
                     需增长 {calc.patGrowthPct.toFixed(0)}%
                   </p>
                 )}
@@ -445,9 +459,9 @@ export default function PATKPITool({ locale }: { locale: "zh" | "en" }) {
             {calc.actualRevenue !== null && (
               <div
                 className="flex items-center justify-between px-3 py-2 rounded-lg mt-2"
-                style={{ backgroundColor: "#1A1A1A", border: "1px solid #252525" }}
+                style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
               >
-                <span className="text-xs" style={{ color: "#555550" }}>当前营收 vs 目标缺口</span>
+                <span className="text-xs" style={{ color: "#7A7A7A" }}>当前营收 vs 目标缺口</span>
                 <span
                   className="text-sm font-mono font-semibold"
                   style={{
@@ -539,28 +553,28 @@ export default function PATKPITool({ locale }: { locale: "zh" | "en" }) {
           {/* Summary strip */}
           <div
             className="mt-4 flex flex-wrap items-center gap-4 px-4 py-3 rounded-xl"
-            style={{ backgroundColor: "#1A1A1A", border: "1px solid #252525" }}
+            style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
           >
             <div className="flex-1 min-w-0">
-              <p className="text-xs" style={{ color: "#555550" }}>目标净利润率</p>
-              <p className="text-sm font-bold font-mono" style={{ color: "#F5F5F0" }}>
+              <p className="text-xs" style={{ color: "#7A7A7A" }}>目标净利润率</p>
+              <p className="text-sm font-bold font-mono" style={{ color: "#2B2B2B" }}>
                 {form.targetNetMarginPct}%
               </p>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs" style={{ color: "#555550" }}>平均成交金额</p>
-              <p className="text-sm font-bold font-mono" style={{ color: "#F5F5F0" }}>
+              <p className="text-xs" style={{ color: "#7A7A7A" }}>平均成交金额</p>
+              <p className="text-sm font-bold font-mono" style={{ color: "#2B2B2B" }}>
                 {fmt(parseFloat(form.asp) || 0, sym)}
               </p>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs" style={{ color: "#555550" }}>转化率</p>
-              <p className="text-sm font-bold font-mono" style={{ color: "#F5F5F0" }}>
+              <p className="text-xs" style={{ color: "#7A7A7A" }}>转化率</p>
+              <p className="text-sm font-bold font-mono" style={{ color: "#2B2B2B" }}>
                 {form.conversionRatePct}%
               </p>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs" style={{ color: "#555550" }}>目标 PAT</p>
+              <p className="text-xs" style={{ color: "#7A7A7A" }}>目标 PAT</p>
               <p className="text-sm font-bold font-mono" style={{ color: "#C9A84C" }}>
                 {fmt(calc.targetPAT, sym)}
               </p>
@@ -570,17 +584,9 @@ export default function PATKPITool({ locale }: { locale: "zh" | "en" }) {
 
         {/* ── Save ───────────────────────────────────────────────────────── */}
         <div className="flex items-center justify-between">
-          <p className="text-xs" style={{ color: "#444440" }}>
-            {lastSaved ? `上次保存: ${lastSaved.toLocaleTimeString()}` : "未保存"}
+          <p className="text-xs" style={{ color: "#2B2B2B" }}>
+            {saving ? "正在保存..." : lastSaved ? `已自动保存 ${lastSaved.toLocaleTimeString()}` : "未保存"}
           </p>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="px-6 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-40"
-            style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1A1A1A" }}
-          >
-            {saving ? "保存中..." : "保存数据"}
-          </button>
         </div>
 
       </div>
