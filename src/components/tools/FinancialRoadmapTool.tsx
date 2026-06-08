@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import {
   ComposedChart,
   Bar,
@@ -13,7 +13,8 @@ import {
 } from "recharts";
 import ToolShell from "@/components/tools/ToolShell";
 import ToolGuide from "@/components/tools/ToolGuide";
-import { useToolSnapshot } from "@/lib/useToolSnapshot";
+import { useToolSnapshot, getCompanyId } from "@/lib/useToolSnapshot";
+import { saveToolData } from "@/lib/toolData";
 import type { FinancialCore } from "@/lib/financialCore";
 import { ENTERPRISE_KEYS } from "@/lib/enterprise";
 
@@ -87,14 +88,13 @@ const GUIDE_STEPS = [
 function fmt(n: number, sym: string): string {
   if (!isFinite(n) || isNaN(n) || n === 0) return "—";
   const abs = Math.abs(n);
-  if (abs >= 1_000_000) return sym + " " + (abs / 1_000_000).toFixed(2) + "M";
-  if (abs >= 1_000) return sym + " " + (abs / 1_000).toFixed(0) + "K";
   return sym + " " + abs.toLocaleString("en-MY", { maximumFractionDigits: 0 });
 }
 
 function fmtShort(n: number): string {
   if (!isFinite(n) || isNaN(n)) return "";
   const abs = Math.abs(n);
+  if (abs >= 1_000_000_000) return (abs / 1_000_000_000).toFixed(1) + "B";
   if (abs >= 1_000_000) return (abs / 1_000_000).toFixed(1) + "M";
   if (abs >= 1_000) return (abs / 1_000).toFixed(0) + "K";
   return String(Math.round(abs));
@@ -111,7 +111,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
   return (
     <div
       className="rounded-2xl p-5"
-      style={{ backgroundColor: "#141414", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#1E1E1E"}` }}
+      style={{ backgroundColor: "#FFFFFF", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#E8DFCF"}` }}
     >
       {children}
     </div>
@@ -119,7 +119,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
 }
 
 function SLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-mono mb-3" style={{ color: "#555550" }}>{children}</p>;
+  return <p className="text-xs font-mono mb-3" style={{ color: "#7A7A7A" }}>{children}</p>;
 }
 
 function YearInput({
@@ -138,13 +138,13 @@ function YearInput({
   textarea?: boolean;
 }) {
   const base = {
-    backgroundColor: "#0D0D0D",
-    border: "1px solid #2A2A2A",
-    color: "#F5F5F0",
+    backgroundColor: "#F8F6F1",
+    border: "1px solid #E8DFCF",
+    color: "#2B2B2B",
   };
   return (
-    <div className="py-1.5" style={{ borderBottom: "1px solid #1A1A1A" }}>
-      <p className="text-xs mb-1" style={{ color: "#888880" }}>{label}</p>
+    <div className="py-1.5" style={{ borderBottom: "1px solid #E8DFCF" }}>
+      <p className="text-xs mb-1" style={{ color: "#7A7A7A" }}>{label}</p>
       {textarea ? (
         <textarea
           value={value}
@@ -152,13 +152,13 @@ function YearInput({
           rows={2}
           className="w-full px-3 py-2 rounded-lg text-xs outline-none resize-none"
           style={base}
-          onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-          onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+          onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+          onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
         />
       ) : (
         <div className="relative">
           {prefix && (
-            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>
+            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>
               {prefix}
             </span>
           )}
@@ -168,11 +168,11 @@ function YearInput({
             onChange={(e) => onChange(e.target.value)}
             className="w-full py-1.5 rounded-lg text-xs text-right outline-none font-mono"
             style={{ ...base, paddingLeft: prefix ? "2rem" : "0.5rem", paddingRight: suffix ? "1.8rem" : "0.5rem" }}
-            onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-            onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+            onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+            onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
           />
           {suffix && (
-            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>
+            <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>
               {suffix}
             </span>
           )}
@@ -203,6 +203,17 @@ export default function FinancialRoadmapTool({ locale }: { locale: "zh" | "en" }
       setLoaded(true);
     }
   }, [savedData, loaded]);
+
+  // ── Auto-save (1.5s debounce) ─────────────────────────────────────────
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!loaded) return;
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => { handleSave(); }, 1500);
+    return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
+
 
   useEffect(() => {
     try {
@@ -304,6 +315,32 @@ export default function FinancialRoadmapTool({ locale }: { locale: "zh" | "en" }
     return { years, yearKPIs, cagr, totalFunding, chartData };
   }, [form, coreData]);
 
+  // ── Standalone toolData localStorage auto-save ──
+  useEffect(() => {
+    const cid = getCompanyId();
+    if (cid === "__default__") return;
+    const pf = (v: string | number) => parseFloat(String(v)) || 0;
+    if (pf(form.year1.revenueTarget) === 0 && pf(form.year1.patTarget) === 0) return;
+    const timer = setTimeout(() => {
+      console.log(`[T07] auto-save to toolData | cid=${cid}`);
+      saveToolData({
+        companyId: cid,
+        toolId: "T07",
+        calculatedOutput: {
+          roadmapYear1Revenue: pf(form.year1.revenueTarget),
+          roadmapYear2Revenue: pf(form.year2.revenueTarget),
+          roadmapYear3Revenue: pf(form.year3.revenueTarget),
+          roadmapYear1PAT: pf(form.year1.patTarget),
+          roadmapYear2PAT: pf(form.year2.patTarget),
+          roadmapYear3PAT: pf(form.year3.patTarget),
+        },
+        currency: sym,
+      });
+    }, 500);
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form, sym]);
+
   // ── Save handler ──────────────────────────────────────────────────────────
 
   async function handleSave() {
@@ -319,6 +356,20 @@ export default function FinancialRoadmapTool({ locale }: { locale: "zh" | "en" }
         if (ac) companyId = `group_${JSON.parse(ac).id ?? "default"}`;
       }
       if (companyId === "no_company") return;
+      // Save to unified toolData localStorage
+      saveToolData({
+        companyId,
+        toolId: "T07",
+        calculatedOutput: {
+          roadmapYear1Revenue: pf(form.year1.revenueTarget),
+          roadmapYear2Revenue: pf(form.year2.revenueTarget),
+          roadmapYear3Revenue: pf(form.year3.revenueTarget),
+          roadmapYear1PAT: pf(form.year1.patTarget),
+          roadmapYear2PAT: pf(form.year2.patTarget),
+          roadmapYear3PAT: pf(form.year3.patTarget),
+        },
+        currency: sym,
+      });
 
       const existing = await fetch(
         `/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(companyId)}`
@@ -384,35 +435,35 @@ export default function FinancialRoadmapTool({ locale }: { locale: "zh" | "en" }
                     className="flex items-center justify-between px-3 py-2 rounded-lg"
                     style={{ backgroundColor: "rgba(201,168,76,0.06)", border: "1px solid rgba(201,168,76,0.15)" }}
                   >
-                    <span className="text-xs" style={{ color: "#888880" }}>估值（PE × {form.peMultiple}x）</span>
+                    <span className="text-xs" style={{ color: "#7A7A7A" }}>估值（PE × {form.peMultiple}x）</span>
                     <span className="text-sm font-bold font-mono" style={{ color: "#C9A84C" }}>
-                      {yearCalc.valuation > 0 ? fmt(yearCalc.valuation, sym) : "—"}
+                      <span style={{ whiteSpace: "nowrap", overflow: "hidden", display: "block", textAlign: "right" }}>{yearCalc.valuation > 0 ? fmt(yearCalc.valuation, sym) : "—"}</span>
                     </span>
                   </div>
                   <div
                     className="flex items-center justify-between px-3 py-2 rounded-lg"
-                    style={{ backgroundColor: "#1A1A1A", border: "1px solid #252525" }}
+                    style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
                   >
-                    <span className="text-xs" style={{ color: "#888880" }}>月销售目标</span>
-                    <span className="text-sm font-mono" style={{ color: "#A0A09A" }}>
+                    <span className="text-xs" style={{ color: "#7A7A7A" }}>月销售目标</span>
+                    <span className="text-sm font-mono" style={{ color: "#9A9490" }}>
                       {kpi.monthlyRevTarget > 0 ? fmt(kpi.monthlyRevTarget, sym) : "—"}
                     </span>
                   </div>
                   <div
                     className="flex items-center justify-between px-3 py-2 rounded-lg"
-                    style={{ backgroundColor: "#1A1A1A", border: "1px solid #252525" }}
+                    style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
                   >
-                    <span className="text-xs" style={{ color: "#888880" }}>月成交单数</span>
-                    <span className="text-sm font-mono" style={{ color: "#A0A09A" }}>
+                    <span className="text-xs" style={{ color: "#7A7A7A" }}>月成交单数</span>
+                    <span className="text-sm font-mono" style={{ color: "#9A9490" }}>
                       {kpi.monthlyUnits > 0 ? Math.ceil(kpi.monthlyUnits) + " 单" : "—"}
                     </span>
                   </div>
                   {prevPAT > 0 && pf(y.patTarget) > 0 && (
                     <div
                       className="flex items-center justify-between px-3 py-2 rounded-lg"
-                      style={{ backgroundColor: "#1A1A1A", border: "1px solid #252525" }}
+                      style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
                     >
-                      <span className="text-xs" style={{ color: "#888880" }}>PAT 年增速</span>
+                      <span className="text-xs" style={{ color: "#7A7A7A" }}>PAT 年增速</span>
                       <span className="text-sm font-mono" style={{ color: "#22C55E" }}>
                         {growthPct(pf(y.patTarget), prevPAT)}
                       </span>
@@ -430,7 +481,7 @@ export default function FinancialRoadmapTool({ locale }: { locale: "zh" | "en" }
             className="flex items-center justify-between px-4 py-2.5 rounded-xl"
             style={{ backgroundColor: "rgba(201,168,76,0.05)", border: "1px solid rgba(201,168,76,0.15)" }}
           >
-            <span className="text-xs" style={{ color: "#888880" }}>
+            <span className="text-xs" style={{ color: "#7A7A7A" }}>
               门店扩张总资本需求（T07）：{sym} {coreData.expansionTotalCapital.toLocaleString("en-MY", { maximumFractionDigits: 0 })}
             </span>
             <button
@@ -456,10 +507,10 @@ export default function FinancialRoadmapTool({ locale }: { locale: "zh" | "en" }
               { label: "PE 估值倍数", field: "peMultiple" as keyof T06Form, suffix: "x" },
             ].map(({ label, field, prefix, suffix }) => (
               <div key={field}>
-                <p className="text-xs mb-1" style={{ color: "#888880" }}>{label}</p>
+                <p className="text-xs mb-1" style={{ color: "#7A7A7A" }}>{label}</p>
                 <div className="relative">
                   {prefix && (
-                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>
                       {prefix}
                     </span>
                   )}
@@ -469,17 +520,17 @@ export default function FinancialRoadmapTool({ locale }: { locale: "zh" | "en" }
                     onChange={(e) => setForm((p) => ({ ...p, [field]: e.target.value }))}
                     className="w-full py-1.5 rounded-lg text-xs text-right outline-none font-mono"
                     style={{
-                      backgroundColor: "#0D0D0D",
-                      border: "1px solid #2A2A2A",
-                      color: "#F5F5F0",
+                      backgroundColor: "#F8F6F1",
+                      border: "1px solid #E8DFCF",
+                      color: "#2B2B2B",
                       paddingLeft: prefix ? "2rem" : "0.5rem",
                       paddingRight: suffix ? "1.8rem" : "0.5rem",
                     }}
-                    onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                    onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                    onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+                    onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
                   />
                   {suffix && (
-                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>
                       {suffix}
                     </span>
                   )}
@@ -512,15 +563,15 @@ export default function FinancialRoadmapTool({ locale }: { locale: "zh" | "en" }
               {
                 label: "第 3 年 PAT",
                 value: pf(form.year3.patTarget) > 0 ? fmt(pf(form.year3.patTarget), sym) : "—",
-                color: "#F5F5F0",
+                color: "#2B2B2B",
               },
             ].map(({ label, value, color }) => (
               <div
                 key={label}
                 className="rounded-xl px-4 py-3"
-                style={{ backgroundColor: "#1A1A1A", border: "1px solid #252525" }}
+                style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
               >
-                <p className="text-xs mb-1" style={{ color: "#555550" }}>{label}</p>
+                <p className="text-xs mb-1" style={{ color: "#7A7A7A" }}>{label}</p>
                 <p className="text-lg font-bold font-mono" style={{ color }}>{value}</p>
               </div>
             ))}
@@ -533,13 +584,13 @@ export default function FinancialRoadmapTool({ locale }: { locale: "zh" | "en" }
                 data={calc.chartData}
                 margin={{ top: 8, right: 8, left: 8, bottom: 8 }}
               >
-                <CartesianGrid stroke="#1A1A1A" vertical={false} />
-                <XAxis dataKey="label" tick={{ fill: "#555550", fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis yAxisId="left" tick={{ fill: "#555550", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
-                <YAxis yAxisId="right" orientation="right" tick={{ fill: "#555550", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
+                <CartesianGrid stroke="#E8DFCF" vertical={false} />
+                <XAxis dataKey="label" tick={{ fill: "#7A7A7A", fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis yAxisId="left" tick={{ fill: "#7A7A7A", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fill: "#7A7A7A", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: 10, fontSize: 12 }}
-                  labelStyle={{ color: "#A0A09A" }}
+                  contentStyle={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", borderRadius: 10, fontSize: 12 }}
+                  labelStyle={{ color: "#9A9490" }}
                   formatter={(v: number, name: string) => [fmt(v, sym), name]}
                 />
                 <Bar yAxisId="left" dataKey="revenue" name="目标营收" fill="#C9A84C" fillOpacity={0.4} radius={[4, 4, 0, 0]} />
@@ -551,15 +602,15 @@ export default function FinancialRoadmapTool({ locale }: { locale: "zh" | "en" }
           <div className="flex gap-5 mt-2">
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: "#C9A84C", opacity: 0.4 }} />
-              <span className="text-xs" style={{ color: "#555550" }}>目标营收</span>
+              <span className="text-xs" style={{ color: "#7A7A7A" }}>目标营收</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: "#C9A84C" }} />
-              <span className="text-xs" style={{ color: "#555550" }}>目标 PAT</span>
+              <span className="text-xs" style={{ color: "#7A7A7A" }}>目标 PAT</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: "#22C55E" }} />
-              <span className="text-xs" style={{ color: "#555550" }}>估值</span>
+              <span className="text-xs" style={{ color: "#7A7A7A" }}>估值</span>
             </div>
           </div>
         </Card>
@@ -571,7 +622,7 @@ export default function FinancialRoadmapTool({ locale }: { locale: "zh" | "en" }
             {/* Line */}
             <div
               className="absolute top-4 left-4 right-4 h-px"
-              style={{ backgroundColor: "#2A2A2A" }}
+              style={{ backgroundColor: "#F8F6F1" }}
             />
             <div className="relative flex justify-between">
               {calc.years.map((y, i) => (
@@ -579,19 +630,19 @@ export default function FinancialRoadmapTool({ locale }: { locale: "zh" | "en" }
                   <div
                     className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold z-10"
                     style={{
-                      backgroundColor: i === 0 ? "#252525" : "#C9A84C",
-                      color: i === 0 ? "#888880" : "#1A1A1A",
-                      border: i === 0 ? "1px solid #2A2A2A" : "none",
+                      backgroundColor: i === 0 ? "#F8F6F1" : "#C9A84C",
+                      color: i === 0 ? "#7A7A7A" : "#FFFFFF",
+                      border: i === 0 ? "1px solid #E8DFCF" : "none",
                     }}
                   >
                     {i === 0 ? "现" : i}
                   </div>
                   <div className="mt-3 text-center">
-                    <p className="text-xs font-semibold mb-1" style={{ color: i === 0 ? "#555550" : "#A0A09A" }}>
+                    <p className="text-xs font-semibold mb-1" style={{ color: i === 0 ? "#7A7A7A" : "#9A9490" }}>
                       {y.label}
                     </p>
                     {y.milestone && (
-                      <p className="text-xs leading-relaxed" style={{ color: "#444440" }}>
+                      <p className="text-xs leading-relaxed" style={{ color: "#2B2B2B" }}>
                         {y.milestone}
                       </p>
                     )}
@@ -609,17 +660,9 @@ export default function FinancialRoadmapTool({ locale }: { locale: "zh" | "en" }
 
         {/* ── Save ───────────────────────────────────────────────────────── */}
         <div className="flex items-center justify-between">
-          <p className="text-xs" style={{ color: "#444440" }}>
-            {lastSaved ? `上次保存: ${lastSaved.toLocaleTimeString()}` : "未保存"}
+          <p className="text-xs" style={{ color: "#2B2B2B" }}>
+            {saving ? "正在保存..." : lastSaved ? `已自动保存 ${lastSaved.toLocaleTimeString()}` : "未保存"}
           </p>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="px-6 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-40"
-            style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1A1A1A" }}
-          >
-            {saving ? "保存中..." : "保存数据"}
-          </button>
         </div>
 
       </div>

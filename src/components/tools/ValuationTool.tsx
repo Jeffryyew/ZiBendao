@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import {
   BarChart,
   Bar,
@@ -13,7 +13,8 @@ import {
 } from "recharts";
 import ToolShell from "@/components/tools/ToolShell";
 import ToolGuide from "@/components/tools/ToolGuide";
-import { useToolSnapshot } from "@/lib/useToolSnapshot";
+import { useToolSnapshot, getCompanyId } from "@/lib/useToolSnapshot";
+import { saveToolData } from "@/lib/toolData";
 import type { FinancialCore } from "@/lib/financialCore";
 import { ENTERPRISE_KEYS } from "@/lib/enterprise";
 
@@ -121,8 +122,6 @@ function fmt(n: number, sym: string): string {
   if (!isFinite(n) || isNaN(n)) return "—";
   const abs = Math.abs(n);
   const sign = n < 0 ? "-" : "";
-  if (abs >= 1_000_000) return sign + sym + " " + (abs / 1_000_000).toFixed(2) + "M";
-  if (abs >= 1_000) return sign + sym + " " + (abs / 1_000).toFixed(0) + "K";
   return sign + sym + " " + abs.toLocaleString("en-MY", { maximumFractionDigits: 0 });
 }
 
@@ -142,7 +141,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
   return (
     <div
       className="rounded-2xl p-5"
-      style={{ backgroundColor: "#141414", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#1E1E1E"}` }}
+      style={{ backgroundColor: "#FFFFFF", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#E8DFCF"}` }}
     >
       {children}
     </div>
@@ -150,7 +149,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
 }
 
 function SLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-mono mb-3" style={{ color: "#555550" }}>{children}</p>;
+  return <p className="text-xs font-mono mb-3" style={{ color: "#7A7A7A" }}>{children}</p>;
 }
 
 function ValCard({
@@ -169,9 +168,9 @@ function ValCard({
   return (
     <div
       className="rounded-2xl p-5"
-      style={{ backgroundColor: "#141414", border: "1px solid #1E1E1E" }}
+      style={{ backgroundColor: "#FFFFFF", border: "1px solid #E8DFCF" }}
     >
-      <p className="text-xs font-semibold mb-3" style={{ color: "#A0A09A" }}>{method}</p>
+      <p className="text-xs font-semibold mb-3" style={{ color: "#9A9490" }}>{method}</p>
       <p className="text-xl font-bold font-mono mb-1" style={{ color: "#C9A84C" }}>
         {isFinite(currentVal) && currentVal > 0 ? fmt(currentVal, sym) : "—"}
       </p>
@@ -180,7 +179,7 @@ function ValCard({
           目标：{fmt(targetVal, sym)}
         </p>
       )}
-      <p className="text-xs leading-relaxed" style={{ color: "#555550" }}>{note}</p>
+      <p className="text-xs leading-relaxed" style={{ color: "#7A7A7A" }}>{note}</p>
     </div>
   );
 }
@@ -197,19 +196,19 @@ function MultiplierInput({
   defaultVal: number;
 }) {
   return (
-    <div className="flex items-center gap-2 py-1.5" style={{ borderBottom: "1px solid #1A1A1A" }}>
-      <span className="flex-1 text-xs" style={{ color: "#888880" }}>{label}</span>
+    <div className="flex items-center gap-2 py-1.5" style={{ borderBottom: "1px solid #E8DFCF" }}>
+      <span className="flex-1 text-xs" style={{ color: "#7A7A7A" }}>{label}</span>
       <input
         type="number"
         value={value || defaultVal}
         onChange={(e) => onChange(e.target.value)}
         step="0.5"
         className="w-20 px-2 py-1 rounded-lg text-xs text-right outline-none font-mono"
-        style={{ backgroundColor: "#0D0D0D", border: "1px solid #2A2A2A", color: "#F5F5F0" }}
-        onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-        onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+        style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}
+        onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+        onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
       />
-      <span className="text-xs font-mono w-4" style={{ color: "#555550" }}>x</span>
+      <span className="text-xs font-mono w-4" style={{ color: "#7A7A7A" }}>x</span>
     </div>
   );
 }
@@ -228,6 +227,17 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
       setLoaded(true);
     }
   }, [savedData, loaded]);
+
+  // ── Auto-save (1.5s debounce) ─────────────────────────────────────────
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!loaded) return;
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => { handleSave(); }, 1500);
+    return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
+
 
   useEffect(() => {
     try {
@@ -341,6 +351,30 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
     };
   }, [form, coreData, peMultiple, revMultiple, evMultiple]);
 
+  // ── Standalone toolData localStorage auto-save ──
+  useEffect(() => {
+    const cid = getCompanyId();
+    if (cid === "__default__") return;
+    if (!calc || calc.blended === 0) return;
+    const timer = setTimeout(() => {
+      console.log(`[T06] auto-save to toolData | cid=${cid}`);
+      saveToolData({
+        companyId: cid,
+        toolId: "T06",
+        calculatedOutput: {
+          currentValuation: calc.blended,
+          currentValuationLow: calc.low,
+          currentValuationHigh: calc.high,
+          targetValuation: calc.targetBlended,
+          industry: form.industry,
+        },
+        currency: sym,
+      });
+    }, 500);
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [calc, sym]);
+
   // ── Save handler ──────────────────────────────────────────────────────────
 
   async function handleSave() {
@@ -356,6 +390,19 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
         if (ac) companyId = `group_${JSON.parse(ac).id ?? "default"}`;
       }
       if (companyId === "no_company") return;
+      // Save to unified toolData localStorage
+      saveToolData({
+        companyId,
+        toolId: "T06",
+        calculatedOutput: {
+          currentValuation: calc.blended,
+          currentValuationLow: calc.low,
+          currentValuationHigh: calc.high,
+          targetValuation: calc.targetBlended,
+          industry: form.industry,
+        },
+        currency: sym,
+      });
 
       const existing = await fetch(
         `/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(companyId)}`
@@ -407,9 +454,9 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
                 onClick={() => setForm((f) => ({ ...f, industry: key }))}
                 className="text-xs px-3 py-1.5 rounded-lg transition-colors"
                 style={{
-                  backgroundColor: form.industry === key ? "#C9A84C" : "#1A1A1A",
-                  color: form.industry === key ? "#1A1A1A" : "#888880",
-                  border: form.industry === key ? "none" : "1px solid #2A2A2A",
+                  backgroundColor: form.industry === key ? "#C9A84C" : "#F8F6F1",
+                  color: form.industry === key ? "#FFFFFF" : "#7A7A7A",
+                  border: form.industry === key ? "none" : "1px solid #E8DFCF",
                 }}
               >
                 {p.label}
@@ -427,10 +474,10 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
               <div
                 key={label}
                 className="rounded-xl px-3 py-2.5"
-                style={{ backgroundColor: "#1A1A1A", border: "1px solid #252525" }}
+                style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
               >
-                <p className="text-xs mb-1" style={{ color: "#555550" }}>{label}</p>
-                <p className="text-sm font-bold font-mono" style={{ color: value > 0 ? "#F5F5F0" : "#444440" }}>
+                <p className="text-xs mb-1" style={{ color: "#7A7A7A" }}>{label}</p>
+                <p className="text-sm font-bold font-mono" style={{ color: value > 0 ? "#2B2B2B" : "#EF4444" }}>
                   {value > 0 ? fmt(value, sym) : "未设定"}
                 </p>
               </div>
@@ -467,38 +514,38 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
             {[1, 2, 3, 4, 5].map((y) => {
               const field = `growthYear${y}Pct` as keyof T05Form;
               return (
-                <div key={y} className="flex items-center gap-2 py-1.5" style={{ borderBottom: "1px solid #1A1A1A" }}>
-                  <span className="flex-1 text-xs" style={{ color: "#888880" }}>第 {y} 年增长率</span>
+                <div key={y} className="flex items-center gap-2 py-1.5" style={{ borderBottom: "1px solid #E8DFCF" }}>
+                  <span className="flex-1 text-xs" style={{ color: "#7A7A7A" }}>第 {y} 年增长率</span>
                   <input
                     type="number"
                     value={form[field]}
                     onChange={(e) => set(field)(e.target.value)}
                     className="w-20 px-2 py-1 rounded-lg text-xs text-right outline-none font-mono"
-                    style={{ backgroundColor: "#0D0D0D", border: "1px solid #2A2A2A", color: "#F5F5F0" }}
-                    onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                    onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                    style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}
+                    onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+                    onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
                   />
-                  <span className="text-xs font-mono w-4" style={{ color: "#555550" }}>%</span>
+                  <span className="text-xs font-mono w-4" style={{ color: "#7A7A7A" }}>%</span>
                 </div>
               );
             })}
-            <div className="flex items-center gap-2 py-1.5 mt-1" style={{ borderBottom: "1px solid #1A1A1A" }}>
-              <span className="flex-1 text-xs" style={{ color: "#888880" }}>折现率</span>
+            <div className="flex items-center gap-2 py-1.5 mt-1" style={{ borderBottom: "1px solid #E8DFCF" }}>
+              <span className="flex-1 text-xs" style={{ color: "#7A7A7A" }}>折现率</span>
               <input type="number" value={form.discountRatePct} onChange={(e) => set("discountRatePct")(e.target.value)}
                 className="w-20 px-2 py-1 rounded-lg text-xs text-right outline-none font-mono"
-                style={{ backgroundColor: "#0D0D0D", border: "1px solid #2A2A2A", color: "#F5F5F0" }}
-                onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")} />
-              <span className="text-xs font-mono w-4" style={{ color: "#555550" }}>%</span>
+                style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}
+                onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+                onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")} />
+              <span className="text-xs font-mono w-4" style={{ color: "#7A7A7A" }}>%</span>
             </div>
             <div className="flex items-center gap-2 py-1.5">
-              <span className="flex-1 text-xs" style={{ color: "#888880" }}>终值倍数</span>
+              <span className="flex-1 text-xs" style={{ color: "#7A7A7A" }}>终值倍数</span>
               <input type="number" value={form.terminalMultiple} onChange={(e) => set("terminalMultiple")(e.target.value)}
                 className="w-20 px-2 py-1 rounded-lg text-xs text-right outline-none font-mono"
-                style={{ backgroundColor: "#0D0D0D", border: "1px solid #2A2A2A", color: "#F5F5F0" }}
-                onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")} />
-              <span className="text-xs font-mono w-4" style={{ color: "#555550" }}>x</span>
+                style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}
+                onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+                onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")} />
+              <span className="text-xs font-mono w-4" style={{ color: "#7A7A7A" }}>x</span>
             </div>
           </Card>
         </div>
@@ -547,9 +594,9 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
               <div
                 key={label}
                 className="rounded-2xl p-4 text-center"
-                style={{ backgroundColor: "#1A1A1A", border: "1px solid #252525" }}
+                style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
               >
-                <p className="text-xs mb-2" style={{ color: "#555550" }}>{label}</p>
+                <p className="text-xs mb-2" style={{ color: "#7A7A7A" }}>{label}</p>
                 <p className="text-lg font-bold font-mono" style={{ color }}>
                   {value > 0 ? fmt(value, sym) : "—"}
                 </p>
@@ -564,7 +611,7 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
               style={{ backgroundColor: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.2)" }}
             >
               <div>
-                <p className="text-xs font-semibold" style={{ color: "#A0A09A" }}>
+                <p className="text-xs font-semibold" style={{ color: "#9A9490" }}>
                   目标估值（达成 KPI PAT 后）
                 </p>
                 <p className="text-xl font-bold font-mono mt-0.5" style={{ color: "#22C55E" }}>
@@ -573,7 +620,7 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
               </div>
               {calc.blended > 0 && (
                 <div className="text-right">
-                  <p className="text-xs" style={{ color: "#555550" }}>估值增幅</p>
+                  <p className="text-xs" style={{ color: "#7A7A7A" }}>估值增幅</p>
                   <p className="text-base font-bold font-mono" style={{ color: "#22C55E" }}>
                     +{(((calc.targetBlended - calc.blended) / calc.blended) * 100).toFixed(0)}%
                   </p>
@@ -594,11 +641,11 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
                 barCategoryGap="30%"
                 barGap={4}
               >
-                <XAxis dataKey="label" tick={{ fill: "#555550", fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fill: "#555550", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
+                <XAxis dataKey="label" tick={{ fill: "#7A7A7A", fontSize: 11 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: "#7A7A7A", fontSize: 10 }} axisLine={false} tickLine={false} tickFormatter={fmtShort} />
                 <Tooltip
-                  contentStyle={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: 10, fontSize: 12 }}
-                  labelStyle={{ color: "#A0A09A" }}
+                  contentStyle={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", borderRadius: 10, fontSize: 12 }}
+                  labelStyle={{ color: "#9A9490" }}
                   formatter={(v: number) => [fmt(v, sym), ""]}
                 />
                 <Bar dataKey="current" name="当前估值" fill="#C9A84C" fillOpacity={0.85} radius={[4, 4, 0, 0]} />
@@ -609,28 +656,20 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
           <div className="flex gap-4 mt-2">
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: "#C9A84C" }} />
-              <span className="text-xs" style={{ color: "#555550" }}>当前估值</span>
+              <span className="text-xs" style={{ color: "#7A7A7A" }}>当前估值</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: "#22C55E", opacity: 0.6 }} />
-              <span className="text-xs" style={{ color: "#555550" }}>目标估值（KPI PAT）</span>
+              <span className="text-xs" style={{ color: "#7A7A7A" }}>目标估值（KPI PAT）</span>
             </div>
           </div>
         </Card>
 
         {/* ── Save ───────────────────────────────────────────────────────── */}
         <div className="flex items-center justify-between">
-          <p className="text-xs" style={{ color: "#444440" }}>
-            {lastSaved ? `上次保存: ${lastSaved.toLocaleTimeString()}` : "未保存"}
+          <p className="text-xs" style={{ color: "#2B2B2B" }}>
+            {saving ? "正在保存..." : lastSaved ? `已自动保存 ${lastSaved.toLocaleTimeString()}` : "未保存"}
           </p>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="px-6 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-40"
-            style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1A1A1A" }}
-          >
-            {saving ? "保存中..." : "保存数据"}
-          </button>
         </div>
 
       </div>

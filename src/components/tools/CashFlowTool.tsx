@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import {
   ComposedChart,
   Bar,
@@ -14,7 +14,8 @@ import {
 } from "recharts";
 import ToolShell from "@/components/tools/ToolShell";
 import ToolGuide from "@/components/tools/ToolGuide";
-import { useToolSnapshot } from "@/lib/useToolSnapshot";
+import { useToolSnapshot, getCompanyId } from "@/lib/useToolSnapshot";
+import { saveToolData } from "@/lib/toolData";
 import type { FinancialCore } from "@/lib/financialCore";
 import { ENTERPRISE_KEYS } from "@/lib/enterprise";
 
@@ -103,6 +104,7 @@ function fmt(n: number, sym: string): string {
 function fmtShort(n: number): string {
   const abs = Math.abs(n);
   const sign = n < 0 ? "-" : "";
+  if (abs >= 1_000_000_000) return sign + (abs / 1_000_000_000).toFixed(1) + "B";
   if (abs >= 1_000_000) return sign + (abs / 1_000_000).toFixed(1) + "M";
   if (abs >= 1_000) return sign + (abs / 1_000).toFixed(0) + "K";
   return sign + abs.toString();
@@ -114,7 +116,7 @@ const SIG_COLORS: Record<Signal, { text: string; bg: string; border: string }> =
   green: { text: "#22C55E", bg: "rgba(34,197,94,0.05)", border: "rgba(34,197,94,0.2)" },
   yellow: { text: "#F0A445", bg: "rgba(240,164,69,0.05)", border: "rgba(240,164,69,0.2)" },
   red: { text: "#EF4444", bg: "rgba(239,68,68,0.05)", border: "rgba(239,68,68,0.2)" },
-  neutral: { text: "#A0A09A", bg: "#141414", border: "#2A2A2A" },
+  neutral: { text: "#9A9490", bg: "#F8F6F1", border: "#E8DFCF" },
 };
 
 // ── Sub-components ─────────────────────────────────────────────────────────
@@ -124,8 +126,8 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
     <div
       className="rounded-2xl p-5"
       style={{
-        backgroundColor: "#141414",
-        border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#1E1E1E"}`,
+        backgroundColor: "#FFFFFF",
+        border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#E8DFCF"}`,
       }}
     >
       {children}
@@ -135,7 +137,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-xs font-mono mb-3" style={{ color: "#555550" }}>
+    <p className="text-xs font-mono mb-3" style={{ color: "#7A7A7A" }}>
       {children}
     </p>
   );
@@ -156,16 +158,16 @@ function InputRow({
 }) {
   return (
     <div
-      className="flex items-center gap-3 py-1.5"
-      style={{ borderBottom: "1px solid #1A1A1A" }}
+      className="grid items-center py-1.5"
+      style={{ gridTemplateColumns: "1fr 155px", borderBottom: "1px solid #E8DFCF", gap: "8px" }}
     >
-      <span className="flex-1 text-xs" style={{ color: "#888880" }}>
+      <span className="text-xs truncate" style={{ color: "#7A7A7A", minWidth: 0 }}>
         {label}
       </span>
-      <div className="relative w-36 flex-shrink-0">
+      <div className="relative">
         <span
-          className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none"
-          style={{ color: "#555550" }}
+          className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none select-none"
+          style={{ color: "#9A9490" }}
         >
           {sym}
         </span>
@@ -174,14 +176,14 @@ function InputRow({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder ?? "0"}
-          className="w-full pl-8 pr-2 py-1.5 rounded-lg text-xs text-right outline-none font-mono"
+          className="w-full pl-8 pr-2 py-1.5 rounded-lg text-xs text-right outline-none font-mono appearance-none"
           style={{
-            backgroundColor: "#0D0D0D",
-            border: "1px solid #2A2A2A",
-            color: "#F5F5F0",
+            backgroundColor: "#F8F6F1",
+            border: "1px solid #E8DFCF",
+            color: "#2B2B2B",
           }}
-          onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-          onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+          onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+          onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
         />
       </div>
     </div>
@@ -204,8 +206,8 @@ function Subtotal({
     <div
       className="flex items-center justify-between px-3 py-2 rounded-lg mt-2"
       style={{
-        backgroundColor: highlight ? "rgba(201,168,76,0.06)" : "#1A1A1A",
-        border: `1px solid ${highlight ? "rgba(201,168,76,0.2)" : "#252525"}`,
+        backgroundColor: highlight ? "rgba(201,168,76,0.06)" : "#F8F6F1",
+        border: `1px solid ${highlight ? "rgba(201,168,76,0.2)" : "#E8DFCF"}`,
       }}
     >
       <span className="text-xs font-semibold" style={{ color: highlight ? "#C9A84C" : "#A0A09A" }}>
@@ -213,7 +215,7 @@ function Subtotal({
       </span>
       <span
         className="text-sm font-bold font-mono"
-        style={{ color: highlight ? "#C9A84C" : isNeg ? "#EF4444" : "#F5F5F0" }}
+        style={{ color: highlight ? "#C9A84C" : isNeg ? "#EF4444" : "#2B2B2B" }}
       >
         {fmt(value, sym)}
       </span>
@@ -236,7 +238,7 @@ function IndicatorCard({
   return (
     <div className="rounded-2xl p-5" style={{ backgroundColor: c.bg, border: `1px solid ${c.border}` }}>
       <div className="flex items-start justify-between mb-2">
-        <span className="text-xs font-semibold" style={{ color: "#A0A09A" }}>{label}</span>
+        <span className="text-xs font-semibold" style={{ color: "#9A9490" }}>{label}</span>
         <span className="text-xl font-bold font-mono" style={{ color: c.text }}>{value}</span>
       </div>
       <p className="text-xs leading-relaxed" style={{ color: c.text, opacity: 0.85 }}>{note}</p>
@@ -268,5 +270,792 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
     }
   }, [savedData, loaded]);
 
+  // ── Auto-save (1.5s debounce) ─────────────────────────────────────────
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!loaded) return;
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => { handleSave(); }, 1500);
+    return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
+
+
   // Load FinancialCore
-  useEffect(() =
+  useEffect(() => {
+    try {
+      const mode = localStorage.getItem(ENTERPRISE_KEYS.MODE);
+      let companyId = "no_company";
+      if (mode === "single") {
+        const sc = localStorage.getItem(ENTERPRISE_KEYS.SINGLE);
+        if (sc) companyId = `single_${JSON.parse(sc).id ?? "default"}`;
+      } else if (mode === "group") {
+        const ac = localStorage.getItem(ENTERPRISE_KEYS.ACTIVE_COMPANY);
+        if (ac) companyId = `group_${JSON.parse(ac).id ?? "default"}`;
+      }
+      if (companyId !== "no_company") {
+        fetch(
+          `/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(companyId)}`
+        )
+          .then((r) => r.json())
+          .then((snap) => {
+            if (snap?.data) setCoreData(snap.data as FinancialCore);
+          })
+          .catch(() => {});
+      }
+    } catch {}
+  }, []);
+
+  const sym = coreData?.currencySymbol ?? "RM";
+
+  function setField<K extends keyof T03Form>(field: K) {
+    return (v: T03Form[K]) => setForm((p) => ({ ...p, [field]: v }));
+  }
+
+  function setMonth(idx: number, key: keyof MonthData) {
+    return (v: string) =>
+      setForm((p) => {
+        const months = [...p.months];
+        months[idx] = { ...months[idx], [key]: v };
+        return { ...p, months };
+      });
+  }
+
+  function importFromCore() {
+    if (!coreData?.annualPAT) return;
+    if (form.inputMode === "simple") {
+      const annual = Math.abs(coreData.annualPAT);
+      setForm((p) => ({
+        ...p,
+        operatingInflow: String(Math.round(annual + annual * 0.2)),
+        operatingOutflow: String(Math.round(annual * 0.2)),
+      }));
+    } else {
+      const monthly = Math.round(coreData.annualPAT / 12);
+      setForm((p) => ({
+        ...p,
+        months: p.months.map((m) => ({ ...m, operatingCF: String(monthly) })),
+      }));
+    }
+  }
+
+  // ── Calculations ──────────────────────────────────────────────────────────
+
+  const calc = useMemo(() => {
+    const pf = (v: string) => parseFloat(v) || 0;
+    const opening = pf(form.openingCash);
+
+    if (form.inputMode === "simple") {
+      const opIn = pf(form.operatingInflow);
+      const opOut = pf(form.operatingOutflow);
+      const invIn = pf(form.investingInflow);
+      const invOut = pf(form.investingOutflow);
+      const finIn = pf(form.financingInflow);
+      const finOut = pf(form.financingOutflow);
+
+      const opCF = opIn - opOut;
+      const invCF = invIn - invOut;
+      const finCF = finIn - finOut;
+      const netCF = opCF + invCF + finCF;
+      const closing = opening + netCF;
+
+      const monthlyBurn = opCF < 0 ? Math.abs(opCF / 12) : 0;
+      const runway = monthlyBurn > 0 && closing > 0 ? Math.floor(closing / monthlyBurn) : Infinity;
+
+      return {
+        mode: "simple" as const,
+        opening,
+        opCF,
+        invCF,
+        finCF,
+        netCF,
+        closing,
+        monthlyBurn,
+        runway,
+        chartData: [
+          { label: "期初现金", value: opening, isBalance: true },
+          { label: "经营活动", value: opCF, isBalance: false },
+          { label: "投资活动", value: invCF, isBalance: false },
+          { label: "融资活动", value: finCF, isBalance: false },
+          { label: "年末现金", value: closing, isBalance: true },
+        ],
+        monthlyData: [] as {
+          label: string;
+          opCF: number;
+          invCF: number;
+          finCF: number;
+          netCF: number;
+          balance: number;
+        }[],
+        breakEvenMonth: null as number | null,
+        lowestCash: closing,
+        lowestCashMonth: null as string | null,
+      };
+    } else {
+      // Detailed: 12-month
+      const monthlyData: {
+        label: string;
+        opCF: number;
+        invCF: number;
+        finCF: number;
+        netCF: number;
+        balance: number;
+      }[] = [];
+      let balance = opening;
+      let breakEvenMonth: number | null = null;
+      let lowestCash = opening;
+      let lowestCashMonth: string | null = null;
+
+      form.months.forEach((m, i) => {
+        const opCF = pf(m.operatingCF);
+        const invCF = pf(m.investingCF);
+        const finCF = pf(m.financingCF);
+        const netCF = opCF + invCF + finCF;
+        balance += netCF;
+        if (balance < lowestCash) {
+          lowestCash = balance;
+          lowestCashMonth = MONTH_LABELS[i];
+        }
+        if (breakEvenMonth === null && netCF > 0) {
+          breakEvenMonth = i + 1;
+        }
+        monthlyData.push({ label: MONTH_LABELS[i], opCF, invCF, finCF, netCF, balance });
+      });
+
+      const closing = balance;
+      const netCF = closing - opening;
+      const totalOpCF = monthlyData.reduce((s, m) => s + m.opCF, 0);
+      const negOpMonths = monthlyData.filter((m) => m.opCF < 0);
+      const monthlyBurn =
+        negOpMonths.length > 0
+          ? Math.abs(negOpMonths.reduce((s, m) => s + m.opCF, 0) / negOpMonths.length)
+          : 0;
+      const runway = monthlyBurn > 0 && opening > 0 ? Math.floor(opening / monthlyBurn) : Infinity;
+
+      return {
+        mode: "detailed" as const,
+        opening,
+        opCF: totalOpCF,
+        invCF: monthlyData.reduce((s, m) => s + m.invCF, 0),
+        finCF: monthlyData.reduce((s, m) => s + m.finCF, 0),
+        netCF,
+        closing,
+        monthlyBurn,
+        runway,
+        chartData: [],
+        monthlyData,
+        breakEvenMonth,
+        lowestCash,
+        lowestCashMonth,
+      };
+    }
+  }, [form]);
+
+  // ── Standalone toolData localStorage auto-save ──
+  useEffect(() => {
+    const cid = getCompanyId();
+    if (cid === "__default__") return;
+    if (!calc || calc.closing === 0) return;
+    const timer = setTimeout(() => {
+      console.log(`[T03] auto-save to toolData | cid=${cid}`);
+      saveToolData({
+        companyId: cid,
+        toolId: "T03",
+        calculatedOutput: {
+          yearEndCash: calc.closing,
+          openingCash: calc.opening,
+          netOperatingCashFlow: calc.opCF,
+        },
+        currency: sym,
+      });
+    }, 500);
+    return () => clearTimeout(timer);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [calc, sym]);
+
+  // ── Signals ────────────────────────────────────────────────────────────────
+
+  function closingSignal(): Signal {
+    if (calc.closing <= 0) return "red";
+    if (calc.closing < calc.opening * 0.5) return "yellow";
+    return "green";
+  }
+
+  function runwaySignal(): Signal {
+    if (!isFinite(calc.runway)) return "green";
+    if (calc.runway > 12) return "green";
+    if (calc.runway >= 6) return "yellow";
+    return "red";
+  }
+
+  function netCFSignal(): Signal {
+    if (calc.netCF > 0) return "green";
+    if (calc.netCF >= -calc.opening * 0.1) return "yellow";
+    return "red";
+  }
+
+  const overallSignal: Signal =
+    runwaySignal() === "red" || closingSignal() === "red"
+      ? "red"
+      : runwaySignal() === "yellow" || closingSignal() === "yellow"
+      ? "yellow"
+      : "green";
+
+  const oc = SIG_COLORS[overallSignal];
+
+  const fundraisingMessages: Record<Signal, string> = {
+    green: "现金流稳健，无需紧急融资。建议继续积累，在最佳时机主动融资。",
+    yellow: "跑道期不足 12 个月，建议现在开始准备融资材料，6 个月内完成首轮接触。",
+    red: "现金流严峻，需立即采取行动：削减非必要支出，并启动紧急融资流程。",
+    neutral: "",
+  };
+
+  // ── Save handler ──────────────────────────────────────────────────────────
+
+  async function handleSave() {
+    await save(form);
+    try {
+      const mode = localStorage.getItem(ENTERPRISE_KEYS.MODE);
+      let companyId = "no_company";
+      if (mode === "single") {
+        const sc = localStorage.getItem(ENTERPRISE_KEYS.SINGLE);
+        if (sc) companyId = `single_${JSON.parse(sc).id ?? "default"}`;
+      } else if (mode === "group") {
+        const ac = localStorage.getItem(ENTERPRISE_KEYS.ACTIVE_COMPANY);
+        if (ac) companyId = `group_${JSON.parse(ac).id ?? "default"}`;
+      }
+      if (companyId === "no_company") return;
+      // Save to unified toolData localStorage
+      saveToolData({
+        companyId,
+        toolId: "T03",
+        calculatedOutput: {
+          yearEndCash: calc.closing,
+          openingCash: calc.opening,
+          netOperatingCashFlow: calc.opCF,
+        },
+        currency: sym,
+      });
+
+      const existing = await fetch(
+        `/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(companyId)}`
+      ).then((r) => r.json());
+      const core = existing?.data ?? {};
+
+      await fetch("/api/tools/snapshot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          toolSlug: "_financial_core",
+          companyId,
+          data: {
+            ...core,
+            openingCash: calc.opening,
+            yearEndCash: calc.closing,
+            currencySymbol: sym,
+            updatedBy: {
+              ...(core.updatedBy ?? {}),
+              "cash-flow": new Date().toISOString(),
+            },
+          },
+        }),
+      });
+    } catch {}
+  }
+
+  const guide = <ToolGuide toolSlug="cash-flow" steps={GUIDE_STEPS} />;
+
+  // ── Render ────────────────────────────────────────────────────────────────
+
+  return (
+    <ToolShell
+      icon=""
+      title={locale === "en" ? "Cash Flow Planning" : "现金流规划"}
+      desc={
+        locale === "en"
+          ? "Plan cash flow, track runway and fundraising timing"
+          : "规划现金进出、追踪跑道期与融资时机"
+      }
+      backHref="/student/dashboard"
+      guideButton={guide}
+    >
+      <div className="space-y-5">
+
+        {/* ── Settings ──────────────────────────────────────────────────── */}
+        <Card>
+          <SectionLabel>基础设置</SectionLabel>
+          <div className="flex flex-wrap items-center gap-4 mb-4">
+            {/* Mode toggle */}
+            <div
+              className="flex items-center gap-1 p-1 rounded-xl"
+              style={{ backgroundColor: "#F8F6F1" }}
+            >
+              {(["simple", "detailed"] as const).map((m) => (
+                <button
+                  key={m}
+                  onClick={() => setField("inputMode")(m)}
+                  className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                  style={{
+                    backgroundColor: form.inputMode === m ? "#C9A84C" : "transparent",
+                    color: form.inputMode === m ? "#FFFFFF" : "#7A7A7A",
+                  }}
+                >
+                  {m === "simple" ? "简单模式（年度）" : "详细模式（逐月）"}
+                </button>
+              ))}
+            </div>
+
+
+          </div>
+
+          {/* Opening cash */}
+          <InputRow
+            label="期初现金余额"
+            value={form.openingCash}
+            onChange={setField("openingCash")}
+            sym={sym}
+          />
+
+          {/* Import buttons */}
+          <div className="mt-3 flex flex-wrap gap-2">
+            {coreData?.cashBalance !== undefined && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs" style={{ color: "#7A7A7A" }}>
+                  资产负债表现金：{fmt(coreData.cashBalance, sym)}
+                </span>
+                <button
+                  onClick={() => setField("openingCash")(String(Math.round(coreData.cashBalance!)))}
+                  className="text-xs px-3 py-1 rounded-lg transition-opacity hover:opacity-70"
+                  style={{
+                    backgroundColor: "rgba(201,168,76,0.1)",
+                    border: "1px solid rgba(201,168,76,0.25)",
+                    color: "#C9A84C",
+                  }}
+                >
+                  导入为期初现金
+                </button>
+              </div>
+            )}
+            {coreData?.annualPAT !== undefined && (
+              <div className="flex items-center gap-2">
+                <span className="text-xs" style={{ color: "#7A7A7A" }}>
+                  利润表 PAT：{fmt(coreData.annualPAT, sym)} / 年
+                </span>
+                <button
+                  onClick={importFromCore}
+                  className="text-xs px-3 py-1 rounded-lg transition-opacity hover:opacity-70"
+                  style={{
+                    backgroundColor: "rgba(201,168,76,0.1)",
+                    border: "1px solid rgba(201,168,76,0.25)",
+                    color: "#C9A84C",
+                  }}
+                >
+                  导入至经营现金流
+                </button>
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {/* ── Simple mode inputs ─────────────────────────────────────────── */}
+        {form.inputMode === "simple" && (
+          <div className="grid lg:grid-cols-3 gap-5">
+            <Card>
+              <SectionLabel>经营活动现金流</SectionLabel>
+              <InputRow
+                label="收取客户款项"
+                value={form.operatingInflow}
+                onChange={setField("operatingInflow")}
+                sym={sym}
+              />
+              <InputRow
+                label="支付供应商及员工"
+                value={form.operatingOutflow}
+                onChange={setField("operatingOutflow")}
+                sym={sym}
+              />
+              <Subtotal label="经营净现金流" value={calc.opCF} sym={sym} highlight={calc.opCF > 0} />
+            </Card>
+
+            <Card>
+              <SectionLabel>投资活动现金流</SectionLabel>
+              <InputRow
+                label="资产出售 / 收回投资"
+                value={form.investingInflow}
+                onChange={setField("investingInflow")}
+                sym={sym}
+              />
+              <InputRow
+                label="资本支出（设备/扩张）"
+                value={form.investingOutflow}
+                onChange={setField("investingOutflow")}
+                sym={sym}
+              />
+              <Subtotal label="投资净现金流" value={calc.invCF} sym={sym} />
+            </Card>
+
+            <Card>
+              <SectionLabel>融资活动现金流</SectionLabel>
+              <InputRow
+                label="贷款 / 股权融资收入"
+                value={form.financingInflow}
+                onChange={setField("financingInflow")}
+                sym={sym}
+              />
+              <InputRow
+                label="还款 / 股息派发"
+                value={form.financingOutflow}
+                onChange={setField("financingOutflow")}
+                sym={sym}
+              />
+              <Subtotal label="融资净现金流" value={calc.finCF} sym={sym} />
+            </Card>
+          </div>
+        )}
+
+        {/* ── Detailed mode: 12-month table ─────────────────────────────── */}
+        {form.inputMode === "detailed" && (
+          <Card>
+            <SectionLabel>12 个月现金流明细（正数 = 流入，负数 = 流出）</SectionLabel>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs" style={{ borderCollapse: "collapse" }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid #E8DFCF" }}>
+                    <th className="text-left pb-2 font-mono pr-2" style={{ color: "#7A7A7A", minWidth: 40 }}>月</th>
+                    <th className="text-right pb-2 font-mono px-2" style={{ color: "#7A7A7A", minWidth: 110 }}>经营活动</th>
+                    <th className="text-right pb-2 font-mono px-2" style={{ color: "#7A7A7A", minWidth: 110 }}>投资活动</th>
+                    <th className="text-right pb-2 font-mono px-2" style={{ color: "#7A7A7A", minWidth: 110 }}>融资活动</th>
+                    <th className="text-right pb-2 font-mono px-2" style={{ color: "#7A7A7A", minWidth: 90 }}>净现金流</th>
+                    <th className="text-right pb-2 font-mono px-2" style={{ color: "#7A7A7A", minWidth: 90 }}>累计余额</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {calc.monthlyData.map((row, i) => (
+                    <tr key={i} style={{ borderBottom: "1px solid #E8DFCF" }}>
+                      <td className="py-1.5 font-mono pr-2" style={{ color: "#7A7A7A" }}>
+                        {row.label}
+                      </td>
+                      {(["operatingCF", "investingCF", "financingCF"] as const).map((key) => (
+                        <td key={key} className="py-1 px-2">
+                          <input
+                            type="number"
+                            value={form.months[i][key]}
+                            onChange={(e) => setMonth(i, key)(e.target.value)}
+                            className="w-full text-right rounded-md py-1 px-2 text-xs font-mono outline-none"
+                            style={{
+                              backgroundColor: "#F8F6F1",
+                              border: "1px solid #E8DFCF",
+                              color:
+                                parseFloat(form.months[i][key]) < 0 ? "#EF4444" : "#2B2B2B",
+                            }}
+                            onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+                            onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
+                          />
+                        </td>
+                      ))}
+                      <td
+                        className="py-1.5 px-2 text-right font-mono font-semibold"
+                        style={{ color: row.netCF < 0 ? "#EF4444" : "#22C55E" }}
+                      >
+                        {fmtShort(row.netCF)}
+                      </td>
+                      <td
+                        className="py-1.5 px-2 text-right font-mono"
+                        style={{
+                          color:
+                            row.balance < 0
+                              ? "#EF4444"
+                              : row.balance < (parseFloat(form.openingCash) || 0) * 0.3
+                              ? "#F0A445"
+                              : "#A0A09A",
+                        }}
+                      >
+                        {fmtShort(row.balance)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+        )}
+
+        {/* ── Summary totals ─────────────────────────────────────────────── */}
+        <div className="grid grid-cols-3 gap-4">
+          <Subtotal label="经营净现金流" value={calc.opCF} sym={sym} />
+          <Subtotal label="投资净现金流" value={calc.invCF} sym={sym} />
+          <Subtotal label="融资净现金流" value={calc.finCF} sym={sym} />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <Subtotal label="年度净现金流" value={calc.netCF} sym={sym} highlight />
+          <Subtotal label="年末现金余额" value={calc.closing} sym={sym} highlight />
+        </div>
+
+        {/* ── Chart ──────────────────────────────────────────────────────── */}
+        <Card>
+          <SectionLabel>
+            {form.inputMode === "simple" ? "现金流瀑布图" : "月度净现金流 + 累计余额"}
+          </SectionLabel>
+          <div style={{ height: 240 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              {form.inputMode === "simple" ? (
+                <ComposedChart
+                  data={calc.chartData}
+                  margin={{ top: 8, right: 8, left: 8, bottom: 8 }}
+                >
+                  <XAxis
+                    dataKey="label"
+                    tick={{ fill: "#7A7A7A", fontSize: 11 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fill: "#7A7A7A", fontSize: 10 }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={fmtShort}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#F8F6F1",
+                      border: "1px solid #E8DFCF",
+                      borderRadius: 10,
+                      fontSize: 12,
+                    }}
+                    labelStyle={{ color: "#9A9490" }}
+                    formatter={(v: number) => [fmt(v, sym), ""]}
+                  />
+                  <ReferenceLine y={0} stroke="#E8DFCF" />
+                  <Bar dataKey="value" radius={[6, 6, 0, 0]}>
+                    {calc.chartData.map((entry, i) => (
+                      <Cell
+                        key={i}
+                        fill={
+                          entry.isBalance
+                            ? "#C9A84C"
+                            : entry.value >= 0
+                            ? "#22C55E"
+                            : "#EF4444"
+                        }
+                        fillOpacity={0.85}
+                      />
+                    ))}
+                  </Bar>
+                </ComposedChart>
+              ) : (
+                <ComposedChart
+                  data={calc.monthlyData}
+                  margin={{ top: 8, right: 8, left: 8, bottom: 8 }}
+                >
+                  <XAxis
+                    dataKey="label"
+                    tick={{ fill: "#7A7A7A", fontSize: 11 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    yAxisId="left"
+                    tick={{ fill: "#7A7A7A", fontSize: 10 }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={fmtShort}
+                  />
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    tick={{ fill: "#7A7A7A", fontSize: 10 }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={fmtShort}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#F8F6F1",
+                      border: "1px solid #E8DFCF",
+                      borderRadius: 10,
+                      fontSize: 12,
+                    }}
+                    labelStyle={{ color: "#9A9490" }}
+                    formatter={(v: number, name: string) => [fmt(v, sym), name]}
+                  />
+                  <ReferenceLine yAxisId="left" y={0} stroke="#E8DFCF" />
+                  <Bar yAxisId="left" dataKey="netCF" name="净现金流" radius={[4, 4, 0, 0]}>
+                    {calc.monthlyData.map((entry, i) => (
+                      <Cell
+                        key={i}
+                        fill={entry.netCF >= 0 ? "#22C55E" : "#EF4444"}
+                        fillOpacity={0.8}
+                      />
+                    ))}
+                  </Bar>
+                  <Line
+                    yAxisId="right"
+                    type="monotone"
+                    dataKey="balance"
+                    name="累计余额"
+                    stroke="#C9A84C"
+                    strokeWidth={2}
+                    dot={false}
+                  />
+                </ComposedChart>
+              )}
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
+        {/* ── Capital indicators ─────────────────────────────────────────── */}
+        <Card accent>
+          <SectionLabel>资本化指标</SectionLabel>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <IndicatorCard
+              label="年末现金余额"
+              value={fmt(calc.closing, sym)}
+              signal={closingSignal()}
+              note={
+                calc.closing > 0
+                  ? calc.closing >= calc.opening * 0.5
+                    ? "现金储备充足，运营安全。"
+                    : "现金余额偏低，建议关注。"
+                  : "现金已耗尽，需立即融资。"
+              }
+            />
+            <IndicatorCard
+              label="年度净现金流"
+              value={fmt(calc.netCF, sym)}
+              signal={netCFSignal()}
+              note={
+                calc.netCF > 0
+                  ? "净流入，现金在积累。"
+                  : calc.netCF >= -calc.opening * 0.1
+                  ? "接近平衡，请控制支出。"
+                  : "净流出，请检查各类支出。"
+              }
+            />
+            <IndicatorCard
+              label="月燃烧率"
+              value={
+                isFinite(calc.monthlyBurn) && calc.monthlyBurn > 0
+                  ? fmt(calc.monthlyBurn, sym)
+                  : "无消耗"
+              }
+              signal={
+                calc.monthlyBurn <= 0
+                  ? "green"
+                  : calc.monthlyBurn > calc.closing / 6
+                  ? "red"
+                  : "yellow"
+              }
+              note={
+                calc.monthlyBurn > 0
+                  ? `每月净消耗 ${fmt(calc.monthlyBurn, sym)}，需监控现金储备。`
+                  : "经营活动现金流为正，没有燃烧。"
+              }
+            />
+            <IndicatorCard
+              label="跑道期"
+              value={
+                !isFinite(calc.runway) || calc.runway <= 0
+                  ? "充足"
+                  : `${calc.runway} 个月`
+              }
+              signal={runwaySignal()}
+              note={
+                !isFinite(calc.runway)
+                  ? "经营现金流为正，无跑道风险。"
+                  : calc.runway > 12
+                  ? `超过 12 个月跑道，融资无压力。`
+                  : calc.runway >= 6
+                  ? `${calc.runway} 个月跑道，建议提前启动融资。`
+                  : `跑道不足 6 个月，融资为当务之急。`
+              }
+            />
+          </div>
+
+          {/* Detailed mode extras */}
+          {form.inputMode === "detailed" && (
+            <div className="mt-4 grid sm:grid-cols-2 gap-4">
+              <div
+                className="rounded-xl px-4 py-3"
+                style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
+              >
+                <p className="text-xs font-semibold mb-1" style={{ color: "#9A9490" }}>
+                  首次月度盈利月份
+                </p>
+                <p
+                  className="text-lg font-bold font-mono"
+                  style={{ color: calc.breakEvenMonth ? "#22C55E" : "#7A7A7A" }}
+                >
+                  {calc.breakEvenMonth ? `第 ${calc.breakEvenMonth} 个月` : "本年度未出现"}
+                </p>
+              </div>
+              <div
+                className="rounded-xl px-4 py-3"
+                style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
+              >
+                <p className="text-xs font-semibold mb-1" style={{ color: "#9A9490" }}>
+                  最低现金月
+                  {calc.lowestCashMonth ? `（${calc.lowestCashMonth}）` : ""}
+                </p>
+                <p
+                  className="text-lg font-bold font-mono"
+                  style={{ color: calc.lowestCash < 0 ? "#EF4444" : "#F0A445" }}
+                >
+                  {fmt(calc.lowestCash, sym)}
+                </p>
+              </div>
+            </div>
+          )}
+        </Card>
+
+        {/* ── Fundraising signal ─────────────────────────────────────────── */}
+        <div
+          className="rounded-2xl px-5 py-4"
+          style={{ backgroundColor: oc.bg, border: `1px solid ${oc.border}` }}
+        >
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-sm font-bold mb-1" style={{ color: oc.text }}>
+                融资时机：
+                {overallSignal === "green" && "现金流稳健"}
+                {overallSignal === "yellow" && "建议开始规划融资"}
+                {overallSignal === "red" && "需要立即行动"}
+              </p>
+              <p className="text-xs leading-relaxed" style={{ color: "#7A7A7A" }}>
+                {fundraisingMessages[overallSignal]}
+              </p>
+            </div>
+            <div
+              className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold"
+              style={{ backgroundColor: oc.border, color: oc.text }}
+            >
+              {overallSignal === "green" ? "A" : overallSignal === "yellow" ? "B" : "C"}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Cash gap warning ───────────────────────────────────────────── */}
+        {calc.closing < 0 && (
+          <div
+            className="flex items-start gap-3 px-4 py-3 rounded-xl"
+            style={{
+              backgroundColor: "rgba(239,68,68,0.05)",
+              border: "1px solid rgba(239,68,68,0.2)",
+            }}
+          >
+            <p className="text-sm" style={{ color: "#EF4444" }}>
+              年末现金为负（缺口 {fmt(Math.abs(calc.closing), sym)}）。企业需要在年末前通过融资或削减支出填补这一缺口，否则将无法维持正常运营。
+            </p>
+          </div>
+        )}
+
+        {/* ── Save ───────────────────────────────────────────────────────── */}
+        <div className="flex items-center justify-between">
+          <p className="text-xs" style={{ color: "#2B2B2B" }}>
+            {saving ? "正在保存..." : lastSaved ? `已自动保存 ${lastSaved.toLocaleTimeString()}` : "未保存"}
+          </p>
+        </div>
+
+      </div>
+    </ToolShell>
+  );
+}

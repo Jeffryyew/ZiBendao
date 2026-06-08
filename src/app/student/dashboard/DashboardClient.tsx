@@ -1,6 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import type { FinancialCore } from "@/lib/financialCore";
+import { loadCompanyToolData } from "@/lib/toolData";
+import type { AllToolData } from "@/lib/toolData";
+import { COUNTRY_OPTIONS } from "@/lib/taxRates";
 import Link from "next/link";
 import {
   ONLINE_BADGES,
@@ -35,6 +39,7 @@ interface Company {
   name: string;
   type: string;
   status: "active" | "inactive";
+  country?: string;
   isParent?: boolean;
   parentId?: string | null;
   shareholding?: number;
@@ -298,7 +303,7 @@ function OverviewTab({
               </div>
               <StatusBadge status={singleCompany.status} />
             </div>
-            <GrowthStatusBar label="企业成长状态" netProfit={singleCompany.netProfit ?? 0} />
+            <GrowthStatusBar label="企业成长状态" netProfit={singleCompany.netProfit ?? 0} companyId={`single_${singleCompany.id}`} />
           </div>
         ) : companyMode === "group" && group.parent ? (
           <div className="space-y-3">
@@ -308,7 +313,7 @@ function OverviewTab({
                 <div className="text-xs" style={{ color: "#9A9490" }}>母公司 · {group.subsidiaries.length} 家子公司</div>
               </div>
             </div>
-            <GrowthStatusBar label="集团成长状态" netProfit={(group.parent?.netProfit ?? 0) + group.subsidiaries.reduce((s, c) => s + (c.netProfit ?? 0), 0)} />
+            <GrowthStatusBar label="集团成长状态" netProfit={(group.parent?.netProfit ?? 0) + group.subsidiaries.reduce((s, c) => s + (c.netProfit ?? 0), 0)} companyId={group.parent ? `group_${group.parent.id}` : undefined} />
           </div>
         ) : null}
       </Card>
@@ -613,6 +618,7 @@ function SingleCompanyView({
     industry: company?.industry ?? "",
     notes: company?.notes ?? "",
     netProfit: company?.netProfit ?? 0,
+    country: company?.country ?? "",
   });
 
   const save = () => {
@@ -625,6 +631,7 @@ function SingleCompanyView({
       industry: form.industry.trim() || undefined,
       notes: form.notes.trim() || undefined,
       netProfit: form.netProfit || undefined,
+      country: (form.country || undefined) as import("@/lib/enterprise").CountryCode | undefined,
     });
     setEditing(false);
   };
@@ -685,11 +692,15 @@ function SingleCompanyView({
             </div>
           </div>
         </div>
-        <GrowthStatusBar label="企业成长状态" netProfit={company.netProfit ?? 0} />
+        <GrowthStatusBar label="企业成长状态" netProfit={company.netProfit ?? 0} companyId={`single_${company.id}`} />
         {company.notes && (
           <p className="mt-3 text-xs leading-relaxed" style={{ color: "#68625C" }}>{company.notes}</p>
         )}
       </div>
+
+      <EnterpriseCoreSummary companyId={`single_${company.id}`} />
+
+      <DebugPanelWrapper companyId={`single_${company.id}`} />
 
       <AIAnalysisCard
         title="小资分析"
@@ -726,6 +737,7 @@ function GroupView({
     industry: "",
     notes: "",
     netProfit: 0,
+    country: "",
   });
 
   const [parentForm, setParentForm] = useState({
@@ -734,6 +746,7 @@ function GroupView({
     status: (group.parent?.status ?? "active") as "active" | "inactive",
     industry: group.parent?.industry ?? "",
     netProfit: group.parent?.netProfit ?? 0,
+    country: group.parent?.country ?? "",
   });
 
   const [editSubForm, setEditSubForm] = useState({
@@ -743,6 +756,7 @@ function GroupView({
     industry: "",
     notes: "",
     netProfit: 0,
+    country: "",
   });
 
   const saveParent = () => {
@@ -757,6 +771,7 @@ function GroupView({
         isParent: true,
         industry: parentForm.industry.trim() || undefined,
         netProfit: parentForm.netProfit || undefined,
+        country: (parentForm.country || undefined) as import("@/lib/enterprise").CountryCode | undefined,
       },
     });
     setEditingParent(false);
@@ -774,9 +789,10 @@ function GroupView({
       industry: subForm.industry.trim() || undefined,
       notes: subForm.notes.trim() || undefined,
       netProfit: subForm.netProfit || undefined,
+      country: (subForm.country || undefined) as import("@/lib/enterprise").CountryCode | undefined,
     };
     onSetGroup({ ...group, subsidiaries: [...group.subsidiaries, newSub] });
-    setSubForm({ name: "", type: "私人有限公司", shareholding: 100, industry: "", notes: "", netProfit: 0 });
+    setSubForm({ name: "", type: "私人有限公司", shareholding: 100, industry: "", notes: "", netProfit: 0, country: "" });
     setAddingSub(false);
   };
 
@@ -788,6 +804,7 @@ function GroupView({
       industry: sub.industry ?? "",
       notes: sub.notes ?? "",
       netProfit: sub.netProfit ?? 0,
+      country: sub.country ?? "",
     });
     setEditingSub(sub.id);
   };
@@ -806,6 +823,7 @@ function GroupView({
               industry: editSubForm.industry.trim() || undefined,
               notes: editSubForm.notes.trim() || undefined,
               netProfit: editSubForm.netProfit || undefined,
+              country: (editSubForm.country || undefined) as import("@/lib/enterprise").CountryCode | undefined,
             }
           : s
       ),
@@ -863,6 +881,19 @@ function GroupView({
               className="w-full px-3 py-2 rounded-xl text-sm outline-none"
               style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", color: "#1C1814" }}
             />
+          </FormField>
+          <FormField label="所在国家">
+            <select
+              value={parentForm.country}
+              onChange={(e) => setParentForm({ ...parentForm, country: e.target.value })}
+              className="w-full px-3 py-2 rounded-xl text-sm outline-none"
+              style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE", color: parentForm.country ? "#1C1814" : "#9A9490" }}
+            >
+              <option value="">请选择国家</option>
+              {COUNTRY_OPTIONS.map((o) => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
           </FormField>
           <button
             onClick={saveParent}
@@ -1053,6 +1084,19 @@ function GroupView({
                 style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE", color: "#1C1814" }}
               />
             </FormField>
+            <FormField label="所在国家">
+              <select
+                value={subForm.country}
+                onChange={(e) => setSubForm({ ...subForm, country: e.target.value })}
+                className="w-full px-3 py-2 rounded-xl text-sm outline-none"
+                style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE", color: subForm.country ? "#1C1814" : "#9A9490" }}
+              >
+                <option value="">请选择国家</option>
+                {COUNTRY_OPTIONS.map((o) => (
+                  <option key={o.value} value={o.value}>{o.label}</option>
+                ))}
+              </select>
+            </FormField>
             <div className="flex gap-2">
               <button
                 onClick={addSubsidiary}
@@ -1125,6 +1169,19 @@ function GroupView({
                   className="w-full px-3 py-2 rounded-xl text-sm outline-none"
                   style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE", color: "#1C1814" }}
                 />
+              </FormField>
+              <FormField label="所在国家">
+                <select
+                  value={editSubForm.country}
+                  onChange={(e) => setEditSubForm({ ...editSubForm, country: e.target.value })}
+                  className="w-full px-3 py-2 rounded-xl text-sm outline-none"
+                  style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE", color: editSubForm.country ? "#1C1814" : "#9A9490" }}
+                >
+                  <option value="">请选择国家</option>
+                  {COUNTRY_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>{o.label}</option>
+                  ))}
+                </select>
               </FormField>
               <button
                 onClick={saveSubEdit}
@@ -1224,7 +1281,9 @@ function GroupView({
       {/* Group overview when no subsidiary selected */}
       {!viewedCompany && (
         <>
-          <GrowthStatusBar label="集团成长状态" netProfit={(group.parent?.netProfit ?? 0) + group.subsidiaries.reduce((s, c) => s + (c.netProfit ?? 0), 0)} />
+          <GrowthStatusBar label="集团成长状态" netProfit={(group.parent?.netProfit ?? 0) + group.subsidiaries.reduce((s, c) => s + (c.netProfit ?? 0), 0)} companyId={group.parent ? `group_${group.parent.id}` : undefined} />
+
+          {group.parent && <EnterpriseCoreSummary companyId={`group_${group.parent.id}`} />}
 
           <AIAnalysisCard
             title="小资分析"
@@ -1295,25 +1354,370 @@ function StatusBadge({ status, small }: { status: "active" | "inactive"; small?:
   );
 }
 
-function getGrowthLevel(netProfit: number): number {
-  if (netProfit >= 3_000_000) return 4;
-  if (netProfit >= 2_000_000) return 3;
-  if (netProfit >= 1_500_000) return 2;
-  if (netProfit >= 1_000_000) return 1;
+
+// ─── Enterprise Core Summary ─────────────────────────────────────────────────
+
+function fmtMoney(n: number | undefined, sym = "RM"): string {
+  if (n == null || isNaN(n)) return "—";
+  if (Math.abs(n) >= 1_000_000) return sym + " " + (n / 1_000_000).toFixed(2) + "M";
+  if (Math.abs(n) >= 1_000) return sym + " " + (n / 1_000).toFixed(0) + "K";
+  return sym + " " + n.toFixed(0);
+}
+
+function fmtPct(n: number | undefined): string {
+  if (n == null || isNaN(n)) return "—";
+  return n.toFixed(1) + "%";
+}
+
+function fmtRatio(n: number | undefined): string {
+  if (n == null || !isFinite(n) || isNaN(n)) return "—";
+  return n.toFixed(2) + "x";
+}
+
+function CoreDataRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center justify-between py-1.5" style={{ borderBottom: "1px solid #F0EDE8" }}>
+      <span className="text-xs" style={{ color: "#9A9490" }}>{label}</span>
+      <span className="text-xs font-semibold font-mono" style={{ color: "#2B2B2B" }}>{value}</span>
+    </div>
+  );
+}
+
+function CoreSection({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-0">
+      <p className="text-xs font-semibold mb-1" style={{ color: "#C9A84C" }}>{title}</p>
+      {children}
+    </div>
+  );
+}
+
+
+
+// ─── DebugPanelWrapper — reads fresh from localStorage ───────────────────────
+function DebugPanelWrapper({ companyId }: { companyId: string }) {
+  const [td, setTd] = useState<AllToolData>({});
+  useEffect(() => {
+    function reload() { setTd(loadCompanyToolData(companyId)); }
+    reload();
+    window.addEventListener("toolDataUpdated", reload);
+    return () => window.removeEventListener("toolDataUpdated", reload);
+  }, [companyId]);
+  return <DebugPanel companyId={companyId} toolData={td} />;
+}
+
+// ─── Debug Panel (TEMPORARY — remove after confirming data flow) ──────────────
+function DebugPanel({ companyId, toolData }: { companyId: string; toolData: AllToolData }) {
+  const [lsItems, setLsItems] = useState<{ key: string; parsed: unknown }[]>([]);
+
+  useEffect(() => {
+    try {
+      const items: { key: string; parsed: unknown }[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.includes("zibendao_toolData")) {
+          try {
+            items.push({ key: k, parsed: JSON.parse(localStorage.getItem(k) || "null") });
+          } catch {
+            items.push({ key: k, parsed: "(parse error)" });
+          }
+        }
+      }
+      setLsItems(items);
+    } catch {}
+  }, [companyId]);
+
+  const t01Raw = toolData.T01;
+  const expectedKey = `zibendao_toolData_${companyId}_T01`;
+  const lsT01 = lsItems.find(i => i.key === expectedKey);
+
+  const rows = [
+    ["Dashboard companyId", companyId],
+    ["Expected T01 key", expectedKey],
+    ["T01 in localStorage?", lsT01 ? "✅ YES" : "❌ NOT FOUND"],
+    ["T01 in toolData?", t01Raw ? "✅ YES" : "❌ NO"],
+    ["T01 calculatedOutput", t01Raw ? JSON.stringify(t01Raw.calculatedOutput, null, 2) : "—"],
+  ] as [string, string][];
+
+  return (
+    <div
+      className="rounded-2xl p-4 space-y-3"
+      style={{ backgroundColor: "#FFF8E7", border: "2px dashed #F0A445", fontSize: "11px" }}
+    >
+      <p className="font-bold" style={{ color: "#7A5C1E" }}>🔍 Debug Panel（确认后移除）</p>
+
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <tbody>
+          {rows.map(([label, val]) => (
+            <tr key={label} style={{ borderBottom: "1px solid rgba(240,164,69,0.2)" }}>
+              <td style={{ padding: "4px 8px 4px 0", color: "#7A5C1E", fontWeight: 600, whiteSpace: "nowrap", verticalAlign: "top" }}>
+                {label}
+              </td>
+              <td style={{ padding: "4px 0", color: "#1C1814", wordBreak: "break-all", whiteSpace: "pre-wrap" }}>
+                {val}
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div>
+        <p className="font-semibold mb-1" style={{ color: "#7A5C1E" }}>
+          All zibendao_toolData keys in localStorage ({lsItems.length}):
+        </p>
+        {lsItems.length === 0 ? (
+          <p style={{ color: "#EF4444" }}>❌ 没有任何 zibendao_toolData 项目！T01 尚未保存或 key 不匹配。</p>
+        ) : (
+          lsItems.map(item => (
+            <div key={item.key} className="mb-2 p-2 rounded" style={{ backgroundColor: "rgba(240,164,69,0.1)" }}>
+              <p className="font-mono font-semibold" style={{ color: "#7A5C1E", marginBottom: 4 }}>
+                {item.key === expectedKey ? "✅" : "⚠️"} {item.key}
+              </p>
+              <pre style={{ color: "#1C1814", fontSize: "10px", overflow: "auto", maxHeight: 120 }}>
+                {JSON.stringify(item.parsed, null, 2)}
+              </pre>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  );
+}
+
+function EnterpriseCoreSummary({ companyId }: { companyId: string }) {
+  const [toolData, setToolData] = useState<AllToolData>({});
+  const [dbCore, setDbCore] = useState<FinancialCore | null>(null);
+  console.log(`[Dashboard] EnterpriseCoreSummary mounted/rendered | companyId=${companyId}`);
+
+  useEffect(() => {
+    if (!companyId) return;
+
+    function reload() {
+      console.log(`[Dashboard] EnterpriseCoreSummary reload | companyId=${companyId}`);
+      const ld = loadCompanyToolData(companyId);
+      console.log(`[Dashboard] toolData keys loaded: [${Object.keys(ld).join(", ")}]`);
+      setToolData(ld);
+    }
+
+    // Step 1: Load all tool data from localStorage immediately
+    reload();
+
+    // Step 2: Listen for toolDataUpdated events (fired by saveToolData)
+    function onToolDataUpdated(e: Event) {
+      const ev = e as CustomEvent<{ companyId: string; toolId: string }>;
+      if (ev.detail.companyId !== companyId) return;
+      console.log(`[Dashboard] toolDataUpdated event | toolId=${ev.detail.toolId}`);
+      reload();
+    }
+    window.addEventListener("toolDataUpdated", onToolDataUpdated);
+
+    // Step 3: Fetch _financial_core from DB as supplement for older data
+    fetch(`/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(companyId)}`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data?.data && Object.keys(data.data.updatedBy ?? {}).length > 0) {
+          setDbCore(data.data as FinancialCore);
+        }
+      })
+      .catch(() => {});
+
+    return () => window.removeEventListener("toolDataUpdated", onToolDataUpdated);
+  }, [companyId]);
+
+  const t01 = toolData.T01?.calculatedOutput;
+  const t02 = toolData.T02?.calculatedOutput;
+  const t03 = toolData.T03?.calculatedOutput;
+  const t06 = toolData.T06?.calculatedOutput;
+  const t07 = toolData.T07?.calculatedOutput;
+  const t08 = toolData.T08?.calculatedOutput;
+  const t09 = toolData.T09?.calculatedOutput;
+
+  const sym =
+    toolData.T01?.currency ??
+    toolData.T02?.currency ??
+    dbCore?.currencySymbol ??
+    "RM";
+
+  const hasLocalData = Object.keys(toolData).length > 0;
+  const hasDbData = dbCore && Object.keys(dbCore.updatedBy ?? {}).length > 0;
+  if (!hasLocalData && !hasDbData) return null;
+
+  // Merged values: localStorage primary, DB fills gaps
+  const annualRevenue = t01?.annualRevenue ?? dbCore?.annualRevenue;
+  const grossProfit   = t01?.grossProfit   ?? dbCore?.grossProfit;
+  const ebit          = t01?.pbt           ?? dbCore?.ebit;
+  const taxAmt        = t01?.taxAmt        ?? dbCore?.taxAmt;
+  const annualPAT     = t01?.pat           ?? dbCore?.annualPAT;
+  const patMargin     = t01?.patMarginPct  ?? dbCore?.patMargin;
+  const grossMargin   = t01?.grossMarginPct ?? dbCore?.grossMargin;
+
+  const totalAssets      = t02?.totalAssets      ?? dbCore?.totalAssets;
+  const totalLiabilities = t02?.totalLiabilities ?? dbCore?.totalLiabilities;
+  const totalEquity      = t02?.totalEquity      ?? dbCore?.totalEquity;
+  const currentRatio     = t02?.currentRatio     ?? dbCore?.currentRatio;
+  const t02DebtToEquity  = t02?.debtToEquity     ?? dbCore?.debtToEquity;
+
+  const yearEndCash          = t03?.yearEndCash          ?? dbCore?.yearEndCash;
+  const netOperatingCashFlow = t03?.netOperatingCashFlow as number | undefined;
+
+  const currentValuation = t06?.currentValuation ?? dbCore?.currentValuation;
+  const targetValuation  = t06?.targetValuation  ?? dbCore?.targetValuation;
+
+  const roadmapYear1Revenue = t07?.roadmapYear1Revenue ?? dbCore?.roadmapYear1Revenue;
+  const roadmapYear2Revenue = t07?.roadmapYear2Revenue ?? dbCore?.roadmapYear2Revenue;
+  const roadmapYear3Revenue = t07?.roadmapYear3Revenue ?? dbCore?.roadmapYear3Revenue;
+  const roadmapYear1PAT     = t07?.roadmapYear1PAT     ?? dbCore?.roadmapYear1PAT;
+  const roadmapYear2PAT     = t07?.roadmapYear2PAT     ?? dbCore?.roadmapYear2PAT;
+  const roadmapYear3PAT     = t07?.roadmapYear3PAT     ?? dbCore?.roadmapYear3PAT;
+
+  const founderPct  = t08?.founderPct  as number | undefined ?? dbCore?.founderPct;
+  const esopPct     = t08?.esopPct     as number | undefined;
+  const investorPct = t08?.investorPct as number | undefined;
+
+  const wacc          = t09?.wacc          as number | undefined;
+  const dscrVal       = t09?.dscr          as number | null | undefined;
+  const capitalDeRatio = t09?.debtToEquity as number | undefined;
+
+  const allTimes = [
+    ...Object.values(toolData).map((d) => d?.updatedAt).filter(Boolean) as string[],
+    ...Object.values(dbCore?.updatedBy ?? {}).filter(Boolean) as string[],
+  ].sort().reverse();
+  const lastUpdated = allTimes[0];
+
+  return (
+    <div className="rounded-2xl p-5 space-y-4" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
+      <p className="text-xs font-semibold" style={{ color: "#1C1814" }}>企业核心数据</p>
+
+      {(t01 || dbCore?.annualRevenue != null) && (
+        <CoreSection title="损益概览">
+          <CoreDataRow label="年营收" value={fmtMoney(annualRevenue, sym)} />
+          <CoreDataRow label="毛利润" value={fmtMoney(grossProfit, sym)} />
+          <CoreDataRow label="税前利润" value={fmtMoney(ebit, sym)} />
+          <CoreDataRow label="企业所得税" value={fmtMoney(taxAmt, sym)} />
+          <CoreDataRow label="PAT" value={fmtMoney(annualPAT, sym)} />
+          <CoreDataRow label="PAT Margin" value={fmtPct(patMargin)} />
+          <CoreDataRow label="毛利率" value={fmtPct(grossMargin)} />
+        </CoreSection>
+      )}
+
+      {(t02 || dbCore?.totalAssets != null) && (
+        <CoreSection title="资产负债表">
+          <CoreDataRow label="总资产" value={fmtMoney(totalAssets, sym)} />
+          <CoreDataRow label="总负债" value={fmtMoney(totalLiabilities, sym)} />
+          <CoreDataRow label="总权益" value={fmtMoney(totalEquity, sym)} />
+          <CoreDataRow label="流动比率" value={fmtRatio(currentRatio)} />
+          <CoreDataRow label="负债权益比" value={fmtRatio(t02DebtToEquity)} />
+        </CoreSection>
+      )}
+
+      {(t03 || dbCore?.yearEndCash != null) && (
+        <CoreSection title="现金流">
+          <CoreDataRow label="年末现金" value={fmtMoney(yearEndCash, sym)} />
+          {netOperatingCashFlow != null && (
+            <CoreDataRow label="净营业现金流" value={fmtMoney(netOperatingCashFlow, sym)} />
+          )}
+        </CoreSection>
+      )}
+
+      {(t06 || dbCore?.currentValuation != null) && (
+        <CoreSection title="企业估值">
+          <CoreDataRow label="当前估值" value={fmtMoney(currentValuation, sym)} />
+          <CoreDataRow label="目标估值" value={fmtMoney(targetValuation, sym)} />
+        </CoreSection>
+      )}
+
+      {(t07 || dbCore?.roadmapYear1Revenue != null) && (
+        <CoreSection title="财务路线图">
+          <CoreDataRow label="第1年营收" value={fmtMoney(roadmapYear1Revenue, sym)} />
+          <CoreDataRow label="第1年PAT" value={fmtMoney(roadmapYear1PAT, sym)} />
+          <CoreDataRow label="第2年营收" value={fmtMoney(roadmapYear2Revenue, sym)} />
+          <CoreDataRow label="第2年PAT" value={fmtMoney(roadmapYear2PAT, sym)} />
+          <CoreDataRow label="第3年营收" value={fmtMoney(roadmapYear3Revenue, sym)} />
+          <CoreDataRow label="第3年PAT" value={fmtMoney(roadmapYear3PAT, sym)} />
+        </CoreSection>
+      )}
+
+      {(t08 || dbCore?.founderPct != null) && (
+        <CoreSection title="股权架构">
+          {founderPct != null && <CoreDataRow label="创始人持股" value={fmtPct(founderPct)} />}
+          {esopPct != null && <CoreDataRow label="ESOP 池" value={fmtPct(esopPct)} />}
+          {investorPct != null && <CoreDataRow label="投资人持股" value={fmtPct(investorPct)} />}
+        </CoreSection>
+      )}
+
+      {t09 && (
+        <CoreSection title="资本结构">
+          {wacc != null && <CoreDataRow label="WACC" value={fmtPct(wacc)} />}
+          {capitalDeRatio != null && <CoreDataRow label="D/E 比" value={fmtRatio(capitalDeRatio)} />}
+          {dscrVal != null && <CoreDataRow label="DSCR" value={dscrVal.toFixed(2) + "x"} />}
+        </CoreSection>
+      )}
+
+      <p className="text-xs" style={{ color: "#C0B8AE" }}>
+        数据来源：资本工具自动同步
+        {lastUpdated && ` · 最近更新于 ${new Date(lastUpdated).toLocaleDateString("zh-CN", { month: "short", day: "numeric" })}`}
+      </p>
+    </div>
+  );
+}
+
+function getGrowthLevel(pat: number): number {
+  if (pat >= 3_000_000) return 4;
+  if (pat >= 2_000_000) return 3;
+  if (pat >= 1_500_000) return 2;
+  if (pat >= 1_000_000) return 1;
   return 0;
 }
 
-function GrowthStatusBar({ label, netProfit }: { label: string; netProfit: number }) {
-  const stages = ["起步", "成长", "扩张", "成熟", "准上市"];
-  const level = getGrowthLevel(netProfit);
+const GROWTH_STAGES = ["起步", "成长", "扩张", "成熟", "准上市"] as const;
+
+const GROWTH_SUGGESTIONS: Record<number, string> = {
+  0: "专注于提高收入与净利润，建立稳定的现金流与资产负债表，为进入成长阶段打好基础。",
+  1: "企业已具备基本盈利能力，建议开始规范财务报表，提升记账与报税合规性，为未来融资做准备。",
+  2: "企业进入快速发展阶段，建议引入专业财务管理，规划股权结构与融资路径，为战略融资奠定基础。",
+  3: "企业已具备较强盈利能力，建议制定资本化战略，优化股东结构，启动战略融资规划，探索更广泛的融资选项。",
+  4: "企业已接近上市门槛，建议聘请专业顾问，系统梳理公司治理与财务合规，积极推进上市或重大融资事项。",
+};
+
+function GrowthStatusBar({ label, netProfit, companyId }: { label: string; netProfit: number; companyId?: string }) {
+  const [pat, setPat] = useState<number>(netProfit);
+
+  useEffect(() => {
+    setPat(netProfit);
+    if (!companyId) return;
+    // Step 1: Read T01 localStorage first (fast, no network)
+    try {
+      const raw = localStorage.getItem(`zibendao_toolData_${companyId}_T01`);
+      if (raw) {
+        const out = JSON.parse(raw)?.calculatedOutput;
+        if (out?.pat != null) { setPat(Number(out.pat)); return; }
+      }
+    } catch {}
+    // Step 2: Fallback to DB
+    fetch(`/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(companyId)}`)
+      .then((r) => r.ok ? r.json() : null)
+      .then((data) => {
+        if (data?.data?.annualPAT != null) {
+          setPat(Number(data.data.annualPAT));
+        } else if (data?.data?.netProfit != null) {
+          setPat(Number(data.data.netProfit));
+        }
+      })
+      .catch(() => {});
+  }, [companyId, netProfit]);
+
+  const level = getGrowthLevel(pat);
+  const stageName = GROWTH_STAGES[level];
+  const suggestion = GROWTH_SUGGESTIONS[level];
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-2">
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
         <span className="text-xs" style={{ color: "#9A9490" }}>{label}</span>
-        <span className="text-xs font-medium" style={{ color: "#C9A84C" }}>{stages[level]}</span>
+        <span className="text-xs font-semibold" style={{ color: "#C9A84C" }}>{stageName}</span>
       </div>
       <div className="flex gap-1">
-        {stages.map((s, i) => (
+        {GROWTH_STAGES.map((s, i) => (
           <div
             key={s}
             className="flex-1 h-1.5 rounded-full"
@@ -1324,11 +1728,12 @@ function GrowthStatusBar({ label, netProfit }: { label: string; netProfit: numbe
           />
         ))}
       </div>
-      <div className="flex justify-between mt-1">
-        {stages.map((s) => (
+      <div className="flex justify-between">
+        {GROWTH_STAGES.map((s) => (
           <span key={s} style={{ color: "#9A9490", fontSize: "9px" }}>{s}</span>
         ))}
       </div>
+      <p className="text-xs leading-relaxed pt-0.5" style={{ color: "#68625C" }}>{suggestion}</p>
     </div>
   );
 }
@@ -1397,8 +1802,8 @@ function IndustrySelect({ value, onChange }: { value: string; onChange: (v: stri
 function CompanyForm({
   form, setForm, onSave,
 }: {
-  form: { name: string; type: string; status: "active" | "inactive"; industry: string; notes: string; netProfit: number };
-  setForm: (f: { name: string; type: string; status: "active" | "inactive"; industry: string; notes: string; netProfit: number }) => void;
+  form: { name: string; type: string; status: "active" | "inactive"; industry: string; notes: string; netProfit: number; country: string };
+  setForm: (f: { name: string; type: string; status: "active" | "inactive"; industry: string; notes: string; netProfit: number; country: string }) => void;
   onSave: () => void;
 }) {
   return (
@@ -1427,6 +1832,19 @@ function CompanyForm({
           className="w-full px-3 py-2 rounded-xl text-sm outline-none"
           style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE", color: "#1C1814" }}
         />
+      </FormField>
+      <FormField label="所在国家">
+        <select
+          value={form.country}
+          onChange={(e) => setForm({ ...form, country: e.target.value })}
+          className="w-full px-3 py-2 rounded-xl text-sm outline-none"
+          style={{ backgroundColor: "#F7F4EF", border: "1px solid #E0D9CE", color: form.country ? "#1C1814" : "#9A9490" }}
+        >
+          <option value="">请选择国家</option>
+          {COUNTRY_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
       </FormField>
       <FormField label="备注（可选）">
         <input
