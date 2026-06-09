@@ -1,229 +1,145 @@
-// 《资本启航》— AI沉浸式100关课程系统 · 13章 · 5阶段
+// 《资本启航》— 课程内容
+// 13 模块 · 100 关 · 问题/故事/概念/结论格式
+// 单一正式数据来源：此文件。勿引用其他版本。
 
-export type LessonType = "STORY" | "QUIZ" | "SIMULATION" | "REFLECTION";
+export type LessonType = "READING" | "QUIZ" | "SIMULATION";
 
-export interface QuizOption { id: string; text: string; correct: boolean; explanation?: string; }
-export interface QuizQuestion { id: string; question: string; options: QuizOption[]; }
-export interface StorySlide { id: string; text: string; visual?: string; highlight?: string; }
-export interface SimulationConfig { type: "pricing" | "valuation" | "equity"; description: string; }
+export interface LessonContent {
+  text: string;
+}
 
 export interface Lesson {
-  id: string; slug: string; title: string; subtitle?: string;
-  type: LessonType; xpReward: number; durationMin: number;
-  character?: { name: string; role: string; avatar: string; era?: string; };
-  scene?: { bg: string; accent: string; icon: string; name: string; };
-  slides?: StorySlide[];
-  questions?: QuizQuestion[];
-  simulation?: SimulationConfig;
-  reflectionPrompt?: string; keyInsight?: string;
+  id: string;
+  slug: string;
+  title: string;
+  type: LessonType;
+  xpReward: number;
+  durationMin: number;
+  content: LessonContent;
 }
 
 export interface Module {
-  id: string; slug: string; order: number; title: string; subtitle: string;
-  description: string; xpReward: number; levelColor: string; levelLabel: string;
-  icon: string; lessons: Lesson[];
+  id: string;
+  slug: string;
+  order: number;
+  title: string;
+  subtitle: string;
+  description: string;
+  xpReward: number;
+  levelColor: string;
+  levelLabel: string;
+  icon: string;
+  lessons: Lesson[];
 }
 
-export interface Phase {
-  id: number; title: string; subtitle: string; color: string; chapterOrders: number[];
-}
+export const XP_PER_LEVEL = [0, 0, 200, 450, 750, 1100, 1500, 2000];
+export const LEVEL_COLORS = ["#3B82F6","#3B82F6","#8B5CF6","#8B5CF6","#F59E0B","#F59E0B","#10B981","#10B981"];
+export const LEVEL_LABELS = ["LV1","LV1","LV2","LV2","LV3","LV3","LV4","LV4"];
 
-export const LEVEL_COLORS = ["#EF4444","#F97316","#EAB308","#22C55E","#3B82F6","#6366F1","#A855F7"];
-export const LEVEL_LABELS = ["LV1 启程","LV2 探索","LV3 构建","LV4 成长","LV5 资本化","LV6 策略化","LV7 升维"];
-export const XP_PER_LEVEL = [0, 200, 450, 800, 1250, 1800, 2500];
 export function getUserLevel(xp: number): number {
-  let level = 1;
-  for (let i = XP_PER_LEVEL.length - 1; i >= 0; i--) {
-    if (xp >= XP_PER_LEVEL[i]) { level = i + 1; break; }
+  for (let i = XP_PER_LEVEL.length - 1; i >= 1; i--) {
+    if (xp >= XP_PER_LEVEL[i]) return i;
   }
-  return Math.min(level, 7);
-}
-export function xpForNextLevel(currentLevel: number): number {
-  return XP_PER_LEVEL[Math.min(currentLevel, 6)] || 2500;
+  return 1;
 }
 
-export const phases: Phase[] = [
-  { id:1, title:"资本认知", subtitle:"从零开始理解资本的本质", color:"from-blue-600 to-blue-400", chapterOrders:[1,2,3] },
-  { id:2, title:"资本工具", subtitle:"掌握融资与报价核心工具", color:"from-purple-600 to-purple-400", chapterOrders:[4,5] },
-  { id:3, title:"产业案例", subtitle:"从真实企业学习资本运作", color:"from-orange-600 to-orange-400", chapterOrders:[6,7,8] },
-  { id:4, title:"估值系统", subtitle:"学会给企业和项目定价", color:"from-green-600 to-green-400", chapterOrders:[9,10,11,12] },
-  { id:5, title:"资本成长", subtitle:"综合实战，成为资本家", color:"from-yellow-600 to-yellow-400", chapterOrders:[13] },
+// 5-phase navigation
+export const phases = [
+  { id:"p1", label:"认识资本",   moduleRange:[1,2]  },
+  { id:"p2", label:"资本逻辑",   moduleRange:[3,4]  },
+  { id:"p3", label:"资本工具",   moduleRange:[5,8]  },
+  { id:"p4", label:"资本估值",   moduleRange:[9,12] },
+  { id:"p5", label:"资本成长",   moduleRange:[13,13]},
 ];
+
+export const TOTAL_COURSE_XP = 1000;
 
 export const CAPITAL_LAUNCH_MODULES: Module[] = [
   // ── CH1 ───────────────────────────────────────────────────────────────
   {
     id:"ch1", slug:"ch1", order:1,
     title:"什么是资本运作", subtitle:"打开资本世界的大门",
-    description:"跟随古老导师，从零开始理解资本的本质、形态与运作逻辑。",
+    description:"建立资本世界认知，理解资本与经营的本质区别。",
     xpReward:0, levelColor:"#3B82F6", levelLabel:"LV1 启程", icon:"🏛️",
     lessons:[
     {
-      id:"ch1-l1", slug:"ch1-l1", title:"资本的第一印象",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"古老导师", role:"智慧引路人", avatar:"🧙‍♂️" },
-      scene:{ bg:"linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%)", accent:"#3B82F6", icon:"🏛️", name:"古老图书馆" },
-      slides:[
-        { id:"s1", text:"资本不是钱，而是让钱持续增值的能力与机制。当你拥有资本，钱会为你工作。", visual:"🌟", highlight:"资本≠钱" },
-        { id:"s2", text:"买一台设备来生产商品，设备就是资本；投资一家公司的股权，资金变成资本。", visual:"⚙️", highlight:"资本是生产性资产" },
-        { id:"s3", text:"资本思维第一步：看穿表面数字，理解背后的增值逻辑，找到钱生钱的系统。", visual:"💡", highlight:"看透本质" }
-      ],
+      id:"ch1-l1", slug:"ch1-l1", title:"什么是资本？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：钱和资本，有什么区别？\\n\\n故事：你口袋里有 10 万块。放着不动，它是钱。拿去投一家奶茶店，它变成资本。\\n\\n概念：资本是被投入、用来创造更多价值的钱或资源。钱是静止的，资本是流动的、有目的的。\\n\\n结论：资本不是你有多少钱，而是你让钱去做什么。` },
     },
     {
-      id:"ch1-l2", slug:"ch1-l2", title:"钱与资本的区别",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"古老导师", role:"智慧引路人", avatar:"🧙‍♂️" },
-      scene:{ bg:"linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%)", accent:"#3B82F6", icon:"🏛️", name:"古老图书馆" },
-      slides:[
-        { id:"s1", text:"钱放在枕头下，只是钱。钱用于购买资产、开拓市场、雇用人才，才成为资本。", visual:"💰", highlight:"钱→资本需要运作" },
-        { id:"s2", text:"普通人：赚钱→花钱。资本家：赚钱→投资→再赚更多钱。两种思维，两种命运。", visual:"🔄", highlight:"思维模式决定财富" },
-        { id:"s3", text:"今天的消费是明天的负债；今天的投资是明天的资产。选择权在你手中。", visual:"⚖️", highlight:"消费vs投资" }
-      ],
+      id:"ch1-l2", slug:"ch1-l2", title:"什么是资本运作？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：资本运作是炒股吗？\\n\\n故事：很多人以为资本运作就是买卖股票。但最成功的企业家，赚的不是差价，而是透过把资本注入业务、创造价值、吸引更多资本来壮大。\\n\\n概念：资本运作是组织资本进入项目，创造价值，再让资本流动或退出的完整过程。\\n\\n结论：资本运作不是交易，是一套系统。` },
     },
     {
-      id:"ch1-l3", slug:"ch1-l3", title:"资本的三种形态",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"古老导师", role:"智慧引路人", avatar:"🧙‍♂️" },
-      scene:{ bg:"linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%)", accent:"#3B82F6", icon:"🏛️", name:"古老图书馆" },
-      slides:[
-        { id:"s1", text:"实物资本：机器、厂房、土地。金融资本：股票、债券、现金。人力资本：技能、知识。", visual:"🏭", highlight:"三种资本形态" },
-        { id:"s2", text:"苹果公司最大的资本不是工厂，而是品牌、专利、软件生态——无形资本远超实物。", visual:"🍎", highlight:"无形资本的力量" },
-        { id:"s3", text:"最被低估的资本，是每个人身上还未被开发的人力资本。你自己就是最大的资产。", visual:"🧠", highlight:"人力资本最重要" }
-      ],
+      id:"ch1-l3", slug:"ch1-l3", title:"为什么企业需要资本？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：一家餐厅生意很好，为什么还要融资？\\n\\n故事：月赚 5 万的餐厅想开 10 家分店——自己存钱要 10 年，用资本运作可以 1 年完成。\\n\\n概念：资本让你用今天的钱做未来的事。时间有价值，资本是企业成长的加速器。\\n\\n结论：资本不是奢侈品，是成长的必要工具。` },
     },
     {
-      id:"ch1-l4", slug:"ch1-l4", title:"资本运作的本质",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"古老导师", role:"智慧引路人", avatar:"🧙‍♂️" },
-      scene:{ bg:"linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%)", accent:"#3B82F6", icon:"🏛️", name:"古老图书馆" },
-      slides:[
-        { id:"s1", text:"资本运作核心公式：用最小的自有资金，撬动最大的外部资源，创造超额价值。", visual:"🎯", highlight:"杠杆是核心" },
-        { id:"s2", text:"巴菲特用保险公司的浮存金（别人的钱）投资，这是教科书级别的资本运作案例。", visual:"🐂", highlight:"巴菲特的秘密" },
-        { id:"s3", text:"资本运作三要素：找好资产、找便宜资金、找合适时机。三点缺一不可。", visual:"🔺", highlight:"资本运作三要素" }
-      ],
+      id:"ch1-l4", slug:"ch1-l4", title:"资本与经营的区别",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：老板每天努力经营，为什么还是做不大？\\n\\n故事：两个老板，同样的餐厅利润。A 继续经营，B 开始资本运作。5 年后，A 还是一家店，B 有 20 家店和一个食品工厂。\\n\\n概念：经营是把今天的事做好。资本运作是设计未来的结构。层次不同。\\n\\n结论：经营决定你今天活得好不好，资本决定你明天能走多远。` },
     },
     {
-      id:"ch1-l5", slug:"ch1-l5", title:"第一章测验",
-      type:"QUIZ", xpReward:20, durationMin:3,
-      questions:[
-        { id:"q1", question:"资本与钱最本质的区别是什么？", options:[
-          { id:"A", text:"资本比钱价值更高", correct:false, explanation:"价值高低不是本质区别" },
-          { id:"B", text:"资本能持续产生收益", correct:true, explanation:"资本的本质是持续增值能力" },
-          { id:"C", text:"资本只能是实物资产", correct:false, explanation:"资本有多种形态" },
-          { id:"D", text:"资本必须存在银行", correct:false, explanation:"资本不限于存款" }
-        ]},
-        { id:"q2", question:"以下哪种行为属于资本运作？", options:[
-          { id:"A", text:"把钱存在家里", correct:false, explanation:"闲置资金不是资本运作" },
-          { id:"B", text:"用工资买奢侈品", correct:false, explanation:"消费不是资本运作" },
-          { id:"C", text:"购买能产生收益的股权", correct:true, explanation:"股权投资是典型资本运作" },
-          { id:"D", text:"提前消费信用卡", correct:false, explanation:"负债消费相反" }
-        ]},
-        { id:"q3", question:"苹果公司最大的资本来源是什么？", options:[
-          { id:"A", text:"工厂设备", correct:false, explanation:"苹果代工生产，工厂不是核心" },
-          { id:"B", text:"iPhone库存", correct:false, explanation:"库存是流动资产" },
-          { id:"C", text:"品牌与专利等无形资产", correct:true, explanation:"苹果核心价值在无形资本" },
-          { id:"D", text:"苹果门店装修", correct:false, explanation:"门店是渠道资产" }
-        ]}
-      ],
+      id:"ch1-l5", slug:"ch1-l5", title:"资本世界的规则",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：为什么有人能拿到投资，有人永远拿不到？\\n\\n故事：同样是餐厅老板，A 说「我的菜很好吃」，B 说「我有清晰的利润模型、可复制的单店结构、明确的退出路线」。投资人选了 B。有人被拒绝了很多次，改变了表达方式之后，拿到了资金。\\n\\n概念：资本世界只认三件事：未来价值、可预测性、退出路径。\\n\\n结论：进入资本世界，先学会它的语言和规则。` },
+    },
+    {
+      id:"ch1-l6", slug:"ch1-l6", title:"资本世界入口",
+      type:"READING", xpReward:15, durationMin:3,
+      content:{ text:`问题：学完这关，我接下来要做什么？\\n\\n故事：每个进入资本世界的企业家都经历同样的旅程——先认识资本是什么，再理解它怎么运作，再学会工具，再设计结构，最后建立自己的成长路线。\\n\\n概念：这门课程就是这条旅程的地图。你现在已经站在入口。\\n\\n结论：接下来，我们一步一步走进资本世界。` },
     },
     ],
   },
   // ── CH2 ───────────────────────────────────────────────────────────────
   {
     id:"ch2", slug:"ch2", order:2,
-    title:"资本的由来", subtitle:"300年前的金融革命",
-    description:"穿越时空，见证荷兰东印度公司如何开创现代资本市场。",
+    title:"资本运作的发展", subtitle:"300年前的金融革命",
+    description:"理解资本运作的演变过程，从第一家股份公司到今天的资本体系。",
     xpReward:0, levelColor:"#6366F1", levelLabel:"LV1 启程", icon:"⚓",
     lessons:[
     {
-      id:"ch2-l1", slug:"ch2-l1", title:"第一家股份公司的诞生",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"Jacob商人", role:"荷兰东印度公司创始人", avatar:"🎩" },
-      scene:{ bg:"linear-gradient(135deg,#0a0520 0%,#1a0a3e 100%)", accent:"#6366F1", icon:"⚓", name:"阿姆斯特丹港口" },
-      slides:[
-        { id:"s1", text:"1602年，荷兰东印度公司（VOC）成立，成为人类历史上第一家向公众发行股票的公司。", visual:"🏴‍☠️", highlight:"1602年的革命" },
-        { id:"s2", text:"荷兰人将航海贸易的巨额风险分散给数千名投资者，每人只承担自己投入的部分。", visual:"⚓", highlight:"风险分散的天才" },
-        { id:"s3", text:"这一发明改变了世界：任何普通市民都可以成为跨洲贸易的股东，资本民主化开始了。", visual:"🌍", highlight:"资本民主化" }
-      ],
+      id:"ch2-l1", slug:"ch2-l1", title:"为什么人类需要资本运作？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：资本运作是怎么来的？是谁发明的？\\n\\n故事：几百年前，有人想派船去远洋贸易。但一趟航程太贵、风险极高，船可能永远回不来，一小群人也出不起、也承受不了。\\n\\n概念：当一件事情的规模和风险超出了一小群人的能力，就需要更多人共同参与。资本运作，就是从这个需求里诞生的。\\n\\n结论：资本运作不是现代发明，而是人类解决「太大、太贵、太险」这个问题的自然答案。` },
     },
     {
-      id:"ch2-l2", slug:"ch2-l2", title:"荷兰东印度公司的秘密",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"Jacob商人", role:"荷兰东印度公司创始人", avatar:"🎩" },
-      scene:{ bg:"linear-gradient(135deg,#0a0520 0%,#1a0a3e 100%)", accent:"#6366F1", icon:"⚓", name:"阿姆斯特丹港口" },
-      slides:[
-        { id:"s1", text:"VOC巅峰时期市值相当于今天的7.9万亿美元，是史上最具价值的公司，至今无人超越。", visual:"💎", highlight:"史上最值钱公司" },
-        { id:"s2", text:"VOC拥有私人军队和外交权，可对外宣战、签约、铸造货币——资本与国家权力融为一体。", visual:"⚔️", highlight:"资本即权力" },
-        { id:"s3", text:"垄断香料贸易路线+控制货源+品牌溢价，VOC把稀缺变成了永久财富机器。", visual:"🌶️", highlight:"垄断创造财富" }
-      ],
+      id:"ch2-l2", slug:"ch2-l2", title:"东印度公司——第一次资本运作",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：历史上第一次真正的资本运作，是什么样的？\\n\\n故事：1602 年，荷兰人想做亚洲贸易，向公众募资，任何人都可以出一笔钱参与这门生意，共同承担风险，共同分享利润。\\n\\n概念：这就是世界上第一家股份公司。多人共同出资，资本运作从此成为一个系统。\\n\\n结论：这是人类历史上第一次把资本运作变成一套可复制的结构。` },
     },
     {
-      id:"ch2-l3", slug:"ch2-l3", title:"股票交易所的出现",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"Jacob商人", role:"荷兰东印度公司创始人", avatar:"🎩" },
-      scene:{ bg:"linear-gradient(135deg,#0a0520 0%,#1a0a3e 100%)", accent:"#6366F1", icon:"⚓", name:"阿姆斯特丹港口" },
-      slides:[
-        { id:"s1", text:"1609年，世界第一个股票交易所在阿姆斯特丹开业，人们可以自由买卖公司股份。", visual:"🏛️", highlight:"交易所诞生" },
-        { id:"s2", text:"流动性改变了一切：投资者随时可退出，企业获得稳定长期资金，双赢格局形成。", visual:"💧", highlight:"流动性=双赢" },
-        { id:"s3", text:"交易所的本质：把未来不确定的企业价值，转化为今天可以实时定价的数字。", visual:"📊", highlight:"定价未来" }
-      ],
+      id:"ch2-l3", slug:"ch2-l3", title:"股权的诞生",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：出了钱，怎么证明你拥有这家公司的一部分？\\n\\n故事：出资的人需要一个凭证证明他们的份额，于是出现了一张纸，写着你拥有公司的 X 份之一。这张纸，就是最早的股票。\\n\\n概念：股权是资本参与的凭证。你出了资本，换来的是对这家公司的一部分所有权。股票，是股权的认证工具。\\n\\n结论：有了股权，资本才可以被量化、被交易、被传递。` },
     },
     {
-      id:"ch2-l4", slug:"ch2-l4", title:"资本主义的崛起",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"Jacob商人", role:"荷兰东印度公司创始人", avatar:"🎩" },
-      scene:{ bg:"linear-gradient(135deg,#0a0520 0%,#1a0a3e 100%)", accent:"#6366F1", icon:"⚓", name:"阿姆斯特丹港口" },
-      slides:[
-        { id:"s1", text:"18-19世纪工业革命所需的铁路、蒸汽机、工厂，大多通过发行股票和债券来融资建设。", visual:"🚂", highlight:"资本驱动工业" },
-        { id:"s2", text:"资本主义核心：私人拥有生产资料+市场竞争机制+利润最大化目标，三者缺一不可。", visual:"⚙️", highlight:"资本主义三要素" },
-        { id:"s3", text:"有限责任公司是资本主义最伟大的发明：投资者最多亏光投入，不会因公司债务倾家荡产。", visual:"🛡️", highlight:"有限责任保护投资者" }
-      ],
+      id:"ch2-l4", slug:"ch2-l4", title:"股票交易所的出现",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：出了资本之后，如果我想退出，怎么办？\\n\\n故事：早期投资者发现钱被锁住了，无法在公司运营期间拿回来。于是人们开始私下买卖股票，慢慢形成了专门的交易场所——股票交易所。\\n\\n概念：交易所解决了资本的流动性问题。投资者不需要等公司结束才能退出，可以随时把股权卖给其他人。\\n\\n结论：流动性让资本运作更完整——进得来，也出得去。` },
     },
     {
-      id:"ch2-l5", slug:"ch2-l5", title:"现代资本市场的形成",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"Jacob商人", role:"荷兰东印度公司创始人", avatar:"🎩" },
-      scene:{ bg:"linear-gradient(135deg,#0a0520 0%,#1a0a3e 100%)", accent:"#6366F1", icon:"⚓", name:"阿姆斯特丹港口" },
-      slides:[
-        { id:"s1", text:"20世纪后，纽约证交所成为全球资本中心，美元借布雷顿森林体系成为世界储备货币。", visual:"🇺🇸", highlight:"美元霸权" },
-        { id:"s2", text:"今天全球每日超过5万亿美元在金融市场流转，资本的速度比历史任何时候都快。", visual:"⚡", highlight:"5万亿/天" },
-        { id:"s3", text:"现代资本市场三大功能：资源配置（把钱送到最需要的地方）、风险分散、价格发现。", visual:"🎯", highlight:"三大核心功能" }
-      ],
+      id:"ch2-l5", slug:"ch2-l5", title:"银行的出现",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：只有自己有钱的人才能参与资本运作吗？\\n\\n故事：有些人有钱但没有好项目，有些人有好项目但没有钱。于是出现了中间人——专门把有钱人的钱借给需要钱的人，收取利息。\\n\\n概念：这就是银行的雏形。银行让资本的流通变得更有效率，钱不再静止地放着，而是被借出去创造价值。\\n\\n结论：银行的出现，让更多人可以参与资本运作，资本开始大规模流动。` },
     },
     {
-      id:"ch2-l6", slug:"ch2-l6", title:"中国资本市场简史",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"Jacob商人", role:"荷兰东印度公司创始人", avatar:"🎩" },
-      scene:{ bg:"linear-gradient(135deg,#0a0520 0%,#1a0a3e 100%)", accent:"#6366F1", icon:"⚓", name:"阿姆斯特丹港口" },
-      slides:[
-        { id:"s1", text:"1990年，上海和深圳证券交易所相继成立，中国现代资本市场的历史由此开始。", visual:"🇨🇳", highlight:"1990年起步" },
-        { id:"s2", text:"从几百亿到超过90万亿人民币市值，中国股市30年成长了数百倍，见证经济腾飞。", visual:"📈", highlight:"30年百倍成长" },
-        { id:"s3", text:"未来：注册制改革、互联互通、人民币国际化——中国资本市场正走向全球舞台中心。", visual:"🌏", highlight:"走向世界" }
-      ],
+      id:"ch2-l6", slug:"ch2-l6", title:"企业融资的演变",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：除了发行股票，企业还有哪些方式引入资本？\\n\\n故事：有些企业不想稀释股权，于是开始发行债券——向投资者借钱，承诺还本付息。后来又出现银行贷款、私募基金、风险投资……工具越来越多。\\n\\n概念：融资是资本进入企业的通道。不同的融资方式，代表不同的成本、风险和控制权安排。\\n\\n结论：企业有了更多方式引入资本，资本运作的工具箱越来越丰富。` },
     },
     {
-      id:"ch2-l7", slug:"ch2-l7", title:"第二章测验",
-      type:"QUIZ", xpReward:20, durationMin:3,
-      questions:[
-        { id:"q1", question:"世界第一家向公众发行股票的公司是？", options:[
-          { id:"A", text:"英国东印度公司", correct:false, explanation:"英国东印度公司晚于荷兰成立" },
-          { id:"B", text:"荷兰东印度公司", correct:true, explanation:"1602年VOC是第一家上市公司" },
-          { id:"C", text:"法国密西西比公司", correct:false, explanation:"密西西比公司成立更晚" },
-          { id:"D", text:"威尼斯银行", correct:false, explanation:"威尼斯银行不是股份公司" }
-        ]},
-        { id:"q2", question:"股票市场最核心的功能是什么？", options:[
-          { id:"A", text:"保证投资者不亏损", correct:false, explanation:"市场不保证盈利" },
-          { id:"B", text:"由政府控制价格", correct:false, explanation:"市场价格由供需决定" },
-          { id:"C", text:"提供流动性并配置资源", correct:true, explanation:"流动性和资源配置是核心" },
-          { id:"D", text:"消除投资风险", correct:false, explanation:"市场分散而非消除风险" }
-        ]},
-        { id:"q3", question:"中国A股市场正式成立于哪一年？", options:[
-          { id:"A", text:"1985年", correct:false, explanation:"1985年尚无正式股市" },
-          { id:"B", text:"1990年", correct:true, explanation:"上交所和深交所1990年成立" },
-          { id:"C", text:"1992年", correct:false, explanation:"1992年是邓小平南巡年份" },
-          { id:"D", text:"2000年", correct:false, explanation:"2000年股市已运行10年" }
-        ]}
-      ],
+      id:"ch2-l7", slug:"ch2-l7", title:"资本运作如何演变至今",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：从第一家股份公司到今天，资本运作经历了什么？\\n\\n故事：几百年里，资本运作从一艘船、几百个投资者，演变成全球每天数万亿资金流动的系统。规则越来越完善，工具越来越多，但核心逻辑从未改变：项目需要资本，资本换取股权，股权等待价值实现，价值实现后资本退出再循环。\\n\\n概念：资本运作的形式在进化，底层逻辑始终如一。\\n\\n结论：理解历史，是为了看清今天的资本运作本质。` },
+    },
+    {
+      id:"ch2-l8", slug:"ch2-l8", title:"资本为什么改变世界",
+      type:"READING", xpReward:15, durationMin:3,
+      content:{ text:`问题：资本运作带来了什么？\\n\\n故事：没有资本运作，远洋贸易不会出现。没有流动性机制，资本会被锁死，无法流向最需要它的地方。\\n\\n概念：资本运作让人类可以集中力量做个人做不到的事，让资源流向最能创造价值的地方。这不是关于金融，而是关于人类如何协作创造更大的价值。\\n\\n结论：理解资本运作，是理解现代商业世界运转方式的起点。` },
     },
     ],
   },
@@ -231,170 +147,112 @@ export const CAPITAL_LAUNCH_MODULES: Module[] = [
   {
     id:"ch3", slug:"ch3", order:3,
     title:"资本底层逻辑", subtitle:"掌握资本运转的基本规律",
-    description:"理解时间价值、复利、风险回报、流动性与杠杆的底层逻辑。",
+    description:"理解资本运作的完整循环，掌握资本世界的底层地图。",
     xpReward:0, levelColor:"#8B5CF6", levelLabel:"LV2 探索", icon:"⚙️",
     lessons:[
     {
-      id:"ch3-l1", slug:"ch3-l1", title:"时间的价值",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"现代导师", role:"资本底层思维导师", avatar:"💼" },
-      scene:{ bg:"linear-gradient(135deg,#12002a 0%,#2c0a5e 100%)", accent:"#8B5CF6", icon:"⚙️", name:"现代会议室" },
-      slides:[
-        { id:"s1", text:"今天的100元比明天的100元更有价值，因为今天的钱可以投资并产生收益。", visual:"⏰", highlight:"时间价值原理" },
-        { id:"s2", text:"年利率10%，今天的100元一年后变110元，10年后变259元——时间是财富的乘法器。", visual:"📈", highlight:"复利的起点" },
-        { id:"s3", text:"每一个拖延的投资决策，都是在主动放弃时间价值。越早行动，复利越大。", visual:"🚀", highlight:"行动就是财富" }
-      ],
+      id:"ch3-l1", slug:"ch3-l1", title:"资本运作，到底有几步？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：资本运作听起来复杂，它其实有多少步？\\n\\n故事：很多人觉得资本运作神秘，因为从来没有人把它从头到尾说清楚。其实它只有 10 步，每一步都有清晰的逻辑。\\n\\n概念：资本运作是一个完整的循环，不是随机发生的。理解这 10 步，你就掌握了资本世界的底层地图。\\n\\n结论：接下来，我们一步一步把这个循环走完。` },
     },
     {
-      id:"ch3-l2", slug:"ch3-l2", title:"复利的魔法",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"现代导师", role:"资本底层思维导师", avatar:"💼" },
-      scene:{ bg:"linear-gradient(135deg,#12002a 0%,#2c0a5e 100%)", accent:"#8B5CF6", icon:"⚙️", name:"现代会议室" },
-      slides:[
-        { id:"s1", text:"爱因斯坦称复利为世界第八大奇迹。本金产生利息，利息再产生利息，财富指数级增长。", visual:"✨", highlight:"第八大奇迹" },
-        { id:"s2", text:"1万元以10%年化收益投资：10年1.6万，20年6.7万，30年17.4万，40年45万——时间越长越惊人。", visual:"💰", highlight:"数字说话" },
-        { id:"s3", text:"复利三要素：本金、收益率、时间。提高任何一个，结果都会显著改变。", visual:"🔺", highlight:"复利三要素" }
-      ],
+      id:"ch3-l2", slug:"ch3-l2", title:"第一步：什么项目适合资本运作？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：不是所有项目都适合资本运作，什么样的项目才适合？\\n\\n故事：一个今天就能赚完的买卖，不需要资本运作。但一个需要时间、需要资源、未来能创造持续价值的项目，就需要资本参与。\\n\\n概念：适合资本运作的项目，必须具备一个条件：在未来某个时间点，能够创造财富或价值。\\n\\n结论：资本运作的起点，是一个有未来价值的项目。` },
     },
     {
-      id:"ch3-l3", slug:"ch3-l3", title:"风险与回报",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"现代导师", role:"资本底层思维导师", avatar:"💼" },
-      scene:{ bg:"linear-gradient(135deg,#12002a 0%,#2c0a5e 100%)", accent:"#8B5CF6", icon:"⚙️", name:"现代会议室" },
-      slides:[
-        { id:"s1", text:"风险和回报永远正相关：想要更高收益，必须承担更高风险。天下没有无风险的高收益。", visual:"⚖️", highlight:"风险收益正相关" },
-        { id:"s2", text:"国债年收益约3%（低风险），优质股票历史年化约8-12%（中风险），创业可能10倍（高风险）。", visual:"📊", highlight:"不同资产风险收益" },
-        { id:"s3", text:"专业投资者的核心能力：在合理风险范围内，最大化预期收益。风险管理比选股更重要。", visual:"🎯", highlight:"风险管理第一" }
-      ],
+      id:"ch3-l3", slug:"ch3-l3", title:"第二步：为什么需要资本？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：有了好项目，为什么自己做不够，还需要资本？\\n\\n故事：一个好项目要成功，需要人才、技术、设备、土地、品牌、资源和资金共同参与。光靠一个人，几乎不可能同时拥有这一切。\\n\\n概念：资本的作用，是把这些要素聚集在一起。资本不只是钱，它是所有能推动项目成长的资源的总称。\\n\\n结论：好项目需要资本，是因为成功需要的资源超出了一个人的边界。` },
     },
     {
-      id:"ch3-l4", slug:"ch3-l4", title:"流动性的意义",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"现代导师", role:"资本底层思维导师", avatar:"💼" },
-      scene:{ bg:"linear-gradient(135deg,#12002a 0%,#2c0a5e 100%)", accent:"#8B5CF6", icon:"⚙️", name:"现代会议室" },
-      slides:[
-        { id:"s1", text:"流动性=把资产变成现金的速度和成本。现金流动性最高，房产流动性低，私募股权更低。", visual:"💧", highlight:"流动性定义" },
-        { id:"s2", text:"2008年金融危机：大量机构持有的抵押证券突然无人接盘，流动性危机引发系统崩溃。", visual:"🌊", highlight:"流动性危机案例" },
-        { id:"s3", text:"投资决策必须考虑：你什么时候需要这笔钱？流动性需求决定资产配置比例。", visual:"🔑", highlight:"流动性关键考量" }
-      ],
+      id:"ch3-l4", slug:"ch3-l4", title:"第三步：资本如何进入？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：资本决定参与一个项目，它怎么进入？\\n\\n故事：投资者看到一个项目，觉得未来有价值，于是把资金、资源或能力注入这个项目。这个动作，就是资本进入。\\n\\n概念：资本进入的方式有很多种——直接投资、贷款、入股、合作。但核心都是一样的：资源从外部流入项目内部。\\n\\n结论：资本进入，是项目从想法变成现实的关键一步。` },
     },
     {
-      id:"ch3-l5", slug:"ch3-l5", title:"杠杆的力量",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"现代导师", role:"资本底层思维导师", avatar:"💼" },
-      scene:{ bg:"linear-gradient(135deg,#12002a 0%,#2c0a5e 100%)", accent:"#8B5CF6", icon:"⚙️", name:"现代会议室" },
-      slides:[
-        { id:"s1", text:"杠杆=用少量自有资金撬动大量借来的资金。房产首付30%，借70%，是最常见的杠杆。", visual:"🏠", highlight:"杠杆日常案例" },
-        { id:"s2", text:"杠杆放大盈利，也放大亏损。资产涨10%时，3倍杠杆赚30%；资产跌10%时，亏30%。", visual:"⚡", highlight:"双刃剑" },
-        { id:"s3", text:"核心原则：只在有稳定现金流覆盖还款时使用杠杆，永远不要用杠杆做高波动投机。", visual:"🛡️", highlight:"杠杆使用原则" }
-      ],
+      id:"ch3-l5", slug:"ch3-l5", title:"第四步：投资者获得股权",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：投资者把资本注入项目，他们得到了什么？\\n\\n故事：投资者出了钱和资源，项目获得了成长的动力。作为回报，投资者获得这家公司的一部分所有权——这就是股权。\\n\\n概念：股权是资本参与的回报。你出资越多，或越早进入，获得的股权比例通常越高。股权代表你对未来价值的分配权。\\n\\n结论：资本进入换取股权，这是资本运作最基本的交换逻辑。` },
     },
     {
-      id:"ch3-l6", slug:"ch3-l6", title:"资本效率",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"现代导师", role:"资本底层思维导师", avatar:"💼" },
-      scene:{ bg:"linear-gradient(135deg,#12002a 0%,#2c0a5e 100%)", accent:"#8B5CF6", icon:"⚙️", name:"现代会议室" },
-      slides:[
-        { id:"s1", text:"资本效率=每投入1元资本能产生多少收益。ROE（净资产收益率）是衡量资本效率的核心指标。", visual:"📐", highlight:"资本效率指标" },
-        { id:"s2", text:"茅台ROE常年超过30%，意味着股东每100元净资产，每年赚30元回来。这是极高的资本效率。", visual:"🍺", highlight:"茅台案例" },
-        { id:"s3", text:"提升资本效率的方法：提高产品利润率、加速资产周转、合理使用财务杠杆。", visual:"🔧", highlight:"提升三路径" }
-      ],
+      id:"ch3-l6", slug:"ch3-l6", title:"第五步：股票是股权的认证工具",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：股权怎么被证明、被记录、被交易？\\n\\n故事：股权是抽象的，需要一个具体的工具来承载它。这个工具就是股票——一张代表你持有某家公司 X 份股权的凭证。\\n\\n概念：股票不是股权本身，而是股权的认证工具。有了股票，股权就可以被量化、被记录、被转让给其他人。\\n\\n结论：股票让股权变得可见、可量化、可流动。` },
     },
     {
-      id:"ch3-l7", slug:"ch3-l7", title:"第一阶段综合测验",
-      type:"QUIZ", xpReward:20, durationMin:3,
-      questions:[
-        { id:"q1", question:"以下哪个说法关于复利是正确的？", options:[
-          { id:"A", text:"只有存款才有复利", correct:false, explanation:"任何投资都可以有复利效应" },
-          { id:"B", text:"复利与时间长短无关", correct:false, explanation:"时间是复利最重要的因素" },
-          { id:"C", text:"本金产生的收益再投资产生更多收益", correct:true, explanation:"这是复利的本质定义" },
-          { id:"D", text:"复利只在利率超过10%时有效", correct:false, explanation:"任何正利率都有复利效应" }
-        ]},
-        { id:"q2", question:"ROE指标衡量的是什么？", options:[
-          { id:"A", text:"公司的总资产规模", correct:false, explanation:"总资产规模用总资产衡量" },
-          { id:"B", text:"股东权益的盈利效率", correct:true, explanation:"ROE=净利润/净资产" },
-          { id:"C", text:"公司的市场价值", correct:false, explanation:"市场价值用市值衡量" },
-          { id:"D", text:"企业的债务水平", correct:false, explanation:"债务用资产负债率衡量" }
-        ]},
-        { id:"q3", question:"下列哪项资产流动性最高？", options:[
-          { id:"A", text:"北京核心区住宅", correct:false, explanation:"房产流动性低" },
-          { id:"B", text:"非上市公司股权", correct:false, explanation:"私募股权流动性极低" },
-          { id:"C", text:"人民币现金", correct:true, explanation:"现金是流动性最高的资产" },
-          { id:"D", text:"黄金", correct:false, explanation:"黄金流动性好但略低于现金" }
-        ]}
-      ],
+      id:"ch3-l7", slug:"ch3-l7", title:"第六步：项目开始创造价值",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：资本进入之后，接下来发生什么？\\n\\n故事：有了资本，项目开始运转。团队组建了，产品出来了，市场打开了，收入开始产生。\\n\\n概念：项目创造价值，是整个资本运作循环的核心。资本是燃料，价值是目标。没有价值的创造，资本就失去了意义。\\n\\n结论：资本进入是手段，项目创造价值才是目的。` },
     },
     {
-      id:"ch3-l8", slug:"ch3-l8", title:"资本思维反思",
-      type:"REFLECTION", xpReward:15, durationMin:3,
-      reflectionPrompt:"经过前三章的学习，你对'资本'的理解发生了什么变化？你身边有哪些资本运作的例子是你以前没注意到的？",
-      keyInsight:"资本不是神秘的东西，它存在于每一个商业决策中。当你开始用资本思维看世界，你会发现无处不在的机会。",
+      id:"ch3-l8", slug:"ch3-l8", title:"第七步：资本运作需要时间",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：为什么不能今天投资，明天就退出？\\n\\n故事：一棵树从种下到结果，需要时间。一家公司从拿到资本到创造出真正的价值，同样需要时间。没有时间，价值无法成熟。\\n\\n概念：时间是资本运作的必要成本。投资者愿意等待，是因为他们相信未来的价值会超过今天的投入。\\n\\n结论：时间不是障碍，而是价值成熟的过程。` },
+    },
+    {
+      id:"ch3-l9", slug:"ch3-l9", title:"第八步：部分投资者需要退出",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：投资者一直持有股权直到永远吗？\\n\\n故事：有些投资者需要把资金拿回来投入下一个项目，有些人需要变现。不是所有人都能或愿意一直持有。\\n\\n概念：退出是资本运作的正常环节，不是失败的信号。资本本身也需要流动，才能继续创造价值。\\n\\n结论：设计好的退出机制，是资本运作系统成熟的标志。` },
+    },
+    {
+      id:"ch3-l10", slug:"ch3-l10", title:"第九步：流动性出现",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：投资者想退出，谁来接手他们的股权？\\n\\n故事：当有人想卖出股权，就需要有人愿意买入。这个买卖双方都能参与的市场，提供了流动性——让股权可以在人与人之间流转。\\n\\n概念：流动性是资本运作的润滑剂。有了流动性，投资者才敢进入，因为他们知道未来有机会退出。\\n\\n结论：流动性让资本运作形成完整的闭环。` },
+    },
+    {
+      id:"ch3-l11", slug:"ch3-l11", title:"第十步：资本再次循环",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：退出的资本去哪里了？\\n\\n故事：投资者从一个项目退出，拿回了资金和收益。这笔钱不会消失，它会流向下一个有潜力的项目，开始新一轮循环。\\n\\n概念：资本循环是资本运作最重要的特性。资本不是被消耗的，而是在一个又一个项目之间流动，每次流动都在创造新的价值。\\n\\n结论：退出不是终点，而是下一次循环的起点。` },
+    },
+    {
+      id:"ch3-l12", slug:"ch3-l12", title:"完整循环：资本运作的底层地图",
+      type:"READING", xpReward:20, durationMin:3,
+      content:{ text:`问题：把这 10 步连起来，资本运作的完整逻辑是什么？\\n\\n故事：从一个有未来价值的项目开始，资本进入，换取股权，项目用时间创造价值，投资者通过流动性退出，资本再次循环。\\n\\n概念：项目 → 资本 → 股权 → 时间 → 流动性 → 资本循环。这六个词，是整个资本运作体系的底层逻辑。\\n\\n结论：你现在掌握了资本世界的底层地图。接下来学习的每一个工具和结构，都会回到这张地图上。` },
     },
     ],
   },
   // ── CH4 ───────────────────────────────────────────────────────────────
   {
     id:"ch4", slug:"ch4", order:4,
-    title:"IPO与融资", subtitle:"企业上市与募资全过程",
-    description:"从天使轮到IPO，掌握企业融资的完整路径与股权稀释逻辑。",
+    title:"IPO 与融资", subtitle:"企业上市与募资全过程",
+    description:"理解融资只是资本工具，掌握股权融资、债权融资与融资路线图。",
     xpReward:0, levelColor:"#EC4899", levelLabel:"LV2 探索", icon:"📈",
     lessons:[
     {
-      id:"ch4-l1", slug:"ch4-l1", title:"什么是IPO",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"投行Wang", role:"投资银行家", avatar:"📊" },
-      scene:{ bg:"linear-gradient(135deg,#1a0010 0%,#4a0030 100%)", accent:"#EC4899", icon:"📈", name:"投行交易大厅" },
-      slides:[
-        { id:"s1", text:"IPO（首次公开募股）是企业首次向公众出售股份并在交易所上市的过程，是融资的重要里程碑。", visual:"📋", highlight:"IPO定义" },
-        { id:"s2", text:"企业上市前需经历：重组架构、审计财务、递交招股书、路演推介、确定发行价、正式挂牌。", visual:"📝", highlight:"IPO六步骤" },
-        { id:"s3", text:"上市好处：获得大量资金、提升品牌公信力、为早期投资者提供退出通道、增强员工激励。", visual:"🎯", highlight:"上市的价值" }
-      ],
+      id:"ch4-l1", slug:"ch4-l1", title:"融资是什么？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：融资就是借钱吗？\\n\\n故事：很多老板把融资理解成「去银行借钱」。但真正的融资，包含的方式远不止借贷——它是企业主动引入资本、换取成长动力的所有方式。\\n\\n概念：融资是企业通过各种方式引入外部资本的行为。资本进入的形式不同，带来的权利和义务也不同。\\n\\n结论：融资不只是借钱，而是选择用什么方式让资本进入你的企业。` },
     },
     {
-      id:"ch4-l2", slug:"ch4-l2", title:"融资的五种方式",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"投行Wang", role:"投资银行家", avatar:"📊" },
-      scene:{ bg:"linear-gradient(135deg,#1a0010 0%,#4a0030 100%)", accent:"#EC4899", icon:"📈", name:"投行交易大厅" },
-      slides:[
-        { id:"s1", text:"股权融资：出让股份换资金，不用还款但稀释控制权。债权融资：借钱还息，保留控制权但有还款压力。", visual:"⚖️", highlight:"股权vs债权" },
-        { id:"s2", text:"五种方式：天使轮（亲友）→VC（风险投资）→PE（私募股权）→IPO（上市）→债券发行。", visual:"🪜", highlight:"融资阶梯" },
-        { id:"s3", text:"选择融资方式的核心：你现在处于什么阶段？愿意稀释多少股权？资金用途是什么？", visual:"🔑", highlight:"选择融资方式" }
-      ],
+      id:"ch4-l2", slug:"ch4-l2", title:"股权融资",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：什么是股权融资？企业失去了什么？得到了什么？\\n\\n故事：一家公司需要资金扩张，找到一位投资者。投资者出资，换取公司 20% 的股权。公司拿到了钱，但股权被稀释了。\\n\\n概念：股权融资是以出让公司部分所有权来换取资金。投资者成为股东，分享未来的利润和增值，但不需要还本付息。\\n\\n结论：股权融资不用还钱，但你让出了公司的一部分控制权和未来收益。` },
     },
     {
-      id:"ch4-l3", slug:"ch4-l3", title:"股权稀释与估值",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"投行Wang", role:"投资银行家", avatar:"📊" },
-      scene:{ bg:"linear-gradient(135deg,#1a0010 0%,#4a0030 100%)", accent:"#EC4899", icon:"📈", name:"投行交易大厅" },
-      slides:[
-        { id:"s1", text:"融资1000万，公司估值1亿，投资人占10%股权。公司越来越值钱，你的股权比例越来越小，但绝对价值增加。", visual:"📉", highlight:"稀释但增值" },
-        { id:"s2", text:"估值=投资额÷出让比例。投资人给500万要20%股权，公司投前估值即为2500万元。", visual:"🧮", highlight:"估值计算" },
-        { id:"s3", text:"创始人核心原则：不要过早稀释太多股权；保持控制权；每轮融资后确保公司价值真正提升。", visual:"🎯", highlight:"创始人原则" }
-      ],
+      id:"ch4-l3", slug:"ch4-l3", title:"债权融资",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：什么是债权融资？它和股权融资有什么不同？\\n\\n故事：同样的公司，选择另一种方式：向银行贷款或发行债券，承诺定期还本付息。公司拿到了钱，股权没有被稀释。\\n\\n概念：债权融资是以承诺还款为条件换取资金。企业保留完整所有权，但必须按时还债，利息是固定成本。\\n\\n结论：债权融资保住了控制权，但增加了财务压力，必须有稳定的现金流支撑还款。` },
     },
     {
-      id:"ch4-l4", slug:"ch4-l4", title:"第四章测验",
-      type:"QUIZ", xpReward:20, durationMin:3,
-      questions:[
-        { id:"q1", question:"IPO的全称是什么？", options:[
-          { id:"A", text:"内部产权转让", correct:false, explanation:"这不是IPO的含义" },
-          { id:"B", text:"首次公开募股", correct:true, explanation:"Initial Public Offering" },
-          { id:"C", text:"国际私人组织", correct:false, explanation:"不是IPO的含义" },
-          { id:"D", text:"中期利润目标", correct:false, explanation:"不是IPO的含义" }
-        ]},
-        { id:"q2", question:"公司融资1000万，出让20%股权，此时公司估值为多少？", options:[
-          { id:"A", text:"1000万", correct:false, explanation:"1000万只是融资额" },
-          { id:"B", text:"5000万", correct:true, explanation:"1000万÷20%=5000万投前估值" },
-          { id:"C", text:"8000万", correct:false, explanation:"计算有误" },
-          { id:"D", text:"2000万", correct:false, explanation:"计算有误" }
-        ]},
-        { id:"q3", question:"以下哪种融资方式最不会稀释创始人股权？", options:[
-          { id:"A", text:"天使轮融资", correct:false, explanation:"天使轮会稀释股权" },
-          { id:"B", text:"风险投资VC", correct:false, explanation:"VC投资会稀释股权" },
-          { id:"C", text:"银行债务融资", correct:true, explanation:"债务不涉及股权稀释" },
-          { id:"D", text:"IPO上市", correct:false, explanation:"IPO是最大的股权稀释" }
-        ]}
-      ],
+      id:"ch4-l4", slug:"ch4-l4", title:"股权还是债权？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：企业融资，应该选股权还是债权？\\n\\n故事：一家成长期企业，现金流还不稳定，如果选债权融资，每月还款压力可能压垮公司。但如果选股权融资，早期出让股权，未来代价可能更大。\\n\\n概念：选择融资方式，取决于两件事：企业当前的现金流是否稳定，以及你愿意付出多少控制权。现金流稳定选债权，需要长期伙伴选股权。\\n\\n结论：没有最好的融资方式，只有最适合当前阶段的选择。` },
+    },
+    {
+      id:"ch4-l5", slug:"ch4-l5", title:"什么是 IPO？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：IPO 是融资的终点吗？\\n\\n故事：一家公司发展到一定规模，决定向公众公开发行股票，让更多人可以参与投资。这个过程，就是首次公开募股——IPO。\\n\\n概念：IPO 是企业从私人公司变成公众公司的过程。通过 IPO，企业可以向大量投资者募集资金，同时原有股东也获得了公开市场提供的流动性。\\n\\n结论：IPO 不是终点，而是企业进入公开资本市场、获得更大流动性的新起点。` },
+    },
+    {
+      id:"ch4-l6", slug:"ch4-l6", title:"融资路线图",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：一家企业从创立到 IPO，融资是怎么一步一步发展的？\\n\\n故事：一家企业的融资通常经历这样的过程：创始人自有资金起步，再到亲友轮融资，再到天使投资，再到 A/B/C 轮机构融资，最后走向 IPO 或被并购退出。\\n\\n概念：不同阶段的融资，对应不同的企业成熟度和资本需求。每一轮融资都是为下一阶段的成长做准备，而不是为了融资而融资。\\n\\n结论：融资路线图不是固定的，但理解每个阶段的逻辑，才能在正确的时机做出正确的融资决策。` },
+    },
+    {
+      id:"ch4-l7", slug:"ch4-l7", title:"融资是工具，不是目的",
+      type:"READING", xpReward:15, durationMin:3,
+      content:{ text:`问题：拿到融资，就代表成功了吗？\\n\\n故事：有企业融到了大笔资金，却因为没有清晰的使用计划，把钱烧完了，什么都没建成。融到钱不等于成功，用好钱才是关键。\\n\\n概念：融资是资本工具，不是终点。融资的意义在于：用这笔资本加速企业创造价值，最终让企业的价值远超融资的成本。\\n\\n结论：融资是手段，价值创造才是目的。` },
     },
     ],
   },
@@ -402,378 +260,170 @@ export const CAPITAL_LAUNCH_MODULES: Module[] = [
   {
     id:"ch5", slug:"ch5", order:5,
     title:"报价系统", subtitle:"掌握价格背后的资本逻辑",
-    description:"学习六种定价方法，掌握报价谈判与系统设计，提升定价竞争力。",
+    description:"理解利润如何形成，掌握成本、风险、利润、折扣、佣金的完整报价逻辑。",
     xpReward:0, levelColor:"#F59E0B", levelLabel:"LV3 构建", icon:"💰",
     lessons:[
     {
-      id:"ch5-l1", slug:"ch5-l1", title:"价格的本质",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"定价专家Li", role:"定价策略顾问", avatar:"💹" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#3d2800 100%)", accent:"#F59E0B", icon:"💰", name:"数据分析中心" },
-      slides:[
-        { id:"s1", text:"价格不是成本的堆砌，而是买卖双方在特定时刻达成的共识，反映供需关系和心理预期。", visual:"💱", highlight:"价格=共识" },
-        { id:"s2", text:"同样一瓶水：便利店3元，景区30元，沙漠300元。成本相同，价格取决于场景和稀缺度。", visual:"💧", highlight:"场景决定价格" },
-        { id:"s3", text:"定价能力是企业最核心的竞争力之一。能自主提价的企业，才是真正的好企业。", visual:"🏆", highlight:"定价权=核心竞争力" }
-      ],
+      id:"ch5-l1", slug:"ch5-l1", title:"成本：报价的底线",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：报价多少才合理？从哪里开始算？\\n\\n故事：一家餐厅老板随口报了一个价，顾客觉得合理就接受了。但算完成本，才发现每卖一份就亏一份。问题不是价格高不高，而是从来没有算清楚成本。\\n\\n概念：成本是报价的起点，也是底线。没有算清成本，任何报价都是猜测。成本包括直接成本（原料、人工）和间接成本（租金、水电、管理费用）。\\n\\n结论：报价之前，必须先知道你的真实成本是多少。` },
     },
     {
-      id:"ch5-l2", slug:"ch5-l2", title:"供需定价法",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"定价专家Li", role:"定价策略顾问", avatar:"💹" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#3d2800 100%)", accent:"#F59E0B", icon:"💰", name:"数据分析中心" },
-      slides:[
-        { id:"s1", text:"需求增加或供给减少，价格上涨；需求减少或供给增加，价格下跌。这是最基本的市场规律。", visual:"📊", highlight:"供需决定价格" },
-        { id:"s2", text:"2021年显卡短缺：芯片供应断链+挖矿需求爆发，RTX3080从建议零售价翻了3-5倍。", visual:"💻", highlight:"供需失衡案例" },
-        { id:"s3", text:"供需分析框架：谁是买方？谁是卖方？哪里存在供需缺口？缺口多大？多久能填补？", visual:"🔍", highlight:"供需分析框架" }
-      ],
+      id:"ch5-l2", slug:"ch5-l2", title:"风险：被忽略的隐形成本",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：成本算清楚了，报价就够了吗？\\n\\n故事：一家承包商按成本加利润报价，却没有把工期延误、材料涨价、客户付款拖延的风险算进去。项目做完，利润全被风险吃掉了。\\n\\n概念：风险是报价中最容易被忽略的部分。任何业务都有不确定性，这些不确定性是真实的成本，必须被计入报价。不承担风险，就应该在报价中体现出来；愿意承担风险，就必须收取对应的费用。\\n\\n结论：报价不只是算成本，还要把你愿意承担的风险定好价格。` },
     },
     {
-      id:"ch5-l3", slug:"ch5-l3", title:"成本加成定价",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"定价专家Li", role:"定价策略顾问", avatar:"💹" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#3d2800 100%)", accent:"#F59E0B", icon:"💰", name:"数据分析中心" },
-      slides:[
-        { id:"s1", text:"成本加成定价：在成本基础上加一个固定利润率。简单直接，但可能错失定价机会。", visual:"➕", highlight:"成本+利润=价格" },
-        { id:"s2", text:"餐厅成本加成：食材成本30元，加成200%，售价90元。这是餐饮业最常用的定价逻辑。", visual:"🍽️", highlight:"餐饮定价案例" },
-        { id:"s3", text:"成本加成的局限：忽略了顾客愿意支付的上限，可能定价过低而错失利润。", visual:"⚠️", highlight:"成本加成的局限" }
-      ],
+      id:"ch5-l3", slug:"ch5-l3", title:"利润：设计出来的，不是碰巧赚到的",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：利润是做完生意剩下的钱，还是一开始就应该设计好的？\\n\\n故事：很多老板的逻辑是：收入减成本，剩下的就是利润。但这样的利润是被动的，受制于各种意外。真正懂报价的人，把利润当成目标，从一开始就设计进去。\\n\\n概念：利润是报价的目标，不是结果。在报价时就决定：这笔生意我要赚多少，然后反推报价是否可行。\\n\\n结论：先定利润目标，再设计报价，而不是做完再看剩多少。` },
     },
     {
-      id:"ch5-l4", slug:"ch5-l4", title:"竞争对标定价",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"定价专家Li", role:"定价策略顾问", avatar:"💹" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#3d2800 100%)", accent:"#F59E0B", icon:"💰", name:"数据分析中心" },
-      slides:[
-        { id:"s1", text:"竞争定价：参考竞争对手的价格，决定自己定价高（差异化）、一样（跟随）还是低（渗透）。", visual:"🏁", highlight:"三种竞争策略" },
-        { id:"s2", text:"苹果iPhone比安卓旗舰贵30-50%，靠的是品牌溢价；小米用接近成本的价格打市场份额。", visual:"📱", highlight:"苹果vs小米" },
-        { id:"s3", text:"选择竞争定价策略时，先问：你的差异化优势是什么？你要争份额还是争利润？", visual:"🎯", highlight:"差异化优先" }
-      ],
+      id:"ch5-l4", slug:"ch5-l4", title:"折扣：有代价的让步",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：给折扣是好事吗？折扣是从哪里来的？\\n\\n故事：客户要求打九折，老板想都没想就答应了。但他没有意识到，这个折扣直接来自原本属于他的利润，而不是凭空出现的。\\n\\n概念：折扣是对利润的直接削减。每一分折扣，都是从你的利润里扣出来的。给折扣之前，必须清楚：你还剩多少利润空间，以及这笔生意是否还值得做。\\n\\n结论：折扣不是免费的，每一次让步都有代价，要有意识地使用它。` },
     },
     {
-      id:"ch5-l5", slug:"ch5-l5", title:"价值定价法",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"定价专家Li", role:"定价策略顾问", avatar:"💹" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#3d2800 100%)", accent:"#F59E0B", icon:"💰", name:"数据分析中心" },
-      slides:[
-        { id:"s1", text:"价值定价：以客户感知到的价值为基础定价，而非成本。顾客愿意付多少，才是价格上限。", visual:"💎", highlight:"价值决定价格" },
-        { id:"s2", text:"麦肯锡咨询费每小时数千美元，远超成本，因为客户愿意为'解决1亿元问题的方案'付高价。", visual:"👔", highlight:"麦肯锡案例" },
-        { id:"s3", text:"价值定价三步：量化你帮客户创造的价值→确定客户愿意分享的比例→设定价格。", visual:"🔢", highlight:"价值定价三步" }
-      ],
+      id:"ch5-l5", slug:"ch5-l5", title:"佣金：分配利润的工具",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：佣金是成本，还是投资？\\n\\n故事：一家公司通过中间人拿到了一笔大单，支付了 10% 的佣金。表面上看利润减少了，但没有这个中间人，这笔单子根本不会来。\\n\\n概念：佣金是为了获取业务而分配出去的利润。它是分配利润的工具，不是纯粹的成本。关键是：支付佣金换来的业务，是否能带来足够的净利润。\\n\\n结论：佣金要算进报价结构里，而不是事后再想怎么处理。` },
     },
     {
-      id:"ch5-l6", slug:"ch5-l6", title:"动态定价策略",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"定价专家Li", role:"定价策略顾问", avatar:"💹" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#3d2800 100%)", accent:"#F59E0B", icon:"💰", name:"数据分析中心" },
-      slides:[
-        { id:"s1", text:"动态定价：根据时间、需求、用户特征实时调整价格。航空公司、酒店、网约车都在用。", visual:"⏱️", highlight:"动态定价定义" },
-        { id:"s2", text:"滴滴打车高峰期溢价：供不应求时提高价格，吸引更多司机上线，同时过滤需求——市场自动平衡。", visual:"🚗", highlight:"滴滴溢价案例" },
-        { id:"s3", text:"动态定价的边界：要让顾客感到公平，过度溢价会损害品牌，需要透明的定价逻辑。", visual:"⚖️", highlight:"公平性边界" }
-      ],
-    },
-    {
-      id:"ch5-l7", slug:"ch5-l7", title:"报价谈判技巧",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"定价专家Li", role:"定价策略顾问", avatar:"💹" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#3d2800 100%)", accent:"#F59E0B", icon:"💰", name:"数据分析中心" },
-      slides:[
-        { id:"s1", text:"谈判中的报价：先报高价留出谈判空间；了解对方底线；让步要慢，每次让步换取对方回报。", visual:"🤝", highlight:"谈判基本策略" },
-        { id:"s2", text:"BATNA原则：谈判前明确你的最佳替代方案。没有替代方案的一方，在谈判中处于弱势。", visual:"🃏", highlight:"BATNA原则" },
-        { id:"s3", text:"报价谈判的终极技巧：让对方先报价，你会获得大量信息来判断是否还有空间。", visual:"🎯", highlight:"让对方先报" }
-      ],
-    },
-    {
-      id:"ch5-l8", slug:"ch5-l8", title:"报价系统设计",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"定价专家Li", role:"定价策略顾问", avatar:"💹" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#3d2800 100%)", accent:"#F59E0B", icon:"💰", name:"数据分析中心" },
-      slides:[
-        { id:"s1", text:"系统化报价五要素：标准化产品定义、分层定价（基础/进阶/旗舰）、量价折扣、有效期、支付条件。", visual:"📋", highlight:"报价系统五要素" },
-        { id:"s2", text:"SaaS软件定价范式：免费版（获客）→专业版（转化）→企业版（收益）。三层漏斗设计。", visual:"💻", highlight:"SaaS三层定价" },
-        { id:"s3", text:"好的报价系统能自动引导客户升级，减少销售摩擦，同时保护利润底线。", visual:"🔧", highlight:"报价系统价值" }
-      ],
-    },
-    {
-      id:"ch5-l9", slug:"ch5-l9", title:"第五章测验",
-      type:"QUIZ", xpReward:20, durationMin:3,
-      questions:[
-        { id:"q1", question:"以下哪种定价方式以客户感知价值为核心？", options:[
-          { id:"A", text:"成本加成定价", correct:false, explanation:"成本加成以成本为基础" },
-          { id:"B", text:"竞争对标定价", correct:false, explanation:"竞争定价参考对手价格" },
-          { id:"C", text:"价值定价法", correct:true, explanation:"价值定价以客户愿付为基础" },
-          { id:"D", text:"统一定价法", correct:false, explanation:"不是本章介绍的方法" }
-        ]},
-        { id:"q2", question:"滴滴高峰期溢价的主要目的是什么？", options:[
-          { id:"A", text:"增加公司利润", correct:false, explanation:"溢价主要不是为了利润" },
-          { id:"B", text:"惩罚高峰期乘客", correct:false, explanation:"不是惩罚机制" },
-          { id:"C", text:"吸引更多司机供给", correct:true, explanation:"溢价是供需平衡机制" },
-          { id:"D", text:"减少交通拥堵", correct:false, explanation:"这不是直接目的" }
-        ]},
-        { id:"q3", question:"报价谈判中BATNA代表什么？", options:[
-          { id:"A", text:"最高价格接受线", correct:false, explanation:"这不是BATNA的含义" },
-          { id:"B", text:"谈判前的最佳替代方案", correct:true, explanation:"Best Alternative To Negotiated Agreement" },
-          { id:"C", text:"报价自动调整系统", correct:false, explanation:"这不是BATNA" },
-          { id:"D", text:"买家平均交易金额", correct:false, explanation:"这不是BATNA的含义" }
-        ]}
-      ],
-    },
-    {
-      id:"ch5-l10", slug:"ch5-l10", title:"报价模拟器",
-      type:"SIMULATION", xpReward:30, durationMin:5,
-      simulation:{ type:"pricing", description:"实战练习：用所学的定价方法为你的产品制定合理的报价方案" },
+      id:"ch5-l6", slug:"ch5-l6", title:"报价逻辑：完整结构",
+      type:"READING", xpReward:15, durationMin:3,
+      content:{ text:`问题：一个完整的报价，是怎么构成的？\\n\\n故事：同样的产品，有人报价只算了材料费，有人把所有要素都算进去了。前者表面便宜，做完亏损；后者清晰，每笔生意都有预期利润。\\n\\n概念：完整的报价结构 = 成本 + 风险 + 利润目标，再根据市场和客户决定是否使用折扣或佣金。每一个要素都有它的位置，缺一不可。\\n\\n结论：报价不是猜测，而是一套有逻辑的系统。掌握这套系统，才能让每一笔生意都在你的掌控之中。` },
     },
     ],
   },
   // ── CH6 ───────────────────────────────────────────────────────────────
   {
     id:"ch6", slug:"ch6", order:6,
-    title:"KFC产业链案例", subtitle:"从炸鸡看资本布局",
-    description:"深入KFC案例，理解供应链资本、特许经营与品牌价值的运作逻辑。",
+    title:"KFC 产业链案例", subtitle:"从炸鸡看资本布局",
+    description:"透过 KFC 产业链理解产业链利润切层与风险转移的资本逻辑。",
     xpReward:0, levelColor:"#EF4444", levelLabel:"LV3 构建", icon:"🏪",
     lessons:[
     {
-      id:"ch6-l1", slug:"ch6-l1", title:"KFC的商业模式",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"KFC经理", role:"百胜集团区域总监", avatar:"🍗" },
-      scene:{ bg:"linear-gradient(135deg,#200000 0%,#500000 100%)", accent:"#EF4444", icon:"🏪", name:"KFC总部" },
-      slides:[
-        { id:"s1", text:"KFC不只是卖炸鸡，它是一个系统：标准化产品+品牌授权+供应链管控+特许经营网络。", visual:"🍗", highlight:"KFC商业系统" },
-        { id:"s2", text:"KFC中国2023年超过9000家门店，百胜中国营收超过113亿美元，远超普通餐饮连锁。", visual:"📊", highlight:"规模的力量" },
-        { id:"s3", text:"核心洞察：KFC真正在卖的是'成功的餐饮经营系统'，而非单纯的食物。", visual:"🔑", highlight:"卖系统不卖产品" }
-      ],
+      id:"ch6-l1", slug:"ch6-l1", title:"大家以为 KFC 卖的是什么？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：KFC 靠什么赚钱？\\n\\n故事：走进任何一家 KFC，看到的是炸鸡、汉堡、薯条。所有人都以为 KFC 是一家卖炸鸡的公司。\\n\\n概念：炸鸡只是最终产品。它是顾客看得见的部分，但不是 KFC 真正赚钱的地方。\\n\\n结论：表面的产品，往往遮住了背后真正的商业逻辑。` },
     },
     {
-      id:"ch6-l2", slug:"ch6-l2", title:"供应链资本运作",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"KFC经理", role:"百胜集团区域总监", avatar:"🍗" },
-      scene:{ bg:"linear-gradient(135deg,#200000 0%,#500000 100%)", accent:"#EF4444", icon:"🏪", name:"KFC总部" },
-      slides:[
-        { id:"s1", text:"KFC的供应链：从养鸡场→饲料厂→屠宰场→冷链物流→门店，每个环节都是资本投入和价值创造。", visual:"🔗", highlight:"供应链资本链" },
-        { id:"s2", text:"百胜建立了自己的供应商体系，通过规模采购压低成本，供应商深度依赖百胜的订单量。", visual:"💼", highlight:"供应链控制权" },
-        { id:"s3", text:"控制上游供应链=控制成本=保证利润空间。KFC的定价权来自对整条价值链的掌控。", visual:"🏆", highlight:"控制链=控制利润" }
-      ],
+      id:"ch6-l2", slug:"ch6-l2", title:"KFC 真正控制的是什么？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：如果炸鸡不是核心，那 KFC 控制的是什么？\\n\\n故事：在炸鸡出现在你面前之前，有一条完整的产业链在运转：鸡种、饲料、药品、屠宰、加工、Franchise 体系。KFC 在这条链上的每一个环节都有参与。\\n\\n概念：KFC 控制的不是炸鸡，而是生产炸鸡所需的整条产业链。\\n\\n结论：控制产业链，就控制了每一个环节的利润。` },
     },
     {
-      id:"ch6-l3", slug:"ch6-l3", title:"特许经营与资本",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"KFC经理", role:"百胜集团区域总监", avatar:"🍗" },
-      scene:{ bg:"linear-gradient(135deg,#200000 0%,#500000 100%)", accent:"#EF4444", icon:"🏪", name:"KFC总部" },
-      slides:[
-        { id:"s1", text:"特许经营是KFC扩张的核心引擎：总部提供品牌、技术、培训，加盟商出资金和管理，共同分利润。", visual:"🤝", highlight:"特许经营模式" },
-        { id:"s2", text:"KFC加盟费+装修+设备：一家门店初期投资约150-200万，加盟商承担资本风险，总部输出品牌价值。", visual:"💰", highlight:"加盟成本分析" },
-        { id:"s3", text:"特许经营本质是资本杠杆：用加盟商的钱实现自己的扩张，总部几乎零成本拿到营业收入提成。", visual:"🎯", highlight:"轻资产扩张" }
-      ],
+      id:"ch6-l3", slug:"ch6-l3", title:"从单一利润到产业链利润",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：原来的模式和现在的模式，有什么本质区别？\\n\\n故事：最初，企业只赚最终炸鸡销售的利润。后来，从鸡种开始，每一个产业链环节都参与进去。\\n\\n概念：从单一利润变成产业链利润——同样一只鸡，从出生到出售，每一个环节都创造利润，每一个环节都归 KFC 所有。\\n\\n结论：产业链利润切层，是把一个利润变成多个利润的方式。` },
     },
     {
-      id:"ch6-l4", slug:"ch6-l4", title:"品牌价值变现",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"KFC经理", role:"百胜集团区域总监", avatar:"🍗" },
-      scene:{ bg:"linear-gradient(135deg,#200000 0%,#500000 100%)", accent:"#EF4444", icon:"🏪", name:"KFC总部" },
-      slides:[
-        { id:"s1", text:"KFC品牌价值估算超过170亿美元。这个数字代表：消费者愿意为KFC多付的溢价总和。", visual:"💎", highlight:"品牌价值量化" },
-        { id:"s2", text:"品牌变现路径：高溢价产品→特许权费→联名合作→品牌授权→资本市场估值提升。", visual:"💹", highlight:"品牌变现五路径" },
-        { id:"s3", text:"品牌是最持久的护城河。KFC经历过危机（苏丹红、禽流感），但品牌依然强韧。", visual:"🛡️", highlight:"品牌护城河" }
-      ],
+      id:"ch6-l4", slug:"ch6-l4", title:"把风险转移出去",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：KFC 自己养鸡吗？\\n\\n故事：KFC 没有自己的鸡场。它通过外包养鸡模式，让鸡农来养鸡。养殖过程中的风险——疾病、死亡率、饲养成本波动——全部由鸡农承担。\\n\\n概念：KFC 把产业链中风险最高、利润最薄的养殖环节外包出去，把风险转移给鸡农。这不是偶然，而是刻意的结构设计。\\n\\n结论：懂得转移风险，是资本运作的重要能力。` },
     },
     {
-      id:"ch6-l5", slug:"ch6-l5", title:"KFC在中国的扩张",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"KFC经理", role:"百胜集团区域总监", avatar:"🍗" },
-      scene:{ bg:"linear-gradient(135deg,#200000 0%,#500000 100%)", accent:"#EF4444", icon:"🏪", name:"KFC总部" },
-      slides:[
-        { id:"s1", text:"1987年KFC在北京前门开第一家店，2023年已超过9700家，是全球最大的KFC单一市场。", visual:"🇨🇳", highlight:"中国扩张史" },
-        { id:"s2", text:"本土化战略：黄金蛋挞、老北京鸡肉卷、豆浆油条——用本地口味打破外来品牌的文化壁垒。", visual:"🥚", highlight:"本土化策略" },
-        { id:"s3", text:"中国市场战略成功关键：早进入（1987年）、深本土化、快速标准化复制、持续产品创新。", visual:"🚀", highlight:"成功四要素" }
-      ],
+      id:"ch6-l5", slug:"ch6-l5", title:"卖给鸡农：反向获利",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：KFC 不养鸡，但它和鸡农之间还有什么关系？\\n\\n故事：KFC 把鸡种和饲料销售给鸡农。鸡农向 KFC 购买鸡种和饲料，然后用自己的钱、自己的土地、自己的时间去养鸡，养大之后再卖回给 KFC。\\n\\n概念：KFC 不仅不承担养殖风险，还在养殖阶段通过销售鸡种和饲料赚取了一层利润。养鸡的人是鸡农，但产业链利润的一部分回到了 KFC 手上。\\n\\n结论：设计得好的产业链，可以让你在别人工作的时候也赚到钱。` },
     },
     {
-      id:"ch6-l6", slug:"ch6-l6", title:"百盛集团对比分析",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"KFC经理", role:"百胜集团区域总监", avatar:"🍗" },
-      scene:{ bg:"linear-gradient(135deg,#200000 0%,#500000 100%)", accent:"#EF4444", icon:"🏪", name:"KFC总部" },
-      slides:[
-        { id:"s1", text:"百盛集团（Parkson）曾是马来西亚最大百货，1994年进入中国，2015年后门店大量关闭。", visual:"📉", highlight:"百盛兴衰" },
-        { id:"s2", text:"对比KFC：百盛重资产（自持物业）vs KFC轻资产（加盟为主）；百盛无差异化vs KFC强品牌。", visual:"⚖️", highlight:"重资产vs轻资产" },
-        { id:"s3", text:"核心教训：商业模式决定资本效率。百盛资产重、周转慢；KFC资产轻、现金流好。", visual:"💡", highlight:"模式决定效率" }
-      ],
+      id:"ch6-l6", slug:"ch6-l6", title:"核心资产自己掌握",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：KFC 把什么留在自己手上？\\n\\n故事：屠宰、加工、品牌、Franchise 体系——这些是产业链中利润最高、最难被复制的环节。KFC 把这些全部掌握在自己手上，不外包。\\n\\n概念：高利润、高壁垒的环节，必须自己掌控。低利润、高风险的环节，可以外包出去。这是资本结构设计的核心判断。\\n\\n结论：知道什么该自己做，什么该让别人做，是产业链设计的关键。` },
     },
     {
-      id:"ch6-l7", slug:"ch6-l7", title:"第六章测验",
-      type:"QUIZ", xpReward:20, durationMin:3,
-      questions:[
-        { id:"q1", question:"特许经营（加盟）模式对总部最大的资本优势是什么？", options:[
-          { id:"A", text:"总部控制所有资产", correct:false, explanation:"加盟是分散资产控制权" },
-          { id:"B", text:"利用加盟商资金扩张", correct:true, explanation:"这是轻资产扩张的核心" },
-          { id:"C", text:"总部承担所有经营风险", correct:false, explanation:"风险由加盟商承担" },
-          { id:"D", text:"不需要建立品牌", correct:false, explanation:"品牌是特许经营基础" }
-        ]},
-        { id:"q2", question:"KFC本土化战略的核心目的是什么？", options:[
-          { id:"A", text:"降低食材成本", correct:false, explanation:"本土化主要不是为了降成本" },
-          { id:"B", text:"打破文化壁垒获取中国消费者", correct:true, explanation:"本土化让外来品牌被接受" },
-          { id:"C", text:"替代所有外国产品", correct:false, explanation:"这不是KFC的目标" },
-          { id:"D", text:"进入低端市场", correct:false, explanation:"KFC定位中端" }
-        ]},
-        { id:"q3", question:"百盛相比KFC最大的资本效率劣势是什么？", options:[
-          { id:"A", text:"产品种类太少", correct:false, explanation:"这不是资本效率问题" },
-          { id:"B", text:"重资产模式导致资本周转慢", correct:true, explanation:"百盛自持物业是核心问题" },
-          { id:"C", text:"价格太高", correct:false, explanation:"这不是资本效率指标" },
-          { id:"D", text:"管理团队不够", correct:false, explanation:"这不是核心问题" }
-        ]}
-      ],
+      id:"ch6-l7", slug:"ch6-l7", title:"产业链利润切层的完整图",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：把所有环节加起来，KFC 究竟赚了几层利润？\\n\\n故事：每一只炸鸡背后，KFC 赚取的利润不是一层，而是五层：鸡种利润 → 饲料利润 → 屠宰加工利润 → 品牌利润 → Franchise 利润。每一层都是独立的利润来源，叠加在一起，才是 KFC 真正的商业价值。\\n\\n概念：产业链利润切层，就是把一条产业链拆成多个利润节点，每个节点都设计成一个独立的获利机会。\\n\\n结论：同样一只鸡，别人只赚一次，KFC 赚了五次。` },
+    },
+    {
+      id:"ch6-l8", slug:"ch6-l8", title:"产业链资本化的启示",
+      type:"READING", xpReward:15, durationMin:3,
+      content:{ text:`问题：KFC 的模式，对企业资本运作有什么启示？\\n\\n故事：大多数企业只看到自己在卖什么，而没有思考整条产业链上还有哪些利润可以参与。KFC 的故事说明：企业的价值，不只来自最终产品的销售，更来自对产业链的设计和控制。\\n\\n概念：产业链资本化，就是把一条产业链的多个环节变成企业的价值来源。控制的环节越多，利润越厚，企业价值越高。\\n\\n结论：不要只看你在卖什么，要看整条链上还有哪些利润可以属于你。` },
     },
     ],
   },
   // ── CH7 ───────────────────────────────────────────────────────────────
   {
     id:"ch7", slug:"ch7", order:7,
-    title:"Apple iPhone案例", subtitle:"极致产品与资本的完美结合",
-    description:"苹果生态系统、品牌溢价与资本运作策略的深度解析。",
+    title:"Apple iPhone 案例", subtitle:"极致产品与资本的完美结合",
+    description:"透过 Apple 商业模式理解持续现金流与风险转移如何提升企业资本价值。",
     xpReward:0, levelColor:"#6B7280", levelLabel:"LV4 成长", icon:"🍎",
     lessons:[
     {
-      id:"ch7-l1", slug:"ch7-l1", title:"苹果的商业模式革命",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"科技家Chen", role:"科技创业者", avatar:"💻" },
-      scene:{ bg:"linear-gradient(135deg,#080808 0%,#1a1a1a 100%)", accent:"#9CA3AF", icon:"🍎", name:"苹果发布会舞台" },
-      slides:[
-        { id:"s1", text:"苹果不只是卖硬件，它在卖一个封闭的数字生态：iPhone+App Store+iCloud+AirPods，形成生态锁定。", visual:"🍎", highlight:"封闭生态战略" },
-        { id:"s2", text:"苹果硬件毛利率约37%，服务业务毛利率超过70%。越来越多收入来自App Store、订阅服务。", visual:"💹", highlight:"服务收入崛起" },
-        { id:"s3", text:"苹果商业模式精髓：用硬件获客，用服务变现，用生态锁定，用品牌溢价定价。", visual:"🔑", highlight:"四维商业飞轮" }
-      ],
+      id:"ch7-l1", slug:"ch7-l1", title:"大家以为 Apple 靠什么赚钱？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：Apple 是一家卖手机的公司吗？\\n\\n故事：每年新 iPhone 发布，全球媒体都在讨论它的硬件规格、售价、销量。所有人都以为 Apple 靠卖手机赚钱。\\n\\n概念：手机是大家看得见的产品，但不是 Apple 真正的利润结构。表面的交易，遮住了背后更大的收入逻辑。\\n\\n结论：要理解一家企业真正靠什么赚钱，必须看它的商业模式，而不只是它卖的产品。` },
     },
     {
-      id:"ch7-l2", slug:"ch7-l2", title:"iPhone的产业链资本",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"科技家Chen", role:"科技创业者", avatar:"💻" },
-      scene:{ bg:"linear-gradient(135deg,#080808 0%,#1a1a1a 100%)", accent:"#9CA3AF", icon:"🍎", name:"苹果发布会舞台" },
-      slides:[
-        { id:"s1", text:"iPhone背后隐藏着超过200个供应商，分布在中国（富士康组装）、韩国（三星屏幕）、日本（索尼镜头）。", visual:"🌏", highlight:"全球供应链" },
-        { id:"s2", text:"苹果对供应商要求极高且给价低，但能成为苹果供应商是最好的背书，带来更多订单。", visual:"📦", highlight:"苹果的供应商策略" },
-        { id:"s3", text:"苹果通过预付款锁定关键零件产能，用订单量压低单价，把成本转嫁给供应链。", visual:"💰", highlight:"苹果的成本控制" }
-      ],
+      id:"ch7-l2", slug:"ch7-l2", title:"一部 iPhone，Apple 赚了多少？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：卖一部 399 USD 的 iPhone，Apple 实际赚到多少？\\n\\n故事：表面上，一部 399 USD 的 iPhone，Apple 的硬件利润约为 80 USD。看起来利润空间不算大。但还有另一层收入没有被计算进去。\\n\\n概念：用户购买 iPhone，通常同时绑定 24 个月的电讯网络配套。Apple 从电讯运营商获得约 18% 的分成，平均每月约 10 USD，24 个月合计约 240 USD。一部 iPhone 的总利润：80 USD + 240 USD = 320 USD。\\n\\n结论：真正的利润，不是来自一次性的手机销售，而是来自 24 个月的持续现金流。` },
     },
     {
-      id:"ch7-l3", slug:"ch7-l3", title:"苹果的生态系统价值",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"科技家Chen", role:"科技创业者", avatar:"💻" },
-      scene:{ bg:"linear-gradient(135deg,#080808 0%,#1a1a1a 100%)", accent:"#9CA3AF", icon:"🍎", name:"苹果发布会舞台" },
-      slides:[
-        { id:"s1", text:"苹果生态锁定：你有iPhone→买AirPods→买iPad→用iCloud→买MacBook，每一步都加深依赖。", visual:"🔒", highlight:"生态锁定机制" },
-        { id:"s2", text:"2023年苹果服务收入超过850亿美元，App Store、Apple Music、iCloud等，都是高毛利生意。", visual:"📱", highlight:"服务收入规模" },
-        { id:"s3", text:"生态系统价值=用户切换成本。苹果让用户离开的代价极高，这是真正的护城河。", visual:"🏰", highlight:"切换成本=护城河" }
-      ],
+      id:"ch7-l3", slug:"ch7-l3", title:"持续现金流的力量",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：一次性收入和持续现金流，有什么本质区别？\\n\\n故事：卖一部手机，利润只来一次。但透过 24 个月的分成，同一个客户在两年内持续为 Apple 创造收入。一个客户变成了一个长期收入来源。\\n\\n概念：持续现金流是商业模式设计的核心目标之一。它让企业的收入不依赖单次交易，而是建立在持续的客户关系上。持续现金流越稳定，企业价值越高。\\n\\n结论：让客户持续付费，比每次都重新寻找新客户，价值大得多。` },
     },
     {
-      id:"ch7-l4", slug:"ch7-l4", title:"品牌溢价与资本",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"科技家Chen", role:"科技创业者", avatar:"💻" },
-      scene:{ bg:"linear-gradient(135deg,#080808 0%,#1a1a1a 100%)", accent:"#9CA3AF", icon:"🍎", name:"苹果发布会舞台" },
-      slides:[
-        { id:"s1", text:"苹果iPhone售价比同配置安卓高30-50%，这个差价就是品牌溢价——消费者为品牌认同感付钱。", visual:"💎", highlight:"品牌溢价量化" },
-        { id:"s2", text:"苹果品牌价值2023年超过4820亿美元（Interbrand评估），是全球最有价值的品牌之一。", visual:"🌟", highlight:"品牌价值4820亿" },
-        { id:"s3", text:"品牌溢价对资本的意义：更高的毛利率→更强的现金流→更大的研发投入→更好的产品→更强的品牌。", visual:"🔄", highlight:"品牌溢价飞轮" }
-      ],
+      id:"ch7-l4", slug:"ch7-l4", title:"透过运营商销售：风险转移",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：Apple 自己卖手机吗？\\n\\n故事：Apple 把大量 iPhone 的销售交给电讯运营商来完成。运营商负责门店、推广、客户服务、销售压力——这些风险和成本都在运营商身上。Apple 专注于设计产品和管理生态系统。\\n\\n概念：透过电讯运营商销售，Apple 把大量的销售风险转移出去。这和 KFC 把养殖风险转移给鸡农是同一套逻辑：把风险最高、利润最薄的环节外包，自己保留高价值的核心。\\n\\n结论：聪明的企业不是什么都自己做，而是懂得把风险设计到合适的位置。` },
     },
     {
-      id:"ch7-l5", slug:"ch7-l5", title:"苹果的资本运作策略",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"科技家Chen", role:"科技创业者", avatar:"💻" },
-      scene:{ bg:"linear-gradient(135deg,#080808 0%,#1a1a1a 100%)", accent:"#9CA3AF", icon:"🍎", name:"苹果发布会舞台" },
-      slides:[
-        { id:"s1", text:"苹果2023年持有超过1500亿美元现金储备。这不是闲置，而是战略武器：并购、回购、研发。", visual:"💰", highlight:"1500亿现金战略" },
-        { id:"s2", text:"苹果回购股票：每年回购超过800亿美元，减少流通股数量，推高每股价值，是股东回报的核心方式。", visual:"📈", highlight:"回购股票策略" },
-        { id:"s3", text:"苹果资本运作三角：现金积累（高利润）→回购增值（减少股数）→股价上涨（股东满意）。", visual:"🔺", highlight:"三角飞轮" }
-      ],
+      id:"ch7-l5", slug:"ch7-l5", title:"持续现金流 + 风险转移 = 更高企业价值",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：这两件事加在一起，对企业价值意味着什么？\\n\\n故事：一家靠一次性销售赚钱的企业，收入不稳定，投资者难以预测未来。但一家拥有持续现金流、同时把主要风险转移出去的企业，收入可预测，风险可控，投资者更愿意给出更高的估值。\\n\\n概念：持续现金流让企业收入可预测，风险转移让企业风险可控。两者结合，企业的可预测性提高，资本市场给出的估值倍数也随之提高。\\n\\n结论：商业模式的设计，直接决定企业在资本市场的价值。` },
     },
     {
-      id:"ch7-l6", slug:"ch7-l6", title:"第七章测验",
-      type:"QUIZ", xpReward:20, durationMin:3,
-      questions:[
-        { id:"q1", question:"苹果最重要的护城河是什么？", options:[
-          { id:"A", text:"工厂生产能力", correct:false, explanation:"苹果代工生产，没有自己的工厂" },
-          { id:"B", text:"最低的产品价格", correct:false, explanation:"苹果是高价策略" },
-          { id:"C", text:"封闭生态系统的用户锁定", correct:true, explanation:"生态锁定是最强护城河" },
-          { id:"D", text:"最多的专利数量", correct:false, explanation:"虽然专利重要但不是最核心" }
-        ]},
-        { id:"q2", question:"苹果回购股票的主要目的是什么？", options:[
-          { id:"A", text:"降低公司负债", correct:false, explanation:"回购与负债无关" },
-          { id:"B", text:"减少股份数量以提升每股价值", correct:true, explanation:"回购减少流通股，提升EPS" },
-          { id:"C", text:"阻止竞争对手收购", correct:false, explanation:"这不是回购的主要目的" },
-          { id:"D", text:"为员工提供股票期权", correct:false, explanation:"这是发行股票，不是回购" }
-        ]},
-        { id:"q3", question:"苹果服务业务（App Store等）相比硬件的优势是什么？", options:[
-          { id:"A", text:"更大的市场规模", correct:false, explanation:"硬件市场规模更大" },
-          { id:"B", text:"更高的毛利率（超过70%）", correct:true, explanation:"服务毛利率远高于硬件" },
-          { id:"C", text:"更低的研发成本", correct:false, explanation:"服务研发成本不低" },
-          { id:"D", text:"无需审核上架应用", correct:false, explanation:"苹果对App Store严格审核" }
-        ]}
-      ],
+      id:"ch7-l6", slug:"ch7-l6", title:"商业模式资本化的启示",
+      type:"READING", xpReward:15, durationMin:3,
+      content:{ text:`问题：Apple 的模式，对企业资本运作有什么启示？\\n\\n故事：很多企业只关注怎么卖更多产品，却没有思考：能不能把一次性交易变成持续收入？能不能把高风险的环节转移出去？这两个问题的答案，往往比销量本身更能影响企业价值。\\n\\n概念：商业模式资本化，就是把企业的运营方式设计成对资本有吸引力的结构——可预测、可扩张、风险可控。这不是产品问题，而是结构问题。\\n\\n结论：不要只想如何卖更多，要想如何设计出一个更有资本价值的商业模式。` },
     },
     ],
   },
   // ── CH8 ───────────────────────────────────────────────────────────────
   {
     id:"ch8", slug:"ch8", order:8,
-    title:"企业为什么要资本运作", subtitle:"资本运作的战略价值",
-    description:"并购整合、资产证券化与资本运作动机的深度分析。",
+    title:"企业为什么资本运作", subtitle:"资本运作的战略价值",
+    description:"建立企业终局思维，理解成长、并购、出售、上市、传承五条资本路径。",
     xpReward:0, levelColor:"#10B981", levelLabel:"LV4 成长", icon:"🏗️",
     lessons:[
     {
-      id:"ch8-l1", slug:"ch8-l1", title:"资本运作的动机",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"企业CEO", role:"上市公司CEO", avatar:"🏢" },
-      scene:{ bg:"linear-gradient(135deg,#001a0f 0%,#003320 100%)", accent:"#10B981", icon:"🏗️", name:"企业总部" },
-      slides:[
-        { id:"s1", text:"企业进行资本运作的动机：扩大规模（并购）、提升估值（上市）、降低成本（证券化）、转移风险（SPV）。", visual:"🎯", highlight:"资本运作四动机" },
-        { id:"s2", text:"中国恒大资本运作反面案例：过度杠杆+跨界扩张，结果因流动性危机导致企业危机。", visual:"⚠️", highlight:"过度运作风险" },
-        { id:"s3", text:"合理的资本运作应以真实经营为基础，任何脱离基本面的'资本游戏'终将崩塌。", visual:"🏗️", highlight:"基本面为根基" }
-      ],
+      id:"ch8-l1", slug:"ch8-l1", title:"企业的终局在哪里？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：经营一家企业，最终会走向哪里？\\n\\n故事：很多老板每天忙着经营，从来没有想过这个问题：这家企业十年后会是什么样子？二十年后呢？当老板无法再亲自经营的时候，企业会怎样？\\n\\n概念：每一家企业，都有它的终局。资本运作的价值，就在于帮助企业主提前设计这个终局，而不是等到终局自然到来。\\n\\n结论：不思考终局，就无法设计出通往终局的路。` },
     },
     {
-      id:"ch8-l2", slug:"ch8-l2", title:"并购与整合",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"企业CEO", role:"上市公司CEO", avatar:"🏢" },
-      scene:{ bg:"linear-gradient(135deg,#001a0f 0%,#003320 100%)", accent:"#10B981", icon:"🏗️", name:"企业总部" },
-      slides:[
-        { id:"s1", text:"并购（M&A）=买下另一家公司。战略目的：扩大市场份额、获取技术/人才、消灭竞争对手、进入新领域。", visual:"🤝", highlight:"并购四目的" },
-        { id:"s2", text:"滴滴合并Uber中国，腾讯收购多家游戏公司，阿里巴巴并购优酷——都是典型并购整合案例。", visual:"📱", highlight:"中国并购案例" },
-        { id:"s3", text:"并购后整合是成败关键：文化冲突、人才流失、系统整合往往是并购失败的主要原因。", visual:"⚠️", highlight:"整合风险" }
-      ],
+      id:"ch8-l2", slug:"ch8-l2", title:"成长：用资本加速",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：企业想扩张，为什么要用资本而不是自己慢慢存钱？\\n\\n故事：一家每年赚 100 万的企业，靠自己存钱扩张，10 年才能有 1000 万的规模。但如果引入资本，今天就可以启动这个扩张计划。\\n\\n概念：资本运作让企业把未来的成长提前实现。成长是资本运作最常见的动机之一——不是因为没有钱，而是因为时间有价值。\\n\\n结论：用资本加速成长，是把未来的机会带到今天来。` },
     },
     {
-      id:"ch8-l3", slug:"ch8-l3", title:"资产证券化",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"企业CEO", role:"上市公司CEO", avatar:"🏢" },
-      scene:{ bg:"linear-gradient(135deg,#001a0f 0%,#003320 100%)", accent:"#10B981", icon:"🏗️", name:"企业总部" },
-      slides:[
-        { id:"s1", text:"资产证券化=把未来现金流打包成证券卖给投资者，提前获得资金。房贷、车贷、租金都能证券化。", visual:"📦", highlight:"证券化定义" },
-        { id:"s2", text:"万科把未来10年的物业管理费打包成ABS（资产支持证券），卖给机构，当场拿到几十亿。", visual:"🏠", highlight:"万科ABS案例" },
-        { id:"s3", text:"证券化的价值：把流动性低的资产变成可交易的证券，实现资产价值提前变现。", visual:"💧", highlight:"流动性魔法" }
-      ],
+      id:"ch8-l3", slug:"ch8-l3", title:"并购：买下你需要的东西",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：企业想进入新市场或获得新能力，最快的方式是什么？\\n\\n故事：自己从头开始建立一个新业务，需要时间、人才、试错。但通过并购，可以直接买下一家已经有这些能力的企业，省去了大量建设期。\\n\\n概念：并购是资本运作的高效工具。用资本购买时间、能力、市场和资源，而不是从头自己建立。资本运作能力越强的企业，并购的选项就越多。\\n\\n结论：并购不是大企业的专利，而是任何懂得资本运作的企业都可以使用的工具。` },
     },
     {
-      id:"ch8-l4", slug:"ch8-l4", title:"第二阶段综合测验",
-      type:"QUIZ", xpReward:25, durationMin:3,
-      questions:[
-        { id:"q1", question:"企业并购后整合失败的最常见原因是什么？", options:[
-          { id:"A", text:"支付了太高的价格", correct:false, explanation:"估值过高是风险，但整合才是主因" },
-          { id:"B", text:"文化冲突和人才流失", correct:true, explanation:"文化和人才是整合最大挑战" },
-          { id:"C", text:"行业监管审批太慢", correct:false, explanation:"这是外部因素" },
-          { id:"D", text:"债务水平过高", correct:false, explanation:"这是财务问题，不是整合问题" }
-        ]},
-        { id:"q2", question:"资产证券化的核心目的是什么？", options:[
-          { id:"A", text:"隐藏企业债务", correct:false, explanation:"证券化是合法融资手段" },
-          { id:"B", text:"提前实现未来现金流的价值", correct:true, explanation:"这是证券化的本质" },
-          { id:"C", text:"降低产品售价", correct:false, explanation:"与定价无关" },
-          { id:"D", text:"增加流通股票数量", correct:false, explanation:"证券化不是股权融资" }
-        ]},
-        { id:"q3", question:"以下哪项是恒大危机的核心教训？", options:[
-          { id:"A", text:"房地产不应该上市", correct:false, explanation:"行业本身没问题" },
-          { id:"B", text:"多元化战略一定失败", correct:false, explanation:"多元化不一定失败" },
-          { id:"C", text:"过度杠杆+流动性管理失控", correct:true, explanation:"高杠杆+流动性危机是根本" },
-          { id:"D", text:"政府调控不公平", correct:false, explanation:"这是外部归因" }
-        ]}
-      ],
+      id:"ch8-l4", slug:"ch8-l4", title:"出售：把企业变成资产",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：企业可以被卖掉吗？出售是失败吗？\\n\\n故事：一位企业主经营了 15 年，把公司从零做到一定规模。这时候，他选择以高价出售这家公司，套现退出，再把这笔钱投入下一个项目。这不是放弃，而是一次成功的资本退出。\\n\\n概念：出售是资本运作中完全合理的终局之一。一家被设计成可出售的企业，本身就是一种高价值的资产。懂得资本运作的企业主，会把企业建成「可投资、可并购、可出售」的结构。\\n\\n结论：出售不是终结，而是把多年努力变现的方式。` },
+    },
+    {
+      id:"ch8-l5", slug:"ch8-l5", title:"上市：进入公开资本市场",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：上市是什么？它是资本运作的终点吗？\\n\\n故事：一家企业发展到一定规模，选择进行 IPO，在公开市场发行股票。原有股东的股权有了公开市场的流动性，企业也获得了持续融资的通道。\\n\\n概念：上市是资本运作的一种高阶出口，也是进入公开资本市场的起点。它不是终点，而是企业进入更大资本游戏的入场门票。\\n\\n结论：上市不是所有企业的必然路径，但它是资本运作能力最高阶的体现之一。` },
+    },
+    {
+      id:"ch8-l6", slug:"ch8-l6", title:"传承：资本结构决定未来",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：企业主百年之后，企业会怎样？\\n\\n故事：很多家族企业在创始人离开后，因为股权结构不清晰、继承人之间有矛盾，最终导致企业分裂或衰败。但一家在资本结构上设计完善的企业，传承可以有序进行。\\n\\n概念：传承是资本运作中最容易被忽视的终局之一。清晰的股权结构、合理的治理安排、提前设计好的传承路径，才能让企业跨越创始人，继续运转。\\n\\n结论：传承不是到了那一天再想，而是从今天的资本结构设计开始。` },
+    },
+    {
+      id:"ch8-l7", slug:"ch8-l7", title:"终局思维：选择你的路",
+      type:"READING", xpReward:15, durationMin:3,
+      content:{ text:`问题：成长、并购、出售、上市、传承——我该走哪条路？\\n\\n故事：没有一条路是唯一正确的。有人把企业做大上市，有人建立家族企业代代相传，有人多次创业多次退出。重要的不是选哪条路，而是你有没有提前知道自己想走哪条路，并为此设计企业的结构。\\n\\n概念：终局思维，就是在还有时间的时候，想清楚企业最终要走向哪里，然后从今天开始做正确的决定。资本运作是工具，终局是方向。\\n\\n结论：先想清楚要去哪里，才能知道该用什么工具、走什么路。` },
     },
     ],
   },
@@ -781,98 +431,38 @@ export const CAPITAL_LAUNCH_MODULES: Module[] = [
   {
     id:"ch9", slug:"ch9", order:9,
     title:"估值基础", subtitle:"给企业贴上正确的价格标签",
-    description:"PE、PB、EV/EBITDA与可比公司分析——掌握主流估值工具。",
+    description:"理解企业价值形成逻辑，掌握 PAT、PE Ratio、市值与回本逻辑。",
     xpReward:0, levelColor:"#0EA5E9", levelLabel:"LV5 资本化", icon:"📐",
     lessons:[
     {
-      id:"ch9-l1", slug:"ch9-l1", title:"什么是估值",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"分析师Zhang", role:"股权估值分析师", avatar:"🔍" },
-      scene:{ bg:"linear-gradient(135deg,#001520 0%,#002a3d 100%)", accent:"#0EA5E9", icon:"📐", name:"金融分析室" },
-      slides:[
-        { id:"s1", text:"估值=给企业/资产确定当前价值的过程。它不是精确科学，而是基于假设和判断的艺术。", visual:"🎨", highlight:"估值是艺术" },
-        { id:"s2", text:"同一家公司，不同分析师可能给出差距50%的估值——因为假设不同，结论不同。", visual:"🔍", highlight:"估值的主观性" },
-        { id:"s3", text:"估值的用途：融资谈判、并购定价、上市定价、内部决策、税务申报。", visual:"🎯", highlight:"估值的应用场景" }
-      ],
+      id:"ch9-l1", slug:"ch9-l1", title:"企业值多少钱？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：一家企业，怎么知道它值多少钱？\\n\\n故事：两个人同时想买一家餐厅。一个人说值 100 万，另一个人说值 300 万。两个人都有道理，因为他们用的是不同的逻辑。\\n\\n概念：企业估值，是对企业未来价值的判断。它不是固定的数字，而是基于某种逻辑和方法得出的结果。不同的方法，会得出不同的估值。\\n\\n结论：估值不是猜测，而是一套有逻辑的计算方式。` },
     },
     {
-      id:"ch9-l2", slug:"ch9-l2", title:"三种主流估值方法",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"分析师Zhang", role:"股权估值分析师", avatar:"🔍" },
-      scene:{ bg:"linear-gradient(135deg,#001520 0%,#002a3d 100%)", accent:"#0EA5E9", icon:"📐", name:"金融分析室" },
-      slides:[
-        { id:"s1", text:"三大估值方法：市场法（参考可比公司）、收益法（折现未来现金流DCF）、资产法（净资产重置成本）。", visual:"📐", highlight:"三大方法" },
-        { id:"s2", text:"实务中通常综合使用：上市公司用市场法，初创公司用收益法，资产密集型用资产法。", visual:"⚖️", highlight:"方法选择逻辑" },
-        { id:"s3", text:"没有'正确'的估值，只有'合理范围'的估值。好的估值师能清楚说明每个假设的依据。", visual:"💡", highlight:"估值的局限性" }
-      ],
+      id:"ch9-l2", slug:"ch9-l2", title:"PAT——税后净利润",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：估值从哪个数字开始计算？\\n\\n故事：一家公司今年收入 500 万，但扣掉成本、员工薪资、租金、税款，最终剩下 100 万。这剩下的 100 万，才是企业真正赚到的钱。\\n\\n概念：PAT（Profit After Tax，税后净利润）是企业一年内扣除所有成本和税款之后，真正归属股东的利润。它是估值计算最重要的基础数字。\\n\\n结论：估值的起点，是企业真正赚到的钱，不是收入，是税后净利润。` },
     },
     {
-      id:"ch9-l3", slug:"ch9-l3", title:"市盈率PE详解",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"分析师Zhang", role:"股权估值分析师", avatar:"🔍" },
-      scene:{ bg:"linear-gradient(135deg,#001520 0%,#002a3d 100%)", accent:"#0EA5E9", icon:"📐", name:"金融分析室" },
-      slides:[
-        { id:"s1", text:"PE=股价÷每股收益（EPS）。PE=20意味着投资者愿意为每1元利润支付20元，期待未来增长。", visual:"📊", highlight:"PE公式" },
-        { id:"s2", text:"银行PE通常5-8倍（稳定低增长）；科技股PE可达50-100倍（高增长预期）；消费龙头20-40倍。", visual:"📈", highlight:"不同行业PE区间" },
-        { id:"s3", text:"PE的局限：忽略债务、适用于盈利企业、易被一次性收益扭曲。PE要结合行业和成长性判断。", visual:"⚠️", highlight:"PE的局限" }
-      ],
+      id:"ch9-l3", slug:"ch9-l3", title:"PE Ratio——市盈率",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：知道了企业赚多少钱，怎么算它值多少钱？\\n\\n故事：一家企业每年赚 100 万。有人愿意用 300 万买下它，有人愿意用 500 万买下它。这个「愿意付多少倍」的数字，就是 PE Ratio。\\n\\n概念：PE Ratio（市盈率）是投资者愿意为企业每 1 元利润支付多少倍的价格。PE Ratio 3 意味着投资者愿意付出 3 年的利润来买下这家企业。PE Ratio 越高，代表市场对这家企业的未来越有信心。\\n\\n结论：PE Ratio 是市场对企业未来价值的信心指数。` },
     },
     {
-      id:"ch9-l4", slug:"ch9-l4", title:"市净率PB详解",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"分析师Zhang", role:"股权估值分析师", avatar:"🔍" },
-      scene:{ bg:"linear-gradient(135deg,#001520 0%,#002a3d 100%)", accent:"#0EA5E9", icon:"📐", name:"金融分析室" },
-      slides:[
-        { id:"s1", text:"PB=股价÷每股净资产。PB=1意味着股价等于账面净资产；PB>1说明市场认可企业创造价值的能力。", visual:"📚", highlight:"PB公式" },
-        { id:"s2", text:"银行股PB常低于1（资产质量担忧）；品牌消费品PB超过10（无形资产溢价）；制造业PB约1-3。", visual:"🏦", highlight:"不同行业PB" },
-        { id:"s3", text:"PB最适合资产密集型行业（银行、地产）。对轻资产公司（互联网），PB参考价值有限。", visual:"💡", highlight:"PB的适用场景" }
-      ],
+      id:"ch9-l4", slug:"ch9-l4", title:"回本逻辑",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：为什么投资者愿意用 3 倍、5 倍甚至更高的倍数来买企业？\\n\\n故事：用 300 万买下一家每年赚 100 万的企业，3 年回本。用 500 万买同一家企业，5 年回本。投资者选择的 PE Ratio，本质上是他们愿意等多少年回本。\\n\\n概念：PE Ratio 的背后，是回本逻辑。不同行业、不同规模、不同成长潜力的企业，市场接受的回本年限不同，因此 PE Ratio 也不同。成长越快、风险越低的企业，市场愿意等更久，给出更高的 PE Ratio。\\n\\n结论：PE Ratio 不是随便定的，它反映的是市场对这家企业的回本预期。` },
     },
     {
-      id:"ch9-l5", slug:"ch9-l5", title:"EV/EBITDA方法",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"分析师Zhang", role:"股权估值分析师", avatar:"🔍" },
-      scene:{ bg:"linear-gradient(135deg,#001520 0%,#002a3d 100%)", accent:"#0EA5E9", icon:"📐", name:"金融分析室" },
-      slides:[
-        { id:"s1", text:"EV=企业总价值（市值+净债务）。EBITDA=息税折旧摊销前利润，衡量核心经营盈利能力。", visual:"🔢", highlight:"EV/EBITDA公式" },
-        { id:"s2", text:"EV/EBITDA剔除了资本结构和折旧政策的影响，适合跨公司、跨国比较。", visual:"⚖️", highlight:"跨国比较利器" },
-        { id:"s3", text:"私募股权最爱用EV/EBITDA：收购时用它定价，退出时用它估算出售价格。通常6-12倍为正常区间。", visual:"💼", highlight:"PE机构的最爱" }
-      ],
+      id:"ch9-l5", slug:"ch9-l5", title:"市值——企业的总价值",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：PAT 和 PE Ratio 怎么合在一起算出企业价值？\\n\\n故事：一家企业每年税后净利润 100 万，市场给出的 PE Ratio 是 5。那么这家企业的估值就是：100 万 × 5 = 500 万。这就是市值的基本计算逻辑。\\n\\n概念：市值 = PAT × PE Ratio。企业的估值由两个因素决定：它赚多少钱，以及市场愿意给它多少倍的价格。提高估值，要么提高利润，要么提高 PE Ratio，或者两者同时提升。\\n\\n结论：市值 = PAT × PE Ratio。这个公式，是理解企业估值最核心的基础。` },
     },
     {
-      id:"ch9-l6", slug:"ch9-l6", title:"可比公司分析",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"分析师Zhang", role:"股权估值分析师", avatar:"🔍" },
-      scene:{ bg:"linear-gradient(135deg,#001520 0%,#002a3d 100%)", accent:"#0EA5E9", icon:"📐", name:"金融分析室" },
-      slides:[
-        { id:"s1", text:"可比公司分析（Comps）：找几家类似公司，看它们的平均估值倍数，用来给目标公司定价。", visual:"🔍", highlight:"Comps方法" },
-        { id:"s2", text:"步骤：选3-5家可比公司→收集其PE/EV/EBITDA等→计算中位数→乘以目标公司指标=估值范围。", visual:"📋", highlight:"Comps五步骤" },
-        { id:"s3", text:"关键：可比公司要真的'可比'——行业相同、规模相近、增速相似。选错可比公司，结论偏差很大。", visual:"⚠️", highlight:"可比公司选择" }
-      ],
-    },
-    {
-      id:"ch9-l7", slug:"ch9-l7", title:"第九章测验",
-      type:"QUIZ", xpReward:20, durationMin:3,
-      questions:[
-        { id:"q1", question:"PE（市盈率）的计算公式是？", options:[
-          { id:"A", text:"净资产÷股价", correct:false, explanation:"这是PB的倒数" },
-          { id:"B", text:"股价÷每股收益", correct:true, explanation:"PE=Price÷EPS" },
-          { id:"C", text:"市值÷营业收入", correct:false, explanation:"这是PS市销率" },
-          { id:"D", text:"净利润÷总资产", correct:false, explanation:"这是ROA" }
-        ]},
-        { id:"q2", question:"EV/EBITDA估值方法最大的优点是什么？", options:[
-          { id:"A", text:"计算最简单", correct:false, explanation:"DCF更简单" },
-          { id:"B", text:"剔除资本结构影响，利于跨公司比较", correct:true, explanation:"这是EV/EBITDA最大优势" },
-          { id:"C", text:"只适用于上市公司", correct:false, explanation:"非上市公司也可用" },
-          { id:"D", text:"可以预测股价走势", correct:false, explanation:"估值不预测股价" }
-        ]},
-        { id:"q3", question:"做可比公司分析时，最关键的是什么？", options:[
-          { id:"A", text:"选择市值最大的公司", correct:false, explanation:"规模不是唯一标准" },
-          { id:"B", text:"选择真正具有可比性的同类公司", correct:true, explanation:"可比性是Comps的核心" },
-          { id:"C", text:"选择最近上市的公司", correct:false, explanation:"上市时间不是关键" },
-          { id:"D", text:"选择利润率最高的公司", correct:false, explanation:"不能只看利润率" }
-        ]}
-      ],
+      id:"ch9-l6", slug:"ch9-l6", title:"估值的完整逻辑",
+      type:"READING", xpReward:15, durationMin:3,
+      content:{ text:`问题：估值到底是在衡量什么？\\n\\n故事：两家餐厅，同样的利润 100 万。一家是单独的餐厅，PE Ratio 3，估值 300 万。另一家有稳定的商业模式和可复制性，PE Ratio 5，估值 500 万。利润一样，但估值不同——因为市场看的不只是今天赚多少，还有未来的可预测性和成长空间。\\n\\n概念：估值衡量的不只是今天的利润，而是企业未来持续创造价值的能力。PAT 是今天的结果，PE Ratio 是市场对未来的判断。两者相乘，才是企业在资本市场的完整价值。\\n\\n结论：理解了 PAT 和 PE Ratio，你就掌握了读懂企业估值的基本工具。` },
     },
     ],
   },
@@ -880,164 +470,97 @@ export const CAPITAL_LAUNCH_MODULES: Module[] = [
   {
     id:"ch10", slug:"ch10", order:10,
     title:"奶茶店估值案例", subtitle:"用一杯奶茶学懂估值",
-    description:"从收入测算到融资谈判，完整的估值实战案例。",
+    description:"透过奶茶店真实案例理解估值逻辑与资本结构改变对企业价值的影响。",
     xpReward:0, levelColor:"#F97316", levelLabel:"LV5 资本化", icon:"🧋",
     lessons:[
     {
-      id:"ch10-l1", slug:"ch10-l1", title:"小明的奶茶梦",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"创业者Xiao", role:"奶茶创业者", avatar:"🧋" },
-      scene:{ bg:"linear-gradient(135deg,#1a0800 0%,#3d1a00 100%)", accent:"#F97316", icon:"🏪", name:"网红奶茶店" },
-      slides:[
-        { id:"s1", text:"小明有10万元，想开一家奶茶店。在谈判融资前，他需要先搞清楚：这家店值多少钱？", visual:"🧋", highlight:"估值的起点" },
-        { id:"s2", text:"奶茶店的价值来源：日销售额×利润率×可持续经营年限，再加上品牌和扩张潜力。", visual:"💰", highlight:"价值来源分析" },
-        { id:"s3", text:"投资人的第一个问题永远是：你的数据是真实的吗？你的商业模式是可持续的吗？", visual:"🔍", highlight:"投资人视角" }
-      ],
+      id:"ch10-l1", slug:"ch10-l1", title:"一家奶茶店，值多少钱？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：一家每年赚 100,000 的奶茶店，估值是多少？\\n\\n故事：老板辛苦经营了一家奶茶店，每年税后净利润 100,000。他想知道，如果要卖掉或引入投资，这家店值多少钱。\\n\\n概念：估值 = PAT × PE Ratio。市场对单店餐饮的接受回本年限是 3 年，因此 PE Ratio = 3。估值 = 100,000 × 3 = 300,000。\\n\\n结论：一家年赚 100,000 的奶茶店，市场估值 300,000。` },
     },
     {
-      id:"ch10-l2", slug:"ch10-l2", title:"收入测算方法",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"创业者Xiao", role:"奶茶创业者", avatar:"🧋" },
-      scene:{ bg:"linear-gradient(135deg,#1a0800 0%,#3d1a00 100%)", accent:"#F97316", icon:"🏪", name:"网红奶茶店" },
-      slides:[
-        { id:"s1", text:"收入测算公式：日均客流量×客单价×营业天数=年收入。每天200杯×25元×365天=182.5万。", visual:"🧮", highlight:"收入测算公式" },
-        { id:"s2", text:"验证方法：对标竞品（周边类似奶茶店的日销量）、调研商圈客流量、参考行业数据。", visual:"📊", highlight:"收入验证三法" },
-        { id:"s3", text:"保守估算原则：用悲观假设做基础，而非乐观假设。'最坏情况能承受吗'是投资人的第一问。", visual:"⚖️", highlight:"保守估算原则" }
-      ],
+      id:"ch10-l2", slug:"ch10-l2", title:"为什么市场给奶茶店 PE 3？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：PE Ratio 3 是怎么来的？为什么不是 5 或 10？\\n\\n故事：投资者看一家单店奶茶店，它依赖一个地点、一个老板、一套固定的客源。风险集中，没有规模化能力。市场只愿意等 3 年回本，因此 PE Ratio = 3。\\n\\n概念：PE Ratio 反映的是市场对企业风险和成长性的判断。单店模式风险高、可复制性低，所以市场给出的 PE 较低。这不是歧视，而是风险定价的结果。\\n\\n结论：PE Ratio 不是谈出来的，是市场根据风险和成长性定出来的。` },
     },
     {
-      id:"ch10-l3", slug:"ch10-l3", title:"成本结构分析",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"创业者Xiao", role:"奶茶创业者", avatar:"🧋" },
-      scene:{ bg:"linear-gradient(135deg,#1a0800 0%,#3d1a00 100%)", accent:"#F97316", icon:"🏪", name:"网红奶茶店" },
-      slides:[
-        { id:"s1", text:"奶茶店主要成本：原材料（30-35%）、房租（15-20%）、人工（15-20%）、营销（5-10%）、其他（5%）。", visual:"💸", highlight:"成本结构拆解" },
-        { id:"s2", text:"固定成本vs变动成本：房租是固定的（卖多卖少都要付），原材料是变动的（卖多才多花）。", visual:"📐", highlight:"固定vs变动成本" },
-        { id:"s3", text:"盈亏平衡点=固定成本÷（单杯售价-单杯变动成本）。这是运营分析最重要的数据。", visual:"🎯", highlight:"盈亏平衡计算" }
-      ],
+      id:"ch10-l3", slug:"ch10-l3", title:"食品工厂，为什么 PE 更高？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：同样年赚 100,000，为什么食品工厂的估值和奶茶店不一样？\\n\\n故事：一家食品工厂，同样年赚 100,000。但工厂有固定设备、生产能力、供应链控制，投资额更高，业务更稳定，可以服务多个客户。市场对工厂的回本预期是 5 年，PE Ratio = 5。估值 = 100,000 × 5 = 500,000。\\n\\n概念：不同的业务模式，市场给出不同的 PE Ratio。食品工厂比单店奶茶更稳定、门槛更高、成长空间更大，因此市场愿意给出更高的倍数。\\n\\n结论：同样的利润，不同的业务结构，估值可以完全不同。` },
     },
     {
-      id:"ch10-l4", slug:"ch10-l4", title:"利润与估值",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"创业者Xiao", role:"奶茶创业者", avatar:"🧋" },
-      scene:{ bg:"linear-gradient(135deg,#1a0800 0%,#3d1a00 100%)", accent:"#F97316", icon:"🏪", name:"网红奶茶店" },
-      slides:[
-        { id:"s1", text:"假设小明奶茶店年收入182万，净利润率20%，年净利润约36万元。PE法估值：36万×15倍PE=540万。", visual:"🧮", highlight:"PE估值计算" },
-        { id:"s2", text:"DCF估值：预测未来5年现金流，以10%折现率折现，加上终值，可能得到600-700万估值区间。", visual:"📈", highlight:"DCF估值" },
-        { id:"s3", text:"两种方法综合：估值约550-650万。小明开价600万，让投资人觉得'有谈判空间但不离谱'。", visual:"⚖️", highlight:"综合估值区间" }
-      ],
+      id:"ch10-l4", slug:"ch10-l4", title:"三家奶茶店加在一起，值多少？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：如果有三家奶茶店，估值就是三倍吗？\\n\\n故事：老板把三家奶茶店加在一起，每家年赚 100,000，总 PAT = 300,000。估值 = 300,000 × 3 = 900,000。三家店的估值是 900,000，确实是三倍。\\n\\n概念：在业务模式没有改变的情况下，估值按比例增长。PE Ratio 不变，利润增加，估值同步增加。\\n\\n结论：纯粹靠增加门店数量，估值线性增长，但 PE Ratio 不会提高。` },
     },
     {
-      id:"ch10-l5", slug:"ch10-l5", title:"融资谈判模拟",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"创业者Xiao", role:"奶茶创业者", avatar:"🧋" },
-      scene:{ bg:"linear-gradient(135deg,#1a0800 0%,#3d1a00 100%)", accent:"#F97316", icon:"🏪", name:"网红奶茶店" },
-      slides:[
-        { id:"s1", text:"小明找到天使投资人：'我的店估值600万，愿意出让15%股权，需要融资90万用于扩第二家店。'", visual:"💬", highlight:"开场报价" },
-        { id:"s2", text:"投资人说：'你第一家店才开3个月，数据太短，估值600万太高。我给你400万估值，要20%股权。'", visual:"🤝", highlight:"投资人还价" },
-        { id:"s3", text:"谈判结果：双方达成450万估值，投资人出资67.5万，占15%。小明保住控制权，拿到扩张资金。", visual:"🎉", highlight:"谈判结果" }
-      ],
+      id:"ch10-l5", slug:"ch10-l5", title:"加入食品工厂，结构开始改变",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：如果三家奶茶店加上一家食品工厂，结构有什么变化？\\n\\n故事：老板在三家奶茶店的基础上，新增了一家食品工厂，为奶茶店供应原料，同时也可以供应其他客户。现在整体的 PAT = 300,000（奶茶）+ 100,000（工厂）= 400,000。\\n\\n概念：加入食品工厂之后，整个业务结构发生了变化。不再只是单店模式，而是有了产业链的雏形。这个结构变化，会影响市场对整体业务的 PE Ratio 判断。\\n\\n结论：结构改变了，PE Ratio 的逻辑也随之改变。` },
     },
     {
-      id:"ch10-l6", slug:"ch10-l6", title:"第十章测验",
-      type:"QUIZ", xpReward:20, durationMin:3,
-      questions:[
-        { id:"q1", question:"奶茶店年收入182万，净利润率20%，用15倍PE估值，估值约为多少？", options:[
-          { id:"A", text:"182万", correct:false, explanation:"182万只是收入" },
-          { id:"B", text:"540万", correct:true, explanation:"36万×15=540万" },
-          { id:"C", text:"2730万", correct:false, explanation:"计算有误" },
-          { id:"D", text:"1200万", correct:false, explanation:"计算有误" }
-        ]},
-        { id:"q2", question:"盈亏平衡点的正确计算方式是什么？", options:[
-          { id:"A", text:"总收入÷总成本", correct:false, explanation:"这不是盈亏平衡" },
-          { id:"B", text:"固定成本÷单杯贡献利润", correct:true, explanation:"盈亏平衡点=固定成本÷边际贡献" },
-          { id:"C", text:"净利润÷营业额", correct:false, explanation:"这是净利润率" },
-          { id:"D", text:"日销量×365", correct:false, explanation:"这是年化日销" }
-        ]},
-        { id:"q3", question:"在估值谈判中，估值越高对创始人一定越有利吗？", options:[
-          { id:"A", text:"是，越高越好", correct:false, explanation:"过高估值会导致融资失败" },
-          { id:"B", text:"不一定，要平衡融资成功率和稀释比例", correct:true, explanation:"合理估值才能成交" },
-          { id:"C", text:"无所谓，反正要谈判", correct:false, explanation:"起点很重要" },
-          { id:"D", text:"应该越低越好", correct:false, explanation:"太低创始人吃亏" }
-        ]}
-      ],
+      id:"ch10-l6", slug:"ch10-l6", title:"SPV：把结构装进一个框架里",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：怎么让市场看到这个新的整体结构？\\n\\n故事：老板成立了一个 SPV（特殊目的载体），把三家奶茶店和一家食品工厂都纳入 SPV 旗下。SPV 的总 PAT = 400,000。因为 SPV 旗下有食品工厂，整体业务的 PE Ratio 提升为 5。估值 = 400,000 × 5 = 2,000,000。\\n\\n概念：SPV 是一个资本结构工具，用来整合多个业务，呈现出更高价值的整体结构。市场对 SPV 整体的估值，取决于 SPV 内最主要的业务性质。\\n\\n结论：SPV 不只是一个法律架构，而是把业务重新包装成更高估值结构的工具。` },
+    },
+    {
+      id:"ch10-l7", slug:"ch10-l7", title:"利润增加了多少？估值增加了多少？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：从 3 家奶茶店到 SPV，利润增加了多少？估值增加了多少？\\n\\n故事：利润变化：从 300,000 增加到 400,000，增加了 33%。估值变化：从 900,000 增加到 2,000,000，增加了 122%。利润只增加了 33%，但估值增加了超过 2 倍。\\n\\n概念：这个差距，来自 PE Ratio 的变化。PE Ratio 从 3 升到 5，让同样的利润增长，被放大成更大的估值增长。这就是资本结构改变的力量。不是利润增加，而是市场给出的倍数提高了。\\n\\n结论：资本结构改变后，PE Ratio 提高，企业价值被放大，而不只是利润的线性增长。` },
+    },
+    {
+      id:"ch10-l8", slug:"ch10-l8", title:"资本结构改变的力量",
+      type:"READING", xpReward:15, durationMin:3,
+      content:{ text:`问题：这个案例的核心启示是什么？\\n\\n故事：老板在没有大幅增加利润的情况下，透过引入食品工厂、成立 SPV、重新设计资本结构，把企业估值从 900,000 提升到 2,000,000。这不是靠更努力工作，而是靠更聪明地设计结构。\\n\\n概念：资本结构的设计，可以在利润不变的情况下大幅提升企业价值。懂得资本运作的企业主，不只想如何赚更多利润，更想如何设计出让市场给出更高倍数的结构。\\n\\n结论：提高企业价值有两条路：增加利润，或提高 PE Ratio。最聪明的做法，是两者同时推进。` },
     },
     ],
   },
   // ── CH11 ───────────────────────────────────────────────────────────────
   {
     id:"ch11", slug:"ch11", order:11,
-    title:"SPV系统", subtitle:"特殊目的载体的资本魔法",
-    description:"SPV结构、法律架构、地产应用与风险隔离机制的完整解析。",
+    title:"SPV 系统", subtitle:"特殊目的载体的资本魔法",
+    description:"理解 SPV 的本质与功能，掌握集团架构、控制权、稀释与融资结构设计。",
     xpReward:0, levelColor:"#7C3AED", levelLabel:"LV6 策略化", icon:"⚖️",
     lessons:[
     {
-      id:"ch11-l1", slug:"ch11-l1", title:"什么是SPV",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"专家Liu", role:"结构融资律师", avatar:"🏦" },
-      scene:{ bg:"linear-gradient(135deg,#0d0020 0%,#1e0050 100%)", accent:"#7C3AED", icon:"⚖️", name:"律师事务所" },
-      slides:[
-        { id:"s1", text:"SPV（特殊目的载体）是为特定业务目的而设立的独立法律实体，与母公司风险隔离。", visual:"⚖️", highlight:"SPV定义" },
-        { id:"s2", text:"SPV最常见用途：项目融资（避免母公司债务）、资产证券化（打包资产发债）、私募基金（合伙架构）。", visual:"🏗️", highlight:"SPV三大用途" },
-        { id:"s3", text:"SPV的核心价值：风险隔离+融资灵活+税务优化+清晰的权益分配。一个工具，多种价值。", visual:"🔑", highlight:"SPV四大价值" }
-      ],
+      id:"ch11-l1", slug:"ch11-l1", title:"什么是 SPV？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：SPV 是什么？\\n\\n故事：一个人用一个专门的法律实体来持有股权，这个实体本身不卖东西、不雇员工、不经营业务，它只做一件事：持有资产或股权，代表设立它的人出现在资本结构里。\\n\\n概念：SPV（Special Purpose Vehicle，特殊目的载体）是为特定目的独立设立的法律实体。它有自己的资产、负债和法律地位，独立于设立它的人。SPV 不经营业务，它的活动范围是持有资产、持有股权、或为特定项目提供融资结构。个人或公司都可以设立 SPV。\\n\\n结论：SPV 是资本结构设计最常用的工具之一，清晰、独立、灵活。` },
     },
     {
-      id:"ch11-l2", slug:"ch11-l2", title:"SPV的法律结构",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"专家Liu", role:"结构融资律师", avatar:"🏦" },
-      scene:{ bg:"linear-gradient(135deg,#0d0020 0%,#1e0050 100%)", accent:"#7C3AED", icon:"⚖️", name:"律师事务所" },
-      slides:[
-        { id:"s1", text:"SPV常见法律形式：有限责任公司（LLC）、有限合伙（LP）、信托（Trust）。各有特点，选哪种取决于目的。", visual:"📋", highlight:"SPV法律形式" },
-        { id:"s2", text:"典型结构：母公司→SPV→项目资产。SPV独立承担项目债务，母公司最多损失注入SPV的资本。", visual:"🏛️", highlight:"风险隔离结构" },
-        { id:"s3", text:"GP+LP架构（私募股权基金）：GP是管理合伙人（决策权），LP是有限合伙人（出资无管理权）。", visual:"🤝", highlight:"GP/LP结构" }
-      ],
+      id:"ch11-l2", slug:"ch11-l2", title:"SPV 的功能一：汇集投资者",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：五个投资者想共同投资同一个项目，最干净的方式是什么？\\n\\n故事：五个人各出 100,000，想共同投资一家企业。如果五个人直接成为股东，企业要管理五个投资方，每次决策、每次分红都需要五个人同意。但五个人先把钱放进一个 SPV，由 SPV 统一持有股权，企业只需要面对一个投资方。\\n\\n概念：SPV 的第一个功能是汇集投资者。多个投资者把资金注入同一个 SPV，SPV 作为统一实体代表所有人参与投资。内部分配和管理在 SPV 层面解决，不影响被投资的企业。\\n\\n结论：SPV 把多个投资者变成一个声音，让资本的进入更有秩序。` },
     },
     {
-      id:"ch11-l3", slug:"ch11-l3", title:"SPV在地产中的应用",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"专家Liu", role:"结构融资律师", avatar:"🏦" },
-      scene:{ bg:"linear-gradient(135deg,#0d0020 0%,#1e0050 100%)", accent:"#7C3AED", icon:"⚖️", name:"律师事务所" },
-      slides:[
-        { id:"s1", text:"每个地产项目通常设立独立SPV（项目公司）：便于独立融资、清晰核算、项目出售时直接转让SPV股权。", visual:"🏠", highlight:"地产SPV应用" },
-        { id:"s2", text:"地产SPV融资工具：银行贷款+信托资金+ABS，多层资本叠加，杠杆率可达项目价值的70-80%。", visual:"💰", highlight:"SPV融资叠加" },
-        { id:"s3", text:"恒大模式：数百个SPV项目公司，各自高杠杆融资，最终因现金流断裂引发连锁危机。", visual:"⚠️", highlight:"SPV滥用风险" }
-      ],
+      id:"ch11-l3", slug:"ch11-l3", title:"SPV 的功能二：简化股权结构",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：股权表上的名字越多，会有什么问题？\\n\\n故事：一家公司融资时引入了 30 个个人投资者，全部出现在股权表上。两年后准备下一轮融资，新投资者看到 30 个名字，认为结构混乱，谈判变得极其复杂，融资进度严重拖慢。\\n\\n概念：用 SPV 把多个投资者整合成一个实体，股权表上只出现一个 SPV 的名字。结构清晰，未来再融资、被并购或进行任何资本操作时，谈判对象简单，交割更快。\\n\\n结论：干净的股权结构是企业吸引资本的重要条件。SPV 是保持结构清晰的有效工具。` },
     },
     {
-      id:"ch11-l4", slug:"ch11-l4", title:"SPV风险隔离机制",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"专家Liu", role:"结构融资律师", avatar:"🏦" },
-      scene:{ bg:"linear-gradient(135deg,#0d0020 0%,#1e0050 100%)", accent:"#7C3AED", icon:"⚖️", name:"律师事务所" },
-      slides:[
-        { id:"s1", text:"破产隔离：SPV设计良好时，母公司破产不影响SPV（投资者）资产；SPV破产不拖垮母公司。", visual:"🛡️", highlight:"破产隔离" },
-        { id:"s2", text:"但隔离不是万能的：如果母公司为SPV提供担保，或资产转移不真实，隔离就可能失效。", visual:"⚠️", highlight:"隔离的局限" },
-        { id:"s3", text:"SPV设计原则：独立董事+独立账户+真实资产转移+不承诺回购+独立经营。缺一不可。", visual:"✅", highlight:"设计原则五条" }
-      ],
+      id:"ch11-l4", slug:"ch11-l4", title:"SPV 的功能三：资产持有与转让",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：想把一个业务转让出去，最简单的方式是什么？\\n\\n故事：一个老板想把旗下一家餐厅卖给别人。餐厅的设备、租约、许可证分散在不同地方，逐项转让极其繁琐。但如果餐厅的所有资产都装在一个 SPV 里，直接出售这个 SPV 就等于完成了全部资产的转让，干净利落。\\n\\n概念：把资产放进 SPV，当需要转让时，买卖的是 SPV 本身而不是逐项资产。这让资产转让更简单、更快速，税务处理上也可以更灵活。\\n\\n结论：SPV 是资产持有和退出的标准工具。它让买卖变得简单。` },
     },
     {
-      id:"ch11-l5", slug:"ch11-l5", title:"第十一章测验",
-      type:"QUIZ", xpReward:20, durationMin:3,
-      questions:[
-        { id:"q1", question:"设立SPV的核心目的是什么？", options:[
-          { id:"A", text:"避税", correct:false, explanation:"避税不是SPV的主要目的" },
-          { id:"B", text:"风险隔离与灵活融资", correct:true, explanation:"这是SPV最核心的价值" },
-          { id:"C", text:"提高母公司股价", correct:false, explanation:"SPV本身不影响母公司股价" },
-          { id:"D", text:"规避监管", correct:false, explanation:"合规SPV不是为了规避监管" }
-        ]},
-        { id:"q2", question:"私募股权基金中GP和LP最大的区别是什么？", options:[
-          { id:"A", text:"GP出资更多", correct:false, explanation:"通常LP出资更多" },
-          { id:"B", text:"LP有管理决策权", correct:false, explanation:"LP无日常管理权" },
-          { id:"C", text:"GP负责管理，LP提供资金", correct:true, explanation:"GP决策，LP出资" },
-          { id:"D", text:"没有区别", correct:false, explanation:"区别很大" }
-        ]},
-        { id:"q3", question:"SPV风险隔离失效的最常见原因是什么？", options:[
-          { id:"A", text:"SPV太小", correct:false, explanation:"规模不是隔离失效原因" },
-          { id:"B", text:"母公司为SPV提供担保", correct:true, explanation:"担保打破了风险隔离" },
-          { id:"C", text:"SPV设在海外", correct:false, explanation:"注册地不影响隔离效果" },
-          { id:"D", text:"SPV有太多投资者", correct:false, explanation:"投资者数量不影响" }
-        ]}
-      ],
+      id:"ch11-l5", slug:"ch11-l5", title:"SPV 与运营公司的分工",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：SPV 和实际做生意的公司，有什么区别？\\n\\n故事：老板有三家奶茶店和一家食品工厂，这四家都是运营公司，负责日常经营。他在上面设立一个 SPV，由这个 SPV 持有四家运营公司的股权。SPV 本身不卖奶茶、不生产食品，它只持有股权，代表老板出现在资本结构里。\\n\\n概念：SPV 和运营公司有明确的分工。运营公司做业务、产生利润；SPV 持有股权、承接资本。两者不是同一回事。在集团架构里，SPV 坐在运营公司上方，不参与日常经营。\\n\\n结论：SPV 负责持有，运营公司负责经营。分工清晰，是资本结构设计的基础。` },
+    },
+    {
+      id:"ch11-l6", slug:"ch11-l6", title:"集团架构",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：个人、SPV、运营公司，怎么组合在一起？\\n\\n故事：老板在最顶层，设立一个 SPV 作为持股平台，SPV 持有旗下三家奶茶店和一家食品工厂的股权。个人通过 SPV 间接控制所有运营公司，每个运营公司独立运营，互不干扰。这个从上到下的结构，就是集团架构。\\n\\n概念：集团架构由三层组成：顶层是个人或最终控制方，中间层是 SPV（持股、融资），底层是运营公司（经营业务）。清晰的集团架构，让企业可以分层引入投资者、保护控制权、方便未来出售或传承。\\n\\n结论：集团架构是企业资本化的基础设施。越早建立，融资和退出就越顺畅。` },
+    },
+    {
+      id:"ch11-l7", slug:"ch11-l7", title:"控制权：用少量股权控制更多资产",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：一定要持有 100% 的股权，才算真正控制一家公司吗？\\n\\n故事：老板持有 SPV 60% 的股权，SPV 持有三家运营公司各 51% 的股权。老板只直接持有 SPV 的股份，但透过 SPV 的持股，他实际上控制了三家运营公司的所有关键决策。\\n\\n概念：在法律上，持有超过 50% 的股权就能控制一家实体的决策。透过集团架构的层层持股，可以用相对较少的资本控制更大规模的资产，同时在 SPV 层引入外部投资者，而不失去对运营公司的控制权。\\n\\n结论：理解控制权的结构，是资本运作中保护自身利益的核心能力。` },
+    },
+    {
+      id:"ch11-l8", slug:"ch11-l8", title:"稀释与融资结构设计",
+      type:"READING", xpReward:15, durationMin:3,
+      content:{ text:`问题：引入投资者之后，自己的股权发生了什么？怎么设计才能保护自己的利益？\\n\\n故事：老板最初持有 SPV 100% 的股权。第一轮融资出让 20%，剩 80%。第二轮再出让 20%，剩 64%。股权比例在下降，但如果每一轮融资都让整体估值增长，64% 的绝对价值可能远超当初 100% 的价值。\\n\\n概念：稀释是融资的必然代价，但稀释本身不是损失。关键在于：融资结构设计好，在哪个层级引入投资者、用什么条件谈判、如何保留关键决策权，这些才是决定稀释代价大小的因素。\\n\\n结论：接受稀释是为了让剩余股权价值更高。好的融资结构，让你在让出部分股权的同时，保住控制权和最大利益。` },
     },
     ],
   },
@@ -1045,138 +568,43 @@ export const CAPITAL_LAUNCH_MODULES: Module[] = [
   {
     id:"ch12", slug:"ch12", order:12,
     title:"未来估值法", subtitle:"DCF折现现金流的终极武器",
-    description:"DCF原理、WACC、FCF预测与初创估值的完整体系。",
+    description:"理解资本市场看未来的逻辑，掌握未来利润、PE设计、融资空间与企业扩张。",
     xpReward:0, levelColor:"#059669", levelLabel:"LV6 策略化", icon:"🔭",
     lessons:[
     {
-      id:"ch12-l1", slug:"ch12-l1", title:"DCF折现现金流原理",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"Dr.Future", role:"未来估值学者", avatar:"🚀" },
-      scene:{ bg:"linear-gradient(135deg,#001a10 0%,#003020 100%)", accent:"#059669", icon:"🔭", name:"未来主义实验室" },
-      slides:[
-        { id:"s1", text:"DCF（折现现金流）：把未来每年的自由现金流，以一个合理的折现率折算回今天的价值之和。", visual:"🔢", highlight:"DCF核心公式" },
-        { id:"s2", text:"核心逻辑：今天的1元>明年的1元（因为今天的1元可以投资增值）。折现就是把未来价值换算成今天。", visual:"⏰", highlight:"折现的本质" },
-        { id:"s3", text:"DCF是最理论正确的估值方法，但对假设极其敏感。折现率变化1%，估值可能变20%以上。", visual:"⚠️", highlight:"DCF的敏感性" }
-      ],
+      id:"ch12-l1", slug:"ch12-l1", title:"资本市场看的是什么？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：投资者在决定是否投资一家企业时，他们在看什么？\\n\\n故事：两家餐厅，今年都赚 100,000。A 餐厅今年还是会赚 100,000，明年、后年也一样。B 餐厅今年赚 100,000，但正在复制模式，三年后预计赚 500,000。投资者会选谁？\\n\\n概念：资本市场看的不是今天的利润，而是未来的价值。投资者愿意今天付出资本，是因为他们相信这家企业未来能创造更大的价值。同样的当前利润，不同的增长潜力会带来完全不同的估值。\\n\\n结论：资本市场的逻辑是：今天的钱，买的是未来的价值。` },
     },
     {
-      id:"ch12-l2", slug:"ch12-l2", title:"终值的计算",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"Dr.Future", role:"未来估值学者", avatar:"🚀" },
-      scene:{ bg:"linear-gradient(135deg,#001a10 0%,#003020 100%)", accent:"#059669", icon:"🔭", name:"未来主义实验室" },
-      slides:[
-        { id:"s1", text:"终值（Terminal Value）：预测期结束后，企业持续经营所创造价值的现值。通常占DCF估值的60-80%。", visual:"🔭", highlight:"终值的重要性" },
-        { id:"s2", text:"永续增长法：终值=最后一年FCF×(1+g)÷(WACC-g)。其中g是永续增长率，通常取2-3%。", visual:"🧮", highlight:"永续增长公式" },
-        { id:"s3", text:"终值假设对估值影响巨大。永续增长率从2%改为3%，有时能让估值增加30%以上。", visual:"⚠️", highlight:"终值假设敏感" }
-      ],
+      id:"ch12-l2", slug:"ch12-l2", title:"未来利润：资本市场看的那个数字",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：投资者用来估值的，是今天的利润，还是未来的利润？\\n\\n故事：一家企业今年税后净利润 100,000。但老板向投资者展示了一个三年计划：第一年 200,000，第二年 400,000，第三年 800,000。投资者用第三年的 800,000 来计算估值，而不是今天的 100,000。\\n\\n概念：未来利润，是投资者最关心的数字。他们投资的不是你现在的状态，而是你三年后、五年后能创造的价值。未来利润越清晰、越可信，估值就越高。\\n\\n结论：要提高估值，不只是做好今天，更要让投资者相信未来。` },
     },
     {
-      id:"ch12-l3", slug:"ch12-l3", title:"折现率WACC",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"Dr.Future", role:"未来估值学者", avatar:"🚀" },
-      scene:{ bg:"linear-gradient(135deg,#001a10 0%,#003020 100%)", accent:"#059669", icon:"🔭", name:"未来主义实验室" },
-      slides:[
-        { id:"s1", text:"WACC（加权平均资本成本）=股权成本×股权比例+债务成本×债务比例×(1-税率)。", visual:"🔢", highlight:"WACC公式" },
-        { id:"s2", text:"股权成本用CAPM计算：Ke=Rf+β×(Rm-Rf)。Rf=无风险利率，β=系统风险，Rm=市场回报。", visual:"📊", highlight:"CAPM计算股权成本" },
-        { id:"s3", text:"WACC直觉：一家公司的融资成本越低（股权稳定+低息债务），DCF估值越高——好公司，便宜钱。", visual:"💡", highlight:"WACC直觉" }
-      ],
+      id:"ch12-l3", slug:"ch12-l3", title:"PE 设计：PE 是怎么来的？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：PE Ratio 只是市场给的，还是可以被设计？\\n\\n故事：同一家企业，如果只有单一业务，PE 是 3。但如果加入食品工厂、建立可复制的加盟体系，PE 可以升到 5 甚至更高。PE 不只是市场判断，它也受到企业自身结构和模式的影响。\\n\\n概念：PE Ratio 可以被设计。通过优化商业模式、建立可复制性、引入更稳定的收入来源，企业可以主动提升市场对它的 PE 评级。PE 的高低，反映的是市场对企业未来可预测性和成长性的信心。\\n\\n结论：设计 PE，就是设计市场对你的信心。这是资本运作的主动能力。` },
     },
     {
-      id:"ch12-l4", slug:"ch12-l4", title:"自由现金流预测",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"Dr.Future", role:"未来估值学者", avatar:"🚀" },
-      scene:{ bg:"linear-gradient(135deg,#001a10 0%,#003020 100%)", accent:"#059669", icon:"🔭", name:"未来主义实验室" },
-      slides:[
-        { id:"s1", text:"自由现金流（FCF）=经营现金流-资本支出（CAPEX）。这是企业真正可自由支配的资金。", visual:"💰", highlight:"FCF公式" },
-        { id:"s2", text:"FCF预测三步：预测收入增长→预测利润率→预测CAPEX需求。每一步都需要行业知识和合理假设。", visual:"📋", highlight:"FCF预测三步" },
-        { id:"s3", text:"利润≠现金流。一家公司账面有利润，但如果应收账款高企、资本支出大，实际FCF可能为负。", visual:"⚠️", highlight:"利润vs现金流" }
-      ],
+      id:"ch12-l4", slug:"ch12-l4", title:"未来估值的计算",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：知道了未来利润和 PE，怎么算未来的企业价值？\\n\\n故事：一家企业今年 PAT 100,000，预计三年后 PAT 达到 500,000。PE Ratio 为 5。未来估值 = 500,000 × 5 = 2,500,000。今天的估值只有 500,000，但三年后的估值是 2,500,000。\\n\\n概念：未来估值 = 未来 PAT × PE Ratio。这个公式和现在估值的算法一样，只是用的是未来的利润数字。投资者今天愿意给出的估值，往往介于现在估值和未来估值之间，取决于他们对这个未来预测的信心程度。\\n\\n结论：未来估值是融资谈判的基础。你展示的未来越清晰，今天能拿到的估值就越高。` },
     },
     {
-      id:"ch12-l5", slug:"ch12-l5", title:"敏感性分析",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"Dr.Future", role:"未来估值学者", avatar:"🚀" },
-      scene:{ bg:"linear-gradient(135deg,#001a10 0%,#003020 100%)", accent:"#059669", icon:"🔭", name:"未来主义实验室" },
-      slides:[
-        { id:"s1", text:"敏感性分析：改变关键假设（增长率、WACC、利润率），观察估值如何变化，找出最关键的假设。", visual:"🔍", highlight:"敏感性分析定义" },
-        { id:"s2", text:"呈现方式：二维敏感性表格（行=WACC变化，列=增长率变化，格中=对应估值）。", visual:"📊", highlight:"敏感性表格" },
-        { id:"s3", text:"专业原则：永远要展示高中低三种情景（乐观/基础/悲观），而非只展示一个'最可能'结果。", visual:"✅", highlight:"三情景原则" }
-      ],
+      id:"ch12-l5", slug:"ch12-l5", title:"融资空间",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：未来估值高，对融资有什么影响？\\n\\n故事：老板想融资 500,000。如果按今天估值 500,000 融资，要出让 50% 的股权，代价极大。但如果用三年后的未来估值 2,500,000 来谈，融资 500,000 只需出让 20%，老板保住了更多控制权和股权。\\n\\n概念：融资空间，是指在不过度稀释股权的前提下，企业能引入多少资本。未来估值越高，同样金额的融资占用的股权比例就越小，融资空间就越大。\\n\\n结论：提高未来估值，就是在扩大融资空间，让你用更少的股权换来更多的资本。` },
     },
     {
-      id:"ch12-l6", slug:"ch12-l6", title:"初创企业估值特殊性",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"Dr.Future", role:"未来估值学者", avatar:"🚀" },
-      scene:{ bg:"linear-gradient(135deg,#001a10 0%,#003020 100%)", accent:"#059669", icon:"🔭", name:"未来主义实验室" },
-      slides:[
-        { id:"s1", text:"初创企业DCF困难：没有历史现金流，增长预测高度不确定，折现率难以确定。", visual:"🚀", highlight:"初创估值难点" },
-        { id:"s2", text:"早期企业常用替代方法：风险投资法（预测退出时价值，倒推现在估值）、可比交易法、里程碑法。", visual:"🎯", highlight:"替代估值方法" },
-        { id:"s3", text:"初创估值最重要的因素：团队能力、市场规模、产品差异化、客户留存率——这些比财务模型更重要。", visual:"👥", highlight:"初创估值关键因素" }
-      ],
+      id:"ch12-l6", slug:"ch12-l6", title:"用未来估值支撑企业扩张",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：企业扩张需要资本，怎么用未来估值来支撑这个过程？\\n\\n故事：老板要把奶茶店从 3 家扩张到 20 家，需要大量资本。他不能等利润慢慢积累，因为机会不等人。用未来估值融资，今天拿到资本，用这笔钱加速扩张，扩张之后利润增长，反过来验证当初的未来预测。\\n\\n概念：未来估值让企业可以在今天拿到未来才能赚到的资本，用于加速扩张。这是资本运作和自我积累最核心的区别：用未来换今天，而不是用今天慢慢存到未来。\\n\\n结论：未来估值是企业扩张的杠杆。它让时间为你工作。` },
     },
     {
-      id:"ch12-l7", slug:"ch12-l7", title:"风险投资估值方法",
-      type:"STORY", xpReward:10, durationMin:2,
-      character:{ name:"Dr.Future", role:"未来估值学者", avatar:"🚀" },
-      scene:{ bg:"linear-gradient(135deg,#001a10 0%,#003020 100%)", accent:"#059669", icon:"🔭", name:"未来主义实验室" },
-      slides:[
-        { id:"s1", text:"VC法（风险投资法）：预测退出时（5-7年后）公司价值→以目标回报率（如10x）折算回今天。", visual:"💼", highlight:"VC估值法" },
-        { id:"s2", text:"举例：预测5年后以50倍PE退出，届时净利润2000万，退出价值=10亿。要求10x回报，今天估值=1亿。", visual:"🧮", highlight:"VC法举例" },
-        { id:"s3", text:"VC的决策本质：这笔投资有多大概率成功×成功时的回报倍数。期望值计算是核心。", visual:"🎯", highlight:"期望值计算" }
-      ],
-    },
-    {
-      id:"ch12-l8", slug:"ch12-l8", title:"第三阶段综合测验",
-      type:"QUIZ", xpReward:25, durationMin:3,
-      questions:[
-        { id:"q1", question:"DCF估值方法中，终值通常占总估值的比例是？", options:[
-          { id:"A", text:"10-20%", correct:false, explanation:"终值占比通常远超20%" },
-          { id:"B", text:"30-50%", correct:false, explanation:"通常更高" },
-          { id:"C", text:"60-80%", correct:true, explanation:"终值通常占DCF估值的多数" },
-          { id:"D", text:"超过90%", correct:false, explanation:"虽然有时接近，但60-80%是普遍区间" }
-        ]},
-        { id:"q2", question:"WACC代表什么？", options:[
-          { id:"A", text:"加权平均资本成本", correct:true, explanation:"Weighted Average Cost of Capital" },
-          { id:"B", text:"全球资产配置中心", correct:false, explanation:"这不是WACC的含义" },
-          { id:"C", text:"市场价格调整系数", correct:false, explanation:"这不是WACC" },
-          { id:"D", text:"企业负债总额", correct:false, explanation:"这不是WACC" }
-        ]},
-        { id:"q3", question:"自由现金流（FCF）的计算公式是？", options:[
-          { id:"A", text:"净利润+折旧", correct:false, explanation:"这是EBITDA的部分" },
-          { id:"B", text:"经营现金流-资本支出", correct:true, explanation:"FCF=CFO-CAPEX" },
-          { id:"C", text:"总收入-总成本", correct:false, explanation:"这是利润" },
-          { id:"D", text:"净利润-股息支出", correct:false, explanation:"这不是FCF" }
-        ]}
-      ],
-    },
-    {
-      id:"ch12-l9", slug:"ch12-l9", title:"第十二章测验",
-      type:"QUIZ", xpReward:20, durationMin:3,
-      questions:[
-        { id:"q1", question:"风险投资法估值中，最重要的假设是什么？", options:[
-          { id:"A", text:"公司当前的资产规模", correct:false, explanation:"早期公司资产不是关键" },
-          { id:"B", text:"退出时的公司价值和目标回报倍数", correct:true, explanation:"这是VC法的两个核心输入" },
-          { id:"C", text:"竞争对手的估值", correct:false, explanation:"可比分析是另一种方法" },
-          { id:"D", text:"创始人的年薪", correct:false, explanation:"这与估值无关" }
-        ]},
-        { id:"q2", question:"为什么利润高的公司有时候自由现金流为负？", options:[
-          { id:"A", text:"会计造假", correct:false, explanation:"不一定是造假" },
-          { id:"B", text:"大量应收款+高资本支出", correct:true, explanation:"这些会消耗经营现金流" },
-          { id:"C", text:"税率太高", correct:false, explanation:"税收减少利润但不直接造成FCF为负" },
-          { id:"D", text:"股息支付过多", correct:false, explanation:"股息在FCF计算之后" }
-        ]},
-        { id:"q3", question:"敏感性分析的主要目的是什么？", options:[
-          { id:"A", text:"找到最准确的估值", correct:false, explanation:"没有最准确，只有合理范围" },
-          { id:"B", text:"识别关键假设对估值的影响程度", correct:true, explanation:"这是敏感性分析的核心" },
-          { id:"C", text:"降低估值", correct:false, explanation:"敏感性分析不改变估值方向" },
-          { id:"D", text:"说服投资人", correct:false, explanation:"这是次要用途" }
-        ]}
-      ],
-    },
-    {
-      id:"ch12-l10", slug:"ch12-l10", title:"未来估值模拟器",
-      type:"SIMULATION", xpReward:30, durationMin:5,
-      simulation:{ type:"valuation", description:"实战演练：用DCF方法为一家企业建模，感受关键假设如何影响最终估值" },
+      id:"ch12-l7", slug:"ch12-l7", title:"用未来估值倒推今天的决策",
+      type:"READING", xpReward:15, durationMin:3,
+      content:{ text:`问题：知道了未来估值的逻辑，今天的经营决策应该怎么改变？\\n\\n故事：老板以前只想着今天赚多少。但现在他知道：三年后的 PAT 乘以 PE，才是他真正的企业价值。于是他开始思考：什么决策能提高三年后的 PAT？什么结构能提高 PE？这两个问题，从根本上改变了他看待经营的方式。\\n\\n概念：未来估值法不只是一个计算工具，它是一种思维方式。把今天的每个决定放在「三年后对估值的影响」这个框架里去评估，经营的优先级就会完全不同。\\n\\n结论：用未来估值倒推今天，是从经营者思维升级到资本运作思维的关键一步。` },
     },
     ],
   },
@@ -1184,319 +612,87 @@ export const CAPITAL_LAUNCH_MODULES: Module[] = [
   {
     id:"ch13", slug:"ch13", order:13,
     title:"资本成长地图", subtitle:"从学员到资本家的最后一跃",
-    description:"综合实战：思维框架、行业地图、投资决策与毕业典礼。",
+    description:"建立企业资本成长路线，整合资本认知、资本逻辑、企业资本化、估值融资与资本成长五个阶段。",
     xpReward:0, levelColor:"#D97706", levelLabel:"LV7 升维", icon:"🗺️",
     lessons:[
     {
-      id:"ch13-l1", slug:"ch13-l1", title:"资本家的思维框架",
-      type:"STORY", xpReward:15, durationMin:2,
-      character:{ name:"资本导师", role:"终极资本导师", avatar:"🌟" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#4d3300 100%)", accent:"#D97706", icon:"🗺️", name:"金色资本殿堂" },
-      slides:[
-        { id:"s1", text:"资本家思维框架：①把钱看成工具 ②投资而非消费 ③长期视野 ④系统性思考 ⑤承受不确定性。", visual:"🧠", highlight:"五维思维框架" },
-        { id:"s2", text:"与普通人的核心差异：资本家问'这笔钱能产生多少回报'，普通人问'这东西值不值这个价'。", visual:"⚖️", highlight:"两种思维对比" },
-        { id:"s3", text:"思维框架是最长期的竞争优势。财富可以失去，但正确的思维框架会持续创造财富。", visual:"💡", highlight:"思维的长期价值" }
-      ],
+      id:"ch13-l1", slug:"ch13-l1", title:"你走过了什么？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：从第一关到现在，你学到了什么？\\n\\n故事：一个人开始学习资本运作时，只知道「资本」这两个字。走到这里，他已经理解了资本是什么、它的历史、它的底层逻辑、融资工具、产业链案例、估值计算、SPV 结构和未来估值法。这条路，是一条从认知到工具到应用的旅程。\\n\\n概念：学习资本运作不是记住几个概念，而是建立一套看世界的方式。从认知到逻辑，从工具到结构，每一步都是下一步的基础。\\n\\n结论：你已经走过了这条路的大部分。现在，把它们连成一张地图。` },
     },
     {
-      id:"ch13-l2", slug:"ch13-l2", title:"如何识别好的投资标的",
-      type:"STORY", xpReward:15, durationMin:2,
-      character:{ name:"资本导师", role:"终极资本导师", avatar:"🌟" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#4d3300 100%)", accent:"#D97706", icon:"🗺️", name:"金色资本殿堂" },
-      slides:[
-        { id:"s1", text:"好标的的五个特征：①强护城河 ②高ROE ③可预期的现金流 ④卓越的管理团队 ⑤合理的价格。", visual:"🎯", highlight:"好标的五特征" },
-        { id:"s2", text:"护城河的类型：品牌（茅台）、网络效应（微信）、转换成本（SAP）、成本优势（拼多多）、规模（京东物流）。", visual:"🏰", highlight:"护城河五类型" },
-        { id:"s3", text:"记住：即使是最好的公司，买贵了也是差投资。'好公司'和'好投资'不是同一件事。", visual:"⚠️", highlight:"价格永远重要" }
-      ],
+      id:"ch13-l2", slug:"ch13-l2", title:"第一阶段：资本认知",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：资本运作的起点是什么？\\n\\n故事：一个老板在学习之前，只知道自己每天在经营，却不知道自己的企业可以被资本化，不知道经营和资本运作是两件不同的事，也不知道自己的企业终局可以被设计。\\n\\n概念：资本认知是第一阶段。它包括：理解资本是什么，理解资本运作和经营的区别，理解为什么企业需要资本，以及资本世界的规则。没有认知，就没有方向。\\n\\n结论：认知是所有改变的起点。知道资本世界存在，才能开始进入它。` },
     },
     {
-      id:"ch13-l3", slug:"ch13-l3", title:"尽职调查要点",
-      type:"STORY", xpReward:15, durationMin:2,
-      character:{ name:"资本导师", role:"终极资本导师", avatar:"🌟" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#4d3300 100%)", accent:"#D97706", icon:"🗺️", name:"金色资本殿堂" },
-      slides:[
-        { id:"s1", text:"尽职调查（DD）是投资前对目标企业的全面核查：财务、法律、商业模式、团队、市场、竞争。", visual:"🔍", highlight:"DD六维度" },
-        { id:"s2", text:"财务DD核心：验证收入真实性、核查资产质量、识别隐性负债、确认现金流状况。", visual:"💰", highlight:"财务DD重点" },
-        { id:"s3", text:"最常被忽略的DD：团队背景调查（创始人诚信记录）、客户访谈（用户真实满意度）。", visual:"👥", highlight:"容易忽略的DD" }
-      ],
+      id:"ch13-l3", slug:"ch13-l3", title:"第二阶段：资本逻辑",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：资本运作的底层规律是什么？\\n\\n故事：资本运作看起来复杂，但走完整个逻辑之后，它其实是一个清晰的循环：项目需要资本，资本换取股权，股权等待时间，价值成熟后流动，资本再次循环。\\n\\n概念：资本逻辑是第二阶段。理解这个循环，就理解了资本世界为什么这样运转。所有的融资工具、估值方法、结构设计，都是这个循环的具体表现形式。\\n\\n结论：掌握底层逻辑，才能在面对任何资本问题时找到方向。` },
     },
     {
-      id:"ch13-l4", slug:"ch13-l4", title:"投资条款清单TS",
-      type:"STORY", xpReward:15, durationMin:2,
-      character:{ name:"资本导师", role:"终极资本导师", avatar:"🌟" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#4d3300 100%)", accent:"#D97706", icon:"🗺️", name:"金色资本殿堂" },
-      slides:[
-        { id:"s1", text:"Term Sheet（条款清单）是投资意向书，核心条款：估值、投资额、股权比例、优先清算权、反稀释条款。", visual:"📋", highlight:"TS核心条款" },
-        { id:"s2", text:"优先清算权：投资人在公司退出时，优先于创始人拿回投资本金（甚至1-2倍）后，剩余再分。", visual:"⚖️", highlight:"优先清算权解析" },
-        { id:"s3", text:"创始人谈TS的核心原则：关注实质而非数字。100万估值差距，远不如一个糟糕的优先清算条款伤害大。", visual:"💡", highlight:"TS谈判原则" }
-      ],
+      id:"ch13-l4", slug:"ch13-l4", title:"产业链与商业模式：资本逻辑的应用",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：底层逻辑怎么在真实商业里体现？\\n\\n故事：KFC 用产业链利润切层，把一只鸡变成五层利润；一家科技公司用持续现金流和风险转移，把硬件销售变成长期收入来源。这两个例子，都是资本逻辑在商业模式里的具体应用。\\n\\n概念：资本逻辑不只是理论，它体现在每一个成功商业模式的设计里。懂得资本逻辑的企业家，会用它来重新思考自己的业务：哪些环节可以资本化？哪些风险可以转移？哪里可以建立持续现金流？\\n\\n结论：资本逻辑的价值，在于它改变你看待自己业务的方式。` },
     },
     {
-      id:"ch13-l5", slug:"ch13-l5", title:"董事会与公司治理",
-      type:"STORY", xpReward:15, durationMin:2,
-      character:{ name:"资本导师", role:"终极资本导师", avatar:"🌟" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#4d3300 100%)", accent:"#D97706", icon:"🗺️", name:"金色资本殿堂" },
-      slides:[
-        { id:"s1", text:"董事会是公司最高决策机构，负责重大战略、CEO任命、财务监督。投资人通常要求董事席位。", visual:"🏛️", highlight:"董事会职能" },
-        { id:"s2", text:"常见治理结构：创始人团队席位+独立董事席位+投资人席位，以保证多方制衡。", visual:"⚖️", highlight:"治理结构设计" },
-        { id:"s3", text:"治理失败案例：WeWork创始人Adam Neumann权力过大，导致公司走向失控——治理是资本的安全网。", visual:"⚠️", highlight:"治理失败案例" }
-      ],
+      id:"ch13-l5", slug:"ch13-l5", title:"第三阶段：企业资本化",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：怎么把一家普通企业变成一家可以资本运作的企业？\\n\\n故事：同样一家餐厅，单独经营时估值 300,000，通过建立 SPV、引入食品工厂、设计集团架构，估值变成 2,000,000。改变的不是利润本身，而是企业的资本结构。\\n\\n概念：企业资本化是第三阶段。它包括：用 SPV 整合资产和投资者，用集团架构组织多个业务，设计控制权保护，以及通过结构改变提升 PE Ratio。这是从经营进入资本世界的关键跨越。\\n\\n结论：资本化不是等到企业足够大才做，而是从今天开始设计。` },
     },
     {
-      id:"ch13-l6", slug:"ch13-l6", title:"退出策略设计",
-      type:"STORY", xpReward:15, durationMin:2,
-      character:{ name:"资本导师", role:"终极资本导师", avatar:"🌟" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#4d3300 100%)", accent:"#D97706", icon:"🗺️", name:"金色资本殿堂" },
-      slides:[
-        { id:"s1", text:"投资的终点是退出。主要退出方式：IPO上市、并购（战略买家/PE）、回购（创始人回购）、清算。", visual:"🚪", highlight:"退出四通道" },
-        { id:"s2", text:"投资前就要想好退出：谁会是潜在买家？上市条件是什么？回购触发条件是什么？", visual:"🎯", highlight:"提前规划退出" },
-        { id:"s3", text:"二级市场（S基金）：让早期投资人在公司上市前就转让股权，为流动性受限的投资人提供出路。", visual:"💧", highlight:"S基金提供流动性" }
-      ],
+      id:"ch13-l6", slug:"ch13-l6", title:"第四阶段：估值与融资",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：企业的价值怎么被量化？资本怎么被引入？\\n\\n故事：老板掌握了 PAT × PE = 估值的公式，开始理解为什么同样的利润不同的结构值不同的钱；又学会了用未来估值融资，把融资空间从 50% 稀释压缩到 20% 稀释。\\n\\n概念：估值与融资是第四阶段。它包括：理解 PAT、PE Ratio 和市值的关系，设计 PE 以提升估值，用未来估值扩大融资空间，以及在正确的层级用正确的结构融资。\\n\\n结论：估值和融资是资本运作的语言，掌握它才能和资本世界对话。` },
     },
     {
-      id:"ch13-l7", slug:"ch13-l7", title:"综合大测验一：基础认知",
-      type:"QUIZ", xpReward:30, durationMin:3,
-      questions:[
-        { id:"q1", question:"以下哪项不是资本护城河？", options:[
-          { id:"A", text:"品牌效应", correct:false, explanation:"品牌是护城河" },
-          { id:"B", text:"网络效应", correct:false, explanation:"网络效应是护城河" },
-          { id:"C", text:"公司规模大", correct:true, explanation:"规模大不等于护城河，需要有壁垒" },
-          { id:"D", text:"转换成本高", correct:false, explanation:"转换成本是护城河" }
-        ]},
-        { id:"q2", question:"复利的三个核心要素是？", options:[
-          { id:"A", text:"股票、基金、债券", correct:false, explanation:"这是资产类型" },
-          { id:"B", text:"本金、收益率、时间", correct:true, explanation:"复利三要素" },
-          { id:"C", text:"买入、持有、卖出", correct:false, explanation:"这是投资动作" },
-          { id:"D", text:"利率、税率、通胀率", correct:false, explanation:"这些是影响因素" }
-        ]},
-        { id:"q3", question:"一家公司的自由现金流为负，最可能的原因是？", options:[
-          { id:"A", text:"产品质量差", correct:false, explanation:"产品质量不直接影响FCF" },
-          { id:"B", text:"大量资本支出超过经营现金流", correct:true, explanation:"重资本扩张期FCF常为负" },
-          { id:"C", text:"员工太多", correct:false, explanation:"人力成本影响利润但不直接决定FCF" },
-          { id:"D", text:"税率太高", correct:false, explanation:"税收影响利润，但不一定使FCF为负" }
-        ]}
-      ],
+      id:"ch13-l7", slug:"ch13-l7", title:"第五阶段：资本成长",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：掌握了前面所有工具之后，企业可以走向哪里？\\n\\n故事：一家奶茶店从单店经营，到设立 SPV、建立集团架构、引入资本扩张、用未来估值持续融资，最终可以走向上市、被并购、或传承给下一代。这条路，就是资本成长的完整路线。\\n\\n概念：资本成长是第五阶段，也是所有阶段的目标。它不是一个终点，而是企业持续进化的能力。资本认知、资本逻辑、企业资本化、估值融资，这四个阶段都是为资本成长服务的。\\n\\n结论：资本成长，是企业从生存走向卓越的路线。` },
     },
     {
-      id:"ch13-l8", slug:"ch13-l8", title:"综合大测验二：工具运用",
-      type:"QUIZ", xpReward:30, durationMin:3,
-      questions:[
-        { id:"q1", question:"某公司今年净利润500万，市场给予20倍PE，公司估值是多少？", options:[
-          { id:"A", text:"500万", correct:false, explanation:"500万只是净利润" },
-          { id:"B", text:"1亿元", correct:true, explanation:"500万×20=1亿" },
-          { id:"C", text:"2000万", correct:false, explanation:"计算有误" },
-          { id:"D", text:"2.5亿", correct:false, explanation:"计算有误" }
-        ]},
-        { id:"q2", question:"DCF估值中，折现率越高，估值结果会怎样？", options:[
-          { id:"A", text:"估值越高", correct:false, explanation:"折现率越高，现值越低" },
-          { id:"B", text:"估值不变", correct:false, explanation:"折现率影响估值" },
-          { id:"C", text:"估值越低", correct:true, explanation:"折现率越高，未来现金流现值越小" },
-          { id:"D", text:"取决于增长率", correct:false, explanation:"折现率直接影响估值方向" }
-        ]},
-        { id:"q3", question:"特许经营模式的核心资本优势是什么？", options:[
-          { id:"A", text:"总部承担所有风险", correct:false, explanation:"特许经营分散风险" },
-          { id:"B", text:"用加盟商资金实现轻资产扩张", correct:true, explanation:"这是特许经营的资本魔法" },
-          { id:"C", text:"消除市场竞争", correct:false, explanation:"这不可能" },
-          { id:"D", text:"降低产品质量标准", correct:false, explanation:"标准化才是关键" }
-        ]}
-      ],
+      id:"ch13-l8", slug:"ch13-l8", title:"资本成长的五条出路",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：企业资本成长，最终会走向哪里？\\n\\n故事：不同的企业家，选择了不同的终局：有人把企业做大，通过资本并购扩张；有人用资本运作提升估值后出售，套现进入下一个项目；有人带领企业走向上市；有人把清晰的股权结构留给下一代传承。\\n\\n概念：资本成长的出路有五条：成长、并购、出售、上市、传承。没有一条路是唯一正确的，但必须在还有时间的时候提前想清楚。终局决定了今天的结构应该怎么设计。\\n\\n结论：先想清楚要去哪里，才能知道今天的资本运作应该怎么走。` },
     },
     {
-      id:"ch13-l9", slug:"ch13-l9", title:"综合大测验三：案例分析",
-      type:"QUIZ", xpReward:30, durationMin:3,
-      questions:[
-        { id:"q1", question:"苹果公司大量回购股票，对投资者的主要影响是？", options:[
-          { id:"A", text:"稀释投资者持股比例", correct:false, explanation:"回购减少股数，增加而非稀释比例" },
-          { id:"B", text:"减少公司营收", correct:false, explanation:"回购不影响营收" },
-          { id:"C", text:"提升每股收益和股东价值", correct:true, explanation:"回购减少股数，EPS和价值提升" },
-          { id:"D", text:"增加公司债务", correct:false, explanation:"回购用现金，可能不涉及债务" }
-        ]},
-        { id:"q2", question:"一家奶茶店年净利润36万，投资人出90万获得15%股权，投资人隐含的公司估值是多少？", options:[
-          { id:"A", text:"90万", correct:false, explanation:"90万只是投资额" },
-          { id:"B", text:"600万", correct:true, explanation:"90万÷15%=600万" },
-          { id:"C", text:"240万", correct:false, explanation:"计算有误" },
-          { id:"D", text:"540万", correct:false, explanation:"这是PE法估值" }
-        ]},
-        { id:"q3", question:"荷兰东印度公司（VOC）的商业成功最关键的因素是？", options:[
-          { id:"A", text:"政府的直接补贴", correct:false, explanation:"主要靠市场化运作" },
-          { id:"B", text:"垄断贸易路线+向公众融资分担风险", correct:true, explanation:"这两点是VOC成功核心" },
-          { id:"C", text:"低廉的产品价格", correct:false, explanation:"香料是高价值商品" },
-          { id:"D", text:"技术创新", correct:false, explanation:"VOC的优势是商业模式而非技术" }
-        ]}
-      ],
+      id:"ch13-l9", slug:"ch13-l9", title:"你的企业，现在在哪个阶段？",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：学完这门课，你的企业处于资本成长地图的哪个位置？\\n\\n故事：有人听完课，发现自己的企业连资本认知都还没有，需要从第一阶段开始；有人已经有了一定结构，但还没有做过估值；有人已经在融资，但没有用未来估值思考过空间。每个人的位置不同。\\n\\n概念：资本成长地图的价值，不只是告诉你终点在哪里，更是帮你知道自己现在在哪里。找到自己的位置，才能知道下一步该做什么。\\n\\n结论：知道自己在哪里，才能制定有效的下一步计划。` },
     },
     {
-      id:"ch13-l10", slug:"ch13-l10", title:"资本地图：制造业",
-      type:"STORY", xpReward:15, durationMin:2,
-      character:{ name:"资本导师", role:"终极资本导师", avatar:"🌟" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#4d3300 100%)", accent:"#D97706", icon:"🗺️", name:"金色资本殿堂" },
-      slides:[
-        { id:"s1", text:"制造业资本运作重点：重资产管理（工厂设备折旧）、供应链融资（应付账款延长）、产能利用率优化。", visual:"🏭", highlight:"制造业资本要点" },
-        { id:"s2", text:"富士康模式：低利润率×超大规模=可观利润。用规模换成本优势，用效率换资本回报。", visual:"📱", highlight:"富士康案例" },
-        { id:"s3", text:"制造业升级路径：从代工（OEM）→品牌制造（OBM）→智能制造，资本效率逐步提升。", visual:"🚀", highlight:"制造业升级路径" }
-      ],
+      id:"ch13-l10", slug:"ch13-l10", title:"建立你的资本成长路线",
+      type:"READING", xpReward:10, durationMin:3,
+      content:{ text:`问题：知道了地图，下一步怎么走？\\n\\n故事：一个老板学完这门课后，做了三件事：第一，为企业进行资本化评估，确认当前的资本结构；第二，设计未来三年的 PAT 增长计划和 PE 提升方向；第三，设立第一个 SPV，开始整理资产结构。这三步，是他的资本成长起点。\\n\\n概念：资本成长路线不是一个宏大的计划，而是从今天开始的具体行动。认知、逻辑、工具、结构，每一个学到的东西，都可以从今天就开始应用。\\n\\n结论：行动比计划更重要。资本成长从今天开始，不是等到「准备好了」才开始。` },
     },
     {
-      id:"ch13-l11", slug:"ch13-l11", title:"资本地图：科技业",
-      type:"STORY", xpReward:15, durationMin:2,
-      character:{ name:"资本导师", role:"终极资本导师", avatar:"🌟" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#4d3300 100%)", accent:"#D97706", icon:"🗺️", name:"金色资本殿堂" },
-      slides:[
-        { id:"s1", text:"科技公司资本特点：轻资产（主要资产是人才和代码）、高增长、高毛利、重研发投入。", visual:"💻", highlight:"科技资本特点" },
-        { id:"s2", text:"SaaS商业模式：一次研发多次销售，边际成本趋近于零，规模越大毛利率越高。", visual:"☁️", highlight:"SaaS经济学" },
-        { id:"s3", text:"科技公司估值逻辑：重增长而非盈利（亚马逊亏损多年但估值极高），用户增长>短期利润。", visual:"📈", highlight:"科技估值逻辑" }
-      ],
-    },
-    {
-      id:"ch13-l12", slug:"ch13-l12", title:"资本地图：消费品",
-      type:"STORY", xpReward:15, durationMin:2,
-      character:{ name:"资本导师", role:"终极资本导师", avatar:"🌟" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#4d3300 100%)", accent:"#D97706", icon:"🗺️", name:"金色资本殿堂" },
-      slides:[
-        { id:"s1", text:"消费品资本重点：品牌建设（长期投入）、渠道管理（铺货和促销）、供应链效率（周转天数）。", visual:"🛒", highlight:"消费品资本要点" },
-        { id:"s2", text:"茅台模式：稀缺性（计划产量不扩张）+品牌溢价+渠道控制=超高ROE的资本神话。", visual:"🍶", highlight:"茅台资本模型" },
-        { id:"s3", text:"消费品公司的护城河：品牌认知（换品牌有心理成本）+渠道深度（终端覆盖率）。", visual:"🏰", highlight:"消费护城河" }
-      ],
-    },
-    {
-      id:"ch13-l13", slug:"ch13-l13", title:"资本地图：金融业",
-      type:"STORY", xpReward:15, durationMin:2,
-      character:{ name:"资本导师", role:"终极资本导师", avatar:"🌟" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#4d3300 100%)", accent:"#D97706", icon:"🗺️", name:"金色资本殿堂" },
-      slides:[
-        { id:"s1", text:"金融业本质是'经营钱'：以低成本募集资金，以高收益放出，利差就是利润来源。", visual:"🏦", highlight:"金融业本质" },
-        { id:"s2", text:"银行的资本运作：存款（低息负债）→贷款（高息资产），净息差×资产规模=净利润。", visual:"📊", highlight:"银行盈利模式" },
-        { id:"s3", text:"金融业的风险：杠杆高（银行资本充足率要求仅8-12%）、流动性风险、信用风险三重压力。", visual:"⚠️", highlight:"金融风险三重" }
-      ],
-    },
-    {
-      id:"ch13-l14", slug:"ch13-l14", title:"资本地图：房地产",
-      type:"STORY", xpReward:15, durationMin:2,
-      character:{ name:"资本导师", role:"终极资本导师", avatar:"🌟" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#4d3300 100%)", accent:"#D97706", icon:"🗺️", name:"金色资本殿堂" },
-      slides:[
-        { id:"s1", text:"地产资本运作链：拿地（高杠杆）→开发（建设期预售）→交房（资金回笼）→再拿地（循环）。", visual:"🏘️", highlight:"地产资本链" },
-        { id:"s2", text:"地产商的资金成本：信托（8-12%）+银行贷款（4-6%）+债券（5-8%），综合资金成本是盈亏关键。", visual:"💰", highlight:"地产融资成本" },
-        { id:"s3", text:"行业洗牌后的机会：高债低杠杆的房企（龙湖、越秀）在行业重组中获得更多市场份额。", visual:"🌟", highlight:"洗牌后机会" }
-      ],
-    },
-    {
-      id:"ch13-l15", slug:"ch13-l15", title:"我的第一份资本计划",
-      type:"REFLECTION", xpReward:20, durationMin:5,
-      reflectionPrompt:"结合你自己的行业或创业想法，写下你的第一份资本运作初步规划：你打算如何用资本思维来优化你的生意或职业路径？",
-      keyInsight:"资本计划不需要完美，它需要真实。一个写下来的粗糙计划，远胜于一个只存在脑中的完美想法。",
-    },
-    {
-      id:"ch13-l16", slug:"ch13-l16", title:"资本运作常见误区",
-      type:"STORY", xpReward:15, durationMin:2,
-      character:{ name:"资本导师", role:"终极资本导师", avatar:"🌟" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#4d3300 100%)", accent:"#D97706", icon:"🗺️", name:"金色资本殿堂" },
-      slides:[
-        { id:"s1", text:"误区一：把融资当成功。融资只是起点，真正的成功是融来的钱创造了真实价值和回报。", visual:"❌", highlight:"融资≠成功" },
-        { id:"s2", text:"误区二：估值越高越好。过高估值意味着下一轮压力大，如果业绩不达预期，将面临down round。", visual:"⚠️", highlight:"估值虚高之害" },
-        { id:"s3", text:"误区三：忽略现金流。很多企业利润表好看，但现金流出问题，最终因'赚钱却破产'倒闭。", visual:"💸", highlight:"现金流永远第一" }
-      ],
-    },
-    {
-      id:"ch13-l17", slug:"ch13-l17", title:"如何找到资本合伙人",
-      type:"STORY", xpReward:15, durationMin:2,
-      character:{ name:"资本导师", role:"终极资本导师", avatar:"🌟" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#4d3300 100%)", accent:"#D97706", icon:"🗺️", name:"金色资本殿堂" },
-      slides:[
-        { id:"s1", text:"资本合伙人分类：天使（个人经验+小额）、VC（高风险高回报）、PE（成熟期并购）、战略投资者（资源协同）。", visual:"🤝", highlight:"投资人分类" },
-        { id:"s2", text:"找投资人三步：①定位阶段（融哪轮？）②匹配策略（谁投过同类项目？）③热联络（共同人引荐）。", visual:"📋", highlight:"找投资人三步" },
-        { id:"s3", text:"最好的投资人不只带钱，还带资源、经验、人脉网络。选对投资人，比多融100万更重要。", visual:"💡", highlight:"投资人选择原则" }
-      ],
-    },
-    {
-      id:"ch13-l18", slug:"ch13-l18", title:"资本家的日常修炼",
-      type:"STORY", xpReward:15, durationMin:2,
-      character:{ name:"资本导师", role:"终极资本导师", avatar:"🌟" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#4d3300 100%)", accent:"#D97706", icon:"🗺️", name:"金色资本殿堂" },
-      slides:[
-        { id:"s1", text:"每日修炼：阅读财经新闻（了解市场动态）、研究一家公司（培养分析习惯）、记录投资想法（建立认知体系）。", visual:"📰", highlight:"每日三修炼" },
-        { id:"s2", text:"年度修炼：复盘投资组合（哪些判断对了？哪些错了？为什么？）、更新行业地图（哪里有新机会？）。", visual:"📆", highlight:"年度复盘" },
-        { id:"s3", text:"最重要的修炼：保持谦逊，持续学习。市场永远比你聪明，保持敬畏才是长胜之道。", visual:"🙏", highlight:"谦逊是最强武器" }
-      ],
-    },
-    {
-      id:"ch13-l19", slug:"ch13-l19", title:"终极挑战：设计资本方案",
-      type:"QUIZ", xpReward:50, durationMin:5,
-      questions:[
-        { id:"q1", question:"你有1000万资金想投资。以下哪种策略最符合资本家思维？", options:[
-          { id:"A", text:"全部存银行，年利率3%", correct:false, explanation:"全部存银行无法实现资产增值" },
-          { id:"B", text:"全部押注一只高风险股票", correct:false, explanation:"单一重仓是赌博不是投资" },
-          { id:"C", text:"分散配置：30%股权+30%债权+20%房产+20%现金", correct:true, explanation:"分散配置符合风险收益平衡原则" },
-          { id:"D", text:"全部消费，及时行乐", correct:false, explanation:"消费不是资本运作" }
-        ]},
-        { id:"q2", question:"一家公司A：PE=8倍；公司B：PE=40倍。以下哪种说法最准确？", options:[
-          { id:"A", text:"A一定比B便宜，应该买A", correct:false, explanation:"PE需要结合增长和行业比较" },
-          { id:"B", text:"B一定被高估，不应该买", correct:false, explanation:"高增长公司高PE可能合理" },
-          { id:"C", text:"需要结合行业和增长率来判断", correct:true, explanation:"PE是相对指标，需综合分析" },
-          { id:"D", text:"两者没有可比性", correct:false, explanation:"可以比，但需要更多信息" }
-        ]},
-        { id:"q3", question:"创业公司在A轮融资时，最需要关注TS中的哪个条款？", options:[
-          { id:"A", text:"公司估值数字", correct:false, explanation:"估值重要但不是最危险的" },
-          { id:"B", text:"投资金额", correct:false, explanation:"金额重要但不是最危险的" },
-          { id:"C", text:"优先清算权的倍数和参与权", correct:true, explanation:"恶意优先清算权会让创始人血本无归" },
-          { id:"D", text:"投资人姓名", correct:false, explanation:"投资人身份不是条款风险" }
-        ]}
-      ],
-    },
-    {
-      id:"ch13-l20", slug:"ch13-l20", title:"你的资本宣言",
-      type:"REFLECTION", xpReward:20, durationMin:5,
-      reflectionPrompt:"经过13章100关的学习，写下你的资本宣言：你是谁？你的资本目标是什么？你将如何用资本思维改变自己的未来？",
-      keyInsight:"你已经不再是资本世界的门外汉。你理解了底层逻辑，学会了工具，见过了真实案例。现在，是时候行动了。",
-    },
-    {
-      id:"ch13-l21", slug:"ch13-l21", title:"🎓 毕业典礼",
-      type:"STORY", xpReward:50, durationMin:5,
-      character:{ name:"资本导师", role:"终极资本导师", avatar:"🌟" },
-      scene:{ bg:"linear-gradient(135deg,#1a1000 0%,#4d3300 100%)", accent:"#D97706", icon:"🗺️", name:"金色资本殿堂" },
-      slides:[
-        { id:"s1", text:"恭喜你！你完成了《资本启航》全部100关。你已经走完了从'资本是什么'到'如何运作资本'的完整旅程。", visual:"🎓", highlight:"完成100关" },
-        { id:"s2", text:"你学会了：资本的本质、历史与逻辑、估值工具、真实案例分析、投资决策框架，以及资本家的思维方式。", visual:"📚", highlight:"学习总结" },
-        { id:"s3", text:"资本世界的旅程才刚刚开始。带着你的知识和勇气，去创造属于你自己的资本故事。加油！", visual:"🚀", highlight:"出发" }
-      ],
+      id:"ch13-l11", slug:"ch13-l11", title:"资本世界的入口，已经打开",
+      type:"READING", xpReward:20, durationMin:3,
+      content:{ text:`问题：现在，你和资本世界的关系变了吗？\\n\\n故事：一年前，一个企业家走进资本世界，不知道规则，不懂语言，不明白为什么有人能拿到投资而他拿不到。走完这段旅程后，他理解了底层逻辑，掌握了工具，知道了方向。资本世界的门，对他打开了。\\n\\n概念：资本运作的能力，不是天生的，也不是只有大企业才需要的。它是一套可以学习、可以实践、可以持续进化的系统。你已经掌握了这套系统的核心。\\n\\n结论：资本世界的入口已经打开。接下来，是你的旅程。` },
     },
     ],
   },
 ];
 
-// Helper: get module by slug
-export function getModuleBySlug(slug: string): Module | undefined {
-  return CAPITAL_LAUNCH_MODULES.find((m) => m.slug === slug);
-}
-
-// Helper: get lesson by slug
-export function getLessonBySlug(moduleSlug: string, lessonSlug: string): Lesson | undefined {
-  const mod = getModuleBySlug(moduleSlug);
-  return mod?.lessons.find((l) => l.slug === lessonSlug);
-}
-
-// Helper: get next lesson
-export function getNextLesson(moduleSlug: string, lessonSlug: string): { module: Module; lesson: Lesson } | null {
-  const modIdx = CAPITAL_LAUNCH_MODULES.findIndex((m) => m.slug === moduleSlug);
-  if (modIdx === -1) return null;
-  const mod = CAPITAL_LAUNCH_MODULES[modIdx];
-  const lessonIdx = mod.lessons.findIndex((l) => l.slug === lessonSlug);
-  if (lessonIdx < mod.lessons.length - 1) {
-    return { module: mod, lesson: mod.lessons[lessonIdx + 1] };
-  }
-  if (modIdx < CAPITAL_LAUNCH_MODULES.length - 1) {
-    const nextMod = CAPITAL_LAUNCH_MODULES[modIdx + 1];
-    return { module: nextMod, lesson: nextMod.lessons[0] };
-  }
-  return null;
-}
-
-// Backward compat alias
+// Helper functions
 export const modules = CAPITAL_LAUNCH_MODULES;
 export const chapters = CAPITAL_LAUNCH_MODULES;
 
-// Total XP available
-export const TOTAL_COURSE_XP = CAPITAL_LAUNCH_MODULES.reduce(
-  (sum, m) => sum + m.lessons.reduce((s, l) => s + l.xpReward, 0),
-  0
-);
+export function getModuleBySlug(slug: string): Module | undefined {
+  return CAPITAL_LAUNCH_MODULES.find(m => m.slug === slug);
+}
+
+export function getLessonBySlug(moduleSlug: string, lessonSlug: string): Lesson | undefined {
+  return getModuleBySlug(moduleSlug)?.lessons.find(l => l.slug === lessonSlug);
+}
+
+export function getNextLesson(moduleSlug: string, lessonSlug: string): { module: Module; lesson: Lesson } | null {
+  const modIdx = CAPITAL_LAUNCH_MODULES.findIndex(m => m.slug === moduleSlug);
+  if (modIdx === -1) return null;
+  const mod = CAPITAL_LAUNCH_MODULES[modIdx];
+  const lIdx = mod.lessons.findIndex(l => l.slug === lessonSlug);
+  if (lIdx < mod.lessons.length - 1) return { module: mod, lesson: mod.lessons[lIdx + 1] };
+  const nextMod = CAPITAL_LAUNCH_MODULES[modIdx + 1];
+  if (nextMod) return { module: nextMod, lesson: nextMod.lessons[0] };
+  return null;
+}
