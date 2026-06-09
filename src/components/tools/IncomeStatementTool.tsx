@@ -441,7 +441,7 @@ export default function IncomeStatementTool({ locale }: { locale: "zh" | "en" })
       { label: isEn ? "Variable" : "变动成本", pct: Math.max(0, varPct), value: totalVariable, color: "#E87C7C" },
       { label: isEn ? "Fixed" : "固定成本", pct: Math.max(0, fixedPct), value: totalFixedAnnual, color: "#6B8FD4" },
       { label: isEn ? "Tax" : "企业所得税", pct: Math.max(0, taxPct), value: taxAmt, color: "#5EAB6A" },
-      { label: "PAT", pct: patPct, value: pat, color: pat >= 0 ? "#C9A84C" : "#EF4444" },
+      { label: "税后净利润", pct: patPct, value: pat, color: pat >= 0 ? "#C9A84C" : "#EF4444" },
     ];
     // If PAT is negative, only show positive portions (summing to ≤100%)
     return segments;
@@ -453,7 +453,7 @@ export default function IncomeStatementTool({ locale }: { locale: "zh" | "en" })
     { name: isEn ? "Variable" : "变动成本", value: -totalVariable, fill: "#E87C7C" },
     { name: isEn ? "Fixed" : "固定成本", value: -totalFixedAnnual, fill: "#6B8FD4" },
     { name: isEn ? "Tax" : "企业所得税", value: -taxAmt, fill: "#5EAB6A" },
-    { name: "PAT", value: pat, fill: pat >= 0 ? "#22C55E" : "#EF4444" },
+    { name: "税后净利润", value: pat, fill: pat >= 0 ? "#22C55E" : "#EF4444" },
   ];
 
   // ── Table helpers ─────────────────────────────────────────────────────
@@ -727,28 +727,28 @@ export default function IncomeStatementTool({ locale }: { locale: "zh" | "en" })
               <PLRow label="年营收" value={annualRevenue} sym={sym} isSubtotal />
               <PLRow label={`变动成本（${pct(totalVariable / Math.max(annualRevenue, 1) * 100)}）`} value={totalVariable} sym={sym} isMinus indent dimLabel />
               <PLRow
-                label={grossProfit >= 0 ? "毛利润" : "毛亏损"}
+                label={grossProfit >= 0 ? "毛利润（Gross Profit）" : "毛亏损"}
                 value={grossProfit}
                 sym={sym}
                 isSubtotal
               />
               <PLRow label={`固定成本（${pct(totalFixedAnnual / Math.max(annualRevenue, 1) * 100)}）`} value={totalFixedAnnual} sym={sym} isMinus indent dimLabel />
               <PLRow
-                label={pbt >= 0 ? "税前利润 PBT" : "税前亏损 PBT"}
+                label={pbt >= 0 ? "税前利润（PBT）" : "税前亏损（PBT）"}
                 value={pbt}
                 sym={sym}
                 isSubtotal
               />
               <PLRow label={`企业所得税（${pbt > 0 ? pct(effectiveRate) : "—"}）`} value={taxAmt} sym={sym} isMinus={taxAmt > 0} indent dimLabel />
               <PLRow
-                label={pat >= 0 ? "PAT 净利润" : "净亏损"}
+                label={pat >= 0 ? "税后净利润（PAT）" : "净亏损"}
                 value={pat}
                 sym={sym}
                 isTotal
               />
             </div>
             <div className="mt-3 flex justify-between items-center pt-2" style={{ borderTop: "1px solid #E8DFCF" }}>
-              <span className="text-xs" style={{ color: "#9A9490" }}>PAT Margin</span>
+              <span className="text-xs" style={{ color: "#9A9490" }}>净利润率（Net Profit Margin）</span>
               <span className="text-sm font-bold font-mono" style={{ color: patMarginPct >= 10 ? "#22C55E" : patMarginPct >= 0 ? "#F0A445" : "#EF4444" }}>
                 {pct(patMarginPct)}
               </span>

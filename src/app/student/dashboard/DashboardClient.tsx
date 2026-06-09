@@ -1495,8 +1495,8 @@ function EnterpriseCoreSummary({ companyId }: { companyId: string }) {
           <CoreDataRow label="毛利润" value={fmtMoney(grossProfit, sym)} />
           <CoreDataRow label="税前利润" value={fmtMoney(ebit, sym)} />
           <CoreDataRow label="企业所得税" value={fmtMoney(taxAmt, sym)} />
-          <CoreDataRow label="PAT" value={fmtMoney(annualPAT, sym)} />
-          <CoreDataRow label="PAT Margin" value={fmtPct(patMargin)} />
+          <CoreDataRow label="税后净利润（PAT）" value={fmtMoney(annualPAT, sym)} />
+          <CoreDataRow label="净利润率" value={fmtPct(patMargin)} />
           <CoreDataRow label="毛利率" value={fmtPct(grossMargin)} />
         </CoreSection>
       )}
@@ -1531,11 +1531,11 @@ function EnterpriseCoreSummary({ companyId }: { companyId: string }) {
       {(t07 || dbCore?.roadmapYear1Revenue != null) && (
         <CoreSection title="财务路线图">
           <CoreDataRow label="第1年营收" value={fmtMoney(roadmapYear1Revenue, sym)} />
-          <CoreDataRow label="第1年PAT" value={fmtMoney(roadmapYear1PAT, sym)} />
+          <CoreDataRow label="第1年税后净利润" value={fmtMoney(roadmapYear1PAT, sym)} />
           <CoreDataRow label="第2年营收" value={fmtMoney(roadmapYear2Revenue, sym)} />
-          <CoreDataRow label="第2年PAT" value={fmtMoney(roadmapYear2PAT, sym)} />
+          <CoreDataRow label="第2年税后净利润" value={fmtMoney(roadmapYear2PAT, sym)} />
           <CoreDataRow label="第3年营收" value={fmtMoney(roadmapYear3Revenue, sym)} />
-          <CoreDataRow label="第3年PAT" value={fmtMoney(roadmapYear3PAT, sym)} />
+          <CoreDataRow label="第3年税后净利润" value={fmtMoney(roadmapYear3PAT, sym)} />
         </CoreSection>
       )}
 

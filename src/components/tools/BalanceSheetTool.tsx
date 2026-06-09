@@ -6,7 +6,6 @@ import ToolGuide from "@/components/tools/ToolGuide";
 import { useToolSnapshot, getCompanyId } from "@/lib/useToolSnapshot";
 import { saveToolData, loadToolData } from "@/lib/toolData";
 import type { FinancialCore } from "@/lib/financialCore";
-import { ENTERPRISE_KEYS } from "@/lib/enterprise";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -215,7 +214,6 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
   const { savedData, saving, lastSaved, save } = useToolSnapshot<T02Form>("balance-sheet");
   const [form, setForm] = useState<T02Form>(DEFAULT_FORM);
   const [loaded, setLoaded] = useState(false);
-  const [manualPAT, setManualPAT] = useState("");
   const [coreData, setCoreData] = useState<FinancialCore | null>(null);
   const sym = coreData?.currencySymbol ?? "RM";
 
@@ -246,25 +244,27 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
   }, [form]);
 
 
-  // Load FinancialCore (PAT from T01)
+  // Load FinancialCore: localStorage T01 first (instant), DB second (override)
   useEffect(() => {
+    const cid = getCompanyId();
+    // 1. Read T01 localStorage output immediately — no network needed
     try {
-      const mode = localStorage.getItem(ENTERPRISE_KEYS.MODE);
-      let companyId = "no_company";
-      if (mode === "single") {
-        const sc = localStorage.getItem(ENTERPRISE_KEYS.SINGLE);
-        if (sc) companyId = `single_${JSON.parse(sc).id ?? "default"}`;
-      } else if (mode === "group") {
-        const ac = localStorage.getItem(ENTERPRISE_KEYS.ACTIVE_COMPANY);
-        if (ac) companyId = `group_${JSON.parse(ac).id ?? "default"}`;
-      }
-      if (companyId !== "no_company") {
-        fetch(`/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(companyId)}`)
-          .then((r) => r.json())
-          .then((snap) => { if (snap?.data) setCoreData(snap.data as FinancialCore); })
-          .catch(() => {});
+      const t01Raw = localStorage.getItem(`zibendao_toolData_${cid}_T01`);
+      if (t01Raw) {
+        const t01 = JSON.parse(t01Raw) as { calculatedOutput?: { pat?: number }; currency?: string };
+        if (t01?.calculatedOutput?.pat !== undefined) {
+          setCoreData(prev => prev ?? ({
+            annualPAT: t01.calculatedOutput!.pat,
+            currencySymbol: t01.currency ?? "RM",
+          } as FinancialCore));
+        }
       }
     } catch {}
+    // 2. DB fetch — overrides localStorage when available
+    fetch(`/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(cid)}`)
+      .then((r) => r.json())
+      .then((snap) => { if (snap?.data) setCoreData(snap.data as FinancialCore); })
+      .catch(() => {});
   }, []);
 
   const set = (field: keyof T02Form) => (v: string) =>
@@ -308,7 +308,7 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
     const currentRatio = currentLiabilities !== 0 ? currentAssets / currentLiabilities : Infinity;
 
     // PAT: from FinancialCore or manual
-    const pat = coreData?.annualPAT ?? (parseFloat(manualPAT) || null);
+    const pat = coreData?.annualPAT ?? null;
     const roe = pat !== null && equity > 0 ? (pat / equity) * 100 : null;
 
     // Imbalance hint
@@ -327,7 +327,7 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
       equity, totalLiabEquity, diff, balanced, imbalanceHint,
       netAssets, workingCapital, debtToEquity, currentRatio, pat, roe,
     };
-  }, [form, coreData, manualPAT, sym]);
+  }, [form, coreData, sym]);
 
   // ── localStorage auto-save (500ms debounce) ──────────────────────────
   useEffect(() => {
@@ -417,16 +417,8 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
     await save(form);
     // Publish to FinancialCore
     try {
-      const mode = localStorage.getItem(ENTERPRISE_KEYS.MODE);
-      let companyId = "no_company";
-      if (mode === "single") {
-        const sc = localStorage.getItem(ENTERPRISE_KEYS.SINGLE);
-        if (sc) companyId = `single_${JSON.parse(sc).id ?? "default"}`;
-      } else if (mode === "group") {
-        const ac = localStorage.getItem(ENTERPRISE_KEYS.ACTIVE_COMPANY);
-        if (ac) companyId = `group_${JSON.parse(ac).id ?? "default"}`;
-      }
-      if (companyId === "no_company") return;
+      const companyId = getCompanyId();
+      if (companyId === "__default__") return;
       // Save to unified toolData localStorage
       saveToolData({
         companyId,
@@ -560,14 +552,14 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
               investorNote={calc.netAssets > 0 ? "正值，具备股权融资基础。" : "负值，需先补充资本才能融资。"}
             />
             <IndicatorCard
-              label="营运资本（短期存活能力）"
+              label="营运资本（Working Capital）"
               value={fmt(calc.workingCapital, sym)}
               signal={workingCapitalSignal()}
               hint="流动资产 − 短期负债"
               investorNote={calc.workingCapital > 0 ? "短期资金充裕，运营稳定。" : "短期资金紧张，投资人会关注现金流。"}
             />
             <IndicatorCard
-              label="负债杠杆"
+              label="负债比率（Debt Ratio）"
               value={ratioFmt(calc.debtToEquity)}
               signal={debtSignal()}
               hint="总负债 ÷ 净资产"
@@ -585,7 +577,7 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
               }}
             >
               <div className="flex items-start justify-between mb-2">
-                <span className="text-xs font-semibold" style={{ color: "#9A9490" }}>ROE（净资产回报率）</span>
+                <span className="text-xs font-semibold" style={{ color: "#9A9490" }}>股东权益回报率（ROE）</span>
                 <span className="text-xl font-bold font-mono" style={{ color: roeSignal() === "neutral" ? "#A0A09A" : roeSignal() === "green" ? "#22C55E" : roeSignal() === "yellow" ? "#F0A445" : "#EF4444" }}>
                   {calc.roe !== null ? pctFmt(calc.roe) : "—"}
                 </span>
@@ -596,20 +588,7 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
                   {calc.roe >= 15 ? "回报率优秀，投资人青睐。" : calc.roe >= 8 ? "回报率尚可，有提升空间。" : "回报率偏低，投资人会要求解释。"}
                 </p>
               ) : (
-                <div className="space-y-1.5">
-                  <p className="text-xs" style={{ color: "#2B2B2B" }}>请先完成利润表，或手动输入：</p>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      placeholder="年净利润"
-                      value={manualPAT}
-                      onChange={(e) => setManualPAT(e.target.value)}
-                      className="w-full pl-8 pr-2 py-1.5 rounded-lg text-xs outline-none font-mono"
-                      style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}
-                    />
-                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>RM</span>
-                  </div>
-                </div>
+                <p className="text-xs" style={{ color: "#9A9490" }}>等待利润表（T01）数据</p>
               )}
             </div>
           </div>
