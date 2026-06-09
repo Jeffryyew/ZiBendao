@@ -1760,4 +1760,11 @@ function CompanyForm({
       <button
         onClick={onSave}
         disabled={!form.name.trim()}
-        className="w-full py-2.5 rounded-xl text-sm font-semibold transition-all d
+        className="w-full py-2.5 rounded-xl text-sm font-semibold transition-all disabled:opacity-40"
+        style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#FFFFFF" }}
+      >
+        保存公司信息
+      </button>
+    </div>
+  );
+}
