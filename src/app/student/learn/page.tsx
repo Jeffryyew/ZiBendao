@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Check } from "lucide-react";
 import { CAPITAL_LAUNCH_MODULES } from "@/lib/capitalLaunchCourse";
 
 type Status = "completed" | "current" | "locked";
@@ -108,7 +107,7 @@ export default function CapitalLaunchPage() {
                     boxShadow: status === "current" ? `0 0 18px ${color}45` : "none",
                   }}
                 >
-                  {status === "completed" ? <Check size={14} strokeWidth={2.5} /> : mod.order}
+                  {status === "completed" ? "✓" : mod.order}
                 </div>
               </div>
             );

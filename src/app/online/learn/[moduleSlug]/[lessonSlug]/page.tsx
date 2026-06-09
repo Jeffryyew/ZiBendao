@@ -3,7 +3,6 @@
 import { use, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { HelpCircle, BookOpen, Lightbulb, CheckCircle2, ArrowLeft } from "lucide-react";
 import {
   getModuleBySlug,
   getLessonBySlug,
@@ -33,7 +32,6 @@ const TOTAL_LESSONS = CAPITAL_LAUNCH_MODULES.reduce((s, m) => s + m.lessons.leng
 type SectionKey = "问题" | "故事" | "概念" | "结论";
 
 type SectionCfg = {
-  icon: React.ComponentType<{ size?: number; strokeWidth?: number; color?: string }>;
   label: string;
   color: string;
   bg: string;
@@ -42,28 +40,24 @@ type SectionCfg = {
 
 const SECTION_CONFIG: Record<SectionKey, SectionCfg> = {
   "问题": {
-    icon: HelpCircle,
     label: "问题",
     color: "#60A5FA",
     bg: "rgba(96,165,250,0.06)",
     border: "rgba(96,165,250,0.18)",
   },
   "故事": {
-    icon: BookOpen,
     label: "故事",
     color: "#A78BFA",
     bg: "rgba(167,139,250,0.06)",
     border: "rgba(167,139,250,0.18)",
   },
   "概念": {
-    icon: Lightbulb,
     label: "概念",
     color: "#34D399",
     bg: "rgba(52,211,153,0.06)",
     border: "rgba(52,211,153,0.18)",
   },
   "结论": {
-    icon: CheckCircle2,
     label: "结论",
     color: "#FBBF24",
     bg: "rgba(251,191,36,0.06)",
@@ -195,7 +189,7 @@ function LessonPlayer({
             className="shrink-0 transition-opacity hover:opacity-60"
             style={{ color: "rgba(255,255,255,0.3)" }}
           >
-            <ArrowLeft size={18} strokeWidth={1.5} />
+            ←
           </Link>
           <div className="flex-1">
             <div className="flex items-center justify-between mb-1.5">
@@ -240,18 +234,9 @@ function LessonPlayer({
             style={{ background: step.cfg.bg, border: `1px solid ${step.cfg.border}` }}
           >
             <div className="flex items-center gap-2.5 mb-5">
-              <div
-                className="w-8 h-8 rounded-xl flex items-center justify-center"
-                style={{
-                  background: `${step.cfg.color}15`,
-                  border: `1px solid ${step.cfg.color}28`,
-                }}
-              >
-                <step.cfg.icon size={16} strokeWidth={2} color={step.cfg.color} />
-              </div>
               <span
-                className="text-xs font-bold tracking-widest uppercase"
-                style={{ color: step.cfg.color }}
+                className="text-xs font-bold tracking-widest uppercase px-2 py-0.5 rounded"
+                style={{ color: step.cfg.color, background: `${step.cfg.color}15`, border: `1px solid ${step.cfg.color}28` }}
               >
                 {step.cfg.label}
               </span>
@@ -328,7 +313,7 @@ function CompletionView({
           className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6"
           style={{ background: `${color}15`, border: `1px solid ${color}28` }}
         >
-          <CheckCircle2 size={38} strokeWidth={1.5} color={color} />
+          <span style={{ fontSize: 38, color, lineHeight: 1 }}>✓</span>
         </div>
 
         <h1 className="text-2xl font-bold mb-2" style={{ color: "#FFFFFF" }}>

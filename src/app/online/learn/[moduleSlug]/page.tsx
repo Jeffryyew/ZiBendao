@@ -3,7 +3,6 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Check } from "lucide-react";
 import { getModuleBySlug } from "@/lib/capitalLaunchCourse";
 
 export default function ModuleOverviewPage({ params }: { params: Promise<{ moduleSlug: string }> }) {
@@ -123,7 +122,7 @@ export default function ModuleOverviewPage({ params }: { params: Promise<{ modul
                     border: isNext ? `1px solid ${color}40` : "none",
                   }}
                 >
-                  {isDone ? <Check size={14} strokeWidth={2.5} /> : isLocked ? "-" : idx + 1}
+                  {isDone ? "✓" : isLocked ? "-" : idx + 1}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-sm font-medium truncate" style={{ color: isDone ? "var(--color-text-muted)" : "var(--color-text-primary)" }}>
