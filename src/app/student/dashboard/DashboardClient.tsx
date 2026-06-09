@@ -1455,6 +1455,7 @@ function EnterpriseCoreSummary({ companyId }: { companyId: string }) {
   const totalLiabilities = t02?.totalLiabilities ?? dbCore?.totalLiabilities;
   const totalEquity      = t02?.totalEquity      ?? dbCore?.totalEquity;
   const currentRatio     = t02?.currentRatio     ?? dbCore?.currentRatio;
+  const t02DebtRatio     = t02?.debtRatio        as number | undefined;
   const t02DebtToEquity  = t02?.debtToEquity     ?? dbCore?.debtToEquity;
 
   const yearEndCash          = t03?.yearEndCash          ?? dbCore?.yearEndCash;
@@ -1504,8 +1505,9 @@ function EnterpriseCoreSummary({ companyId }: { companyId: string }) {
         <CoreSection title="资产负债表">
           <CoreDataRow label="总资产" value={fmtMoney(totalAssets, sym)} />
           <CoreDataRow label="总负债" value={fmtMoney(totalLiabilities, sym)} />
-          <CoreDataRow label="总权益" value={fmtMoney(totalEquity, sym)} />
+          <CoreDataRow label="股东权益" value={fmtMoney(totalEquity, sym)} />
           <CoreDataRow label="流动比率" value={fmtRatio(currentRatio)} />
+          {t02DebtRatio != null && <CoreDataRow label="负债率" value={t02DebtRatio.toFixed(1) + "%"} />}
           <CoreDataRow label="负债权益比" value={fmtRatio(t02DebtToEquity)} />
         </CoreSection>
       )}
@@ -1758,11 +1760,4 @@ function CompanyForm({
       <button
         onClick={onSave}
         disabled={!form.name.trim()}
-        className="w-full py-2.5 rounded-xl text-sm font-semibold transition-all disabled:opacity-40"
-        style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#FFFFFF" }}
-      >
-        保存公司信息
-      </button>
-    </div>
-  );
-}
+        className="w-full py-2.5 rounded-xl text-sm font-semibold transition-all d

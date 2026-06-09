@@ -4,7 +4,7 @@ import { useState, useRef, useMemo, useEffect } from "react";
 import ToolShell from "@/components/tools/ToolShell";
 import ToolGuide from "@/components/tools/ToolGuide";
 import { useToolSnapshot, getCompanyId } from "@/lib/useToolSnapshot";
-import { saveToolData } from "@/lib/toolData";
+import { saveToolData, loadToolData } from "@/lib/toolData";
 import type { FinancialCore } from "@/lib/financialCore";
 import { ENTERPRISE_KEYS } from "@/lib/enterprise";
 
@@ -219,15 +219,23 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
   const [coreData, setCoreData] = useState<FinancialCore | null>(null);
   const sym = coreData?.currencySymbol ?? "RM";
 
-  // Load saved data
+  // Load from localStorage first (primary), DB second
   useEffect(() => {
+    const cid = getCompanyId();
+    const lsSaved = loadToolData(cid, "T02") ?? loadToolData("__default__", "T02");
+    if (lsSaved?.inputData && !loaded) {
+      setForm(lsSaved.inputData as T02Form);
+      setLoaded(true);
+      return;
+    }
     if (savedData && !loaded) {
       setForm(savedData);
       setLoaded(true);
     }
-  }, [savedData, loaded]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [savedData]);
 
-  // ── Auto-save (1.5s debounce) ─────────────────────────────────────────
+  // ── DB auto-save (1.5s debounce, for FinancialCore sync) ──────────────
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (!loaded) return;
@@ -321,24 +329,22 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
     };
   }, [form, coreData, manualPAT, sym]);
 
-  // ── Standalone toolData localStorage auto-save (500ms debounce, no `loaded` guard) ──
+  // ── localStorage auto-save (500ms debounce) ──────────────────────────
   useEffect(() => {
     const cid = getCompanyId();
-    if (cid === "__default__") return;
     if (calc.totalAssets === 0 && calc.totalLiabilities === 0) return; // skip blank
     const timer = setTimeout(() => {
-      console.log(`[T02] auto-save to toolData | cid=${cid}`);
       saveToolData({
         companyId: cid,
         toolId: "T02",
+        inputData: form as unknown as Record<string, unknown>,
         calculatedOutput: {
           totalAssets: calc.totalAssets,
           totalLiabilities: calc.totalLiabilities,
           totalEquity: calc.equity,
-          debtToEquity: calc.debtToEquity,
           currentRatio: calc.currentRatio,
-          cashBalance: parseFloat(form.cash) || 0,
-          totalLoans: (parseFloat(form.shortTermLoans) || 0) + (parseFloat(form.longTermLoans) || 0),
+          debtRatio: calc.totalAssets > 0 ? calc.totalLiabilities / calc.totalAssets : 0,
+          debtToEquity: calc.debtToEquity,
         },
         currency: sym,
       });
@@ -632,12 +638,6 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
           </div>
         </div>
 
-        {/* Save */}
-        <div className="flex items-center justify-between">
-          <p className="text-xs" style={{ color: "#2B2B2B" }}>
-            {saving ? "正在保存..." : lastSaved ? `已自动保存 ${lastSaved.toLocaleTimeString()}` : "未保存"}
-          </p>
-        </div>
 
       </div>
     </ToolShell>
