@@ -263,4 +263,31 @@ function LessonCards({ text, color }: { text: string; color: string }) {
       {cards.map((card, i) => (
         <div
           key={i}
-          className="rou
+          className="rounded-2xl p-5"
+          style={{
+            background: card.bg,
+            border: `1px solid ${card.border}`,
+          }}
+        >
+          {card.isKnown && (
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-lg leading-none">{card.emoji}</span>
+              <span
+                className="text-xs font-bold tracking-wider uppercase"
+                style={{ color: card.color }}
+              >
+                {card.label}
+              </span>
+            </div>
+          )}
+          <p
+            className="text-sm leading-relaxed"
+            style={{ color: card.isKnown ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.55)" }}
+          >
+            {card.body}
+          </p>
+        </div>
+      ))}
+    </div>
+  );
+}
