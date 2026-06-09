@@ -309,13 +309,6 @@ function CompletionView({
       style={{ background: "linear-gradient(180deg, #0a0a14 0%, #06060e 100%)" }}
     >
       <div className="max-w-sm w-full text-center">
-        <div
-          className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6"
-          style={{ background: `${color}15`, border: `1px solid ${color}28` }}
-        >
-          <span style={{ fontSize: 38, color, lineHeight: 1 }}>✓</span>
-        </div>
-
         <h1 className="text-2xl font-bold mb-2" style={{ color: "#FFFFFF" }}>
           本关完成
         </h1>
