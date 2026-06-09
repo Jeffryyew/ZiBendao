@@ -33,13 +33,24 @@ export default function LessonPage({
   return <LessonPlayer mod={mod} lesson={lesson} moduleSlug={moduleSlug} />;
 }
 
-// ─── Lesson Player ─────────────────────────────────────────────────────────────
-function LessonPlayer({ mod, lesson, moduleSlug }: { mod: Module; lesson: Lesson; moduleSlug: string }) {
+// ─── Lesson Player shell ──────────────────────────────────────────────────────
+function LessonPlayer({
+  mod,
+  lesson,
+  moduleSlug,
+}: {
+  mod: Module;
+  lesson: Lesson;
+  moduleSlug: string;
+}) {
   const router = useRouter();
   const [completed, setCompleted] = useState(false);
   const { queueBadges } = useBadge();
-
   const next = getNextLesson(moduleSlug, lesson.slug);
+
+  // Progress within module
+  const lessonIdx = mod.lessons.findIndex((l) => l.id === lesson.id);
+  const progress = Math.round(((lessonIdx + 1) / mod.lessons.length) * 100);
 
   const handleComplete = useCallback(() => {
     setCompleted(true);
@@ -53,79 +64,132 @@ function LessonPlayer({ mod, lesson, moduleSlug }: { mod: Module; lesson: Lesson
       const currentStates = getBadgeStates();
       const newBadges = checkNewBadges(ids, currentStates);
       if (newBadges.length > 0) {
-        for (const badge of newBadges) {
-          setBadgeState(badge.id, "unlocked_new");
-        }
+        for (const badge of newBadges) setBadgeState(badge.id, "unlocked_new");
         queueBadges(newBadges);
       }
     } catch {}
   }, [lesson.id, queueBadges]);
 
   const handleNext = useCallback(() => {
-    if (next) {
-      router.push(`/online/learn/${next.module.slug}/${next.lesson.slug}`);
-    } else {
-      router.push("/student/learn");
-    }
+    if (next) router.push(`/online/learn/${next.module.slug}/${next.lesson.slug}`);
+    else router.push("/student/learn");
   }, [next, router]);
 
-  const bg = "linear-gradient(180deg, #0a0a14 0%, #06060e 100%)";
+  const color = mod.levelColor;
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: bg }}>
-      {/* Top Bar */}
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ background: "linear-gradient(180deg, #0a0a14 0%, #06060e 100%)" }}
+    >
+      {/* ── Top Bar ── */}
       <div
-        className="flex items-center justify-between px-4 py-3 flex-shrink-0 sticky top-0 z-10"
-        style={{ background: "rgba(6,6,14,0.92)", backdropFilter: "blur(12px)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}
+        className="sticky top-0 z-20 flex items-center gap-3 px-4 py-3"
+        style={{
+          background: "rgba(6,6,14,0.94)",
+          backdropFilter: "blur(12px)",
+          borderBottom: "1px solid rgba(255,255,255,0.05)",
+        }}
       >
         <Link
           href={`/online/learn/${moduleSlug}`}
-          className="text-sm transition-opacity hover:opacity-70"
-          style={{ color: "rgba(255,255,255,0.4)" }}
+          className="shrink-0 text-sm transition-opacity hover:opacity-60"
+          style={{ color: "rgba(255,255,255,0.35)" }}
         >
-          &larr; {mod.title}
+          ←
         </Link>
+
+        {/* Progress bar */}
+        <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
+          <div
+            className="h-full rounded-full transition-all duration-500"
+            style={{ width: `${progress}%`, background: color }}
+          />
+        </div>
+
         <span
-          className="text-xs px-2.5 py-1 rounded-full font-mono"
-          style={{ background: `${mod.levelColor}20`, color: mod.levelColor }}
+          className="shrink-0 text-xs font-mono px-2 py-1 rounded-full"
+          style={{ background: `${color}20`, color }}
         >
           +{lesson.xpReward} XP
         </span>
       </div>
 
-      {/* Content */}
-      <div className="flex-1">
-        <ReadingLesson lesson={lesson} mod={mod} onComplete={handleComplete} completed={completed} />
+      {/* ── Card content ── */}
+      <div className="flex-1 max-w-lg mx-auto w-full px-4 py-6 pb-36">
+        {/* Lesson header */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <span
+              className="text-xs px-2.5 py-1 rounded-full font-medium"
+              style={{ background: `${color}18`, color, border: `1px solid ${color}28` }}
+            >
+              {mod.icon} {mod.levelLabel}
+            </span>
+            <span className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
+              关 {lessonIdx + 1} / {mod.lessons.length}
+            </span>
+          </div>
+          <h1
+            className="text-xl font-bold leading-snug"
+            style={{ color: "#FFFFFF", fontFamily: "var(--font-display, system-ui)" }}
+          >
+            {lesson.title}
+          </h1>
+        </div>
+
+        {/* Four section cards */}
+        <LessonCards text={lesson.content?.text ?? ""} color={color} />
+
+        {/* Complete button */}
+        {!completed && (
+          <button
+            onClick={handleComplete}
+            className="w-full py-4 rounded-2xl font-bold text-sm mt-6 transition-all active:scale-95"
+            style={{
+              background: `linear-gradient(135deg, ${color} 0%, ${color}cc 100%)`,
+              color: "#fff",
+              boxShadow: `0 4px 20px ${color}40`,
+            }}
+          >
+            完成这一关 ✓
+          </button>
+        )}
       </div>
 
-      {/* Complete / Next CTA */}
+      {/* ── XP celebration + Next CTA ── */}
       {completed && (
         <div
           className="fixed bottom-0 left-0 right-0 p-4"
-          style={{ background: "linear-gradient(to top, rgba(6,6,14,0.98) 60%, transparent)" }}
+          style={{
+            background: "linear-gradient(to top, rgba(6,6,14,0.98) 70%, transparent)",
+          }}
         >
-          <div className="max-w-sm mx-auto">
+          <div className="max-w-lg mx-auto">
             <div
-              className="rounded-2xl p-4 mb-3 text-center"
-              style={{ background: `${mod.levelColor}18`, border: `1px solid ${mod.levelColor}33` }}
+              className="rounded-2xl px-5 py-3 mb-3 flex items-center justify-between"
+              style={{ background: `${color}18`, border: `1px solid ${color}30` }}
             >
-              <div className="text-sm font-bold mb-1" style={{ color: mod.levelColor }}>
-                +{lesson.xpReward} XP 获得！
+              <div>
+                <div className="text-sm font-bold" style={{ color }}>
+                  🎉 +{lesson.xpReward} XP 获得！
+                </div>
+                <div className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
+                  {next ? `下一关：${next.lesson.title}` : "本模块全部完成！"}
+                </div>
               </div>
-              <div className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                {next ? `下一关：${next.lesson.title}` : "模块完成！"}
-              </div>
+              <div className="text-2xl">{mod.icon}</div>
             </div>
             <button
               onClick={handleNext}
               className="w-full py-4 rounded-2xl font-bold text-sm transition-all active:scale-95"
               style={{
-                background: `linear-gradient(135deg, ${mod.levelColor} 0%, ${mod.levelColor}cc 100%)`,
-                color: "#FFFFFF",
-                boxShadow: `0 4px 24px ${mod.levelColor}44`,
+                background: `linear-gradient(135deg, ${color} 0%, ${color}cc 100%)`,
+                color: "#fff",
+                boxShadow: `0 4px 20px ${color}40`,
               }}
             >
-              {next ? `继续：${next.lesson.title} →` : "完成模块 →"}
+              {next ? `继续下一关 →` : "返回课程地图 →"}
             </button>
           </div>
         </div>
@@ -134,107 +198,69 @@ function LessonPlayer({ mod, lesson, moduleSlug }: { mod: Module; lesson: Lesson
   );
 }
 
-// ─── Section label config ─────────────────────────────────────────────────────
-const SECTION_LABELS: Record<string, { emoji: string; color: string; bg: string }> = {
-  "问题": { emoji: "🤔", color: "#60A5FA", bg: "rgba(96,165,250,0.08)" },
-  "故事": { emoji: "📖", color: "#A78BFA", bg: "rgba(167,139,250,0.08)" },
-  "概念": { emoji: "💡", color: "#34D399", bg: "rgba(52,211,153,0.08)" },
-  "结论": { emoji: "✅", color: "#FBBF24", bg: "rgba(251,191,36,0.08)" },
+// ─── Section config ────────────────────────────────────────────────────────────
+const SECTIONS: Record<string, { emoji: string; label: string; color: string; bg: string; border: string }> = {
+  问题: {
+    emoji: "🤔",
+    label: "问题",
+    color: "#60A5FA",
+    bg: "rgba(96,165,250,0.07)",
+    border: "rgba(96,165,250,0.2)",
+  },
+  故事: {
+    emoji: "📖",
+    label: "故事",
+    color: "#A78BFA",
+    bg: "rgba(167,139,250,0.07)",
+    border: "rgba(167,139,250,0.2)",
+  },
+  概念: {
+    emoji: "💡",
+    label: "概念",
+    color: "#34D399",
+    bg: "rgba(52,211,153,0.07)",
+    border: "rgba(52,211,153,0.2)",
+  },
+  结论: {
+    emoji: "✅",
+    label: "结论",
+    color: "#FBBF24",
+    bg: "rgba(251,191,36,0.07)",
+    border: "rgba(251,191,36,0.2)",
+  },
 };
 
-// ─── READING LESSON ───────────────────────────────────────────────────────────
-function ReadingLesson({
-  lesson, mod, onComplete, completed,
-}: {
-  lesson: Lesson; mod: Module; onComplete: () => void; completed: boolean;
-}) {
-  const color = mod.levelColor;
-  const text = lesson.content?.text ?? "";
+// ─── LessonCards: parse and render the four sections ─────────────────────────
+function LessonCards({ text, color }: { text: string; color: string }) {
+  // Split on double-newlines, trim each paragraph
+  const paragraphs = text
+    .split(/\n\n+/)
+    .map((p) => p.trim())
+    .filter(Boolean);
 
-  // Parse paragraphs: split on double newlines
-  const paragraphs = text.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
-
-  // Each paragraph may start with a label like "问题：", "故事：" etc.
-  const parsed = paragraphs.map((p) => {
+  // Map each paragraph to a known section or a generic card
+  const cards = paragraphs.map((p) => {
     const colonIdx = p.indexOf("：");
     if (colonIdx > 0 && colonIdx <= 4) {
-      const label = p.slice(0, colonIdx);
+      const key = p.slice(0, colonIdx);
       const body = p.slice(colonIdx + 1).trim();
-      const config = SECTION_LABELS[label];
-      if (config) return { label, body, ...config };
+      const cfg = SECTIONS[key];
+      if (cfg) return { ...cfg, body, isKnown: true };
     }
-    return { label: null, body: p, emoji: null, color: "rgba(255,255,255,0.75)", bg: "transparent" };
+    return {
+      emoji: "📌",
+      label: "",
+      color,
+      bg: "rgba(255,255,255,0.03)",
+      border: "rgba(255,255,255,0.08)",
+      body: p,
+      isKnown: false,
+    };
   });
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-8 pb-32">
-      {/* Lesson header */}
-      <div className="mb-8">
+    <div className="space-y-3">
+      {cards.map((card, i) => (
         <div
-          className="inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full mb-4"
-          style={{ background: `${color}15`, color, border: `1px solid ${color}25` }}
-        >
-          <span>{mod.icon}</span>
-          <span>{mod.levelLabel}</span>
-        </div>
-        <h1
-          className="text-2xl font-bold leading-snug"
-          style={{ color: "#FFFFFF", fontFamily: "var(--font-display, system-ui)" }}
-        >
-          {lesson.title}
-        </h1>
-      </div>
-
-      {/* Content sections */}
-      <div className="space-y-4">
-        {parsed.map((section, i) => (
-          <div
-            key={i}
-            className="rounded-2xl p-5"
-            style={{
-              background: section.label ? section.bg : "rgba(255,255,255,0.02)",
-              border: section.label
-                ? `1px solid ${section.color}25`
-                : "1px solid rgba(255,255,255,0.05)",
-            }}
-          >
-            {section.label && (
-              <div
-                className="flex items-center gap-2 mb-3"
-              >
-                <span className="text-base">{section.emoji}</span>
-                <span
-                  className="text-xs font-bold tracking-wide uppercase"
-                  style={{ color: section.color }}
-                >
-                  {section.label}
-                </span>
-              </div>
-            )}
-            <p
-              className="text-sm leading-relaxed"
-              style={{ color: section.label ? "rgba(255,255,255,0.82)" : "rgba(255,255,255,0.6)" }}
-            >
-              {section.body}
-            </p>
-          </div>
-        ))}
-      </div>
-
-      {/* Complete button */}
-      {!completed && (
-        <button
-          onClick={onComplete}
-          className="w-full py-4 rounded-2xl font-bold text-sm mt-8 transition-all active:scale-95"
-          style={{
-            background: `linear-gradient(135deg, ${color}22 0%, ${color}11 100%)`,
-            color,
-            border: `1px solid ${color}33`,
-          }}
-        >
-          完成阅读 ✓
-        </button>
-      )}
-    </div>
-  );
-}
+          key={i}
+          className="rou
