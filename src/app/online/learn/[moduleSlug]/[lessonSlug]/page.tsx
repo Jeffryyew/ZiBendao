@@ -354,7 +354,7 @@ function CompletionView({
         </button>
 
         <Link
-          href="/online/learn"
+          href="/student/learn"
           className="block mt-4 text-xs transition-opacity hover:opacity-60"
           style={{ color: "rgba(255,255,255,0.22)" }}
         >
