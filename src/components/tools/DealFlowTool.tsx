@@ -217,7 +217,7 @@ export default function DealFlowTool({ locale }: { locale: "zh" | "en" }) {
                   style={{ backgroundColor: sc.bg, border: `1px solid ${sc.border}` }}
                 >
                   <span className="text-xs font-semibold" style={{ color: sc.text }}>{label}</span>
-                  <span className="text-xs font-mono px-1.5 py-0.5 rounded-full" style={{ backgroundColor: "rgba(0,0,0,0.3)", color: sc.text }}>
+                  <span className="text-xs font-mono px-1.5 py-0.5 rounded-full" style={{ backgroundColor: "rgba(201,168,76,0.12)", color: sc.text }}>
                     {stageDeals.length}
                   </span>
                 </div>

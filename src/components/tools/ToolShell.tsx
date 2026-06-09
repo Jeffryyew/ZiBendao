@@ -160,6 +160,13 @@ export default function ToolShell({
               {mode === "group" ? "集团 · " : ""}{companyName}
             </span>
           )}
+          <Link
+            href="/student/tools"
+            className="text-xs px-2.5 py-1 rounded-full flex-shrink-0 transition-opacity hover:opacity-80 print:hidden"
+            style={{ backgroundColor: "#FBF4E4", color: "#8B6514", border: "1px solid rgba(139,101,20,0.2)" }}
+          >
+            资本工具
+          </Link>
           {guideButton && <div className="flex-shrink-0">{guideButton}</div>}
         </div>
       </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect } from "react";
 import {
   ComposedChart,
   Bar,
@@ -99,8 +99,6 @@ function fmt(n: number, sym: string): string {
   if (!isFinite(n) || isNaN(n)) return "—";
   const abs = Math.abs(n);
   const sign = n < 0 ? "-" : "";
-  if (abs >= 1_000_000) return sign + sym + " " + (abs / 1_000_000).toFixed(2) + "M";
-  if (abs >= 1_000) return sign + sym + " " + (abs / 1_000).toFixed(0) + "K";
   return sign + sym + " " + abs.toLocaleString("en-MY", { maximumFractionDigits: 0 });
 }
 
@@ -115,10 +113,10 @@ function fmtShort(n: number): string {
 type Signal = "green" | "yellow" | "red" | "neutral";
 
 const SIG: Record<Signal, { text: string; bg: string; border: string }> = {
-  green: { text: "#22C55E", bg: "rgba(34,197,94,0.05)", border: "rgba(34,197,94,0.2)" },
-  yellow: { text: "#F0A445", bg: "rgba(240,164,69,0.05)", border: "rgba(240,164,69,0.2)" },
-  red: { text: "#EF4444", bg: "rgba(239,68,68,0.05)", border: "rgba(239,68,68,0.2)" },
-  neutral: { text: "#A0A09A", bg: "#141414", border: "#2A2A2A" },
+  green: { text: "#3D7A41", bg: "rgba(61,122,65,0.06)", border: "rgba(61,122,65,0.2)" },
+  yellow: { text: "#C9863A", bg: "rgba(201,134,58,0.06)", border: "rgba(201,134,58,0.2)" },
+  red: { text: "#B05050", bg: "rgba(176,80,80,0.06)", border: "rgba(176,80,80,0.2)" },
+  neutral: { text: "#9A9490", bg: "#F8F6F1", border: "#E8DFCF" },
 };
 
 // ── Sub-components ─────────────────────────────────────────────────────────
@@ -127,7 +125,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
   return (
     <div
       className="rounded-2xl p-5"
-      style={{ backgroundColor: "#141414", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#1E1E1E"}` }}
+      style={{ backgroundColor: "#FFFFFF", border: `1px solid ${accent ? "rgba(201,168,76,0.2)" : "#E8DFCF"}` }}
     >
       {children}
     </div>
@@ -135,7 +133,7 @@ function Card({ children, accent = false }: { children: React.ReactNode; accent?
 }
 
 function SLabel({ children }: { children: React.ReactNode }) {
-  return <p className="text-xs font-mono mb-3" style={{ color: "#555550" }}>{children}</p>;
+  return <p className="text-xs font-mono mb-3" style={{ color: "#7A7A7A" }}>{children}</p>;
 }
 
 function InputRow({
@@ -154,14 +152,14 @@ function InputRow({
   hint?: string;
 }) {
   return (
-    <div className="flex items-center gap-3 py-1.5" style={{ borderBottom: "1px solid #1A1A1A" }}>
+    <div className="flex items-center gap-3 py-1.5" style={{ borderBottom: "1px solid #E8DFCF" }}>
       <div className="flex-1">
-        <span className="text-xs" style={{ color: "#888880" }}>{label}</span>
-        {hint && <p className="text-xs mt-0.5" style={{ color: "#444440" }}>{hint}</p>}
+        <span className="text-xs" style={{ color: "#7A7A7A" }}>{label}</span>
+        {hint && <p className="text-xs mt-0.5" style={{ color: "#2B2B2B" }}>{hint}</p>}
       </div>
-      <div className="relative w-36 flex-shrink-0">
+      <div className="relative">
         {prefix && (
-          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>
+          <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>
             {prefix}
           </span>
         )}
@@ -169,19 +167,19 @@ function InputRow({
           type="number"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full py-1.5 rounded-lg text-xs text-right outline-none font-mono"
+          className="appearance-none w-full py-1.5 rounded-lg text-xs text-right outline-none font-mono"
           style={{
-            backgroundColor: "#0D0D0D",
-            border: "1px solid #2A2A2A",
-            color: "#F5F5F0",
+            backgroundColor: "#F8F6F1",
+            border: "1px solid #E8DFCF",
+            color: "#2B2B2B",
             paddingLeft: prefix ? "2rem" : "0.5rem",
             paddingRight: suffix ? "1.8rem" : "0.5rem",
           }}
-          onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-          onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+          onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+          onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
         />
         {suffix && (
-          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#555550" }}>
+          <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#7A7A7A" }}>
             {suffix}
           </span>
         )}
@@ -195,12 +193,12 @@ function Subtotal({ label, value, sym, highlight }: { label: string; value: numb
     <div
       className="flex items-center justify-between px-3 py-2 rounded-lg mt-2"
       style={{
-        backgroundColor: highlight ? "rgba(201,168,76,0.06)" : "#1A1A1A",
-        border: `1px solid ${highlight ? "rgba(201,168,76,0.2)" : "#252525"}`,
+        backgroundColor: highlight ? "rgba(201,168,76,0.06)" : "#F8F6F1",
+        border: `1px solid ${highlight ? "rgba(201,168,76,0.2)" : "#E8DFCF"}`,
       }}
     >
       <span className="text-xs font-semibold" style={{ color: highlight ? "#C9A84C" : "#A0A09A" }}>{label}</span>
-      <span className="text-sm font-bold font-mono" style={{ color: highlight ? "#C9A84C" : "#F5F5F0" }}>
+      <span className="text-sm font-bold font-mono" style={{ color: highlight ? "#C9A84C" : "#2B2B2B" }}>
         {fmt(value, sym)}
       </span>
     </div>
@@ -231,6 +229,17 @@ export default function StoreExpansionTool({ locale }: { locale: "zh" | "en" }) 
     }
   }, [savedData, loaded]);
 
+  // ── Auto-save (1.5s debounce) ─────────────────────────────────────────
+  const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (!loaded) return;
+    if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
+    autoSaveTimer.current = setTimeout(() => { handleSave(); }, 1500);
+    return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [form]);
+
+
   useEffect(() => {
     try {
       const mode = localStorage.getItem(ENTERPRISE_KEYS.MODE);
@@ -251,7 +260,7 @@ export default function StoreExpansionTool({ locale }: { locale: "zh" | "en" }) 
     } catch {}
   }, []);
 
-  const sym = form.currencySymbol || coreData?.currencySymbol || "RM";
+  const sym = coreData?.currencySymbol ?? "RM";
   const planYears = parseInt(form.planYears) || 3;
   const pf = (v: string | number) => parseFloat(String(v)) || 0;
 
@@ -430,7 +439,7 @@ export default function StoreExpansionTool({ locale }: { locale: "zh" | "en" }) 
           <SLabel>扩张计划</SLabel>
           <div className="flex flex-wrap items-center gap-4 mb-4">
             <div>
-              <p className="text-xs mb-1.5" style={{ color: "#888880" }}>规划年数</p>
+              <p className="text-xs mb-1.5" style={{ color: "#7A7A7A" }}>规划年数</p>
               <div className="flex gap-1">
                 {(["1", "2", "3", "4", "5"] as const).map((y) => (
                   <button
@@ -438,9 +447,9 @@ export default function StoreExpansionTool({ locale }: { locale: "zh" | "en" }) 
                     onClick={() => set("planYears")(y)}
                     className="w-8 h-8 rounded-lg text-xs font-semibold transition-colors"
                     style={{
-                      backgroundColor: form.planYears === y ? "#C9A84C" : "#1A1A1A",
-                      color: form.planYears === y ? "#1A1A1A" : "#888880",
-                      border: form.planYears === y ? "none" : "1px solid #2A2A2A",
+                      backgroundColor: form.planYears === y ? "#C9A84C" : "#F8F6F1",
+                      color: form.planYears === y ? "#FFFFFF" : "#7A7A7A",
+                      border: form.planYears === y ? "none" : "1px solid #E8DFCF",
                     }}
                   >
                     {y}
@@ -448,34 +457,25 @@ export default function StoreExpansionTool({ locale }: { locale: "zh" | "en" }) 
                 ))}
               </div>
             </div>
-            <select
-              value={form.currencySymbol}
-              onChange={(e) => set("currencySymbol")(e.target.value)}
-              className="text-xs px-3 py-2 rounded-lg outline-none"
-              style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", color: "#A0A09A" }}
-            >
-              {["RM", "S$", "Rp", "THB", "NT$", "JPY", "$"].map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
+
           </div>
 
           {/* Year store counts */}
           <div className="flex gap-3 flex-wrap">
             {Array.from({ length: planYears }).map((_, i) => (
               <div key={i} className="flex-1 min-w-16">
-                <p className="text-xs mb-1 text-center" style={{ color: "#555550" }}>第 {i + 1} 年</p>
+                <p className="text-xs mb-1 text-center" style={{ color: "#7A7A7A" }}>第 {i + 1} 年</p>
                 <input
                   type="number"
                   min="0"
                   value={form.yearPlans[i]?.storeCount ?? "0"}
                   onChange={(e) => setYearPlan(i, e.target.value)}
                   className="w-full text-center py-2 rounded-xl text-sm font-bold font-mono outline-none"
-                  style={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", color: "#C9A84C" }}
-                  onFocus={(e) => (e.target.style.borderColor = "#C9A84C")}
-                  onBlur={(e) => (e.target.style.borderColor = "#2A2A2A")}
+                  style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#C9A84C" }}
+                  onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
+                  onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
                 />
-                <p className="text-xs mt-1 text-center" style={{ color: "#444440" }}>家</p>
+                <p className="text-xs mt-1 text-center" style={{ color: "#2B2B2B" }}>家</p>
               </div>
             ))}
           </div>
@@ -583,7 +583,7 @@ export default function StoreExpansionTool({ locale }: { locale: "zh" | "en" }) 
               const c = SIG[signal];
               return (
                 <div key={label} className="rounded-2xl p-5" style={{ backgroundColor: c.bg, border: `1px solid ${c.border}` }}>
-                  <p className="text-xs font-semibold mb-2" style={{ color: "#A0A09A" }}>{label}</p>
+                  <p className="text-xs font-semibold mb-2" style={{ color: "#9A9490" }}>{label}</p>
                   <p className="text-2xl font-bold font-mono mb-1" style={{ color: c.text }}>{value}</p>
                   <p className="text-xs" style={{ color: c.text, opacity: 0.8 }}>{note}</p>
                 </div>
@@ -603,27 +603,27 @@ export default function StoreExpansionTool({ locale }: { locale: "zh" | "en" }) 
               >
                 <XAxis
                   dataKey="label"
-                  tick={{ fill: "#555550", fontSize: 9 }}
+                  tick={{ fill: "#7A7A7A", fontSize: 9 }}
                   axisLine={false}
                   tickLine={false}
                   interval={3}
                 />
                 <YAxis
                   yAxisId="left"
-                  tick={{ fill: "#555550", fontSize: 10 }}
+                  tick={{ fill: "#7A7A7A", fontSize: 10 }}
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={fmtShort}
                 />
                 <Tooltip
-                  contentStyle={{ backgroundColor: "#1A1A1A", border: "1px solid #2A2A2A", borderRadius: 10, fontSize: 12 }}
-                  labelStyle={{ color: "#A0A09A" }}
+                  contentStyle={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", borderRadius: 10, fontSize: 12 }}
+                  labelStyle={{ color: "#9A9490" }}
                   formatter={(v: number, name: string) => [fmt(v, sym), name]}
                 />
-                <ReferenceLine yAxisId="left" y={0} stroke="#2A2A2A" strokeDasharray="4 4" />
+                <ReferenceLine yAxisId="left" y={0} stroke="#E8DFCF" strokeDasharray="4 4" />
                 <Bar yAxisId="left" dataKey="net" name="月净利润" radius={[3, 3, 0, 0]}>
                   {calc.cashflowChart.map((entry, i) => (
-                    <Cell key={i} fill={entry.net >= 0 ? "#22C55E" : "#EF4444"} fillOpacity={0.7} />
+                    <Cell key={i} fill={entry.net >= 0 ? "#4A8A50" : "#B05050"} fillOpacity={0.75} />
                   ))}
                 </Bar>
                 <Line
@@ -661,16 +661,16 @@ export default function StoreExpansionTool({ locale }: { locale: "zh" | "en" }) 
                 >
                   <div className="flex items-start justify-between gap-4 flex-wrap">
                     <div>
-                      <p className="text-sm font-bold" style={{ color: "#A0A09A" }}>
+                      <p className="text-sm font-bold" style={{ color: "#9A9490" }}>
                         第 {y.year} 年
                         {y.newStores > 0 ? `（新开 ${y.newStores} 家，累计 ${y.cumulativeStores} 家）` : "（无新店）"}
                       </p>
-                      <p className="text-xs mt-1" style={{ color: "#555550" }}>
+                      <p className="text-xs mt-1" style={{ color: "#7A7A7A" }}>
                         本年新增资本：{fmt(y.capitalDeployed, sym)}　累计投入：{fmt(y.cumulativeCapital, sym)}
                       </p>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs" style={{ color: "#555550" }}>门店年 PAT 贡献</p>
+                      <p className="text-xs" style={{ color: "#7A7A7A" }}>门店年 PAT 贡献</p>
                       <p className="text-lg font-bold font-mono" style={{ color: c.text }}>
                         {y.yearlyPAT > 0 ? fmt(y.yearlyPAT, sym) : "—"}
                       </p>
@@ -679,9 +679,9 @@ export default function StoreExpansionTool({ locale }: { locale: "zh" | "en" }) 
                   {hasTarget && (
                     <div
                       className="mt-3 flex items-center justify-between px-3 py-2 rounded-lg"
-                      style={{ backgroundColor: "rgba(0,0,0,0.2)" }}
+                      style={{ backgroundColor: "rgba(201,168,76,0.08)", border: "1px solid rgba(201,168,76,0.15)" }}
                     >
-                      <span className="text-xs" style={{ color: "#888880" }}>
+                      <span className="text-xs" style={{ color: "#7A7A7A" }}>
                         路线图 PAT 目标：{fmt(y.roadmapTarget!, sym)}
                       </span>
                       <span className="text-xs font-bold" style={{ color: c.text }}>
@@ -690,7 +690,7 @@ export default function StoreExpansionTool({ locale }: { locale: "zh" | "en" }) 
                     </div>
                   )}
                   {!hasTarget && (
-                    <p className="text-xs mt-2" style={{ color: "#444440" }}>
+                    <p className="text-xs mt-2" style={{ color: "#2B2B2B" }}>
                       请先在财务路线图工具设定第 {y.year} 年 PAT 目标，以进行对标。
                     </p>
                   )}
@@ -702,17 +702,9 @@ export default function StoreExpansionTool({ locale }: { locale: "zh" | "en" }) 
 
         {/* ── Save ───────────────────────────────────────────────────────── */}
         <div className="flex items-center justify-between">
-          <p className="text-xs" style={{ color: "#444440" }}>
-            {lastSaved ? `上次保存: ${lastSaved.toLocaleTimeString()}` : "未保存"}
+          <p className="text-xs" style={{ color: "#2B2B2B" }}>
+            {saving ? "正在保存..." : lastSaved ? `已自动保存 ${lastSaved.toLocaleTimeString()}` : "未保存"}
           </p>
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="px-6 py-2.5 rounded-xl text-sm font-semibold transition-opacity hover:opacity-80 disabled:opacity-40"
-            style={{ background: "linear-gradient(135deg, #B8943A, #C9A84C)", color: "#1A1A1A" }}
-          >
-            {saving ? "保存中..." : "保存数据"}
-          </button>
         </div>
 
       </div>
