@@ -44,3 +44,18 @@ next-env.d.ts
 
 .vercel
 .claude/
+
+# Volatile log/debug files
+auth-debug-result.txt
+debug-result.txt
+git_push_log.txt
+latest_deploy.txt
+new_deploy_status.txt
+redeploy_result.txt
+vercel_status.txt
+
+# Automation scripts (contain sensitive tokens — never commit)
+*.bat
+*.vbs
+*.ps1
+run_build_push.bat

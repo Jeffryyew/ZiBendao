@@ -3,16 +3,95 @@
 import { use, useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { HelpCircle, BookOpen, Lightbulb, CheckCircle2, ArrowLeft } from "lucide-react";
 import {
   getModuleBySlug,
   getLessonBySlug,
   getNextLesson,
+  CAPITAL_LAUNCH_MODULES,
   type Lesson,
   type Module,
 } from "@/lib/capitalLaunchCourse";
 import { checkNewBadges, getBadgeStates, setBadgeState } from "@/lib/badges";
 import { useBadge } from "@/context/BadgeContext";
 
+// Global lesson index across all modules
+function getLessonGlobalIndex(moduleSlug: string, lessonSlug: string): number {
+  let idx = 0;
+  for (const mod of CAPITAL_LAUNCH_MODULES) {
+    for (const lesson of mod.lessons) {
+      idx++;
+      if (mod.slug === moduleSlug && lesson.slug === lessonSlug) return idx;
+    }
+  }
+  return 0;
+}
+
+const TOTAL_LESSONS = CAPITAL_LAUNCH_MODULES.reduce((s, m) => s + m.lessons.length, 0);
+
+// ─── Section config: Lucide Icons only, zero emoji ──────────────────────────
+type SectionKey = "问题" | "故事" | "概念" | "结论";
+
+type SectionCfg = {
+  icon: React.ComponentType<{ size?: number; strokeWidth?: number; color?: string }>;
+  label: string;
+  color: string;
+  bg: string;
+  border: string;
+};
+
+const SECTION_CONFIG: Record<SectionKey, SectionCfg> = {
+  "问题": {
+    icon: HelpCircle,
+    label: "问题",
+    color: "#60A5FA",
+    bg: "rgba(96,165,250,0.06)",
+    border: "rgba(96,165,250,0.18)",
+  },
+  "故事": {
+    icon: BookOpen,
+    label: "故事",
+    color: "#A78BFA",
+    bg: "rgba(167,139,250,0.06)",
+    border: "rgba(167,139,250,0.18)",
+  },
+  "概念": {
+    icon: Lightbulb,
+    label: "概念",
+    color: "#34D399",
+    bg: "rgba(52,211,153,0.06)",
+    border: "rgba(52,211,153,0.18)",
+  },
+  "结论": {
+    icon: CheckCircle2,
+    label: "结论",
+    color: "#FBBF24",
+    bg: "rgba(251,191,36,0.06)",
+    border: "rgba(251,191,36,0.18)",
+  },
+};
+
+interface Step {
+  key: SectionKey | null;
+  body: string;
+  cfg: SectionCfg | null;
+}
+
+function parseSteps(text: string): Step[] {
+  const paragraphs = text.split(/\n\n+/).map((p) => p.trim()).filter(Boolean);
+  return paragraphs.map((p) => {
+    const colonIdx = p.indexOf("：");
+    if (colonIdx > 0 && colonIdx <= 4) {
+      const key = p.slice(0, colonIdx) as SectionKey;
+      const body = p.slice(colonIdx + 1).trim();
+      const cfg = SECTION_CONFIG[key] ?? null;
+      if (cfg) return { key, body, cfg };
+    }
+    return { key: null, body: p, cfg: null };
+  });
+}
+
+// ─── Page entry ──────────────────────────────────────────────────────────────
 export default function LessonPage({
   params,
 }: {
@@ -20,7 +99,6 @@ export default function LessonPage({
 }) {
   const { moduleSlug, lessonSlug } = use(params);
   const router = useRouter();
-
   const mod = getModuleBySlug(moduleSlug);
   const lesson = mod ? getLessonBySlug(moduleSlug, lessonSlug) : undefined;
 
@@ -29,11 +107,10 @@ export default function LessonPage({
   }, [mod, lesson, router]);
 
   if (!mod || !lesson) return null;
-
   return <LessonPlayer mod={mod} lesson={lesson} moduleSlug={moduleSlug} />;
 }
 
-// ─── Lesson Player shell ──────────────────────────────────────────────────────
+// ─── Lesson Player ────────────────────────────────────────────────────────────
 function LessonPlayer({
   mod,
   lesson,
@@ -44,16 +121,16 @@ function LessonPlayer({
   moduleSlug: string;
 }) {
   const router = useRouter();
-  const [completed, setCompleted] = useState(false);
   const { queueBadges } = useBadge();
   const next = getNextLesson(moduleSlug, lesson.slug);
+  const steps = parseSteps(lesson.content?.text ?? "");
+  const [stepIdx, setStepIdx] = useState(0);
+  const [done, setDone] = useState(false);
 
-  // Progress within module
-  const lessonIdx = mod.lessons.findIndex((l) => l.id === lesson.id);
-  const progress = Math.round(((lessonIdx + 1) / mod.lessons.length) * 100);
+  const globalIdx = getLessonGlobalIndex(moduleSlug, lesson.slug);
+  const color = mod.levelColor;
 
-  const handleComplete = useCallback(() => {
-    setCompleted(true);
+  const markComplete = useCallback(() => {
     try {
       const raw = localStorage.getItem("zbd_online_completed");
       const ids: string[] = raw ? JSON.parse(raw) : [];
@@ -70,224 +147,235 @@ function LessonPlayer({
     } catch {}
   }, [lesson.id, queueBadges]);
 
-  const handleNext = useCallback(() => {
+  const handleContinue = useCallback(() => {
+    if (stepIdx < steps.length - 1) {
+      setStepIdx((i) => i + 1);
+    } else {
+      markComplete();
+      setDone(true);
+    }
+  }, [stepIdx, steps.length, markComplete]);
+
+  const handleGoNext = useCallback(() => {
     if (next) router.push(`/online/learn/${next.module.slug}/${next.lesson.slug}`);
     else router.push("/student/learn");
   }, [next, router]);
 
-  const color = mod.levelColor;
+  if (done) {
+    return (
+      <CompletionView
+        lesson={lesson}
+        mod={mod}
+        next={next}
+        onGoNext={handleGoNext}
+      />
+    );
+  }
+
+  const step = steps[stepIdx] ?? { key: null, body: "", cfg: null };
+  const isLastStep = stepIdx === steps.length - 1;
 
   return (
     <div
       className="min-h-screen flex flex-col"
       style={{ background: "linear-gradient(180deg, #0a0a14 0%, #06060e 100%)" }}
     >
-      {/* ── Top Bar ── */}
+      {/* Top bar */}
       <div
-        className="sticky top-0 z-20 flex items-center gap-3 px-4 py-3"
+        className="sticky top-0 z-20 px-4 pt-3 pb-3"
         style={{
-          background: "rgba(6,6,14,0.94)",
+          background: "rgba(6,6,14,0.95)",
           backdropFilter: "blur(12px)",
           borderBottom: "1px solid rgba(255,255,255,0.05)",
         }}
       >
-        <Link
-          href={`/online/learn/${moduleSlug}`}
-          className="shrink-0 text-sm transition-opacity hover:opacity-60"
-          style={{ color: "rgba(255,255,255,0.35)" }}
-        >
-          ←
-        </Link>
-
-        {/* Progress bar */}
-        <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "rgba(255,255,255,0.08)" }}>
-          <div
-            className="h-full rounded-full transition-all duration-500"
-            style={{ width: `${progress}%`, background: color }}
-          />
+        <div className="flex items-center gap-3 mb-2">
+          <Link
+            href={`/online/learn/${moduleSlug}`}
+            className="shrink-0 transition-opacity hover:opacity-60"
+            style={{ color: "rgba(255,255,255,0.3)" }}
+          >
+            <ArrowLeft size={18} strokeWidth={1.5} />
+          </Link>
+          <div className="flex-1">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-xs" style={{ color: "rgba(255,255,255,0.3)" }}>
+                {mod.levelLabel} · 第 {globalIdx} / {TOTAL_LESSONS} 关
+              </span>
+              <span className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.22)" }}>
+                步骤 {stepIdx + 1} / {steps.length}
+              </span>
+            </div>
+            <div className="flex gap-1">
+              {steps.map((_, i) => (
+                <div
+                  key={i}
+                  className="flex-1 h-1 rounded-full transition-all duration-300"
+                  style={{
+                    background:
+                      i < stepIdx
+                        ? color
+                        : i === stepIdx
+                        ? `${color}70`
+                        : "rgba(255,255,255,0.08)",
+                  }}
+                />
+              ))}
+            </div>
+          </div>
         </div>
-
-        <span
-          className="shrink-0 text-xs font-mono px-2 py-1 rounded-full"
-          style={{ background: `${color}20`, color }}
+        <h2
+          className="text-sm font-medium truncate pl-7"
+          style={{ color: "rgba(255,255,255,0.48)" }}
         >
-          +{lesson.xpReward} XP
-        </span>
+          {lesson.title}
+        </h2>
       </div>
 
-      {/* ── Card content ── */}
-      <div className="flex-1 max-w-lg mx-auto w-full px-4 py-6 pb-36">
-        {/* Lesson header */}
-        <div className="mb-6">
-          <div className="flex items-center gap-2 mb-3">
-            <span
-              className="text-xs px-2.5 py-1 rounded-full font-medium"
-              style={{ background: `${color}18`, color, border: `1px solid ${color}28` }}
-            >
-              {mod.icon} {mod.levelLabel}
-            </span>
-            <span className="text-xs" style={{ color: "rgba(255,255,255,0.25)" }}>
-              关 {lessonIdx + 1} / {mod.lessons.length}
-            </span>
-          </div>
-          <h1
-            className="text-xl font-bold leading-snug"
-            style={{ color: "#FFFFFF", fontFamily: "var(--font-display, system-ui)" }}
+      {/* Step card */}
+      <div className="flex-1 flex flex-col justify-center max-w-lg mx-auto w-full px-4 py-12">
+        {step.cfg ? (
+          <div
+            className="rounded-3xl p-7"
+            style={{ background: step.cfg.bg, border: `1px solid ${step.cfg.border}` }}
           >
-            {lesson.title}
-          </h1>
-        </div>
-
-        {/* Four section cards */}
-        <LessonCards text={lesson.content?.text ?? ""} color={color} />
-
-        {/* Complete button */}
-        {!completed && (
-          <button
-            onClick={handleComplete}
-            className="w-full py-4 rounded-2xl font-bold text-sm mt-6 transition-all active:scale-95"
+            <div className="flex items-center gap-2.5 mb-5">
+              <div
+                className="w-8 h-8 rounded-xl flex items-center justify-center"
+                style={{
+                  background: `${step.cfg.color}15`,
+                  border: `1px solid ${step.cfg.color}28`,
+                }}
+              >
+                <step.cfg.icon size={16} strokeWidth={2} color={step.cfg.color} />
+              </div>
+              <span
+                className="text-xs font-bold tracking-widest uppercase"
+                style={{ color: step.cfg.color }}
+              >
+                {step.cfg.label}
+              </span>
+            </div>
+            <p
+              className="text-base"
+              style={{ color: "rgba(255,255,255,0.88)", lineHeight: "1.85" }}
+            >
+              {step.body}
+            </p>
+          </div>
+        ) : (
+          <div
+            className="rounded-3xl p-7"
             style={{
-              background: `linear-gradient(135deg, ${color} 0%, ${color}cc 100%)`,
-              color: "#fff",
-              boxShadow: `0 4px 20px ${color}40`,
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid rgba(255,255,255,0.07)",
             }}
           >
-            完成这一关 ✓
-          </button>
-        )}
-      </div>
-
-      {/* ── XP celebration + Next CTA ── */}
-      {completed && (
-        <div
-          className="fixed bottom-0 left-0 right-0 p-4"
-          style={{
-            background: "linear-gradient(to top, rgba(6,6,14,0.98) 70%, transparent)",
-          }}
-        >
-          <div className="max-w-lg mx-auto">
-            <div
-              className="rounded-2xl px-5 py-3 mb-3 flex items-center justify-between"
-              style={{ background: `${color}18`, border: `1px solid ${color}30` }}
+            <p
+              className="text-base"
+              style={{ color: "rgba(255,255,255,0.7)", lineHeight: "1.85" }}
             >
-              <div>
-                <div className="text-sm font-bold" style={{ color }}>
-                  🎉 +{lesson.xpReward} XP 获得！
-                </div>
-                <div className="text-xs mt-0.5" style={{ color: "rgba(255,255,255,0.4)" }}>
-                  {next ? `下一关：${next.lesson.title}` : "本模块全部完成！"}
-                </div>
-              </div>
-              <div className="text-2xl">{mod.icon}</div>
-            </div>
-            <button
-              onClick={handleNext}
-              className="w-full py-4 rounded-2xl font-bold text-sm transition-all active:scale-95"
-              style={{
-                background: `linear-gradient(135deg, ${color} 0%, ${color}cc 100%)`,
-                color: "#fff",
-                boxShadow: `0 4px 20px ${color}40`,
-              }}
-            >
-              {next ? `继续下一关 →` : "返回课程地图 →"}
-            </button>
+              {step.body}
+            </p>
           </div>
-        </div>
-      )}
+        )}
+
+        <button
+          onClick={handleContinue}
+          className="w-full mt-8 py-4 rounded-2xl font-semibold text-sm transition-all active:scale-[0.98]"
+          style={
+            isLastStep
+              ? {
+                  background: `linear-gradient(135deg, ${color} 0%, ${color}cc 100%)`,
+                  color: "#fff",
+                  boxShadow: `0 4px 20px ${color}38`,
+                }
+              : {
+                  background: "rgba(255,255,255,0.06)",
+                  color: "rgba(255,255,255,0.65)",
+                  border: "1px solid rgba(255,255,255,0.09)",
+                }
+          }
+        >
+          {isLastStep ? "我理解了" : "继续"}
+        </button>
+      </div>
     </div>
   );
 }
 
-// ─── Section config ────────────────────────────────────────────────────────────
-const SECTIONS: Record<string, { emoji: string; label: string; color: string; bg: string; border: string }> = {
-  问题: {
-    emoji: "🤔",
-    label: "问题",
-    color: "#60A5FA",
-    bg: "rgba(96,165,250,0.07)",
-    border: "rgba(96,165,250,0.2)",
-  },
-  故事: {
-    emoji: "📖",
-    label: "故事",
-    color: "#A78BFA",
-    bg: "rgba(167,139,250,0.07)",
-    border: "rgba(167,139,250,0.2)",
-  },
-  概念: {
-    emoji: "💡",
-    label: "概念",
-    color: "#34D399",
-    bg: "rgba(52,211,153,0.07)",
-    border: "rgba(52,211,153,0.2)",
-  },
-  结论: {
-    emoji: "✅",
-    label: "结论",
-    color: "#FBBF24",
-    bg: "rgba(251,191,36,0.07)",
-    border: "rgba(251,191,36,0.2)",
-  },
-};
-
-// ─── LessonCards: parse and render the four sections ─────────────────────────
-function LessonCards({ text, color }: { text: string; color: string }) {
-  // Split on double-newlines, trim each paragraph
-  const paragraphs = text
-    .split(/\n\n+/)
-    .map((p) => p.trim())
-    .filter(Boolean);
-
-  // Map each paragraph to a known section or a generic card
-  const cards = paragraphs.map((p) => {
-    const colonIdx = p.indexOf("：");
-    if (colonIdx > 0 && colonIdx <= 4) {
-      const key = p.slice(0, colonIdx);
-      const body = p.slice(colonIdx + 1).trim();
-      const cfg = SECTIONS[key];
-      if (cfg) return { ...cfg, body, isKnown: true };
-    }
-    return {
-      emoji: "📌",
-      label: "",
-      color,
-      bg: "rgba(255,255,255,0.03)",
-      border: "rgba(255,255,255,0.08)",
-      body: p,
-      isKnown: false,
-    };
-  });
+// ─── Completion View ──────────────────────────────────────────────────────────
+function CompletionView({
+  lesson,
+  mod,
+  next,
+  onGoNext,
+}: {
+  lesson: Lesson;
+  mod: Module;
+  next: { module: Module; lesson: Lesson } | null;
+  onGoNext: () => void;
+}) {
+  const color = mod.levelColor;
 
   return (
-    <div className="space-y-3">
-      {cards.map((card, i) => (
+    <div
+      className="min-h-screen flex flex-col items-center justify-center px-4"
+      style={{ background: "linear-gradient(180deg, #0a0a14 0%, #06060e 100%)" }}
+    >
+      <div className="max-w-sm w-full text-center">
         <div
-          key={i}
-          className="rounded-2xl p-5"
+          className="w-20 h-20 rounded-3xl flex items-center justify-center mx-auto mb-6"
+          style={{ background: `${color}15`, border: `1px solid ${color}28` }}
+        >
+          <CheckCircle2 size={38} strokeWidth={1.5} color={color} />
+        </div>
+
+        <h1 className="text-2xl font-bold mb-2" style={{ color: "#FFFFFF" }}>
+          本关完成
+        </h1>
+        <p className="text-sm mb-2" style={{ color: "rgba(255,255,255,0.4)" }}>
+          {lesson.title}
+        </p>
+
+        <div
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl mb-8 mt-3"
+          style={{ background: `${color}12`, border: `1px solid ${color}22` }}
+        >
+          <span className="text-sm font-bold" style={{ color }}>
+            +{lesson.xpReward} XP
+          </span>
+          <span className="text-xs" style={{ color: "rgba(255,255,255,0.28)" }}>
+            已获得
+          </span>
+        </div>
+
+        {next && (
+          <p className="text-xs mb-4" style={{ color: "rgba(255,255,255,0.28)" }}>
+            下一关：{next.lesson.title}
+          </p>
+        )}
+
+        <button
+          onClick={onGoNext}
+          className="w-full py-4 rounded-2xl font-bold text-sm transition-all active:scale-[0.98]"
           style={{
-            background: card.bg,
-            border: `1px solid ${card.border}`,
+            background: `linear-gradient(135deg, ${color} 0%, ${color}cc 100%)`,
+            color: "#fff",
+            boxShadow: `0 4px 20px ${color}38`,
           }}
         >
-          {card.isKnown && (
-            <div className="flex items-center gap-2 mb-3">
-              <span className="text-lg leading-none">{card.emoji}</span>
-              <span
-                className="text-xs font-bold tracking-wider uppercase"
-                style={{ color: card.color }}
-              >
-                {card.label}
-              </span>
-            </div>
-          )}
-          <p
-            className="text-sm leading-relaxed"
-            style={{ color: card.isKnown ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.55)" }}
-          >
-            {card.body}
-          </p>
-        </div>
-      ))}
+          {next ? "进入下一关" : "返回课程地图"}
+        </button>
+
+        <Link
+          href="/online/learn"
+          className="block mt-4 text-xs transition-opacity hover:opacity-60"
+          style={{ color: "rgba(255,255,255,0.22)" }}
+        >
+          返回课程地图
+        </Link>
+      </div>
     </div>
   );
 }
