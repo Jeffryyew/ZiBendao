@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { ENTERPRISE_KEYS } from "@/lib/enterprise";
 import type { CompanyMode } from "@/lib/enterprise";
+import { setLocale } from "@/app/actions/locale";
 
 interface ToolShellProps {
   icon: string;
@@ -45,7 +47,6 @@ function useCompanyState(): CompanyState {
           setCompanyName(parsed.name || null);
           setHasActiveCompany(true);
         } else {
-          // No active company selected — try to show parent name as fallback
           const grp = localStorage.getItem(ENTERPRISE_KEYS.GROUP);
           if (grp) {
             const parsed = JSON.parse(grp);
@@ -59,6 +60,36 @@ function useCompanyState(): CompanyState {
   }, []);
 
   return { mode, companyName, hasActiveCompany, ready };
+}
+
+function LocaleSwitcher() {
+  const router = useRouter();
+  const [, startTransition] = useTransition();
+  const [locale, setLocaleState] = useState<"zh" | "en">("zh");
+
+  useEffect(() => {
+    const match = document.cookie.split("; ").find(r => r.startsWith("locale="));
+    if (match) setLocaleState(match.split("=")[1] as "zh" | "en");
+  }, []);
+
+  function toggle() {
+    const next = locale === "zh" ? "en" : "zh";
+    setLocaleState(next);
+    startTransition(async () => {
+      await setLocale(next);
+      router.refresh();
+    });
+  }
+
+  return (
+    <button
+      onClick={toggle}
+      className="text-xs px-2.5 py-1 rounded-full flex-shrink-0 transition-opacity hover:opacity-80 print:hidden"
+      style={{ backgroundColor: "#F0EBE0", color: "#68625C", border: "1px solid #D8D1C6" }}
+    >
+      {locale === "zh" ? "EN" : "中文"}
+    </button>
+  );
 }
 
 export default function ToolShell({
@@ -167,6 +198,7 @@ export default function ToolShell({
           >
             资本工具
           </Link>
+          <LocaleSwitcher />
           {guideButton && <div className="flex-shrink-0">{guideButton}</div>}
         </div>
       </div>

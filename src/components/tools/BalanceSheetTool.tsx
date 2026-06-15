@@ -189,20 +189,25 @@ function IndicatorCard({
   hint: string;
 }) {
   const colors: Record<Signal, { text: string; bg: string; border: string }> = {
-    green: { text: "#22C55E", bg: "rgba(34,197,94,0.05)", border: "rgba(34,197,94,0.2)" },
-    yellow: { text: "#F0A445", bg: "rgba(240,164,69,0.05)", border: "rgba(240,164,69,0.2)" },
-    red: { text: "#EF4444", bg: "rgba(239,68,68,0.05)", border: "rgba(239,68,68,0.2)" },
+    green: { text: "#3D7A41", bg: "rgba(61,122,65,0.06)", border: "rgba(61,122,65,0.2)" },
+    yellow: { text: "#C9863A", bg: "rgba(201,134,58,0.06)", border: "rgba(201,134,58,0.2)" },
+    red: { text: "#B05050", bg: "rgba(176,80,80,0.06)", border: "rgba(176,80,80,0.2)" },
     neutral: { text: "#9A9490", bg: "#F8F6F1", border: "#E8DFCF" },
   };
   const c = colors[signal];
   return (
-    <div className="rounded-2xl p-5" style={{ backgroundColor: c.bg, border: `1px solid ${c.border}` }}>
-      <div className="flex items-start justify-between mb-2">
-        <span className="text-xs font-semibold" style={{ color: "#9A9490" }}>{label}</span>
-        <span className="text-xl font-bold font-mono" style={{ color: c.text }}>{value}</span>
-      </div>
-      <p className="text-xs leading-relaxed mb-1" style={{ color: "#7A7A7A" }}>{hint}</p>
-      <p className="text-xs leading-relaxed" style={{ color: c.text, opacity: 0.9 }}>{investorNote}</p>
+    <div
+      className="rounded-2xl p-5 flex flex-col"
+      style={{ backgroundColor: c.bg, border: `1px solid ${c.border}`, minHeight: "152px" }}
+    >
+      {/* Row 1: big value */}
+      <p className="text-xl font-bold font-mono leading-tight truncate" style={{ color: c.text }}>{value}</p>
+      {/* Row 2: label name */}
+      <p className="text-xs font-semibold mt-2" style={{ color: "#9A9490" }}>{label}</p>
+      {/* Row 3: formula */}
+      <p className="text-xs mt-1.5" style={{ color: "#7A7A7A" }}>{hint}</p>
+      {/* Row 4: evaluation */}
+      <p className="text-xs mt-2" style={{ color: c.text }}>{investorNote}</p>
     </div>
   );
 }
@@ -404,9 +409,9 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
   };
 
   const signalColors: Record<Signal, { text: string; bg: string; border: string }> = {
-    green: { text: "#22C55E", bg: "rgba(34,197,94,0.06)", border: "rgba(34,197,94,0.25)" },
-    yellow: { text: "#F0A445", bg: "rgba(240,164,69,0.06)", border: "rgba(240,164,69,0.25)" },
-    red: { text: "#EF4444", bg: "rgba(239,68,68,0.06)", border: "rgba(239,68,68,0.25)" },
+    green: { text: "#3D7A41", bg: "rgba(61,122,65,0.06)", border: "rgba(61,122,65,0.25)" },
+    yellow: { text: "#C9863A", bg: "rgba(201,134,58,0.06)", border: "rgba(201,134,58,0.25)" },
+    red: { text: "#B05050", bg: "rgba(176,80,80,0.06)", border: "rgba(176,80,80,0.25)" },
     neutral: { text: "#9A9490", bg: "#F8F6F1", border: "#E8DFCF" },
   };
 
@@ -474,11 +479,11 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
         <div
           className="flex items-start gap-3 px-4 py-3 rounded-xl"
           style={{
-            backgroundColor: calc.balanced ? "rgba(34,197,94,0.05)" : "rgba(239,68,68,0.05)",
-            border: `1px solid ${calc.balanced ? "rgba(34,197,94,0.2)" : "rgba(239,68,68,0.2)"}`,
+            backgroundColor: calc.balanced ? "rgba(61,122,65,0.06)" : "rgba(176,80,80,0.06)",
+            border: `1px solid ${calc.balanced ? "rgba(61,122,65,0.2)" : "rgba(176,80,80,0.2)"}`,
           }}
         >
-          <p className="text-sm" style={{ color: calc.balanced ? "#22C55E" : "#EF4444" }}>
+          <p className="text-sm" style={{ color: calc.balanced ? "#3D7A41" : "#B05050" }}>
             {calc.balanced
               ? "资产负债表已平衡（资产 = 负债 + 权益）"
               : calc.imbalanceHint}
@@ -542,24 +547,24 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
 
         {/* 5 capital indicators */}
         <Card accent>
-          <Label>5 项资本化指标</Label>
+          <Label>资本化指标</Label>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <IndicatorCard
-              label="净资产（可投资基础）"
+              label={isEn ? "Net Assets" : "净资产"}
               value={fmt(calc.netAssets, sym)}
               signal={netAssetsSignal()}
               hint="总资产 − 总负债"
               investorNote={calc.netAssets > 0 ? "正值，具备股权融资基础。" : "负值，需先补充资本才能融资。"}
             />
             <IndicatorCard
-              label="营运资本（Working Capital）"
+              label={isEn ? "Working Capital" : "营运资本"}
               value={fmt(calc.workingCapital, sym)}
               signal={workingCapitalSignal()}
               hint="流动资产 − 短期负债"
               investorNote={calc.workingCapital > 0 ? "短期资金充裕，运营稳定。" : "短期资金紧张，投资人会关注现金流。"}
             />
             <IndicatorCard
-              label="负债比率（Debt Ratio）"
+              label={isEn ? "Debt Ratio" : "负债比率"}
               value={ratioFmt(calc.debtToEquity)}
               signal={debtSignal()}
               hint="总负债 ÷ 净资产"
@@ -570,25 +575,31 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
                 : "杠杆偏高，投资人可能要求先降债。"
               }
             />
-            <div className="rounded-2xl p-5"
+            <div
+              className="rounded-2xl p-5 flex flex-col"
               style={{
-                backgroundColor: roeSignal() === "neutral" ? "#F8F6F1" : roeSignal() === "green" ? "rgba(34,197,94,0.05)" : roeSignal() === "yellow" ? "rgba(240,164,69,0.05)" : "rgba(239,68,68,0.05)",
-                border: `1px solid ${roeSignal() === "neutral" ? "#E8DFCF" : roeSignal() === "green" ? "rgba(34,197,94,0.2)" : roeSignal() === "yellow" ? "rgba(240,164,69,0.2)" : "rgba(239,68,68,0.2)"}`,
+                backgroundColor: roeSignal() === "neutral" ? "#F8F6F1" : roeSignal() === "green" ? "rgba(61,122,65,0.06)" : roeSignal() === "yellow" ? "rgba(201,134,58,0.06)" : "rgba(176,80,80,0.06)",
+                border: `1px solid ${roeSignal() === "neutral" ? "#E8DFCF" : roeSignal() === "green" ? "rgba(61,122,65,0.2)" : roeSignal() === "yellow" ? "rgba(201,134,58,0.2)" : "rgba(176,80,80,0.2)"}`,
+                minHeight: "152px",
               }}
             >
-              <div className="flex items-start justify-between mb-2">
-                <span className="text-xs font-semibold" style={{ color: "#9A9490" }}>股东权益回报率（ROE）</span>
-                <span className="text-xl font-bold font-mono" style={{ color: roeSignal() === "neutral" ? "#A0A09A" : roeSignal() === "green" ? "#22C55E" : roeSignal() === "yellow" ? "#F0A445" : "#EF4444" }}>
-                  {calc.roe !== null ? pctFmt(calc.roe) : "—"}
-                </span>
-              </div>
-              <p className="text-xs mb-1" style={{ color: "#7A7A7A" }}>净利润 ÷ 净资产</p>
+              {/* Row 1: big value */}
+              <p className="text-xl font-bold font-mono leading-tight" style={{ color: roeSignal() === "neutral" ? "#A0A09A" : roeSignal() === "green" ? "#3D7A41" : roeSignal() === "yellow" ? "#C9863A" : "#B05050" }}>
+                {calc.roe !== null ? pctFmt(calc.roe) : "—"}
+              </p>
+              {/* Row 2: label */}
+              <p className="text-xs font-semibold mt-2" style={{ color: "#9A9490" }}>
+                {isEn ? "ROE" : "股东权益回报率"}
+              </p>
+              {/* Row 3: formula */}
+              <p className="text-xs mt-1.5" style={{ color: "#7A7A7A" }}>净利润 ÷ 净资产</p>
+              {/* Row 4: evaluation */}
               {calc.roe !== null ? (
-                <p className="text-xs" style={{ color: roeSignal() === "green" ? "#22C55E" : roeSignal() === "yellow" ? "#F0A445" : "#EF4444" }}>
+                <p className="text-xs mt-2" style={{ color: roeSignal() === "green" ? "#3D7A41" : roeSignal() === "yellow" ? "#C9863A" : "#B05050" }}>
                   {calc.roe >= 15 ? "回报率优秀，投资人青睐。" : calc.roe >= 8 ? "回报率尚可，有提升空间。" : "回报率偏低，投资人会要求解释。"}
                 </p>
               ) : (
-                <p className="text-xs" style={{ color: "#9A9490" }}>等待利润表（T01）数据</p>
+                <p className="text-xs mt-2" style={{ color: "#9A9490" }}>等待利润表（T01）数据</p>
               )}
             </div>
           </div>
