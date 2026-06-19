@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import ToolShell from "@/components/tools/ToolShell";
 import ToolGuide from "@/components/tools/ToolGuide";
+import CashFlowErrorBoundary from "@/components/tools/CashFlowErrorBoundary";
 import { useToolSnapshot, getCompanyId } from "@/lib/useToolSnapshot";
 import { saveToolData, loadToolData } from "@/lib/toolData";
 import type { FinancialCore } from "@/lib/financialCore";
@@ -242,7 +243,7 @@ function IndicatorCard({
   note: string;
   formula?: string;
 }) {
-  const c = SIG_COLORS[signal];
+  const c = SIG_COLORS[signal] ?? SIG_COLORS["neutral"];
   return (
     <div
       className="rounded-2xl p-5 flex flex-col"
@@ -258,7 +259,7 @@ function IndicatorCard({
 
 // ── Main component ─────────────────────────────────────────────────────────
 
-export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
+function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
   const { savedData, saving, lastSaved, save } = useToolSnapshot<T03Form>("cash-flow");
   const [form, setForm] = useState<T03Form>(DEFAULT_FORM);
   const [loaded, setLoaded] = useState(false);
@@ -977,7 +978,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
               formula="流动资产 − 流动负债"
               signal={
                 t02Data?.workingCapital === undefined
-                  ? "grey"
+                  ? "neutral"
                   : t02Data.workingCapital > 0
                   ? "green"
                   : t02Data.workingCapital < 0
@@ -1146,5 +1147,13 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
 
       </div>
     </ToolShell>
+  );
+}
+
+export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
+  return (
+    <CashFlowErrorBoundary>
+      <CashFlowToolInner locale={locale} />
+    </CashFlowErrorBoundary>
   );
 }
