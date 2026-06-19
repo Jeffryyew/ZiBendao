@@ -436,6 +436,9 @@ export default function BalanceSheetTool({ locale }: { locale: "zh" | "en" }) {
           currentRatio: calc.currentRatio,
           cashBalance: parseFloat(form.cash) || 0,
           totalLoans: (parseFloat(form.shortTermLoans) || 0) + (parseFloat(form.longTermLoans) || 0),
+          workingCapital: calc.workingCapital,
+          currentAssets: calc.currentAssets,
+          currentLiabilities: calc.currentLiabilities,
         },
         currency: sym,
       });

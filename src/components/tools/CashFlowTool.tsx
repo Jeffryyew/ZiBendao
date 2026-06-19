@@ -15,9 +15,8 @@ import {
 import ToolShell from "@/components/tools/ToolShell";
 import ToolGuide from "@/components/tools/ToolGuide";
 import { useToolSnapshot, getCompanyId } from "@/lib/useToolSnapshot";
-import { saveToolData } from "@/lib/toolData";
+import { saveToolData, loadToolData } from "@/lib/toolData";
 import type { FinancialCore } from "@/lib/financialCore";
-import { ENTERPRISE_KEYS } from "@/lib/enterprise";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -113,11 +112,18 @@ function fmtShort(n: number): string {
 type Signal = "green" | "yellow" | "red" | "neutral";
 
 const SIG_COLORS: Record<Signal, { text: string; bg: string; border: string }> = {
-  green: { text: "#22C55E", bg: "rgba(34,197,94,0.05)", border: "rgba(34,197,94,0.2)" },
-  yellow: { text: "#F0A445", bg: "rgba(240,164,69,0.05)", border: "rgba(240,164,69,0.2)" },
-  red: { text: "#EF4444", bg: "rgba(239,68,68,0.05)", border: "rgba(239,68,68,0.2)" },
+  green: { text: "#3D7A41", bg: "rgba(61,122,65,0.06)", border: "rgba(61,122,65,0.2)" },
+  yellow: { text: "#C9863A", bg: "rgba(201,134,58,0.06)", border: "rgba(201,134,58,0.2)" },
+  red: { text: "#B05050", bg: "rgba(176,80,80,0.06)", border: "rgba(176,80,80,0.2)" },
   neutral: { text: "#9A9490", bg: "#F8F6F1", border: "#E8DFCF" },
 };
+
+// Full number formatter for chart Y-axis (no K/M)
+function fmtAxis(n: number): string {
+  const abs = Math.abs(n);
+  const sign = n < 0 ? "-" : "";
+  return sign + abs.toLocaleString("en-MY", { maximumFractionDigits: 0 });
+}
 
 // ── Sub-components ─────────────────────────────────────────────────────────
 
@@ -215,7 +221,7 @@ function Subtotal({
       </span>
       <span
         className="text-sm font-bold font-mono"
-        style={{ color: highlight ? "#C9A84C" : isNeg ? "#EF4444" : "#2B2B2B" }}
+        style={{ color: highlight ? "#C9A84C" : isNeg ? "#B05050" : "#2B2B2B" }}
       >
         {fmt(value, sym)}
       </span>
@@ -228,20 +234,24 @@ function IndicatorCard({
   value,
   signal,
   note,
+  formula,
 }: {
   label: string;
   value: string;
   signal: Signal;
   note: string;
+  formula?: string;
 }) {
   const c = SIG_COLORS[signal];
   return (
-    <div className="rounded-2xl p-5" style={{ backgroundColor: c.bg, border: `1px solid ${c.border}` }}>
-      <div className="flex items-start justify-between mb-2">
-        <span className="text-xs font-semibold" style={{ color: "#9A9490" }}>{label}</span>
-        <span className="text-xl font-bold font-mono" style={{ color: c.text }}>{value}</span>
-      </div>
-      <p className="text-xs leading-relaxed" style={{ color: c.text, opacity: 0.85 }}>{note}</p>
+    <div
+      className="rounded-2xl p-5 flex flex-col"
+      style={{ backgroundColor: c.bg, border: `1px solid ${c.border}`, minHeight: "152px" }}
+    >
+      <p className="text-xl font-bold font-mono leading-tight truncate" style={{ color: c.text }}>{value}</p>
+      <p className="text-xs font-semibold mt-2" style={{ color: "#9A9490" }}>{label}</p>
+      {formula && <p className="text-xs mt-1 font-mono" style={{ color: "#B0AA9A" }}>{formula}</p>}
+      <p className="text-xs mt-2" style={{ color: c.text }}>{note}</p>
     </div>
   );
 }
@@ -254,9 +264,26 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
   const [loaded, setLoaded] = useState(false);
   const [coreData, setCoreData] = useState<FinancialCore | null>(null);
 
-  // Load saved data
+  // Load saved data — localStorage primary (instant), DB secondary
   useEffect(() => {
-    if (savedData && !loaded) {
+    if (loaded) return;
+    const cid = getCompanyId();
+    const lsSaved = loadToolData(cid, "T03") ?? loadToolData("__default__", "T03");
+    if (lsSaved?.inputData) {
+      const saved = lsSaved.inputData as Partial<T03Form>;
+      const merged: T03Form = {
+        ...DEFAULT_FORM,
+        ...saved,
+        months:
+          saved.months && (saved.months as MonthData[]).length === 12
+            ? (saved.months as MonthData[])
+            : makeDefaultMonths(),
+      };
+      setForm(merged);
+      setLoaded(true);
+      return;
+    }
+    if (savedData) {
       const merged: T03Form = {
         ...DEFAULT_FORM,
         ...savedData,
@@ -281,29 +308,24 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
   }, [form]);
 
 
-  // Load FinancialCore
+  // Load FinancialCore + T01/T02 data
+  const [t01Data, setT01Data] = useState<Record<string, number> | null>(null);
+  const [t02Data, setT02Data] = useState<Record<string, number> | null>(null);
+
   useEffect(() => {
-    try {
-      const mode = localStorage.getItem(ENTERPRISE_KEYS.MODE);
-      let companyId = "no_company";
-      if (mode === "single") {
-        const sc = localStorage.getItem(ENTERPRISE_KEYS.SINGLE);
-        if (sc) companyId = `single_${JSON.parse(sc).id ?? "default"}`;
-      } else if (mode === "group") {
-        const ac = localStorage.getItem(ENTERPRISE_KEYS.ACTIVE_COMPANY);
-        if (ac) companyId = `group_${JSON.parse(ac).id ?? "default"}`;
-      }
-      if (companyId !== "no_company") {
-        fetch(
-          `/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(companyId)}`
-        )
-          .then((r) => r.json())
-          .then((snap) => {
-            if (snap?.data) setCoreData(snap.data as FinancialCore);
-          })
-          .catch(() => {});
-      }
-    } catch {}
+    const cid = getCompanyId();
+    if (cid === "__default__") return;
+    // T01
+    const ls1 = loadToolData(cid, "T01");
+    if (ls1?.calculatedOutput) setT01Data(ls1.calculatedOutput as Record<string, number>);
+    // T02
+    const ls2 = loadToolData(cid, "T02");
+    if (ls2?.calculatedOutput) setT02Data(ls2.calculatedOutput as Record<string, number>);
+    // FinancialCore from DB
+    fetch(`/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(cid)}`)
+      .then((r) => r.json())
+      .then((snap) => { if (snap?.data) setCoreData(snap.data as FinancialCore); })
+      .catch(() => {});
   }, []);
 
   const sym = coreData?.currencySymbol ?? "RM";
@@ -321,22 +343,85 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
       });
   }
 
-  function importFromCore() {
-    if (!coreData?.annualPAT) return;
-    if (form.inputMode === "simple") {
-      const annual = Math.abs(coreData.annualPAT);
+  // ── Mode switch with sync ────────────────────────────────────────────────
+  function switchMode(newMode: "simple" | "detailed") {
+    if (newMode === form.inputMode) return;
+    if (newMode === "detailed") {
+      // Simple → Detailed: distribute annual evenly to 12 months
+      const pf = (v: string) => parseFloat(v) || 0;
+      const opCF = pf(form.operatingInflow) - pf(form.operatingOutflow);
+      const invCF = pf(form.investingInflow) - pf(form.investingOutflow);
+      const finCF = pf(form.financingInflow) - pf(form.financingOutflow);
+      const mOp = Math.round(opCF / 12);
+      const mInv = Math.round(invCF / 12);
+      const mFin = Math.round(finCF / 12);
       setForm((p) => ({
         ...p,
-        operatingInflow: String(Math.round(annual + annual * 0.2)),
-        operatingOutflow: String(Math.round(annual * 0.2)),
+        inputMode: "detailed",
+        months: MONTH_LABELS.map(() => ({
+          operatingCF: String(mOp),
+          investingCF: String(mInv),
+          financingCF: String(mFin),
+        })),
       }));
     } else {
-      const monthly = Math.round(coreData.annualPAT / 12);
+      // Detailed → Simple: aggregate months
+      const pf = (v: string) => parseFloat(v) || 0;
+      const totalOp = form.months.reduce((s, m) => s + pf(m.operatingCF), 0);
+      const totalInv = form.months.reduce((s, m) => s + pf(m.investingCF), 0);
+      const totalFin = form.months.reduce((s, m) => s + pf(m.financingCF), 0);
       setForm((p) => ({
         ...p,
-        months: p.months.map((m) => ({ ...m, operatingCF: String(monthly) })),
+        inputMode: "simple",
+        operatingInflow: totalOp >= 0 ? String(Math.round(totalOp)) : "0",
+        operatingOutflow: totalOp < 0 ? String(Math.round(-totalOp)) : "0",
+        investingInflow: totalInv >= 0 ? String(Math.round(totalInv)) : "0",
+        investingOutflow: totalInv < 0 ? String(Math.round(-totalInv)) : "0",
+        financingInflow: totalFin >= 0 ? String(Math.round(totalFin)) : "0",
+        financingOutflow: totalFin < 0 ? String(Math.round(-totalFin)) : "0",
       }));
     }
+  }
+
+  // ── Import from T01 (Income Statement) ───────────────────────────────────
+  function importFromT01() {
+    const cid = getCompanyId();
+    const t01 = loadToolData(cid, "T01");
+    const out = t01?.calculatedOutput as Record<string, number> | undefined ?? t01Data;
+    if (!out) return;
+    const revenue = out.annualRevenue ?? 0;
+    const pat = out.pat ?? 0;
+    const costs = Math.max(0, revenue - pat);
+    if (form.inputMode === "simple") {
+      setForm((p) => ({
+        ...p,
+        operatingInflow: String(Math.round(revenue)),
+        operatingOutflow: String(Math.round(costs)),
+      }));
+    } else {
+      setForm((p) => ({
+        ...p,
+        months: p.months.map((m) => ({
+          ...m,
+          operatingCF: String(Math.round(pat / 12)),
+        })),
+      }));
+    }
+  }
+
+  // ── Import from T02 (Balance Sheet) ──────────────────────────────────────
+  function importFromT02() {
+    const cid = getCompanyId();
+    const t02 = loadToolData(cid, "T02");
+    const out = t02?.calculatedOutput as Record<string, number> | undefined ?? t02Data;
+    if (!out) return;
+    if (out.cashBalance !== undefined) {
+      setForm((p) => ({ ...p, openingCash: String(Math.round(out.cashBalance)) }));
+    }
+  }
+
+  function importFromCore() {
+    importFromT01();
   }
 
   // ── Calculations ──────────────────────────────────────────────────────────
@@ -513,35 +598,30 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
   // ── Save handler ──────────────────────────────────────────────────────────
 
   async function handleSave() {
+    const companyId = getCompanyId();
+    if (companyId === "__default__") { await save(form); return; }
+    // Save inputData to localStorage (primary, instant)
+    saveToolData({
+      companyId,
+      toolId: "T03",
+      inputData: form as unknown as Record<string, unknown>,
+      calculatedOutput: {
+        yearEndCash: calc.closing,
+        openingCash: calc.opening,
+        netOperatingCashFlow: calc.opCF,
+        netCF: calc.netCF,
+        monthlyBurn: calc.monthlyBurn,
+        runway: isFinite(calc.runway) ? calc.runway : 9999,
+      },
+      currency: sym,
+    });
+    // Save to DB (secondary)
     await save(form);
     try {
-      const mode = localStorage.getItem(ENTERPRISE_KEYS.MODE);
-      let companyId = "no_company";
-      if (mode === "single") {
-        const sc = localStorage.getItem(ENTERPRISE_KEYS.SINGLE);
-        if (sc) companyId = `single_${JSON.parse(sc).id ?? "default"}`;
-      } else if (mode === "group") {
-        const ac = localStorage.getItem(ENTERPRISE_KEYS.ACTIVE_COMPANY);
-        if (ac) companyId = `group_${JSON.parse(ac).id ?? "default"}`;
-      }
-      if (companyId === "no_company") return;
-      // Save to unified toolData localStorage
-      saveToolData({
-        companyId,
-        toolId: "T03",
-        calculatedOutput: {
-          yearEndCash: calc.closing,
-          openingCash: calc.opening,
-          netOperatingCashFlow: calc.opCF,
-        },
-        currency: sym,
-      });
-
       const existing = await fetch(
         `/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(companyId)}`
       ).then((r) => r.json());
       const core = existing?.data ?? {};
-
       await fetch("/api/tools/snapshot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -553,10 +633,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
             openingCash: calc.opening,
             yearEndCash: calc.closing,
             currencySymbol: sym,
-            updatedBy: {
-              ...(core.updatedBy ?? {}),
-              "cash-flow": new Date().toISOString(),
-            },
+            updatedBy: { ...(core.updatedBy ?? {}), "cash-flow": new Date().toISOString() },
           },
         }),
       });
@@ -593,7 +670,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
               {(["simple", "detailed"] as const).map((m) => (
                 <button
                   key={m}
-                  onClick={() => setField("inputMode")(m)}
+                  onClick={() => switchMode(m)}
                   className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors"
                   style={{
                     backgroundColor: form.inputMode === m ? "#C9A84C" : "transparent",
@@ -618,41 +695,28 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
 
           {/* Import buttons */}
           <div className="mt-3 flex flex-wrap gap-2">
-            {coreData?.cashBalance !== undefined && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs" style={{ color: "#7A7A7A" }}>
-                  资产负债表现金：{fmt(coreData.cashBalance, sym)}
-                </span>
-                <button
-                  onClick={() => setField("openingCash")(String(Math.round(coreData.cashBalance!)))}
-                  className="text-xs px-3 py-1 rounded-lg transition-opacity hover:opacity-70"
-                  style={{
-                    backgroundColor: "rgba(201,168,76,0.1)",
-                    border: "1px solid rgba(201,168,76,0.25)",
-                    color: "#C9A84C",
-                  }}
-                >
-                  导入为期初现金
-                </button>
-              </div>
-            )}
-            {coreData?.annualPAT !== undefined && (
-              <div className="flex items-center gap-2">
-                <span className="text-xs" style={{ color: "#7A7A7A" }}>
-                  利润表 PAT：{fmt(coreData.annualPAT, sym)} / 年
-                </span>
-                <button
-                  onClick={importFromCore}
-                  className="text-xs px-3 py-1 rounded-lg transition-opacity hover:opacity-70"
-                  style={{
-                    backgroundColor: "rgba(201,168,76,0.1)",
-                    border: "1px solid rgba(201,168,76,0.25)",
-                    color: "#C9A84C",
-                  }}
-                >
-                  导入至经营现金流
-                </button>
-              </div>
+            <button
+              onClick={importFromT01}
+              className="text-xs px-3 py-1.5 rounded-lg font-medium transition-opacity hover:opacity-80"
+              style={{ backgroundColor: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", color: "#C9A84C" }}
+              title={t01Data ? `营业收入 ${fmt(t01Data.annualRevenue ?? 0, sym)}` : "请先填写利润表（T01）"}
+            >
+              从利润表导入
+            </button>
+            <button
+              onClick={importFromT02}
+              className="text-xs px-3 py-1.5 rounded-lg font-medium transition-opacity hover:opacity-80"
+              style={{ backgroundColor: "rgba(107,155,210,0.1)", border: "1px solid rgba(107,155,210,0.3)", color: "#5A8AC0" }}
+              title={t02Data ? `资产负债表现金 ${fmt(t02Data.cashBalance ?? 0, sym)}` : "请先填写资产负债表（T02）"}
+            >
+              从企业数据导入
+            </button>
+            {(t01Data?.annualRevenue || t02Data?.cashBalance) && (
+              <span className="text-xs self-center" style={{ color: "#9A9490" }}>
+                {t01Data?.annualRevenue ? `T01营收 ${fmt(t01Data.annualRevenue, sym)}` : ""}
+                {t01Data?.annualRevenue && t02Data?.cashBalance ? " · " : ""}
+                {t02Data?.cashBalance ? `T02现金 ${fmt(t02Data.cashBalance, sym)}` : ""}
+              </span>
             )}
           </div>
         </Card>
@@ -746,7 +810,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
                               backgroundColor: "#F8F6F1",
                               border: "1px solid #E8DFCF",
                               color:
-                                parseFloat(form.months[i][key]) < 0 ? "#EF4444" : "#2B2B2B",
+                                parseFloat(form.months[i][key]) < 0 ? "#B05050" : "#2B2B2B",
                             }}
                             onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
                             onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
@@ -754,23 +818,23 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
                         </td>
                       ))}
                       <td
-                        className="py-1.5 px-2 text-right font-mono font-semibold"
-                        style={{ color: row.netCF < 0 ? "#EF4444" : "#22C55E" }}
+                        className="py-1.5 px-2 text-right font-mono font-semibold text-xs"
+                        style={{ color: row.netCF < 0 ? "#B05050" : "#3D7A41" }}
                       >
-                        {fmtShort(row.netCF)}
+                        {fmt(row.netCF, sym)}
                       </td>
                       <td
-                        className="py-1.5 px-2 text-right font-mono"
+                        className="py-1.5 px-2 text-right font-mono text-xs"
                         style={{
                           color:
                             row.balance < 0
-                              ? "#EF4444"
+                              ? "#B05050"
                               : row.balance < (parseFloat(form.openingCash) || 0) * 0.3
-                              ? "#F0A445"
+                              ? "#C9863A"
                               : "#A0A09A",
                         }}
                       >
-                        {fmtShort(row.balance)}
+                        {fmt(row.balance, sym)}
                       </td>
                     </tr>
                   ))}
@@ -813,7 +877,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
                     tick={{ fill: "#7A7A7A", fontSize: 10 }}
                     axisLine={false}
                     tickLine={false}
-                    tickFormatter={fmtShort}
+                    tickFormatter={fmtAxis}
                   />
                   <Tooltip
                     contentStyle={{
@@ -834,8 +898,8 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
                           entry.isBalance
                             ? "#C9A84C"
                             : entry.value >= 0
-                            ? "#22C55E"
-                            : "#EF4444"
+                            ? "#4A8A50"
+                            : "#B05050"
                         }
                         fillOpacity={0.85}
                       />
@@ -858,7 +922,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
                     tick={{ fill: "#7A7A7A", fontSize: 10 }}
                     axisLine={false}
                     tickLine={false}
-                    tickFormatter={fmtShort}
+                    tickFormatter={fmtAxis}
                   />
                   <YAxis
                     yAxisId="right"
@@ -866,7 +930,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
                     tick={{ fill: "#7A7A7A", fontSize: 10 }}
                     axisLine={false}
                     tickLine={false}
-                    tickFormatter={fmtShort}
+                    tickFormatter={fmtAxis}
                   />
                   <Tooltip
                     contentStyle={{
@@ -883,7 +947,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
                     {calc.monthlyData.map((entry, i) => (
                       <Cell
                         key={i}
-                        fill={entry.netCF >= 0 ? "#22C55E" : "#EF4444"}
+                        fill={entry.netCF >= 0 ? "#4A8A50" : "#B05050"}
                         fillOpacity={0.8}
                       />
                     ))}
@@ -906,10 +970,32 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
         {/* ── Capital indicators ─────────────────────────────────────────── */}
         <Card accent>
           <SectionLabel>资本化指标</SectionLabel>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <IndicatorCard
+              label="营运资金"
+              value={t02Data?.workingCapital !== undefined ? fmt(t02Data.workingCapital, sym) : "—"}
+              formula="流动资产 − 流动负债"
+              signal={
+                t02Data?.workingCapital === undefined
+                  ? "grey"
+                  : t02Data.workingCapital > 0
+                  ? "green"
+                  : t02Data.workingCapital < 0
+                  ? "red"
+                  : "yellow"
+              }
+              note={
+                t02Data?.workingCapital === undefined
+                  ? "请先完成资产负债表（T02）。"
+                  : t02Data.workingCapital > 0
+                  ? "营运资金充足，短期偿债能力良好。"
+                  : "营运资金为负，流动性风险较高。"
+              }
+            />
             <IndicatorCard
               label="年末现金余额"
               value={fmt(calc.closing, sym)}
+              formula="期初现金 + 年度净现金流"
               signal={closingSignal()}
               note={
                 calc.closing > 0
@@ -922,6 +1008,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
             <IndicatorCard
               label="年度净现金流"
               value={fmt(calc.netCF, sym)}
+              formula="经营 + 投资 + 融资现金流"
               signal={netCFSignal()}
               note={
                 calc.netCF > 0
@@ -938,6 +1025,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
                   ? fmt(calc.monthlyBurn, sym)
                   : "无消耗"
               }
+              formula="月均净现金消耗"
               signal={
                 calc.monthlyBurn <= 0
                   ? "green"
@@ -958,6 +1046,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
                   ? "充足"
                   : `${calc.runway} 个月`
               }
+              formula="年末现金 ÷ 月燃烧率"
               signal={runwaySignal()}
               note={
                 !isFinite(calc.runway)
@@ -983,7 +1072,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
                 </p>
                 <p
                   className="text-lg font-bold font-mono"
-                  style={{ color: calc.breakEvenMonth ? "#22C55E" : "#7A7A7A" }}
+                  style={{ color: calc.breakEvenMonth ? "#3D7A41" : "#7A7A7A" }}
                 >
                   {calc.breakEvenMonth ? `第 ${calc.breakEvenMonth} 个月` : "本年度未出现"}
                 </p>
@@ -998,7 +1087,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
                 </p>
                 <p
                   className="text-lg font-bold font-mono"
-                  style={{ color: calc.lowestCash < 0 ? "#EF4444" : "#F0A445" }}
+                  style={{ color: calc.lowestCash < 0 ? "#B05050" : "#C9863A" }}
                 >
                   {fmt(calc.lowestCash, sym)}
                 </p>
@@ -1042,7 +1131,7 @@ export default function CashFlowTool({ locale }: { locale: "zh" | "en" }) {
               border: "1px solid rgba(239,68,68,0.2)",
             }}
           >
-            <p className="text-sm" style={{ color: "#EF4444" }}>
+            <p className="text-sm" style={{ color: "#B05050" }}>
               年末现金为负（缺口 {fmt(Math.abs(calc.closing), sym)}）。企业需要在年末前通过融资或削减支出填补这一缺口，否则将无法维持正常运营。
             </p>
           </div>
