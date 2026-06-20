@@ -44,8 +44,8 @@ export const CAPITAL_MODULES: CapitalModule[] = [
   },
   {
     id: "financial-roadmap", icon: "", layer: 1, href: "/tools/financial-roadmap",
-    zh: { name: "T06 财务路线图", desc: "3年财务目标规划，复利增长预测与里程碑设定" },
-    en: { name: "T06 Financial Roadmap", desc: "3-year financial goal planning with compound growth projection" },
+    zh: { name: "T06 融资路线图", desc: "模拟融资轮次、股权稀释、估值成长与 IPO 路径" },
+    en: { name: "T06 Fundraising Roadmap", desc: "Simulate funding rounds, equity dilution and IPO path" },
   },
 
   // Layer 2 — 企业资本化 (T07, T08, T10, T12, T13)
