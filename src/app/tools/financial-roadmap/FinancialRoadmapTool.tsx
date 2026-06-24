@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef, useMemo, useEffect } from "react";
+import { useState, useRef, useMemo, useEffect, useCallback } from "react";
 import ToolShell from "@/components/tools/ToolShell";
 import ToolGuide from "@/components/tools/ToolGuide";
 import { useToolSnapshot, getCompanyId } from "@/lib/useToolSnapshot";
 import { saveToolData, loadToolData } from "@/lib/toolData";
+import type { FinancialCore } from "@/lib/financialCore";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -18,13 +19,8 @@ type InvestorType =
   | "Public Market";
 
 const INVESTOR_TYPES: InvestorType[] = [
-  "Founder",
-  "Angel Investor",
-  "Venture Capital",
-  "Private Equity",
-  "Strategic Investor",
-  "Investment Banker",
-  "Public Market",
+  "Founder", "Angel Investor", "Venture Capital",
+  "Private Equity", "Strategic Investor", "Investment Banker", "Public Market",
 ];
 
 const INVESTOR_ZH: Record<InvestorType, string> = {
@@ -39,15 +35,18 @@ const INVESTOR_ZH: Record<InvestorType, string> = {
 
 interface Round {
   id: string;
-  stageName: string;
   stageNameZh: string;
   intervalMonths: string;
   investorType: InvestorType;
-  preMoneyValuation: string;
+  postMoneyValuation: string; // PRIMARY input for non-founder rounds
   investmentAmount: string;
   peMultiple: string;
   isFounder: boolean;
-  initialValuation: string;
+  initialValuation: string;   // Founder stage only
+  // Founder-specific equity split
+  hasCoFounder: boolean;
+  founderPct: string;   // "70" means 70%
+  coFounderPct: string; // "30" means 30%
 }
 
 interface T06FRForm {
@@ -57,105 +56,88 @@ interface T06FRForm {
 
 // ── Default Data ───────────────────────────────────────────────────────────
 
-let _idCounter = 0;
-function makeId(): string {
-  return `r${Date.now().toString(36)}${(++_idCounter).toString(36)}`;
-}
+let _id = 0;
+function makeId(): string { return `r${Date.now().toString(36)}${(++_id).toString(36)}`; }
 
 const DEFAULT_ROUNDS: Round[] = [
   {
-    id: "founder", stageName: "Founder", stageNameZh: "创办人",
+    id: "founder", stageNameZh: "创办人",
     intervalMonths: "0", investorType: "Founder",
-    preMoneyValuation: "0", investmentAmount: "0", peMultiple: "6",
+    postMoneyValuation: "0", investmentAmount: "0", peMultiple: "6",
     isFounder: true, initialValuation: "3000000",
+    hasCoFounder: false, founderPct: "100", coFounderPct: "0",
   },
   {
-    id: "angel", stageName: "Angel", stageNameZh: "天使轮",
+    id: "angel", stageNameZh: "天使轮",
     intervalMonths: "4", investorType: "Angel Investor",
-    preMoneyValuation: "3000000", investmentAmount: "500000", peMultiple: "7",
+    postMoneyValuation: "3500000", investmentAmount: "500000", peMultiple: "7",
     isFounder: false, initialValuation: "0",
+    hasCoFounder: false, founderPct: "100", coFounderPct: "0",
   },
   {
-    id: "series-a", stageName: "Series A", stageNameZh: "A 轮",
+    id: "series-a", stageNameZh: "A 轮",
     intervalMonths: "12", investorType: "Venture Capital",
-    preMoneyValuation: "8000000", investmentAmount: "2000000", peMultiple: "9",
+    postMoneyValuation: "10000000", investmentAmount: "2000000", peMultiple: "9",
     isFounder: false, initialValuation: "0",
+    hasCoFounder: false, founderPct: "100", coFounderPct: "0",
   },
   {
-    id: "series-b", stageName: "Series B", stageNameZh: "B 轮",
+    id: "series-b", stageNameZh: "B 轮",
     intervalMonths: "18", investorType: "Venture Capital",
-    preMoneyValuation: "20000000", investmentAmount: "5000000", peMultiple: "11",
+    postMoneyValuation: "25000000", investmentAmount: "5000000", peMultiple: "11",
     isFounder: false, initialValuation: "0",
+    hasCoFounder: false, founderPct: "100", coFounderPct: "0",
   },
   {
-    id: "series-c", stageName: "Series C", stageNameZh: "C 轮",
+    id: "series-c", stageNameZh: "C 轮",
     intervalMonths: "18", investorType: "Private Equity",
-    preMoneyValuation: "50000000", investmentAmount: "15000000", peMultiple: "13",
+    postMoneyValuation: "65000000", investmentAmount: "15000000", peMultiple: "13",
     isFounder: false, initialValuation: "0",
+    hasCoFounder: false, founderPct: "100", coFounderPct: "0",
   },
   {
-    id: "ipo", stageName: "IPO", stageNameZh: "首次公开发行",
+    id: "ipo", stageNameZh: "首次公开发行",
     intervalMonths: "24", investorType: "Public Market",
-    preMoneyValuation: "150000000", investmentAmount: "50000000", peMultiple: "18",
+    postMoneyValuation: "200000000", investmentAmount: "50000000", peMultiple: "18",
     isFounder: false, initialValuation: "0",
+    hasCoFounder: false, founderPct: "100", coFounderPct: "0",
   },
 ];
 
-const DEFAULT_FORM: T06FRForm = {
-  rounds: DEFAULT_ROUNDS,
-  currencySymbol: "RM",
-};
+const DEFAULT_FORM: T06FRForm = { rounds: DEFAULT_ROUNDS, currencySymbol: "RM" };
 
 // ── Guide Steps ────────────────────────────────────────────────────────────
 
 const GUIDE_STEPS = [
-  {
-    title: "融资路线图的作用",
-    body: "融资路线图帮你模拟从创办到 IPO 的完整股权稀释过程，清楚看到每一轮融资后创办人和各轮投资人的持股比例、市值变化与净利润目标。",
-  },
-  {
-    title: "Pre-Money 与 Post-Money",
-    body: "Pre-Money Valuation（融资前估值）是新投资人进入前公司的价值。Post-Money = Pre-Money + 投资金额。新投资人持股 = 投资金额 ÷ Post-Money。",
-  },
-  {
-    title: "股权稀释原理",
-    body: "每一轮新投资人进入时，现有股东的持股比例都会被等比例稀释。稀释后持股 = 原持股 × （1 - 新投资人持股比例）。虽然比例降低，但估值上升后市值不一定下降。",
-  },
-  {
-    title: "PE 与 PAT 目标",
-    body: "PE（市盈率倍数）= 估值 ÷ 净利润。系统自动计算：要支撑这一轮估值，企业需要达到的目标净利润（PAT）= Post-Money ÷ PE。",
-  },
-  {
-    title: "市值下降提醒",
-    body: "当新一轮的 Pre-Money Valuation 低于上一轮的 Post-Money Valuation，会触发提醒：前一轮股东的账面市值可能下降。这不代表公司出问题，但需要与老股东沟通清楚。",
-  },
+  { title: "融资路线图的作用", body: "从创办到 IPO 的完整股权稀释模拟，清楚看到每一轮融资后创办人和各轮投资人的持股比例、市值变化与净利润目标。" },
+  { title: "Post-Money 与 Pre-Money", body: "用户填入融资后估值（Post-Money）和投资金额，系统自动计算融资前估值（Pre-Money = Post-Money − 投资金额）和投资人持股比例。" },
+  { title: "股权稀释原理", body: "每一轮新投资人进入时，现有股东的持股比例都会被等比例稀释：稀释后持股 = 原持股 × （1 − 新投资人持股比例）。比例降低但估值上升时，市值仍可能增加。" },
+  { title: "PE 与 PAT 目标", body: "PE（市盈率）= 估值 ÷ 净利润。目标净利润（PAT）= Post-Money ÷ PE。填入PE倍数，系统自动算出这一轮估值对应的净利润要求。" },
+  { title: "市值下降提醒", body: "当新一轮的 Pre-Money 低于上一轮的 Post-Money 时，系统会提醒：前一轮股东的账面市值可能下降，需与老股东沟通协商。" },
 ];
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
-function pf(v: string): number {
-  return parseFloat((v ?? "").toString().replace(/,/g, "")) || 0;
+function pf(v: string | number | undefined): number {
+  if (v === undefined || v === null) return 0;
+  return parseFloat(v.toString().replace(/,/g, "")) || 0;
 }
 
 function fmt(n: number, sym: string): string {
-  if (!isFinite(n)) return sym + " —";
+  if (!isFinite(n)) return `${sym} —`;
   const abs = Math.abs(n);
   const s = abs.toLocaleString("en-MY", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   return (n < 0 ? "-" : "") + sym + " " + s;
 }
 
 function fmtPct(n: number): string {
-  if (!isFinite(n)) return "—";
+  if (!isFinite(n) || n === 0) return "—";
   return (n * 100).toFixed(1) + "%";
 }
 
 // ── Computed Types ─────────────────────────────────────────────────────────
 
-interface Stakeholder {
-  id: string;
-  label: string;
-  zh: string;
-}
+interface Stakeholder { id: string; zh: string; }
 
 interface ComputedRound {
   round: Round;
@@ -172,10 +154,7 @@ interface ComputedRound {
   totalMonths: number;
 }
 
-function computeRounds(form: T06FRForm): {
-  computed: ComputedRound[];
-  stakeholders: Stakeholder[];
-} {
+function computeRounds(form: T06FRForm): { computed: ComputedRound[]; stakeholders: Stakeholder[] } {
   const rounds = form.rounds;
   const stakeholders: Stakeholder[] = [];
   let cap: Record<string, number> = {};
@@ -193,14 +172,21 @@ function computeRounds(form: T06FRForm): {
       preMoney = postMoney;
       investment = 0;
       newInvestorPct = 0;
-      stakeholders.push({ id: r.id, label: r.stageName, zh: r.stageNameZh });
-      cap = { [r.id]: 1.0 };
+      // Founder stakeholders
+      const fPct = r.hasCoFounder ? Math.min(100, Math.max(0, pf(r.founderPct))) / 100 : 1.0;
+      const coPct = r.hasCoFounder ? Math.min(100, Math.max(0, pf(r.coFounderPct))) / 100 : 0;
+      stakeholders.push({ id: r.id, zh: "创办人" });
+      cap = { [r.id]: fPct };
+      if (r.hasCoFounder && coPct > 0) {
+        stakeholders.push({ id: r.id + "_co", zh: "联合创办人" });
+        cap[r.id + "_co"] = coPct;
+      }
     } else {
-      preMoney = pf(r.preMoneyValuation);
+      postMoney = pf(r.postMoneyValuation);
       investment = pf(r.investmentAmount);
-      postMoney = preMoney + investment;
+      preMoney = postMoney - investment;
       newInvestorPct = postMoney > 0 ? investment / postMoney : 0;
-      stakeholders.push({ id: r.id, label: r.stageName, zh: r.stageNameZh });
+      stakeholders.push({ id: r.id, zh: r.stageNameZh });
       const newCap: Record<string, number> = {};
       for (const [key, pct] of Object.entries(cap)) {
         newCap[key] = pct * (1 - newInvestorPct);
@@ -226,19 +212,9 @@ function computeRounds(form: T06FRForm): {
       }
     }
 
-    computed.push({
-      round: r, idx: i,
-      preMoney, investment, postMoney, newInvestorPct,
-      pe, patTarget,
-      capSnapshot: { ...cap },
-      valueSnapshot: { ...valueSnapshot },
-      downRoundIds,
-      totalMonths,
-    });
-
+    computed.push({ round: r, idx: i, preMoney, investment, postMoney, newInvestorPct, pe, patTarget, capSnapshot: { ...cap }, valueSnapshot: { ...valueSnapshot }, downRoundIds, totalMonths });
     prevValueSnapshot = { ...valueSnapshot };
   }
-
   return { computed, stakeholders };
 }
 
@@ -246,10 +222,7 @@ function computeRounds(form: T06FRForm): {
 
 function Card({ children, accent = false }: { children: React.ReactNode; accent?: boolean }) {
   return (
-    <div
-      className="rounded-2xl p-5"
-      style={{ backgroundColor: "#FFFFFF", border: `1px solid ${accent ? "rgba(201,168,76,0.25)" : "#E8DFCF"}` }}
-    >
+    <div className="rounded-2xl p-5" style={{ backgroundColor: "#FFFFFF", border: `1px solid ${accent ? "rgba(201,168,76,0.25)" : "#E8DFCF"}` }}>
       {children}
     </div>
   );
@@ -259,46 +232,25 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
   return <p className="text-xs font-mono mb-3" style={{ color: "#7A7A7A" }}>{children}</p>;
 }
 
-function FieldRow({
-  label, children,
-}: { label: string; children: React.ReactNode }) {
+function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center justify-between py-1.5" style={{ borderBottom: "1px solid #F0EBE0" }}>
-      <span className="text-xs" style={{ color: "#7A7A7A" }}>{label}</span>
-      <div className="flex-shrink-0 ml-3">{children}</div>
+    <div className="flex items-center justify-between py-1.5 gap-3" style={{ borderBottom: "1px solid #F0EBE0" }}>
+      <span className="text-xs flex-shrink-0" style={{ color: "#7A7A7A" }}>{label}</span>
+      <div className="flex-shrink-0">{children}</div>
     </div>
   );
 }
 
-function NumInput({
-  value, onChange, sym, placeholder,
-}: {
-  value: string;
-  onChange: (v: string) => void;
-  sym?: string;
-  placeholder?: string;
+function NumInput({ value, onChange, sym, placeholder, width }: {
+  value: string; onChange: (v: string) => void; sym?: string; placeholder?: string; width?: number;
 }) {
   return (
     <div className="relative">
-      {sym && (
-        <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#9A9490" }}>
-          {sym}
-        </span>
-      )}
+      {sym && <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-mono pointer-events-none" style={{ color: "#9A9490" }}>{sym}</span>}
       <input
-        type="number"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder ?? "0"}
+        type="number" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder ?? "0"}
         className="py-1 rounded-lg text-xs text-right outline-none font-mono appearance-none"
-        style={{
-          width: 140,
-          paddingLeft: sym ? 28 : 8,
-          paddingRight: 8,
-          backgroundColor: "#F8F6F1",
-          border: "1px solid #E8DFCF",
-          color: "#2B2B2B",
-        }}
+        style={{ width: width ?? 140, paddingLeft: sym ? 30 : 8, paddingRight: 8, backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}
         onFocus={(e) => { e.target.select(); (e.target as HTMLInputElement).style.borderColor = "#C9A84C"; }}
         onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = "#E8DFCF"; }}
       />
@@ -306,24 +258,54 @@ function NumInput({
   );
 }
 
-function TextInput({
-  value, onChange, width,
-}: { value: string; onChange: (v: string) => void; width?: number }) {
+function TextInput({ value, onChange, width, placeholder }: { value: string; onChange: (v: string) => void; width?: number; placeholder?: string }) {
   return (
-    <input
-      type="text"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
+    <input type="text" value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
       className="py-1 px-2 rounded-lg text-xs outline-none"
-      style={{
-        width: width ?? 120,
-        backgroundColor: "#F8F6F1",
-        border: "1px solid #E8DFCF",
-        color: "#2B2B2B",
-      }}
+      style={{ width: width ?? 130, backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}
       onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = "#C9A84C"; }}
       onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = "#E8DFCF"; }}
     />
+  );
+}
+
+// ── Delete Confirm Modal ───────────────────────────────────────────────────
+
+function DeleteModal({ name, onCancel, onConfirm }: { name: string; onCancel: () => void; onConfirm: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: "rgba(0,0,0,0.3)" }}>
+      <div className="rounded-2xl p-6 max-w-sm w-full mx-4" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E8DFCF" }}>
+        <p className="text-sm font-bold mb-2" style={{ color: "#2B2B2B" }}>确认删除</p>
+        <p className="text-xs mb-5" style={{ color: "#7A7A7A" }}>
+          确定要删除「{name}」这个融资阶段吗？删除后无法恢复。
+        </p>
+        <div className="flex gap-3 justify-end">
+          <button onClick={onCancel} className="text-xs px-4 py-2 rounded-lg"
+            style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#7A7A7A" }}>
+            取消
+          </button>
+          <button onClick={onConfirm} className="text-xs px-4 py-2 rounded-lg font-semibold"
+            style={{ backgroundColor: "rgba(176,80,80,0.1)", border: "1px solid rgba(176,80,80,0.3)", color: "#B05050" }}>
+            确认删除
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Insert Round Button ────────────────────────────────────────────────────
+
+function InsertBtn({ onClick }: { onClick: () => void }) {
+  return (
+    <div className="flex items-center gap-2 my-1">
+      <div className="flex-1 h-px" style={{ backgroundColor: "#E8DFCF" }} />
+      <button onClick={onClick} className="text-xs px-2 py-0.5 rounded-md"
+        style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#B0AA9A" }}>
+        + 在此插入阶段
+      </button>
+      <div className="flex-1 h-px" style={{ backgroundColor: "#E8DFCF" }} />
+    </div>
   );
 }
 
@@ -333,7 +315,12 @@ export default function FinancialRoadmapTool() {
   const { savedData, saving, lastSaved, save } = useToolSnapshot<T06FRForm>("financial-roadmap");
   const [form, setForm] = useState<T06FRForm>(DEFAULT_FORM);
   const [loaded, setLoaded] = useState(false);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [coreData, setCoreData] = useState<FinancialCore | null>(null);
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
 
+  // ── Load from localStorage / DB ──────────────────────────────────────────
   useEffect(() => {
     if (loaded) return;
     const cid = getCompanyId();
@@ -341,20 +328,101 @@ export default function FinancialRoadmapTool() {
     if (ls?.inputData) {
       const saved = ls.inputData as Partial<T06FRForm>;
       if (saved.rounds && Array.isArray(saved.rounds) && saved.rounds.length > 0) {
-        setForm({ currencySymbol: "RM", ...saved });
+        // Migrate old preMoneyValuation → postMoneyValuation if needed
+        const migrated = saved.rounds.map((r: Partial<Round>) => {
+          const base: Round = { ...DEFAULT_ROUNDS[0], id: makeId(), ...r } as Round;
+          if (!base.postMoneyValuation && (r as Record<string,string>).preMoneyValuation) {
+            base.postMoneyValuation = String(pf((r as Record<string,string>).preMoneyValuation) + pf(r.investmentAmount ?? "0"));
+          }
+          if (base.hasCoFounder === undefined) base.hasCoFounder = false;
+          if (!base.founderPct) base.founderPct = "100";
+          if (!base.coFounderPct) base.coFounderPct = "0";
+          return base;
+        });
+        setForm({ currencySymbol: "RM", ...saved, rounds: migrated });
         setLoaded(true);
         return;
       }
     }
     if (savedData) {
       const merged = { ...DEFAULT_FORM, ...savedData };
-      if (!merged.rounds || !Array.isArray(merged.rounds) || merged.rounds.length === 0) {
-        merged.rounds = DEFAULT_ROUNDS;
-      }
+      if (!merged.rounds || !Array.isArray(merged.rounds) || merged.rounds.length === 0) merged.rounds = DEFAULT_ROUNDS;
       setForm(merged);
       setLoaded(true);
+      return;
     }
+    // No data found — still allow auto-save after timeout
+    const t = setTimeout(() => setLoaded(true), 1500);
+    return () => clearTimeout(t);
   }, [savedData, loaded]);
+
+  // ── Load currency from FinancialCore ─────────────────────────────────────
+  useEffect(() => {
+    const cid = getCompanyId();
+    if (cid === "__default__") return;
+    fetch(`/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(cid)}`)
+      .then((r) => r.json())
+      .then((snap) => {
+        if (snap?.data) {
+          const core = snap.data as FinancialCore;
+          setCoreData(core);
+          if (core.currencySymbol && !loadToolData(cid, "T06")?.inputData) {
+            setForm((p) => ({ ...p, currencySymbol: core.currencySymbol ?? p.currencySymbol }));
+          }
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // ── Auto-save (500ms debounce) ─────────────────────────────────────────
+  const formRef = useRef(form);
+  formRef.current = form;
+  const symRef = useRef(form.currencySymbol);
+  symRef.current = form.currencySymbol;
+
+  const handleSave = useCallback(async () => {
+    const companyId = getCompanyId();
+    const cid = companyId === "__default__" ? "__default__" : companyId;
+    const f = formRef.current;
+    const s = symRef.current;
+    // Compute summary output for enterprise page
+    const { computed: comp, stakeholders: sh } = computeRounds(f);
+    const lastRound = comp[comp.length - 1];
+    const founderSh = sh.find(s => !s.id.endsWith("_co") && comp[0]?.capSnapshot[s.id] !== undefined);
+    const cofounderSh = sh.find(s => s.id.endsWith("_co"));
+    const founderFinalPct = founderSh ? (lastRound?.capSnapshot[founderSh.id] ?? 0) : 0;
+    const cofounderFinalPct = cofounderSh ? (lastRound?.capSnapshot[cofounderSh.id] ?? 0) : 0;
+    const totalInvested = comp.filter(c => !c.round.isFounder).reduce((acc, c) => acc + c.investment, 0);
+    const ipoRound = comp.find(c => c.round.stageNameZh.includes("IPO") || c.round.stageNameZh.includes("首次"));
+    const currentRoundIdx = comp.length - 1;
+    const calculatedOutput = {
+      latestPostMoney: lastRound?.postMoney ?? 0,
+      founderFinalPct,
+      cofounderFinalPct,
+      totalInvested,
+      ipoTargetValuation: ipoRound?.postMoney ?? 0,
+      latestPatTarget: lastRound?.patTarget ?? 0,
+      latestPe: lastRound?.pe ?? 0,
+      currentStageName: lastRound?.round.stageNameZh ?? "",
+      roundCount: currentRoundIdx,
+    };
+    saveToolData({ companyId: cid, toolId: "T06", inputData: f as unknown as Record<string, unknown>, calculatedOutput, currency: s });
+    await save(f);
+    // Sync to FinancialCore
+    try {
+      const existing = await fetch(`/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(cid)}`).then(r => r.json());
+      const core = existing?.data ?? {};
+      await fetch("/api/tools/snapshot", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          toolSlug: "_financial_core",
+          companyId: cid,
+          data: { ...core, currencySymbol: s, latestFundingPostMoney: lastRound?.postMoney ?? 0, latestFundingStage: lastRound?.round.stageNameZh ?? "", updatedBy: { ...(core.updatedBy ?? {}), "financial-roadmap": new Date().toISOString() } },
+        }),
+      });
+    } catch {}
+  }, [save]);
 
   const autoSaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
@@ -362,216 +430,260 @@ export default function FinancialRoadmapTool() {
     if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
     autoSaveTimer.current = setTimeout(handleSave, 500);
     return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current); };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form]);
+  }, [form, loaded, handleSave]);
 
-  const sym = form.currencySymbol || "RM";
+  const sym = form.currencySymbol || coreData?.currencySymbol || "RM";
+
+  // ── Round mutations ───────────────────────────────────────────────────────
 
   function updateRound(id: string, patch: Partial<Round>) {
-    setForm((p) => ({
-      ...p,
-      rounds: p.rounds.map((r) => r.id === id ? { ...r, ...patch } : r),
-    }));
+    setForm((p) => ({ ...p, rounds: p.rounds.map((r) => r.id === id ? { ...r, ...patch } : r) }));
   }
 
-  function addRound() {
+  function insertRoundAfter(afterIdx: number) {
     const newRound: Round = {
-      id: makeId(),
-      stageName: "New Round",
-      stageNameZh: "新轮次",
-      intervalMonths: "12",
-      investorType: "Venture Capital",
-      preMoneyValuation: "0",
-      investmentAmount: "0",
-      peMultiple: "10",
-      isFounder: false,
-      initialValuation: "0",
+      id: makeId(), stageNameZh: "新轮次",
+      intervalMonths: "12", investorType: "Venture Capital",
+      postMoneyValuation: "0", investmentAmount: "0", peMultiple: "10",
+      isFounder: false, initialValuation: "0",
+      hasCoFounder: false, founderPct: "100", coFounderPct: "0",
     };
-    setForm((p) => ({ ...p, rounds: [...p.rounds, newRound] }));
+    setForm((p) => {
+      const rounds = [...p.rounds];
+      rounds.splice(afterIdx + 1, 0, newRound);
+      return { ...p, rounds };
+    });
   }
 
   function deleteRound(id: string) {
     setForm((p) => ({ ...p, rounds: p.rounds.filter((r) => r.id !== id) }));
+    setDeleteConfirmId(null);
   }
 
-  async function handleSave() {
-    const companyId = getCompanyId();
-    const cid = companyId === "__default__" ? "__default__" : companyId;
-    saveToolData({
-      companyId: cid,
-      toolId: "T06",
-      inputData: form as unknown as Record<string, unknown>,
-      calculatedOutput: {},
-      currency: sym,
+  function moveRound(fromIdx: number, toIdx: number) {
+    if (toIdx < 1 || toIdx >= form.rounds.length) return; // can't move before founder
+    setForm((p) => {
+      const rounds = [...p.rounds];
+      const [moved] = rounds.splice(fromIdx, 1);
+      rounds.splice(toIdx, 0, moved);
+      return { ...p, rounds };
     });
-    await save(form);
   }
 
+  // ── Drag-and-drop handlers ────────────────────────────────────────────────
+  function onDragStart(e: React.DragEvent, idx: number) {
+    e.dataTransfer.effectAllowed = "move";
+    setDragIdx(idx);
+  }
+  function onDragOver(e: React.DragEvent, idx: number) {
+    e.preventDefault();
+    if (idx === 0) return; // can't drag onto founder
+    setDragOverIdx(idx);
+  }
+  function onDrop(e: React.DragEvent, toIdx: number) {
+    e.preventDefault();
+    if (dragIdx !== null && dragIdx !== toIdx && toIdx !== 0) {
+      moveRound(dragIdx, toIdx);
+    }
+    setDragIdx(null);
+    setDragOverIdx(null);
+  }
+  function onDragEnd() { setDragIdx(null); setDragOverIdx(null); }
+
+  // ── Computation ───────────────────────────────────────────────────────────
   const { computed, stakeholders } = useMemo(() => computeRounds(form), [form]);
-
+  const founderStakeholder = stakeholders[0];
+  const coFounderStakeholder = stakeholders.find(s => s.id.endsWith("_co"));
   const allWarnings = computed.filter((c) => c.downRoundIds.length > 0);
-  const guide = <ToolGuide toolSlug="financial-roadmap" steps={GUIDE_STEPS} />;
-
-  // Cumulative months label
-  function monthsLabel(totalMonths: number): string {
-    if (totalMonths === 0) return "第 0 个月";
-    const yr = Math.floor(totalMonths / 12);
-    const mo = totalMonths % 12;
-    if (yr === 0) return `第 ${mo} 个月`;
-    if (mo === 0) return `第 ${yr} 年`;
-    return `第 ${yr} 年 ${mo} 个月`;
-  }
 
   function stakeLabel(id: string): string {
     return stakeholders.find((s) => s.id === id)?.zh ?? id;
   }
 
+  function monthsLabel(n: number): string {
+    if (n === 0) return "第 0 个月";
+    const yr = Math.floor(n / 12), mo = n % 12;
+    if (yr === 0) return `第 ${mo} 个月`;
+    if (mo === 0) return `第 ${yr} 年`;
+    return `第 ${yr} 年 ${mo} 个月`;
+  }
+
+  const guide = <ToolGuide toolSlug="financial-roadmap" steps={GUIDE_STEPS} />;
+
   return (
-    <ToolShell
-      icon=""
-      title="融资路线图"
-      desc="模拟融资轮次、股权稀释、估值成长与 IPO 路径"
-      backHref="/student/dashboard"
-      guideButton={guide}
-    >
+    <ToolShell icon="" title="融资路线图" desc="模拟融资轮次、股权稀释、估值成长与 IPO 路径" backHref="/student/dashboard" guideButton={guide}>
       <div className="space-y-6">
+
+        {/* ── Delete Confirm Modal ────────────────────────────────────── */}
+        {deleteConfirmId && (() => {
+          const r = form.rounds.find(r => r.id === deleteConfirmId);
+          return <DeleteModal name={r?.stageNameZh ?? ""} onCancel={() => setDeleteConfirmId(null)} onConfirm={() => deleteRound(deleteConfirmId)} />;
+        })()}
 
         {/* ── Section 1: Round Settings ────────────────────────────────── */}
         <Card>
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-4">
             <SectionLabel>融资阶段设置</SectionLabel>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
                 <span className="text-xs" style={{ color: "#7A7A7A" }}>货币</span>
-                <select
-                  value={sym}
-                  onChange={(e) => setForm((p) => ({ ...p, currencySymbol: e.target.value }))}
+                <select value={sym} onChange={(e) => setForm((p) => ({ ...p, currencySymbol: e.target.value }))}
                   className="text-xs py-1 px-2 rounded-lg outline-none"
-                  style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}
-                >
-                  {["RM", "USD", "SGD", "HKD", "CNY", "IDR", "THB"].map((c) => (
-                    <option key={c} value={c}>{c}</option>
-                  ))}
+                  style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}>
+                  {["RM", "USD", "SGD", "HKD", "CNY", "IDR", "THB"].map((c) => <option key={c} value={c}>{c}</option>)}
                 </select>
               </div>
-              <button
-                onClick={addRound}
-                className="text-xs px-3 py-1.5 rounded-lg font-medium"
-                style={{ backgroundColor: "rgba(201,168,76,0.1)", border: "1px solid rgba(201,168,76,0.3)", color: "#C9A84C" }}
-              >
-                + 新增阶段
-              </button>
             </div>
           </div>
 
-          <div className="space-y-4">
-            {form.rounds.map((r, idx) => {
-              const c = computed[idx];
-              return (
+          {/* Insert before first non-founder */}
+          <InsertBtn onClick={() => insertRoundAfter(0)} />
+
+          {form.rounds.map((r, idx) => {
+            const c = computed[idx];
+            const isDragging = dragIdx === idx;
+            const isDragOver = dragOverIdx === idx;
+            const canDrag = !r.isFounder;
+            const preMoney = r.isFounder ? pf(r.initialValuation) : (pf(r.postMoneyValuation) - pf(r.investmentAmount));
+
+            return (
+              <div key={r.id}>
                 <div
-                  key={r.id}
-                  className="rounded-xl p-4"
-                  style={{ backgroundColor: r.isFounder ? "rgba(201,168,76,0.04)" : "#FAFAF8", border: "1px solid #E8DFCF" }}
+                  draggable={canDrag}
+                  onDragStart={canDrag ? (e) => onDragStart(e, idx) : undefined}
+                  onDragOver={canDrag ? (e) => onDragOver(e, idx) : undefined}
+                  onDrop={canDrag ? (e) => onDrop(e, idx) : undefined}
+                  onDragEnd={onDragEnd}
+                  className="rounded-xl p-4 transition-opacity"
+                  style={{
+                    backgroundColor: r.isFounder ? "rgba(201,168,76,0.04)" : "#FAFAF8",
+                    border: `1px solid ${isDragOver ? "#C9A84C" : "#E8DFCF"}`,
+                    opacity: isDragging ? 0.4 : 1,
+                    cursor: canDrag ? "grab" : "default",
+                  }}
                 >
-                  {/* Round header */}
+                  {/* Card header */}
                   <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <span
-                        className="text-xs font-bold px-2 py-0.5 rounded-md"
-                        style={{ backgroundColor: r.isFounder ? "rgba(201,168,76,0.15)" : "#F0EBE0", color: r.isFounder ? "#C9A84C" : "#9A9490" }}
-                      >
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-xs font-bold px-2 py-0.5 rounded-md flex-shrink-0"
+                        style={{ backgroundColor: r.isFounder ? "rgba(201,168,76,0.15)" : "#F0EBE0", color: r.isFounder ? "#C9A84C" : "#9A9490" }}>
                         {idx === 0 ? "创始" : `第 ${idx} 轮`}
                       </span>
-                      <div className="flex items-center gap-2">
-                        <TextInput
-                          value={r.stageName}
-                          onChange={(v) => updateRound(r.id, { stageName: v })}
-                          width={100}
-                        />
-                        <span style={{ color: "#C0BAB0" }}>/</span>
-                        <TextInput
-                          value={r.stageNameZh}
-                          onChange={(v) => updateRound(r.id, { stageNameZh: v })}
-                          width={80}
-                        />
-                      </div>
+                      <TextInput value={r.stageNameZh} onChange={(v) => updateRound(r.id, { stageNameZh: v })} width={160} placeholder="阶段名称" />
+                      {canDrag && <span className="text-xs select-none" style={{ color: "#C0BAB0", cursor: "grab" }}>⠿</span>}
                     </div>
-                    {!r.isFounder && (
-                      <button
-                        onClick={() => deleteRound(r.id)}
-                        className="text-xs px-2 py-1 rounded-lg"
-                        style={{ color: "#B05050", backgroundColor: "rgba(176,80,80,0.07)", border: "1px solid rgba(176,80,80,0.2)" }}
-                      >
-                        删除
-                      </button>
-                    )}
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {!r.isFounder && idx > 1 && (
+                        <button onClick={() => moveRound(idx, idx - 1)} className="text-xs px-2 py-1 rounded-md"
+                          style={{ backgroundColor: "#F0EBE0", color: "#9A9490", border: "1px solid #E8DFCF" }}>↑</button>
+                      )}
+                      {!r.isFounder && idx < form.rounds.length - 1 && (
+                        <button onClick={() => moveRound(idx, idx + 1)} className="text-xs px-2 py-1 rounded-md"
+                          style={{ backgroundColor: "#F0EBE0", color: "#9A9490", border: "1px solid #E8DFCF" }}>↓</button>
+                      )}
+                      {!r.isFounder && (
+                        <button onClick={() => setDeleteConfirmId(r.id)} className="text-xs px-2 py-1 rounded-lg"
+                          style={{ color: "#B05050", backgroundColor: "rgba(176,80,80,0.07)", border: "1px solid rgba(176,80,80,0.2)" }}>
+                          删除
+                        </button>
+                      )}
+                    </div>
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-x-6">
+                    {/* Left: inputs */}
                     <div>
                       {!r.isFounder && (
                         <FieldRow label="距上一轮（个月）">
-                          <NumInput value={r.intervalMonths} onChange={(v) => updateRound(r.id, { intervalMonths: v })} />
+                          <NumInput value={r.intervalMonths} onChange={(v) => updateRound(r.id, { intervalMonths: v })} width={120} />
                         </FieldRow>
                       )}
                       <FieldRow label="投资人类型">
-                        <select
-                          value={r.investorType}
-                          onChange={(e) => updateRound(r.id, { investorType: e.target.value as InvestorType })}
+                        <select value={r.investorType} onChange={(e) => updateRound(r.id, { investorType: e.target.value as InvestorType })}
                           className="text-xs py-1 px-2 rounded-lg outline-none"
-                          style={{ width: 140, backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}
-                        >
-                          {INVESTOR_TYPES.map((t) => (
-                            <option key={t} value={t}>{INVESTOR_ZH[t]}</option>
-                          ))}
+                          style={{ width: 160, backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}>
+                          {INVESTOR_TYPES.map((t) => <option key={t} value={t}>{INVESTOR_ZH[t]}</option>)}
                         </select>
                       </FieldRow>
                       {r.isFounder ? (
-                        <FieldRow label="初始估值">
-                          <NumInput sym={sym} value={r.initialValuation} onChange={(v) => updateRound(r.id, { initialValuation: v })} />
-                        </FieldRow>
+                        <>
+                          <FieldRow label="创始估值">
+                            <NumInput sym={sym} value={r.initialValuation} onChange={(v) => updateRound(r.id, { initialValuation: v })} />
+                          </FieldRow>
+                          <FieldRow label="联合创办人">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input type="checkbox" checked={r.hasCoFounder}
+                                onChange={(e) => updateRound(r.id, { hasCoFounder: e.target.checked })}
+                                className="rounded" />
+                              <span className="text-xs" style={{ color: "#7A7A7A" }}>有联合创办人</span>
+                            </label>
+                          </FieldRow>
+                          {r.hasCoFounder && (
+                            <>
+                              <FieldRow label="创办人持股 %">
+                                <NumInput value={r.founderPct} onChange={(v) => updateRound(r.id, { founderPct: v })} placeholder="70" width={120} />
+                              </FieldRow>
+                              <FieldRow label="联合创办人持股 %">
+                                <NumInput value={r.coFounderPct} onChange={(v) => updateRound(r.id, { coFounderPct: v })} placeholder="30" width={120} />
+                              </FieldRow>
+                              {Math.abs(pf(r.founderPct) + pf(r.coFounderPct) - 100) > 0.1 && (
+                                <p className="text-xs mt-1" style={{ color: "#C9863A" }}>
+                                  提醒：创办人持股合计 {pf(r.founderPct) + pf(r.coFounderPct)}%，建议等于 100%
+                                </p>
+                              )}
+                            </>
+                          )}
+                        </>
                       ) : (
                         <>
-                          <FieldRow label="融资前估值（Pre-Money）">
-                            <NumInput sym={sym} value={r.preMoneyValuation} onChange={(v) => updateRound(r.id, { preMoneyValuation: v })} />
+                          <FieldRow label="融资后估值（Post-Money）">
+                            <NumInput sym={sym} value={r.postMoneyValuation} onChange={(v) => updateRound(r.id, { postMoneyValuation: v })} />
                           </FieldRow>
                           <FieldRow label="投资金额">
                             <NumInput sym={sym} value={r.investmentAmount} onChange={(v) => updateRound(r.id, { investmentAmount: v })} />
                           </FieldRow>
+                          {/* Auto-computed Pre-Money */}
+                          <div className="flex items-center justify-between py-1.5 gap-3">
+                            <span className="text-xs" style={{ color: "#B0AA9A" }}>融资前估值（Pre-Money）</span>
+                            <span className="text-xs font-mono" style={{ color: "#B0AA9A" }}>{fmt(preMoney, sym)}</span>
+                          </div>
                         </>
                       )}
                       <FieldRow label="PE 倍数">
-                        <NumInput value={r.peMultiple} onChange={(v) => updateRound(r.id, { peMultiple: v })} placeholder="10" />
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs font-mono" style={{ color: "#9A9490" }}>PE</span>
+                          <NumInput value={r.peMultiple} onChange={(v) => updateRound(r.id, { peMultiple: v })} placeholder="10" width={80} />
+                        </div>
                       </FieldRow>
                     </div>
-                    <div className="flex flex-col justify-center">
-                      {/* Auto-computed summary */}
-                      <div
-                        className="rounded-xl px-4 py-3 space-y-1.5"
-                        style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
-                      >
+
+                    {/* Right: auto-computed summary */}
+                    <div className="flex flex-col justify-center mt-3 sm:mt-0">
+                      <div className="rounded-xl px-4 py-3 space-y-1.5" style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}>
                         <div className="flex justify-between">
-                          <span className="text-xs" style={{ color: "#9A9490" }}>
-                            {r.isFounder ? "创始估值" : "融资后估值（Post-Money）"}
-                          </span>
-                          <span className="text-xs font-bold font-mono" style={{ color: "#C9A84C" }}>
-                            {fmt(c?.postMoney ?? 0, sym)}
-                          </span>
+                          <span className="text-xs" style={{ color: "#9A9490" }}>{r.isFounder ? "创始估值" : "融资后估值"}</span>
+                          <span className="text-xs font-bold font-mono" style={{ color: "#C9A84C" }}>{fmt(c?.postMoney ?? 0, sym)}</span>
                         </div>
                         {!r.isFounder && (
                           <div className="flex justify-between">
                             <span className="text-xs" style={{ color: "#9A9490" }}>本轮投资人持股</span>
-                            <span className="text-xs font-bold font-mono" style={{ color: "#2B2B2B" }}>
-                              {fmtPct(c?.newInvestorPct ?? 0)}
-                            </span>
+                            <span className="text-xs font-bold font-mono" style={{ color: "#2B2B2B" }}>{fmtPct(c?.newInvestorPct ?? 0)}</span>
                           </div>
                         )}
                         <div className="flex justify-between">
                           <span className="text-xs" style={{ color: "#9A9490" }}>创办人持股</span>
                           <span className="text-xs font-bold font-mono" style={{ color: "#3D7A41" }}>
-                            {fmtPct(c?.capSnapshot?.["founder"] ?? c?.capSnapshot?.[form.rounds[0]?.id] ?? 0)}
+                            {fmtPct(c?.capSnapshot?.[founderStakeholder?.id ?? "founder"] ?? 0)}
                           </span>
                         </div>
+                        {coFounderStakeholder && (
+                          <div className="flex justify-between">
+                            <span className="text-xs" style={{ color: "#9A9490" }}>联合创办人持股</span>
+                            <span className="text-xs font-bold font-mono" style={{ color: "#5A8AC0" }}>
+                              {fmtPct(c?.capSnapshot?.[coFounderStakeholder.id] ?? 0)}
+                            </span>
+                          </div>
+                        )}
                         <div className="flex justify-between">
                           <span className="text-xs" style={{ color: "#9A9490" }}>目标净利润（PAT）</span>
                           <span className="text-xs font-bold font-mono" style={{ color: "#2B2B2B" }}>
@@ -579,10 +691,7 @@ export default function FinancialRoadmapTool() {
                           </span>
                         </div>
                         {c?.downRoundIds && c.downRoundIds.length > 0 && (
-                          <div
-                            className="text-xs px-2 py-1 rounded-md mt-1"
-                            style={{ backgroundColor: "rgba(176,80,80,0.07)", color: "#B05050" }}
-                          >
+                          <div className="text-xs px-2 py-1 rounded-md" style={{ backgroundColor: "rgba(176,80,80,0.07)", color: "#B05050" }}>
                             前轮股东账面市值可能下降
                           </div>
                         )}
@@ -590,9 +699,15 @@ export default function FinancialRoadmapTool() {
                     </div>
                   </div>
                 </div>
-              );
-            })}
-          </div>
+
+                {/* Insert after each round (except last) */}
+                {idx < form.rounds.length - 1 && <InsertBtn onClick={() => insertRoundAfter(idx)} />}
+              </div>
+            );
+          })}
+
+          {/* Insert after last */}
+          <InsertBtn onClick={() => insertRoundAfter(form.rounds.length - 1)} />
         </Card>
 
         {/* ── Section 2: Roadmap Visual ─────────────────────────────────── */}
@@ -601,96 +716,73 @@ export default function FinancialRoadmapTool() {
           <div className="space-y-0">
             {computed.map((c, i) => (
               <div key={c.round.id}>
-                {/* Time connector (not for Founder) */}
                 {i > 0 && (
-                  <div className="flex items-center gap-3 py-1 pl-4">
-                    <div className="w-0.5 self-stretch" style={{ backgroundColor: "#E8DFCF", minHeight: 20 }} />
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-0.5" style={{ backgroundColor: "#E8DFCF" }} />
+                  <div className="flex items-stretch gap-3 py-1 pl-4">
+                    <div className="w-0.5" style={{ backgroundColor: "#E8DFCF" }} />
+                    <div className="flex items-center gap-2 py-1">
+                      <div className="w-4 h-px" style={{ backgroundColor: "#E8DFCF" }} />
                       <span className="text-xs font-mono" style={{ color: "#B0AA9A" }}>
                         {pf(c.round.intervalMonths) > 0 ? `+${pf(c.round.intervalMonths)} 个月` : "同期"}
                       </span>
                     </div>
                   </div>
                 )}
-                {/* Round card */}
                 <div className="flex gap-3 items-start">
-                  {/* Left: dot + line */}
-                  <div className="flex flex-col items-center mt-3 flex-shrink-0">
-                    <div
-                      className="w-3 h-3 rounded-full flex-shrink-0"
-                      style={{ backgroundColor: c.round.isFounder ? "#C9A84C" : i === computed.length - 1 ? "#3D7A41" : "#9A9490", border: "2px solid white", boxShadow: "0 0 0 2px #E8DFCF" }}
-                    />
+                  <div className="flex flex-col items-center mt-3.5 flex-shrink-0">
+                    <div className="w-3 h-3 rounded-full" style={{
+                      backgroundColor: c.round.isFounder ? "#C9A84C" : i === computed.length - 1 ? "#3D7A41" : "#9A9490",
+                      border: "2px solid white", boxShadow: "0 0 0 2px #E8DFCF",
+                    }} />
                   </div>
-                  {/* Right: content */}
-                  <div
-                    className="flex-1 rounded-xl p-4 mb-1"
-                    style={{
-                      backgroundColor: c.downRoundIds.length > 0 ? "rgba(176,80,80,0.03)" : c.round.isFounder ? "rgba(201,168,76,0.05)" : "#FFFFFF",
-                      border: `1px solid ${c.downRoundIds.length > 0 ? "rgba(176,80,80,0.15)" : c.round.isFounder ? "rgba(201,168,76,0.2)" : "#E8DFCF"}`,
-                    }}
-                  >
-                    {/* Stage header */}
+                  <div className="flex-1 rounded-xl p-4 mb-1" style={{
+                    backgroundColor: c.downRoundIds.length > 0 ? "rgba(176,80,80,0.03)" : c.round.isFounder ? "rgba(201,168,76,0.05)" : "#FFFFFF",
+                    border: `1px solid ${c.downRoundIds.length > 0 ? "rgba(176,80,80,0.15)" : c.round.isFounder ? "rgba(201,168,76,0.2)" : "#E8DFCF"}`,
+                  }}>
                     <div className="flex items-center justify-between mb-3">
-                      <div>
-                        <span className="text-sm font-bold" style={{ color: "#2B2B2B" }}>
-                          {c.round.stageName}
-                        </span>
-                        <span className="text-xs ml-2" style={{ color: "#9A9490" }}>
-                          {c.round.stageNameZh}
-                        </span>
-                        <span className="text-xs ml-2" style={{ color: "#B0AA9A" }}>
-                          {INVESTOR_ZH[c.round.investorType]}
-                        </span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-sm font-bold" style={{ color: "#2B2B2B" }}>{c.round.stageNameZh}</span>
+                        <span className="text-xs" style={{ color: "#B0AA9A" }}>{INVESTOR_ZH[c.round.investorType]}</span>
                       </div>
-                      <span className="text-xs font-mono" style={{ color: "#B0AA9A" }}>
-                        {monthsLabel(c.totalMonths)}
-                      </span>
+                      <span className="text-xs font-mono flex-shrink-0" style={{ color: "#B0AA9A" }}>{monthsLabel(c.totalMonths)}</span>
                     </div>
-
-                    {/* Metrics grid */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
                       <div>
-                        <p className="text-xs" style={{ color: "#9A9490" }}>
-                          {c.round.isFounder ? "创始估值" : "融资后估值"}
-                        </p>
-                        <p className="text-sm font-bold font-mono" style={{ color: "#C9A84C" }}>
-                          {fmt(c.postMoney, sym)}
-                        </p>
+                        <p className="text-xs" style={{ color: "#9A9490" }}>{c.round.isFounder ? "创始估值" : "融资后估值"}</p>
+                        <p className="text-sm font-bold font-mono" style={{ color: "#C9A84C" }}>{fmt(c.postMoney, sym)}</p>
                       </div>
                       {!c.round.isFounder && (
                         <div>
                           <p className="text-xs" style={{ color: "#9A9490" }}>投资金额</p>
-                          <p className="text-sm font-bold font-mono" style={{ color: "#2B2B2B" }}>
-                            {fmt(c.investment, sym)}
-                          </p>
+                          <p className="text-sm font-bold font-mono" style={{ color: "#2B2B2B" }}>{fmt(c.investment, sym)}</p>
                         </div>
                       )}
                       <div>
-                        <p className="text-xs" style={{ color: "#9A9490" }}>创办人持股</p>
+                        <p className="text-xs" style={{ color: "#9A9490" }}>创办人</p>
                         <p className="text-sm font-bold font-mono" style={{ color: "#3D7A41" }}>
-                          {fmtPct(c.capSnapshot[form.rounds[0]?.id] ?? 0)}
+                          {fmtPct(c.capSnapshot[founderStakeholder?.id ?? "founder"] ?? 0)}
                         </p>
                       </div>
-                      {!c.round.isFounder && (
+                      {coFounderStakeholder && (
                         <div>
-                          <p className="text-xs" style={{ color: "#9A9490" }}>本轮投资人</p>
-                          <p className="text-sm font-bold font-mono" style={{ color: "#2B2B2B" }}>
-                            {fmtPct(c.newInvestorPct)}
+                          <p className="text-xs" style={{ color: "#9A9490" }}>联合创办人</p>
+                          <p className="text-sm font-bold font-mono" style={{ color: "#5A8AC0" }}>
+                            {fmtPct(c.capSnapshot[coFounderStakeholder.id] ?? 0)}
                           </p>
                         </div>
                       )}
+                      {!c.round.isFounder && (
+                        <div>
+                          <p className="text-xs" style={{ color: "#9A9490" }}>本轮持股</p>
+                          <p className="text-sm font-bold font-mono" style={{ color: "#2B2B2B" }}>{fmtPct(c.newInvestorPct)}</p>
+                        </div>
+                      )}
                       <div>
-                        <p className="text-xs" style={{ color: "#9A9490" }}>PE 倍数</p>
-                        <p className="text-sm font-bold font-mono" style={{ color: "#2B2B2B" }}>
-                          {pf(c.round.peMultiple)}x
-                        </p>
+                        <p className="text-xs" style={{ color: "#9A9490" }}>市盈率</p>
+                        <p className="text-sm font-bold font-mono" style={{ color: "#2B2B2B" }}>PE {c.pe || "—"}</p>
                       </div>
                       <div>
                         <p className="text-xs" style={{ color: "#9A9490" }}>目标净利润</p>
-                        <p className="text-sm font-bold font-mono" style={{ color: "#2B2B2B" }}>
-                          {c.patTarget > 0 ? fmt(c.patTarget, sym) : "—"}
-                        </p>
+                        <p className="text-sm font-bold font-mono" style={{ color: "#2B2B2B" }}>{c.patTarget > 0 ? fmt(c.patTarget, sym) : "—"}</p>
                       </div>
                     </div>
                   </div>
@@ -704,12 +796,10 @@ export default function FinancialRoadmapTool() {
         <Card>
           <SectionLabel>股权稀释表（Cap Table）</SectionLabel>
           <div className="overflow-x-auto">
-            <table className="w-full text-xs" style={{ borderCollapse: "collapse" }}>
+            <table className="w-full text-xs" style={{ borderCollapse: "collapse", minWidth: 400 }}>
               <thead>
                 <tr style={{ borderBottom: "2px solid #E8DFCF" }}>
-                  <th className="text-left pb-2 pr-3 font-semibold" style={{ color: "#7A7A7A", whiteSpace: "nowrap", minWidth: 100 }}>
-                    股东
-                  </th>
+                  <th className="text-left pb-2 pr-3 font-semibold" style={{ color: "#7A7A7A", whiteSpace: "nowrap", minWidth: 110 }}>股东</th>
                   {computed.map((c) => (
                     <th key={c.round.id} className="text-right pb-2 px-2 font-semibold" style={{ color: "#7A7A7A", whiteSpace: "nowrap", minWidth: 90 }}>
                       {c.round.stageNameZh}
@@ -718,43 +808,33 @@ export default function FinancialRoadmapTool() {
                 </tr>
               </thead>
               <tbody>
-                {/* Ownership % rows */}
-                <tr>
-                  <td colSpan={computed.length + 1} className="pt-3 pb-1">
-                    <span className="text-xs font-mono" style={{ color: "#B0AA9A" }}>持股比例</span>
-                  </td>
-                </tr>
+                <tr><td colSpan={computed.length + 1} className="pt-3 pb-1">
+                  <span className="text-xs font-mono" style={{ color: "#B0AA9A" }}>持股比例</span>
+                </td></tr>
                 {stakeholders.map((sh) => (
                   <tr key={sh.id} style={{ borderBottom: "1px solid #F0EBE0" }}>
-                    <td className="py-1.5 pr-3 font-semibold" style={{ color: "#2B2B2B", whiteSpace: "nowrap" }}>
-                      {sh.zh}
-                    </td>
+                    <td className="py-1.5 pr-3 font-semibold" style={{ color: "#2B2B2B", whiteSpace: "nowrap" }}>{sh.zh}</td>
                     {computed.map((c) => {
                       const pct = c.capSnapshot[sh.id];
                       const visible = pct !== undefined && pct > 0.0001;
                       const isNew = !c.round.isFounder && c.round.id === sh.id;
+                      const isFounderRow = sh.id === founderStakeholder?.id;
+                      const isCoFound = sh.id === coFounderStakeholder?.id;
                       return (
-                        <td key={c.round.id} className="py-1.5 px-2 text-right font-mono" style={{
-                          color: isNew ? "#C9A84C" : sh.id === form.rounds[0]?.id ? "#3D7A41" : "#2B2B2B",
-                          fontWeight: isNew || sh.id === form.rounds[0]?.id ? 700 : 400,
-                        }}>
+                        <td key={c.round.id} className="py-1.5 px-2 text-right font-mono"
+                          style={{ color: isNew ? "#C9A84C" : isFounderRow ? "#3D7A41" : isCoFound ? "#5A8AC0" : "#2B2B2B", fontWeight: isNew || isFounderRow || isCoFound ? 700 : 400 }}>
                           {visible ? fmtPct(pct) : <span style={{ color: "#D0CBC0" }}>—</span>}
                         </td>
                       );
                     })}
                   </tr>
                 ))}
-                {/* Value rows */}
-                <tr>
-                  <td colSpan={computed.length + 1} className="pt-4 pb-1">
-                    <span className="text-xs font-mono" style={{ color: "#B0AA9A" }}>账面市值（{sym}）</span>
-                  </td>
-                </tr>
+                <tr><td colSpan={computed.length + 1} className="pt-4 pb-1">
+                  <span className="text-xs font-mono" style={{ color: "#B0AA9A" }}>账面市值（{sym}）</span>
+                </td></tr>
                 {stakeholders.map((sh) => (
                   <tr key={`v-${sh.id}`} style={{ borderBottom: "1px solid #F0EBE0" }}>
-                    <td className="py-1.5 pr-3" style={{ color: "#7A7A7A", whiteSpace: "nowrap" }}>
-                      {sh.zh}
-                    </td>
+                    <td className="py-1.5 pr-3" style={{ color: "#7A7A7A", whiteSpace: "nowrap" }}>{sh.zh}</td>
                     {computed.map((c, ci) => {
                       const val = c.valueSnapshot[sh.id];
                       const visible = val !== undefined && val > 0.5;
@@ -762,16 +842,14 @@ export default function FinancialRoadmapTool() {
                       const prevVal = ci > 0 ? computed[ci - 1].valueSnapshot[sh.id] : undefined;
                       const isUp = prevVal !== undefined && val !== undefined && val > prevVal + 1;
                       return (
-                        <td key={c.round.id} className="py-1.5 px-2 text-right font-mono text-xs" style={{
-                          color: isDown ? "#B05050" : isUp ? "#3D7A41" : "#2B2B2B",
-                        }}>
+                        <td key={c.round.id} className="py-1.5 px-2 text-right font-mono text-xs"
+                          style={{ color: isDown ? "#B05050" : isUp ? "#3D7A41" : "#2B2B2B" }}>
                           {visible ? fmt(val, sym) : <span style={{ color: "#D0CBC0" }}>—</span>}
                         </td>
                       );
                     })}
                   </tr>
                 ))}
-                {/* Post-money footer */}
                 <tr style={{ borderTop: "2px solid #E8DFCF", backgroundColor: "rgba(201,168,76,0.04)" }}>
                   <td className="py-2 pr-3 font-bold text-xs" style={{ color: "#C9A84C" }}>融资后估值</td>
                   {computed.map((c) => (
@@ -787,40 +865,23 @@ export default function FinancialRoadmapTool() {
 
         {/* ── Section 4: PE / PAT KPI ───────────────────────────────────── */}
         <Card>
-          <SectionLabel>PE 倍数与目标净利润</SectionLabel>
+          <SectionLabel>目标净利润（PAT）</SectionLabel>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {computed.filter((c) => !c.round.isFounder).map((c) => (
-              <div
-                key={c.round.id}
-                className="rounded-xl p-4"
-                style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
-              >
+              <div key={c.round.id} className="rounded-xl p-4" style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold" style={{ color: "#2B2B2B" }}>
-                    {c.round.stageNameZh}
-                  </span>
-                  <span
-                    className="text-xs px-2 py-0.5 rounded-md font-mono"
-                    style={{ backgroundColor: "rgba(201,168,76,0.12)", color: "#C9A84C" }}
-                  >
-                    {c.pe}x
+                  <span className="text-xs font-semibold" style={{ color: "#2B2B2B" }}>{c.round.stageNameZh}</span>
+                  <span className="text-xs px-2 py-0.5 rounded-md font-mono font-semibold"
+                    style={{ backgroundColor: "rgba(201,168,76,0.12)", color: "#C9A84C" }}>
+                    PE {c.pe}
                   </span>
                 </div>
                 <p className="text-xs mb-1" style={{ color: "#9A9490" }}>融资后估值</p>
-                <p className="text-base font-bold font-mono mb-2" style={{ color: "#C9A84C" }}>
-                  {fmt(c.postMoney, sym)}
-                </p>
-                <div
-                  className="rounded-lg px-3 py-2"
-                  style={{ backgroundColor: "rgba(61,122,65,0.06)", border: "1px solid rgba(61,122,65,0.15)" }}
-                >
+                <p className="text-base font-bold font-mono mb-2" style={{ color: "#C9A84C" }}>{fmt(c.postMoney, sym)}</p>
+                <div className="rounded-lg px-3 py-2" style={{ backgroundColor: "rgba(61,122,65,0.06)", border: "1px solid rgba(61,122,65,0.15)" }}>
                   <p className="text-xs mb-0.5" style={{ color: "#9A9490" }}>目标净利润（PAT）</p>
-                  <p className="text-sm font-bold font-mono" style={{ color: "#3D7A41" }}>
-                    {c.patTarget > 0 ? fmt(c.patTarget, sym) : "—"}
-                  </p>
-                  <p className="text-xs mt-1" style={{ color: "#B0AA9A" }}>
-                    = {fmt(c.postMoney, sym)} ÷ {c.pe}x
-                  </p>
+                  <p className="text-sm font-bold font-mono" style={{ color: "#3D7A41" }}>{c.patTarget > 0 ? fmt(c.patTarget, sym) : "—"}</p>
+                  <p className="text-xs mt-1" style={{ color: "#B0AA9A" }}>= {fmt(c.postMoney, sym)} ÷ PE {c.pe}</p>
                 </div>
               </div>
             ))}
@@ -831,30 +892,24 @@ export default function FinancialRoadmapTool() {
         {allWarnings.length > 0 && (
           <div className="space-y-3">
             {allWarnings.map((c) => (
-              <div
-                key={c.round.id}
-                className="rounded-xl px-4 py-3"
-                style={{ backgroundColor: "rgba(176,80,80,0.05)", border: "1px solid rgba(176,80,80,0.2)" }}
-              >
+              <div key={c.round.id} className="rounded-xl px-4 py-3"
+                style={{ backgroundColor: "rgba(176,80,80,0.05)", border: "1px solid rgba(176,80,80,0.2)" }}>
                 <p className="text-sm font-semibold mb-1" style={{ color: "#B05050" }}>
-                  估值提醒：{c.round.stageNameZh}（{c.round.stageName}）
+                  估值提醒：{c.round.stageNameZh}
                 </p>
                 <p className="text-xs mb-2" style={{ color: "#9A9490" }}>
                   本轮融资前估值低于上一轮融资后估值，以下股东账面市值可能下降：
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {c.downRoundIds.map((id) => (
-                    <span
-                      key={id}
-                      className="text-xs px-2 py-1 rounded-md"
-                      style={{ backgroundColor: "rgba(176,80,80,0.08)", color: "#B05050" }}
-                    >
+                    <span key={id} className="text-xs px-2 py-1 rounded-md"
+                      style={{ backgroundColor: "rgba(176,80,80,0.08)", color: "#B05050" }}>
                       {stakeLabel(id)} 市值下降
                     </span>
                   ))}
                 </div>
                 <p className="text-xs mt-2" style={{ color: "#B0AA9A" }}>
-                  建议：提高本轮融资前估值，或与前轮股东重新协商价格。
+                  建议：提高本轮融资后估值，或减少投资金额，使融资前估值高于上一轮融资后估值。
                 </p>
               </div>
             ))}
@@ -862,7 +917,7 @@ export default function FinancialRoadmapTool() {
         )}
 
         {/* ── Save status ───────────────────────────────────────────────── */}
-        <div className="flex items-center justify-between">
+        <div>
           <p className="text-xs" style={{ color: "#9A9490" }}>
             {saving ? "正在保存..." : lastSaved ? `已自动保存 ${lastSaved.toLocaleTimeString()}` : "未保存"}
           </p>
