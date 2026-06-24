@@ -1472,6 +1472,13 @@ function EnterpriseCoreSummary({ companyId }: { companyId: string }) {
   const t06LatestPatTarget   = t06?.latestPatTarget   as number | undefined;
   const t06LatestPe          = t06?.latestPe          as number | undefined;
   const t06CurrentStage      = t06?.currentStageName  as string | undefined;
+  const t06ActualStageName   = t06?.currentActualStageName as string | undefined;
+  const t06ActualPostMoney   = t06?.currentActualPostMoney as number | undefined;
+  const t06NextStageName     = t06?.nextStageName     as string | undefined;
+  const t06NextStagePostMoney = t06?.nextStagePostMoney as number | undefined;
+  const t06NextStagePat      = t06?.nextStagePat      as number | undefined;
+  const t06NextStagePe       = t06?.nextStagePe       as number | undefined;
+  const t06IsAtIPO           = !!(t06?.isAtIPO);
 
   const roadmapYear1Revenue = t07?.roadmapYear1Revenue ?? dbCore?.roadmapYear1Revenue;
   const roadmapYear2Revenue = t07?.roadmapYear2Revenue ?? dbCore?.roadmapYear2Revenue;
@@ -1539,27 +1546,46 @@ function EnterpriseCoreSummary({ companyId }: { companyId: string }) {
 
       {t06 ? (
         <CoreSection title="融资路线图">
-          {t06CurrentStage && <CoreDataRow label="当前融资阶段" value={t06CurrentStage} />}
-          {t06LatestPostMoney != null && t06LatestPostMoney > 0 && (
-            <CoreDataRow label="最新估值（Post-Money）" value={fmtMoney(t06LatestPostMoney, sym)} />
-          )}
-          {t06FounderFinalPct != null && t06FounderFinalPct > 0 && (
-            <CoreDataRow label="创办人最终持股" value={(t06FounderFinalPct * 100).toFixed(1) + "%"} />
-          )}
-          {t06CofounderFinalPct != null && t06CofounderFinalPct > 0 && (
-            <CoreDataRow label="联合创办人持股" value={(t06CofounderFinalPct * 100).toFixed(1) + "%"} />
-          )}
-          {t06TotalInvested != null && t06TotalInvested > 0 && (
-            <CoreDataRow label="累计融资额" value={fmtMoney(t06TotalInvested, sym)} />
-          )}
-          {t06IpoTarget != null && t06IpoTarget > 0 && (
-            <CoreDataRow label="IPO 目标估值" value={fmtMoney(t06IpoTarget, sym)} />
-          )}
-          {t06LatestPatTarget != null && t06LatestPatTarget > 0 && (
-            <CoreDataRow label="目标净利润（PAT）" value={fmtMoney(t06LatestPatTarget, sym)} />
-          )}
-          {t06LatestPe != null && t06LatestPe > 0 && (
-            <CoreDataRow label="市盈率（PE）" value={"PE " + t06LatestPe} />
+          {t06ActualStageName ? (
+            <>
+              <CoreDataRow label="当前融资阶段" value={t06ActualStageName} />
+              {t06ActualPostMoney != null && t06ActualPostMoney > 0 && (
+                <CoreDataRow label="当前估值" value={fmtMoney(t06ActualPostMoney, sym)} />
+              )}
+              {t06IsAtIPO ? (
+                <div className="py-1.5">
+                  <span className="text-xs px-2 py-1 rounded-md" style={{ backgroundColor: "rgba(61,122,65,0.08)", color: "#3D7A41", border: "1px solid rgba(61,122,65,0.2)" }}>
+                    已达到上市阶段
+                  </span>
+                </div>
+              ) : (
+                <>
+                  {t06NextStageName && <CoreDataRow label="下一目标阶段" value={t06NextStageName} />}
+                  {t06NextStagePostMoney != null && t06NextStagePostMoney > 0 && (
+                    <CoreDataRow label="下一阶段目标估值" value={fmtMoney(t06NextStagePostMoney, sym)} />
+                  )}
+                  {t06NextStagePat != null && t06NextStagePat > 0 && (
+                    <CoreDataRow label="下一阶段目标 PAT" value={fmtMoney(t06NextStagePat, sym)} />
+                  )}
+                  {t06NextStagePe != null && t06NextStagePe > 0 && (
+                    <CoreDataRow label="市盈率（PE）" value={"PE " + t06NextStagePe} />
+                  )}
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              {t06CurrentStage && <CoreDataRow label="最新阶段" value={t06CurrentStage} />}
+              {t06LatestPostMoney != null && t06LatestPostMoney > 0 && (
+                <CoreDataRow label="最新估值" value={fmtMoney(t06LatestPostMoney, sym)} />
+              )}
+              {t06FounderFinalPct != null && t06FounderFinalPct > 0 && (
+                <CoreDataRow label="创办人最终持股" value={(t06FounderFinalPct * 100).toFixed(1) + "%"} />
+              )}
+              {t06TotalInvested != null && t06TotalInvested > 0 && (
+                <CoreDataRow label="累计融资额" value={fmtMoney(t06TotalInvested, sym)} />
+              )}
+            </>
           )}
         </CoreSection>
       ) : (

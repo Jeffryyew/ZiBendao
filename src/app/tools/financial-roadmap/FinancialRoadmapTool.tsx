@@ -52,6 +52,7 @@ interface Round {
 interface T06FRForm {
   rounds: Round[];
   currencySymbol: string;
+  currentStageId: string;
 }
 
 // ── Default Data ───────────────────────────────────────────────────────────
@@ -110,7 +111,7 @@ const DEFAULT_ROUNDS: Round[] = [
   },
 ];
 
-const DEFAULT_FORM: T06FRForm = { rounds: DEFAULT_ROUNDS, currencySymbol: "RM" };
+const DEFAULT_FORM: T06FRForm = { rounds: DEFAULT_ROUNDS, currencySymbol: "RM", currentStageId: "" };
 
 // ── Guide Steps ────────────────────────────────────────────────────────────
 
@@ -349,7 +350,7 @@ export default function FinancialRoadmapTool() {
           if (base.registeredCapital === undefined) base.registeredCapital = base.isFounder ? "100000" : "0";
           return base;
         });
-        setForm({ currencySymbol: "RM", ...saved, rounds: migrated });
+        setForm({ currencySymbol: "RM", currentStageId: "", ...saved, rounds: migrated });
         setLoaded(true);
         return;
       }
@@ -402,6 +403,15 @@ export default function FinancialRoadmapTool() {
     const cofounderFinalPct = cofounderSh ? (lastRound?.capSnapshot[cofounderSh.id] ?? 0) : 0;
     const totalInvested = comp.filter(c => !c.round.isFounder).reduce((acc, c) => acc + c.investment, 0);
     const ipoRound = comp.find(c => c.round.stageNameZh.includes("IPO") || c.round.stageNameZh.includes("首次"));
+    const currentStageId = f.currentStageId;
+    const selIdx = currentStageId ? comp.findIndex(c => c.round.id === currentStageId) : -1;
+    const selRound = selIdx >= 0 ? comp[selIdx] : null;
+    const nextRound = selIdx >= 0 && selIdx < comp.length - 1 ? comp[selIdx + 1] : null;
+    const isAtIPO = selRound != null && (
+      selRound.round.stageNameZh.includes("IPO") ||
+      selRound.round.stageNameZh.includes("首次") ||
+      selRound.round.investorType === "Public Market"
+    );
     const calculatedOutput = {
       latestPostMoney: lastRound?.postMoney ?? 0,
       founderFinalPct,
@@ -412,6 +422,13 @@ export default function FinancialRoadmapTool() {
       latestPe: lastRound?.pe ?? 0,
       currentStageName: lastRound?.round.stageNameZh ?? "",
       roundCount: comp.length - 1,
+      currentActualStageName: selRound?.round.stageNameZh ?? "",
+      currentActualPostMoney: selRound?.postMoney ?? 0,
+      nextStageName: nextRound?.round.stageNameZh ?? "",
+      nextStagePostMoney: nextRound?.postMoney ?? 0,
+      nextStagePat: nextRound?.patTarget ?? 0,
+      nextStagePe: nextRound?.pe ?? 0,
+      isAtIPO,
     };
     saveToolData({ companyId: cid, toolId: "T06", inputData: f as unknown as Record<string, unknown>, calculatedOutput, currency: s });
     await save(f);
@@ -525,6 +542,70 @@ export default function FinancialRoadmapTool() {
           const r = form.rounds.find(r => r.id === deleteConfirmId);
           return <DeleteModal name={r?.stageNameZh ?? ""} onCancel={() => setDeleteConfirmId(null)} onConfirm={() => deleteRound(deleteConfirmId)} />;
         })()}
+
+        {/* Section 0: Current Actual Stage */}
+        <Card accent>
+          <SectionLabel>当前实际融资阶段</SectionLabel>
+          <FieldRow label="目前企业所在阶段">
+            <select
+              value={form.currentStageId}
+              onChange={(e) => setForm((p) => ({ ...p, currentStageId: e.target.value }))}
+              className="text-xs py-1 px-2 rounded-lg outline-none"
+              style={{ width: 200, backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}>
+              <option value="">请选择当前阶段</option>
+              {form.rounds.map((r) => (
+                <option key={r.id} value={r.id}>{r.stageNameZh}</option>
+              ))}
+            </select>
+          </FieldRow>
+          {form.currentStageId && (() => {
+            const selIdx = computed.findIndex(c => c.round.id === form.currentStageId);
+            const sel = selIdx >= 0 ? computed[selIdx] : null;
+            const nxt = selIdx >= 0 && selIdx < computed.length - 1 ? computed[selIdx + 1] : null;
+            const atIPO = sel ? (
+              sel.round.stageNameZh.includes("IPO") ||
+              sel.round.stageNameZh.includes("首次") ||
+              sel.round.investorType === "Public Market"
+            ) : false;
+            if (!sel) return null;
+            return (
+              <div className="mt-3 rounded-xl px-4 py-3 space-y-2" style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}>
+                <div className="flex justify-between">
+                  <span className="text-xs" style={{ color: "#9A9490" }}>当前融资阶段</span>
+                  <span className="text-xs font-bold" style={{ color: "#C9A84C" }}>{sel.round.stageNameZh}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-xs" style={{ color: "#9A9490" }}>当前估值</span>
+                  <span className="text-xs font-bold font-mono" style={{ color: "#2B2B2B" }}>{fmt(sel.postMoney, sym)}</span>
+                </div>
+                {atIPO ? (
+                  <div className="mt-2 text-xs px-3 py-2 rounded-lg" style={{ backgroundColor: "rgba(61,122,65,0.08)", color: "#3D7A41", border: "1px solid rgba(61,122,65,0.2)" }}>
+                    已达到上市阶段
+                  </div>
+                ) : nxt ? (
+                  <div className="pt-2" style={{ borderTop: "1px solid #E8DFCF" }}>
+                    <div className="flex justify-between mb-1.5">
+                      <span className="text-xs" style={{ color: "#9A9490" }}>下一目标阶段</span>
+                      <span className="text-xs font-bold" style={{ color: "#2B2B2B" }}>{nxt.round.stageNameZh}</span>
+                    </div>
+                    <div className="flex justify-between mb-1.5">
+                      <span className="text-xs" style={{ color: "#9A9490" }}>下一阶段目标估值</span>
+                      <span className="text-xs font-bold font-mono" style={{ color: "#C9A84C" }}>{fmt(nxt.postMoney, sym)}</span>
+                    </div>
+                    <div className="flex justify-between mb-1.5">
+                      <span className="text-xs" style={{ color: "#9A9490" }}>下一阶段目标 PAT</span>
+                      <span className="text-xs font-bold font-mono" style={{ color: "#3D7A41" }}>{nxt.patTarget > 0 ? fmt(nxt.patTarget, sym) : "—"}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-xs" style={{ color: "#9A9490" }}>市盈率（PE）</span>
+                      <span className="text-xs font-bold font-mono" style={{ color: "#2B2B2B" }}>PE {nxt.pe || "—"}</span>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            );
+          })()}
+        </Card>
 
         {/* Section 1: Round Settings */}
         <Card>
