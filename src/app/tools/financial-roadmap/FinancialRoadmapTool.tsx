@@ -530,7 +530,9 @@ export default function FinancialRoadmapTool() {
                 <select value={sym} onChange={(e) => setForm((p) => ({ ...p, currencySymbol: e.target.value }))}
                   className="text-xs py-1 px-2 rounded-lg outline-none"
                   style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF", color: "#2B2B2B" }}>
-                  {["RM", "USD", "SGD", "HKD", "CNY", "IDR", "THB"].map((c) => <option key={c} value={c}>{c}</option>)}
+                  {Array.from(new Set([coreData?.currencySymbol ?? "RM", "USD"])).map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -570,7 +572,6 @@ export default function FinancialRoadmapTool() {
                         {idx === 0 ? "创始" : `第 ${idx} 轮`}
                       </span>
                       <TextInput value={r.stageNameZh} onChange={(v) => updateRound(r.id, { stageNameZh: v })} width={160} placeholder="阶段名称" />
-                      {canDrag && <span className="text-xs select-none" style={{ color: "#C0BAB0", cursor: "grab" }}>⠿</span>}
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       {!r.isFounder && idx > 1 && (
@@ -916,14 +917,9 @@ export default function FinancialRoadmapTool() {
           </div>
         )}
 
-        {/* ── Save status ───────────────────────────────────────────────── */}
-        <div>
-          <p className="text-xs" style={{ color: "#9A9490" }}>
-            {saving ? "正在保存..." : lastSaved ? `已自动保存 ${lastSaved.toLocaleTimeString()}` : "未保存"}
-          </p>
-        </div>
 
       </div>
     </ToolShell>
   );
 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
