@@ -78,7 +78,7 @@ const GUIDE_STEPS = [
   { title: "导入财务数据", body: "点击「从利润表导入」可自动填入当前营收与税后净利润（PAT）；点击「从融资路线图导入」可带入当前阶段 PE、目标 PAT 与 IPO 目标估值。导入后仍可手动调整。" },
   { title: "4 种估值方法", body: "市盈率法（PAT × 倍数）最常用；营收倍数法适合早期亏损企业；企业价值倍数（EV/EBITDA）剪除财务结构差异；现金流折现法（DCF）基于未来现金流折现。" },
   { title: "当前估值 vs 目标估值", body: "基于当前 PAT 算出当前估值；基于目标 PAT 算出目标估值。投资人通常以「未来估值打折」的方式进场，这个差距就是你的谈判空间。" },
-  { title: "融资报价区间", body: "系统综合 4 种方法给出保守估值、建议融资佐值、理想佐值三档。建议以建议融资佐值作为谈判起点，保守估值作为底线。" },
+  { title: "融资报价区间", body: "系统综合 4 种方法给出保守估值、建议融资估值、理想估值三档。建议以建议融资估值作为谈判起点，保守估值作为底线。" },
 ];
 
 // ── Helpers ────────────────────────────────────────────────────────────────────────────────
@@ -259,13 +259,20 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
     const currentStage = String(t06.currentActualStageName ?? "");
     if (!currentStage) { showMsg("融资路线图尚未设定「当前实际融资阶段」，请先在融资路线图选择"); return; }
     const currentPE = Number(t06.currentStagePe ?? 0);
-    const currentPat = Number(t06.currentStagePat ?? 0);
     const currentVal = Number(t06.currentActualPostMoney ?? 0);
+    // 当前阶段PAT目标：直接字段 > 计算 (postMoney/PE) > fallback 0
+    const currentPatRaw = Number(t06.currentStagePat ?? 0);
+    const currentPat = currentPatRaw > 0 ? currentPatRaw
+      : (currentVal > 0 && currentPE > 0 ? currentVal / currentPE : 0);
     const nextStage = String(t06.nextStageName ?? "");
     const nextVal = Number(t06.nextStagePostMoney ?? 0);
     const nextPat = Number(t06.nextStagePat ?? 0);
     const ipoVal = Number(t06.ipoTargetValuation ?? 0);
-    const ipoPat = Number(t06.ipoPatTarget ?? 0);
+    // IPO PAT：直接字段 > 计算 (ipoVal / latestPe)
+    const ipoPatRaw = Number(t06.ipoPatTarget ?? 0);
+    const ipoLatestPe = Number(t06.latestPe ?? 0);
+    const ipoPat = ipoPatRaw > 0 ? ipoPatRaw
+      : (ipoVal > 0 && ipoLatestPe > 0 ? ipoVal / ipoLatestPe : 0);
     setForm((p) => ({
       ...p,
       customPE: currentPE > 0 ? String(currentPE) : p.customPE,
@@ -310,7 +317,22 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
     const w = [pf(form.weightPE), pf(form.weightRevenue), pf(form.weightEvEbitda), pf(form.weightDCF)];
     const totalW = w.reduce((a, b) => a + b, 0) || 1;
     const vals = [vPE, vRev, vEVEBITDA, dcfValue];
-    const blended = vals.reduce((acc, v, i) => acc + (v > 0 ? v * (w[i] / totalW) : 0), 0);
+    const methodLabels = ["市盈率（PE）", "营收倍数", "EV/EBITDA", "现金流折现（DCF）"];
+    // Outlier detection: exclude if > 200% or < 50% of the average of valid values
+    const validVals = vals.filter(x => x > 0);
+    const avg = validVals.length > 0 ? validVals.reduce((a, b) => a + b, 0) / validVals.length : 0;
+    const outlierMethods: string[] = [];
+    const activeVals = vals.map((v, i) => {
+      if (v <= 0) return 0;
+      if (avg > 0 && (v > avg * 2.0 || v < avg * 0.5)) {
+        outlierMethods.push(methodLabels[i]);
+        return 0; // excluded from blended
+      }
+      return v;
+    });
+    const activeW = w.map((wi, i) => activeVals[i] > 0 ? wi : 0);
+    const activeTotalW = activeW.reduce((a, b) => a + b, 0) || 1;
+    const blended = activeVals.reduce((acc, v, i) => acc + (v > 0 ? v * (activeW[i] / activeTotalW) : 0), 0);
 
     const tvPE = targetPAT > 0 ? targetPAT * peMultiple : null;
     const tvRev = targetRevenue > 0 ? targetRevenue * revMultiple : null;
@@ -327,7 +349,7 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
       { label: "EV/EBITDA", current: vEVEBITDA > 0 ? vEVEBITDA : null, target: tvEVEBITDA },
       { label: "DCF", current: dcfValue > 0 ? dcfValue : null, target: null },
     ];
-    return { vPE, vRev, vEVEBITDA, dcfValue, blended, low, high, tvPE, tvRev, tvEVEBITDA, targetBlended, currentPAT, currentRevenue, targetPAT, chartData };
+    return { vPE, vRev, vEVEBITDA, dcfValue, blended, low, high, tvPE, tvRev, tvEVEBITDA, targetBlended, currentPAT, currentRevenue, targetPAT, chartData, outlierMethods };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form, coreData, peMultiple, revMultiple, evMultiple]);
 
@@ -503,12 +525,23 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
           <ValCard method="市盈率法（PE）" currentVal={calc.vPE} targetVal={calc.tvPE} sym={sym}
             note={`税后净利润（PAT）× ${peMultiple}x`} />
           <ValCard method="营收倍数法" currentVal={calc.vRev} targetVal={calc.tvRev} sym={sym}
-            note={`营收 × ${revMultiple}x 倍数`} />
+            note={`营收 × ${revMultiple}x`} />
           <ValCard method="企业价值倍数（EV/EBITDA）" currentVal={calc.vEVEBITDA} targetVal={calc.tvEVEBITDA} sym={sym}
-            note={`EBIT × ${evMultiple}x 倍数`} />
+            note={`EBIT × ${evMultiple}x`} />
           <ValCard method="现金流折现法（DCF）" currentVal={calc.dcfValue} targetVal={null} sym={sym}
             note={`5 年现金流折现 + 终值，折现率 ${form.discountRatePct}%`} />
         </div>
+
+        {calc.outlierMethods.length > 0 && (
+          <div className="rounded-xl px-4 py-3" style={{ backgroundColor: "rgba(176,90,80,0.06)", border: "1px solid rgba(176,90,80,0.2)" }}>
+            <p className="text-xs font-semibold mb-1" style={{ color: "#B05050" }}>
+              异常值已排除（差距 &gt; 200% 或 &lt; 50% 均值）
+            </p>
+            <p className="text-xs" style={{ color: "#9A9490" }}>
+              {calc.outlierMethods.join("、")} — 已从综合估值区间中排除，不影响主计算。
+            </p>
+          </div>
+        )}
 
         {/* 综合估值区间 */}
         <Card accent>
@@ -533,12 +566,12 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
             <div className="flex items-center justify-between px-4 py-3 rounded-xl"
               style={{ backgroundColor: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.2)" }}>
               <div>
-                <p className="text-xs font-semibold" style={{ color: "#9A9490" }}>目标佐值（达成目标 PAT 后）</p>
+                <p className="text-xs font-semibold" style={{ color: "#9A9490" }}>目标估值（达成目标 PAT 后）</p>
                 <p className="text-xl font-bold font-mono mt-0.5" style={{ color: "#22C55E" }}>{fmt(calc.targetBlended, sym)}</p>
               </div>
               {calc.blended > 0 && (
                 <div className="text-right">
-                  <p className="text-xs" style={{ color: "#7A7A7A" }}>佐值增幅</p>
+                  <p className="text-xs" style={{ color: "#7A7A7A" }}>估值增幅</p>
                   <p className="text-base font-bold font-mono" style={{ color: "#22C55E" }}>
                     +{(((calc.targetBlended - calc.blended) / calc.blended) * 100).toFixed(0)}%
                   </p>
@@ -554,19 +587,30 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
             <SLabel>下一轮融资目标 — {form.importedNextStage}</SLabel>
             <div className="grid sm:grid-cols-2 gap-5">
               <div>
-                <p className="text-xs font-mono mb-2" style={{ color: "#9A9490" }}>佐值差距</p>
-                <GapRow label="下一轮目标佐值" value={fmt(nextVal, sym)} highlight />
-                <GapRow label="当前佐值" value={fmt(calc.blended, sym)} />
+                <p className="text-xs font-mono mb-2" style={{ color: "#9A9490" }}>估值差距</p>
+                <GapRow label="下一轮目标估值" value={fmt(nextVal, sym)} highlight />
+                <GapRow label="当前估值" value={fmt(calc.blended, sym)} />
                 <GapRow label="距离下一轮" value={calc.blended > 0 ? fmt(nextVal - calc.blended, sym) : "—"} />
                 {calc.blended > 0 && (
-                  <div className="py-1.5">
-                    <div className="flex justify-between mb-1">
-                      <span className="text-xs" style={{ color: "#9A9490" }}>成长倍数</span>
-                      <span className="text-xs font-bold font-mono" style={{ color: "#C9A84C" }}>
-                        {(nextVal / calc.blended).toFixed(2)} 倍
-                      </span>
+                  <>
+                    <div className="py-1.5" style={{ borderBottom: "1px solid #F0EBE0" }}>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-xs" style={{ color: "#9A9490" }}>成长倍数</span>
+                        <span className="text-xs font-bold font-mono" style={{ color: "#C9A84C" }}>
+                          {(nextVal / calc.blended).toFixed(2)} 倍
+                        </span>
+                      </div>
                     </div>
-                  </div>
+                    <div className="py-1.5">
+                      <div className="flex justify-between mb-1">
+                        <span className="text-xs" style={{ color: "#9A9490" }}>估值完成度</span>
+                        <span className="text-xs font-bold font-mono" style={{ color: "#C9A84C" }}>
+                          {((calc.blended / nextVal) * 100).toFixed(1)}%
+                        </span>
+                      </div>
+                      <ProgressBar pct={(calc.blended / nextVal) * 100} color="#C9A84C" />
+                    </div>
+                  </>
                 )}
               </div>
               {nextPat > 0 && (
@@ -598,14 +642,14 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
             <SLabel>上市目标（IPO）</SLabel>
             <div className="grid sm:grid-cols-2 gap-5">
               <div>
-                <p className="text-xs font-mono mb-2" style={{ color: "#9A9490" }}>佐值差距</p>
-                <GapRow label="IPO 目标佐值" value={fmt(ipoTarget, sym)} highlight />
-                <GapRow label="当前佐值" value={calc.blended > 0 ? fmt(calc.blended, sym) : "未设定"} />
+                <p className="text-xs font-mono mb-2" style={{ color: "#9A9490" }}>估值差距</p>
+                <GapRow label="IPO 目标估值" value={fmt(ipoTarget, sym)} highlight />
+                <GapRow label="当前估值" value={calc.blended > 0 ? fmt(calc.blended, sym) : "未设定"} />
                 <GapRow label="差距" value={calc.blended > 0 ? fmt(ipoTarget - calc.blended, sym) : "—"} />
                 {calc.blended > 0 && (
                   <div className="py-1.5">
                     <div className="flex justify-between mb-1">
-                      <span className="text-xs" style={{ color: "#9A9490" }}>佐值完成度</span>
+                      <span className="text-xs" style={{ color: "#9A9490" }}>估值完成度</span>
                       <span className="text-xs font-bold font-mono" style={{ color: "#C9A84C" }}>
                         {((calc.blended / ipoTarget) * 100).toFixed(1)}%
                       </span>
@@ -639,7 +683,7 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
 
         {/* 图表 */}
         <Card>
-          <SLabel>当前佐值 vs 目标佐值</SLabel>
+          <SLabel>当前估值 vs 目标估值</SLabel>
           <div style={{ height: 220 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={calc.chartData} margin={{ top: 8, right: 8, left: 8, bottom: 8 }} barCategoryGap="30%" barGap={4}>
@@ -650,19 +694,19 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
                   labelStyle={{ color: "#9A9490" }}
                   formatter={(v: number) => [fmt(v, sym), ""]}
                 />
-                <Bar dataKey="current" name="当前佐值" fill="#C9A84C" fillOpacity={0.85} radius={[4, 4, 0, 0]} />
-                <Bar dataKey="target" name="目标佐值" fill="#22C55E" fillOpacity={0.6} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="current" name="当前估值" fill="#C9A84C" fillOpacity={0.85} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="target" name="目标估值" fill="#22C55E" fillOpacity={0.6} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
           <div className="flex gap-4 mt-2">
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: "#C9A84C" }} />
-              <span className="text-xs" style={{ color: "#7A7A7A" }}>当前佐值</span>
+              <span className="text-xs" style={{ color: "#7A7A7A" }}>当前估值</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: "#22C55E", opacity: 0.6 }} />
-              <span className="text-xs" style={{ color: "#7A7A7A" }}>目标佐值</span>
+              <span className="text-xs" style={{ color: "#7A7A7A" }}>目标估值</span>
             </div>
           </div>
         </Card>
