@@ -1461,8 +1461,17 @@ function EnterpriseCoreSummary({ companyId }: { companyId: string }) {
   const yearEndCash          = t03?.yearEndCash          ?? dbCore?.yearEndCash;
   const netOperatingCashFlow = t03?.netOperatingCashFlow as number | undefined;
 
-  const currentValuation = t06?.currentValuation ?? dbCore?.currentValuation;
-  const targetValuation  = t06?.targetValuation  ?? dbCore?.targetValuation;
+  const currentValuation = dbCore?.currentValuation;
+  const targetValuation  = dbCore?.targetValuation;
+  // T06 融资路线图 computed fields
+  const t06LatestPostMoney   = t06?.latestPostMoney   as number | undefined;
+  const t06FounderFinalPct   = t06?.founderFinalPct   as number | undefined;
+  const t06CofounderFinalPct = t06?.cofounderFinalPct as number | undefined;
+  const t06TotalInvested     = t06?.totalInvested     as number | undefined;
+  const t06IpoTarget         = t06?.ipoTargetValuation as number | undefined;
+  const t06LatestPatTarget   = t06?.latestPatTarget   as number | undefined;
+  const t06LatestPe          = t06?.latestPe          as number | undefined;
+  const t06CurrentStage      = t06?.currentStageName  as string | undefined;
 
   const roadmapYear1Revenue = t07?.roadmapYear1Revenue ?? dbCore?.roadmapYear1Revenue;
   const roadmapYear2Revenue = t07?.roadmapYear2Revenue ?? dbCore?.roadmapYear2Revenue;
@@ -1521,11 +1530,47 @@ function EnterpriseCoreSummary({ companyId }: { companyId: string }) {
         </CoreSection>
       )}
 
-      {(t06 || dbCore?.currentValuation != null) && (
+      {dbCore?.currentValuation != null && (
         <CoreSection title="企业估值">
           <CoreDataRow label="当前估值" value={fmtMoney(currentValuation, sym)} />
           <CoreDataRow label="目标估值" value={fmtMoney(targetValuation, sym)} />
         </CoreSection>
+      )}
+
+      {t06 ? (
+        <CoreSection title="融资路线图">
+          {t06CurrentStage && <CoreDataRow label="当前融资阶段" value={t06CurrentStage} />}
+          {t06LatestPostMoney != null && t06LatestPostMoney > 0 && (
+            <CoreDataRow label="最新估值（Post-Money）" value={fmtMoney(t06LatestPostMoney, sym)} />
+          )}
+          {t06FounderFinalPct != null && t06FounderFinalPct > 0 && (
+            <CoreDataRow label="创办人最终持股" value={(t06FounderFinalPct * 100).toFixed(1) + "%"} />
+          )}
+          {t06CofounderFinalPct != null && t06CofounderFinalPct > 0 && (
+            <CoreDataRow label="联合创办人持股" value={(t06CofounderFinalPct * 100).toFixed(1) + "%"} />
+          )}
+          {t06TotalInvested != null && t06TotalInvested > 0 && (
+            <CoreDataRow label="累计融资额" value={fmtMoney(t06TotalInvested, sym)} />
+          )}
+          {t06IpoTarget != null && t06IpoTarget > 0 && (
+            <CoreDataRow label="IPO 目标估值" value={fmtMoney(t06IpoTarget, sym)} />
+          )}
+          {t06LatestPatTarget != null && t06LatestPatTarget > 0 && (
+            <CoreDataRow label="目标净利润（PAT）" value={fmtMoney(t06LatestPatTarget, sym)} />
+          )}
+          {t06LatestPe != null && t06LatestPe > 0 && (
+            <CoreDataRow label="市盈率（PE）" value={"PE " + t06LatestPe} />
+          )}
+        </CoreSection>
+      ) : (
+        <div className="py-3 px-4 rounded-xl" style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}>
+          <p className="text-xs font-semibold mb-1" style={{ color: "#C9A84C" }}>融资路线图</p>
+          <p className="text-xs mb-2" style={{ color: "#9A9490" }}>尚未建立融资路线图</p>
+          <a href="/tools/financial-roadmap" className="text-xs px-3 py-1.5 rounded-lg inline-block"
+            style={{ backgroundColor: "rgba(201,168,76,0.12)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.3)" }}>
+            前往融资路线图工具
+          </a>
+        </div>
       )}
 
       {(t07 || dbCore?.roadmapYear1Revenue != null) && (
