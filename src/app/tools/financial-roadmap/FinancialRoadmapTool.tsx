@@ -1077,4 +1077,21 @@ export default function FinancialRoadmapTool() {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {c.downRoundIds.map((id) => (
-                    <span key={id} 
+                  {c.downRoundIds.map((id) => (
+                      style={{ backgroundColor: "rgba(176,80,80,0.08)", color: "#B05050" }}>
+                      {stakeLabel(id)} 市值下降
+                    </span>
+                  ))}
+                </div>
+                <p className="text-xs mt-2" style={{ color: "#B0AA9A" }}>
+                  建议：提高本轮融资后估值，或减少投资金额，使融资前估值高于上一轮融资后估值。
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+      </div>
+    </ToolShell>
+  );
+}
