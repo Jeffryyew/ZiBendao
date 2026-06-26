@@ -53,9 +53,9 @@ const DEFAULT_FORM: T05Form = {
 
 const GUIDE_STEPS = [
   { title: "企业估值是融资的起点", body: "投资人用估值决定「进多少钱、占多少股」。了解自己的估值，才能在融资谈判桌上有底气，不被压价。" },
-  { title: "两种主流估值方法", body: "市盈率法（PE）最常用：税后净利润 × PE 倍数。营收倍数法（PS）适合早期或亏损企业：年营收 × PS 倍数。" },
+  { title: "两种主流估值方法", body: "市盈率法（PE）最常用：税后净利润（PAT）× 市盈率（PE）倍数。营收倍数法（PS）适合早期或亏损企业：年营收 × 市销率（PS）倍数。" },
   { title: "当前阶段 vs 下一轮", body: "工具从融资路线图读取当前阶段数据。重点关注：当前估值距离下一轮目标还有多远，而不是直接看 IPO。" },
-  { title: "数据来源", body: "点击【从利润表导入】自动填入当前 PAT 与营收；点击【从融资路线图导入】带入当前阶段 PE、目标 PAT 与 IPO 目标。导入后仍可手动调整。" },
+  { title: "数据来源", body: "点击【从利润表导入】自动填入当前税后净利润（PAT）与营收；点击【从融资路线图导入】带入当前阶段市盈率（PE）、目标税后净利润（PAT）与 IPO 目标。导入后仍可手动调整。" },
 ];
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -229,7 +229,7 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
     }));
     showMsg(pat != null && pat > 0
       ? "✓ 已从利润表导入年营收与税后净利润（PAT）"
-      : "利润表数据已找到，但 PAT 为零，请先完善利润表");
+      : "利润表数据已找到，但税后净利润（PAT）为零，请先完善利润表");
   }
 
   function importFromRoadmap() {
@@ -389,7 +389,7 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
               value={calc.currentRevenue > 0 ? fmt(calc.currentRevenue, sym) : "未设定"}
             />
             <KpiChip
-              label="当前阶段目标 PAT"
+              label="当前阶段目标税后净利润（PAT）"
               value={calc.targetPAT > 0 ? fmt(calc.targetPAT, sym) : "未设定"}
             />
             <KpiChip
@@ -401,7 +401,7 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
           {/* Input fields */}
           <NumField label="当前税后净利润（PAT）" value={form.manualPAT} onChange={set("manualPAT")} sym={sym} />
           <NumField label="当前年营收" value={form.manualRevenue} onChange={set("manualRevenue")} sym={sym} />
-          <NumField label="当前阶段目标 PAT" value={form.manualTargetPAT} onChange={set("manualTargetPAT")} sym={sym} />
+          <NumField label="当前阶段目标税后净利润（PAT）" value={form.manualTargetPAT} onChange={set("manualTargetPAT")} sym={sym} />
           <NumField label="当前阶段目标估值" value={form.importedCurrentValuation} onChange={set("importedCurrentValuation")} sym={sym} last />
         </Card>
 
@@ -416,7 +416,7 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
         <div className="grid sm:grid-cols-2 gap-4">
           <div className="rounded-2xl p-5" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E8DFCF" }}>
             <p className="text-xs font-semibold mb-1" style={{ color: "#9A9490" }}>市盈率法（PE）</p>
-            <p className="text-xs mb-3" style={{ color: "#B0AA9A" }}>PAT × {peMultiple}x</p>
+            <p className="text-xs mb-3" style={{ color: "#B0AA9A" }}>税后净利润（PAT）× {peMultiple}</p>
             <p className="text-2xl font-bold font-mono mb-1" style={{ color: "#C9A84C" }}>
               {calc.vPE > 0 ? fmt(calc.vPE, sym) : "—"}
             </p>
@@ -428,7 +428,7 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
           </div>
           <div className="rounded-2xl p-5" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E8DFCF" }}>
             <p className="text-xs font-semibold mb-1" style={{ color: "#9A9490" }}>营收倍数法（PS）</p>
-            <p className="text-xs mb-3" style={{ color: "#B0AA9A" }}>营收 × {psMultiple}x</p>
+            <p className="text-xs mb-3" style={{ color: "#B0AA9A" }}>营收 × {psMultiple}</p>
             <p className="text-2xl font-bold font-mono mb-1" style={{ color: "#C9A84C" }}>
               {calc.vRev > 0 ? fmt(calc.vRev, sym) : "—"}
             </p>
@@ -440,7 +440,7 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
           <Card>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-xs font-semibold mb-0.5" style={{ color: "#9A9490" }}>达成目标 PAT 后的估值</p>
+                <p className="text-xs font-semibold mb-0.5" style={{ color: "#9A9490" }}>达成目标税后净利润（PAT）后的估值</p>
                 <p className="text-2xl font-bold font-mono mt-1" style={{ color: "#22C55E" }}>{fmt(calc.tvPE, sym)}</p>
               </div>
               {calc.vPE > 0 && (
@@ -459,7 +459,7 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
                   <span className="font-mono" style={{ color: "#2B2B2B" }}>{fmt(calc.vPE, sym)}</span>
                 </div>
                 <div className="flex justify-between text-xs" style={{ color: "#9A9490" }}>
-                  <span>目标估值（PE）</span>
+                  <span>目标估值（市盈率法）</span>
                   <span className="font-mono" style={{ color: "#22C55E" }}>{fmt(calc.tvPE, sym)}</span>
                 </div>
               </div>
@@ -475,7 +475,7 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
               <div>
                 <p className="text-xs font-mono mb-2" style={{ color: "#9A9490" }}>估值差距</p>
                 <GapRow label="下一轮目标估值" value={fmt(nextVal, sym)} highlight />
-                <GapRow label="当前估值（PE）" value={calc.vPE > 0 ? fmt(calc.vPE, sym) : "未设定"} />
+                <GapRow label="当前估值（市盈率法）" value={calc.vPE > 0 ? fmt(calc.vPE, sym) : "未设定"} />
                 <GapRow label="距离下一轮" value={calc.vPE > 0 ? fmt(nextVal - calc.vPE, sym) : "—"} />
                 {calc.vPE > 0 && (
                   <>
@@ -494,14 +494,14 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
               </div>
               {nextPat > 0 && (
                 <div>
-                  <p className="text-xs font-mono mb-2" style={{ color: "#9A9490" }}>PAT 差距</p>
-                  <GapRow label="下一轮目标 PAT" value={fmt(nextPat, sym)} highlight />
-                  <GapRow label="当前 PAT" value={calc.currentPAT > 0 ? fmt(calc.currentPAT, sym) : "未设定"} />
-                  <GapRow label="距离下一轮 PAT" value={calc.currentPAT > 0 ? fmt(nextPat - calc.currentPAT, sym) : "—"} />
+                  <p className="text-xs font-mono mb-2" style={{ color: "#9A9490" }}>税后净利润（PAT）差距</p>
+                  <GapRow label="下一轮目标税后净利润（PAT）" value={fmt(nextPat, sym)} highlight />
+                  <GapRow label="当前税后净利润（PAT）" value={calc.currentPAT > 0 ? fmt(calc.currentPAT, sym) : "未设定"} />
+                  <GapRow label="距离下一轮税后净利润（PAT）" value={calc.currentPAT > 0 ? fmt(nextPat - calc.currentPAT, sym) : "—"} />
                   {calc.currentPAT > 0 && (
                     <div className="pt-2">
                       <div className="flex justify-between mb-1">
-                        <span className="text-xs" style={{ color: "#9A9490" }}>PAT 完成度</span>
+                        <span className="text-xs" style={{ color: "#9A9490" }}>税后净利润（PAT）完成度</span>
                         <span className="text-xs font-bold font-mono" style={{ color: "#3D7A41" }}>
                           {((calc.currentPAT / nextPat) * 100).toFixed(1)}%
                         </span>
@@ -523,7 +523,7 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
               <div>
                 <p className="text-xs font-mono mb-2" style={{ color: "#9A9490" }}>估值差距</p>
                 <GapRow label="IPO 目标估值" value={fmt(ipoTarget, sym)} highlight />
-                <GapRow label="当前估值（PE）" value={calc.vPE > 0 ? fmt(calc.vPE, sym) : "未设定"} />
+                <GapRow label="当前估值（市盈率法）" value={calc.vPE > 0 ? fmt(calc.vPE, sym) : "未设定"} />
                 <GapRow label="差距" value={calc.vPE > 0 ? fmt(ipoTarget - calc.vPE, sym) : "—"} />
                 {calc.vPE > 0 && (
                   <div className="pt-2">
@@ -539,14 +539,14 @@ export default function ValuationTool({ locale }: { locale: "zh" | "en" }) {
               </div>
               {ipoPat > 0 && (
                 <div>
-                  <p className="text-xs font-mono mb-2" style={{ color: "#9A9490" }}>PAT 差距</p>
-                  <GapRow label="IPO 目标 PAT" value={fmt(ipoPat, sym)} highlight />
-                  <GapRow label="当前 PAT" value={calc.currentPAT > 0 ? fmt(calc.currentPAT, sym) : "未设定"} />
+                  <p className="text-xs font-mono mb-2" style={{ color: "#9A9490" }}>税后净利润（PAT）差距</p>
+                  <GapRow label="IPO 目标税后净利润（PAT）" value={fmt(ipoPat, sym)} highlight />
+                  <GapRow label="当前税后净利润（PAT）" value={calc.currentPAT > 0 ? fmt(calc.currentPAT, sym) : "未设定"} />
                   <GapRow label="差距" value={calc.currentPAT > 0 ? fmt(ipoPat - calc.currentPAT, sym) : "—"} />
                   {calc.currentPAT > 0 && (
                     <div className="pt-2">
                       <div className="flex justify-between mb-1">
-                        <span className="text-xs" style={{ color: "#9A9490" }}>PAT 完成度</span>
+                        <span className="text-xs" style={{ color: "#9A9490" }}>税后净利润（PAT）完成度</span>
                         <span className="text-xs font-bold font-mono" style={{ color: "#3D7A41" }}>
                           {((calc.currentPAT / ipoPat) * 100).toFixed(1)}%
                         </span>
