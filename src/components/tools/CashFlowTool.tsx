@@ -168,7 +168,7 @@ function InputRow({
       className="grid items-center py-1.5"
       style={{ gridTemplateColumns: "1fr 155px", borderBottom: "1px solid #E8DFCF", gap: "8px" }}
     >
-      <span className="text-xs truncate" style={{ color: "#7A7A7A", minWidth: 0 }}>
+      <span className="text-xs" style={{ color: "#7A7A7A", minWidth: 0, whiteSpace: "nowrap", overflow: "visible" }}>
         {label}
       </span>
       <div className="relative">
@@ -619,7 +619,7 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
                 sym={sym}
               />
               <InputRow
-                label="资本支出（设备/扩张）"
+                label="资本支出"
                 value={form.investingOutflow}
                 onChange={setField("investingOutflow")}
                 sym={sym}
@@ -630,7 +630,7 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
             <Card>
               <SectionLabel>融资活动现金流</SectionLabel>
               <InputRow
-                label="贷款 / 股权融资收入"
+                label="贷款 / 股权融资"
                 value={form.financingInflow}
                 onChange={setField("financingInflow")}
                 sym={sym}
