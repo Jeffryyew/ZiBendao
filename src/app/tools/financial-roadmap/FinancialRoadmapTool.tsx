@@ -518,24 +518,36 @@ export default function FinancialRoadmapTool() {
   function onListPointerMove(e: React.PointerEvent) {
     if (!isDraggingRef.current) return;
     e.preventDefault();
+    e.stopPropagation();
     const curIdx = draggingIdxRef.current;
     if (curIdx === null || !roundListRef.current) return;
     const cards = Array.from(roundListRef.current.querySelectorAll<HTMLElement>("[data-di]"));
-    for (const card of cards) {
+
+    // Moving UP: iterate cards descending to find the first card above that we've crossed
+    for (let i = cards.length - 1; i >= 0; i--) {
+      const card = cards[i];
       const ti = parseInt(card.getAttribute("data-di")!);
-      if (ti === curIdx || ti === 0) continue;
+      if (ti >= curIdx || ti === 0) continue;
       const rect = card.getBoundingClientRect();
-      const mid = rect.top + rect.height / 2;
-      if (ti < curIdx && e.clientY < mid) {
-        setForm(p => { const rounds = [...p.rounds]; const [item] = rounds.splice(curIdx, 1); rounds.splice(ti, 0, item); return { ...p, rounds }; });
+      if (e.clientY < rect.bottom) {
+        setForm(p => { const rs = [...p.rounds]; const [item] = rs.splice(curIdx, 1); rs.splice(ti, 0, item); return { ...p, rounds: rs }; });
         draggingIdxRef.current = ti;
         setDraggingIdx(ti);
-        break;
-      } else if (ti > curIdx && e.clientY > mid) {
-        setForm(p => { const rounds = [...p.rounds]; const [item] = rounds.splice(curIdx, 1); rounds.splice(ti, 0, item); return { ...p, rounds }; });
+        return;
+      }
+    }
+
+    // Moving DOWN: iterate cards ascending to find the first card below that we've crossed
+    for (let i = 0; i < cards.length; i++) {
+      const card = cards[i];
+      const ti = parseInt(card.getAttribute("data-di")!);
+      if (ti <= curIdx) continue;
+      const rect = card.getBoundingClientRect();
+      if (e.clientY > rect.top) {
+        setForm(p => { const rs = [...p.rounds]; const [item] = rs.splice(curIdx, 1); rs.splice(ti, 0, item); return { ...p, rounds: rs }; });
         draggingIdxRef.current = ti;
         setDraggingIdx(ti);
-        break;
+        return;
       }
     }
   }
@@ -691,16 +703,19 @@ export default function FinancialRoadmapTool() {
                       {canDrag && (
                         <div
                           onPointerDown={(e) => onHandlePointerDown(e, idx)}
+                          onPointerMove={onListPointerMove}
+                          onPointerUp={endDrag}
+                          onPointerCancel={endDrag}
                           style={{
                             cursor: isThisDragging ? "grabbing" : "grab",
                             touchAction: "none",
                             userSelect: "none",
                             WebkitUserSelect: "none",
                             WebkitTouchCallout: "none",
-                            color: "#C9C4BA",
+                            color: isThisDragging ? "#C9A84C" : "#C9C4BA",
                             fontSize: "1rem",
                             lineHeight: 1,
-                            padding: "4px 6px",
+                            padding: "4px 8px",
                             borderRadius: "6px",
                             display: "flex",
                             alignItems: "center",
@@ -1062,21 +1077,4 @@ export default function FinancialRoadmapTool() {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {c.downRoundIds.map((id) => (
-                    <span key={id} className="text-xs px-2 py-1 rounded-md"
-                      style={{ backgroundColor: "rgba(176,80,80,0.08)", color: "#B05050" }}>
-                      {stakeLabel(id)} 市值下降
-                    </span>
-                  ))}
-                </div>
-                <p className="text-xs mt-2" style={{ color: "#B0AA9A" }}>
-                  建议：提高本轮融资后估值，或减少投资金额，使融资前估值高于上一轮融资后估值。
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-
-      </div>
-    </ToolShell>
-  );
-}
+                    <span key={id} 
