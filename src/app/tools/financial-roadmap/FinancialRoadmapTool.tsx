@@ -329,10 +329,8 @@ export default function FinancialRoadmapTool() {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [coreData, setCoreData] = useState<FinancialCore | null>(null);
   const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
-  const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const draggingIdxRef = useRef<number | null>(null);
   const isDraggingRef = useRef(false);
-  const dragStartY = useRef(0);
   const roundListRef = useRef<HTMLDivElement | null>(null);
 
   // ── Load from localStorage / DB ──────────────────────────────────────────
@@ -500,35 +498,25 @@ export default function FinancialRoadmapTool() {
     });
   }
 
-  // ── Long-press drag handlers ──────────────────────────────────────────────
+  // ── Drag handle handlers ──────────────────────────────────────────────────
   function endDrag() {
     isDraggingRef.current = false;
     draggingIdxRef.current = null;
     setDraggingIdx(null);
-    if (longPressRef.current) { clearTimeout(longPressRef.current); longPressRef.current = null; }
   }
 
-  function onCardPointerDown(e: React.PointerEvent, idx: number) {
+  function onHandlePointerDown(e: React.PointerEvent, idx: number) {
     if (form.rounds[idx]?.isFounder) return;
-    dragStartY.current = e.clientY;
+    e.stopPropagation();
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    longPressRef.current = setTimeout(() => {
-      isDraggingRef.current = true;
-      draggingIdxRef.current = idx;
-      setDraggingIdx(idx);
-      try { navigator.vibrate(30); } catch {}
-      longPressRef.current = null;
-    }, 300);
+    isDraggingRef.current = true;
+    draggingIdxRef.current = idx;
+    setDraggingIdx(idx);
+    try { navigator.vibrate(20); } catch {}
   }
 
   function onListPointerMove(e: React.PointerEvent) {
-    if (!isDraggingRef.current) {
-      if (longPressRef.current && Math.abs(e.clientY - dragStartY.current) > 10) {
-        clearTimeout(longPressRef.current);
-        longPressRef.current = null;
-      }
-      return;
-    }
+    if (!isDraggingRef.current) return;
     e.preventDefault();
     const curIdx = draggingIdxRef.current;
     if (curIdx === null || !roundListRef.current) return;
@@ -679,7 +667,6 @@ export default function FinancialRoadmapTool() {
               <div key={r.id}>
                 <div
                   data-di={idx}
-                  onPointerDown={canDrag ? (e) => onCardPointerDown(e, idx) : undefined}
                   className="rounded-xl p-4"
                   style={{
                     backgroundColor: r.isFounder ? "rgba(201,168,76,0.04)" : "#FAFAF8",
@@ -687,12 +674,9 @@ export default function FinancialRoadmapTool() {
                     opacity: isThisDragging ? 0.95 : 1,
                     transform: isThisDragging ? "scale(1.02)" : "scale(1)",
                     boxShadow: isThisDragging ? "0 8px 24px rgba(0,0,0,0.10)" : "none",
-                    cursor: canDrag ? (isThisDragging ? "grabbing" : "grab") : "default",
                     transition: "transform 200ms ease, box-shadow 200ms ease, opacity 200ms ease, border-color 200ms ease",
-                    touchAction: "none",
                     position: "relative",
                     zIndex: isThisDragging ? 10 : 0,
-                    userSelect: "none",
                   }}
                 >
                   <div className="flex items-center justify-between mb-3">
@@ -705,10 +689,25 @@ export default function FinancialRoadmapTool() {
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
                       {canDrag && (
-                        <span className="text-xs px-1.5 py-0.5 rounded select-none pointer-events-none"
-                          style={{ color: "#C9C4BA", fontSize: "0.65rem", letterSpacing: "0.05em" }}>
-                          长按拖曳
-                        </span>
+                        <div
+                          onPointerDown={(e) => onHandlePointerDown(e, idx)}
+                          style={{
+                            cursor: isThisDragging ? "grabbing" : "grab",
+                            touchAction: "none",
+                            userSelect: "none",
+                            WebkitUserSelect: "none",
+                            WebkitTouchCallout: "none",
+                            color: "#C9C4BA",
+                            fontSize: "1rem",
+                            lineHeight: 1,
+                            padding: "4px 6px",
+                            borderRadius: "6px",
+                            display: "flex",
+                            alignItems: "center",
+                          } as React.CSSProperties}
+                        >
+                          &#8801;
+                        </div>
                       )}
                       {!r.isFounder && (
                         <button onClick={() => setDeleteConfirmId(r.id)} className="text-xs px-2 py-1 rounded-lg"
@@ -1081,3 +1080,4 @@ export default function FinancialRoadmapTool() {
     </ToolShell>
   );
 }
+                                                                                                                                            
