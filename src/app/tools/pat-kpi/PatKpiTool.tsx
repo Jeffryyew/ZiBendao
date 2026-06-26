@@ -76,6 +76,7 @@ function fmt(n: number): string {
 }
 
 function pf(v: string | undefined): number { return parseFloat(v ?? "") || 0; }
+function uid(): string { return Math.random().toString(36).slice(2, 8); }
 
 function calcSim(
   products: ImportedProduct[],
@@ -400,6 +401,24 @@ export default function PatKpiTool() {
     }));
   }
 
+  function setCostLabel(which: "cur" | "nxt", type: "fixed" | "variable", id: string, label: string) {
+    const key = which === "cur"
+      ? (type === "fixed" ? "curFixedCosts" : "curVariableCosts")
+      : (type === "fixed" ? "nxtFixedCosts" : "nxtVariableCosts");
+    setForm(p => ({
+      ...p,
+      [key]: (p[key] as CostRow[]).map(r => r.id === id ? { ...r, label } : r),
+    }));
+  }
+
+  function addCost(which: "cur" | "nxt", type: "fixed" | "variable") {
+    const key = which === "cur"
+      ? (type === "fixed" ? "curFixedCosts" : "curVariableCosts")
+      : (type === "fixed" ? "nxtFixedCosts" : "nxtVariableCosts");
+    const newRow: CostRow = { id: uid(), label: "", amount: "0" };
+    setForm(p => ({ ...p, [key]: [...(p[key] as CostRow[]), newRow] }));
+  }
+
   // ─ Calculations ──────────────────────────────────────────────────────────
   const taxPct = pf(form.taxRatePct) / 100;
   const taxFactor = 1 - taxPct;
@@ -459,7 +478,7 @@ export default function PatKpiTool() {
           {/* Product table */}
           <div>
             <div className="grid text-xs pb-2 mb-1"
-              style={{ gridTemplateColumns: "1fr 90px 110px", color: "#9A9490", borderBottom: "1px solid #F0EBE0", gap: "6px" }}>
+              style={{ gridTemplateColumns: "1fr 90px 150px", color: "#9A9490", borderBottom: "1px solid #F0EBE0", gap: "6px" }}>
               <span>产品名称</span>
               <span className="text-right">售价</span>
               <span className="text-right">每月销量</span>
@@ -469,7 +488,7 @@ export default function PatKpiTool() {
               const qty = pf(simQtys[p.id]);
               return (
                 <div key={p.id} className="grid items-center py-1.5"
-                  style={{ gridTemplateColumns: "1fr 90px 110px", borderBottom: "1px solid #F8F6F1", gap: "6px" }}>
+                  style={{ gridTemplateColumns: "1fr 90px 150px", borderBottom: "1px solid #F8F6F1", gap: "6px" }}>
                   <span className="text-xs" style={{ color: "#2B2B2B" }}>{p.name || "—"}</span>
                   <span className="text-right text-xs font-mono px-1.5 py-0.5 rounded"
                     style={{ backgroundColor: "#F8F6F1", color: "#7A7A7A" }}>
@@ -491,7 +510,7 @@ export default function PatKpiTool() {
               {[
                 { l: "月营收", v: fmt(sim.revMonthly) },
                 { l: "年营收", v: fmt(sim.revAnnual) },
-                { l: "年度税后净利润（PAT）", v: fmt(sim.pat), gold: true },
+                { l: "年度税后净利润", v: fmt(sim.pat), gold: true },
               ].map((d, i) => (
                 <div key={i} className="rounded-xl px-3 py-2.5" style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}>
                   <p className="text-xs mb-1" style={{ color: "#9A9490" }}>{d.l}</p>
@@ -503,50 +522,65 @@ export default function PatKpiTool() {
         </Card>
 
         {/* Fixed costs */}
-        {fixedCosts.length > 0 && (
-          <Card>
-            <SLabel>固定成本（月度）</SLabel>
-            {fixedCosts.map(r => (
-              <div key={r.id} className="grid items-center py-1.5"
-                style={{ gridTemplateColumns: "1fr 145px", borderBottom: "1px solid #F8F6F1", gap: "8px" }}>
-                <span className="text-xs" style={{ color: "#7A7A7A" }}>{r.label}</span>
-                <AmountInput value={r.amount} onChange={v => setCost(which, "fixed", r.id, v)} prefix="RM" />
-              </div>
-            ))}
-            <div className="flex items-center justify-between pt-2 mt-1" style={{ borderTop: "1px solid #E8DFCF" }}>
-              <span className="text-xs font-semibold" style={{ color: "#9A9490" }}>月度合计</span>
-              <span className="text-xs font-bold font-mono" style={{ color: "#EF4444" }}>{fmt(sim.fixedMonthly)}</span>
+        <Card>
+          <SLabel>固定成本（月度）</SLabel>
+          {fixedCosts.map(r => (
+            <div key={r.id} className="grid items-center py-1.5"
+              style={{ gridTemplateColumns: "1fr 145px", borderBottom: "1px solid #F8F6F1", gap: "8px" }}>
+              <input
+                type="text"
+                value={r.label}
+                onChange={e => setCostLabel(which, "fixed", r.id, e.target.value)}
+                placeholder="成本项目名称"
+                className="text-xs outline-none bg-transparent"
+                style={{ color: "#7A7A7A" }}
+              />
+              <AmountInput value={r.amount} onChange={v => setCost(which, "fixed", r.id, v)} prefix="RM" />
             </div>
-          </Card>
-        )}
+          ))}
+          <button
+            onClick={() => addCost(which, "fixed")}
+            className="mt-2 text-xs font-semibold"
+            style={{ color: "#C9A84C" }}
+          >
+            ＋ 新增成本项目
+          </button>
+          <div className="flex items-center justify-between pt-2 mt-2" style={{ borderTop: "1px solid #E8DFCF" }}>
+            <span className="text-xs font-semibold" style={{ color: "#9A9490" }}>月度合计</span>
+            <span className="text-xs font-bold font-mono" style={{ color: "#EF4444" }}>{fmt(sim.fixedMonthly)}</span>
+          </div>
+        </Card>
 
         {/* Variable costs */}
-        {variableCosts.length > 0 && (
-          <Card>
-            <SLabel>变动成本（月度）</SLabel>
-            {variableCosts.map(r => (
-              <div key={r.id} className="grid items-center py-1.5"
-                style={{ gridTemplateColumns: "1fr 145px", borderBottom: "1px solid #F8F6F1", gap: "8px" }}>
-                <span className="text-xs" style={{ color: "#7A7A7A" }}>{r.label}</span>
-                <AmountInput value={r.amount} onChange={v => setCost(which, "variable", r.id, v)} prefix="RM" />
-              </div>
-            ))}
-            <div className="flex items-center justify-between pt-2 mt-1" style={{ borderTop: "1px solid #E8DFCF" }}>
-              <span className="text-xs font-semibold" style={{ color: "#9A9490" }}>月度合计</span>
-              <span className="text-xs font-bold font-mono" style={{ color: "#EF4444" }}>{fmt(sim.varMonthly)}</span>
+        <Card>
+          <SLabel>变动成本（月度）</SLabel>
+          {variableCosts.map(r => (
+            <div key={r.id} className="grid items-center py-1.5"
+              style={{ gridTemplateColumns: "1fr 145px", borderBottom: "1px solid #F8F6F1", gap: "8px" }}>
+              <input
+                type="text"
+                value={r.label}
+                onChange={e => setCostLabel(which, "variable", r.id, e.target.value)}
+                placeholder="成本项目名称"
+                className="text-xs outline-none bg-transparent"
+                style={{ color: "#7A7A7A" }}
+              />
+              <AmountInput value={r.amount} onChange={v => setCost(which, "variable", r.id, v)} prefix="RM" />
             </div>
-          </Card>
-        )}
-
-        {/* No T01 data yet */}
-        {fixedCosts.length === 0 && variableCosts.length === 0 && (
-          <div className="rounded-2xl py-8 flex items-center justify-center"
-            style={{ border: "1px dashed #E8DFCF" }}>
-            <p className="text-xs" style={{ color: "#BFBAB4" }}>
-              成本数据将自动同步自利润表（T01）
-            </p>
+          ))}
+          <button
+            onClick={() => addCost(which, "variable")}
+            className="mt-2 text-xs font-semibold"
+            style={{ color: "#C9A84C" }}
+          >
+            ＋ 新增成本项目
+          </button>
+          <div className="flex items-center justify-between pt-2 mt-2" style={{ borderTop: "1px solid #E8DFCF" }}>
+            <span className="text-xs font-semibold" style={{ color: "#9A9490" }}>月度合计</span>
+            <span className="text-xs font-bold font-mono" style={{ color: "#EF4444" }}>{fmt(sim.varMonthly)}</span>
           </div>
-        )}
+        </Card>
+
       </div>
     );
   }
@@ -646,19 +680,6 @@ export default function PatKpiTool() {
                 fixedMonthly={nxtSim.fixedMonthly}
               />
             )}
-          </div>
-        )}
-
-        {/* Tax rate reference */}
-        {hasProducts && (
-          <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl"
-            style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}>
-            <span className="text-xs" style={{ color: "#9A9490" }}>
-              当前税率（来自利润表）：
-              <span className="font-mono font-semibold ml-1" style={{ color: "#2B2B2B" }}>
-                {pf(form.taxRatePct).toFixed(1)}%
-              </span>
-            </span>
           </div>
         )}
 
