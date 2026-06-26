@@ -259,7 +259,7 @@ function PLRow({
 
 export default function IncomeStatementTool({ locale }: { locale: "zh" | "en" }) {
   const isEn = locale === "en";
-  const { savedData, dataReady, saving, lastSaved, save } = useToolSnapshot<T01Form>("income-statement");
+  const { savedData, dataReady, save } = useToolSnapshot<T01Form>("income-statement");
 
   const [form, setForm] = useState<T01Form>(DEFAULT_FORM);
   const [loaded, setLoaded] = useState(false);
@@ -383,12 +383,7 @@ export default function IncomeStatementTool({ locale }: { locale: "zh" | "en" })
     }, 0);
   }, [form.products]);
 
-  const annualRevenue = form.revenueSource === "products"
-    ? productRevenue
-    : (parseFloat(form.revenueOverride) || 0);
-
-  const revenueMismatch = form.revenueSource === "manual" && Math.abs((parseFloat(form.revenueOverride) || 0) - productRevenue) > 1;
-  const mismatchDiff = (parseFloat(form.revenueOverride) || 0) - productRevenue;
+  const annualRevenue = productRevenue;
 
   // ── A. Actual Financial Results ───────────────────────────────────────
 
@@ -564,16 +559,6 @@ export default function IncomeStatementTool({ locale }: { locale: "zh" | "en" })
     >
       <div className="space-y-5">
 
-        {/* ── Revenue mismatch banner ── */}
-        {revenueMismatch && (
-          <div
-            className="px-4 py-3 rounded-xl text-sm"
-            style={{ backgroundColor: "rgba(240,164,69,0.08)", border: "1px solid rgba(240,164,69,0.3)", color: "#F0A445" }}
-          >
-            产品营收合计 {sym} {fmtCell(productRevenue)}，与手动填写的营收差距 {sym} {Math.abs(mismatchDiff).toLocaleString()}（{mismatchDiff > 0 ? "高出" : "低于"}产品表），建议核对。
-          </div>
-        )}
-
         {/* ── Product / service table ── */}
         <SectionCard>
           <SectionLabel>产品 / 服务单价表</SectionLabel>
@@ -642,29 +627,6 @@ export default function IncomeStatementTool({ locale }: { locale: "zh" | "en" })
             </table>
           </div>
 
-          {/* Revenue source toggle */}
-          <div className="mt-4 flex items-center gap-3 flex-wrap">
-            <span className="text-xs" style={{ color: "#7A7A7A" }}>损益表营收来源：</span>
-            {(["products", "manual"] as const).map((src) => (
-              <button
-                key={src}
-                onClick={() => setField("revenueSource", src)}
-                className="text-xs px-3 py-1 rounded-lg transition-colors"
-                style={{
-                  backgroundColor: form.revenueSource === src ? "rgba(201,168,76,0.15)" : "#F8F6F1",
-                  border: `1px solid ${form.revenueSource === src ? "rgba(201,168,76,0.4)" : "#E8DFCF"}`,
-                  color: form.revenueSource === src ? "#C9A84C" : "#7A7A7A",
-                }}
-              >
-                {src === "products" ? "从产品表自动带入" : "手动填写"}
-              </button>
-            ))}
-            {form.revenueSource === "manual" && (
-              <div className="w-40">
-                <NumInput value={form.revenueOverride} onChange={(v) => setField("revenueOverride", v)} prefix={sym} placeholder="年营收" />
-              </div>
-            )}
-          </div>
         </SectionCard>
 
         {/* ── Cost inputs ── */}
@@ -872,13 +834,6 @@ export default function IncomeStatementTool({ locale }: { locale: "zh" | "en" })
             <p className="text-xs" style={{ color: "#9A9490" }}>请先填入营收数据。</p>
           )}
         </SectionCard>
-
-        {/* ── Auto-save status ── */}
-        <div>
-          <p className="text-xs" style={{ color: "#9A9490" }}>
-            {saving ? "正在保存..." : lastSaved ? `已自动保存 ${lastSaved.toLocaleTimeString()}` : "未保存"}
-          </p>
-        </div>
 
       </div>
     </ToolShell>
