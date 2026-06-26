@@ -76,8 +76,8 @@ const GUIDE_STEPS = [
     body: "经营活动现金流：日常营业产生和消耗的现金。投资活动现金流：购买设备、扩张等资本支出。融资活动现金流：银行贷款、股权融资和还款。三者相加是净现金流。",
   },
   {
-    title: "简单模式 vs 详细模式",
-    body: "简单模式适合年度规划和快速评估，填入每类现金流的年度总额。详细模式提供 12 个月的逐月输入，适合现金流紧张或计划融资的企业，能准确算出资金缺口和最低点。",
+    title: "年度规划与快速评估",
+    body: "填入每类现金流的年度总额，系统自动计算年末现金、跑道期和融资时机信号，帮助你快速掌握全年资金健康状况。",
   },
   {
     title: "关键指标：燃烧率与跑道期",
@@ -249,7 +249,11 @@ function IndicatorCard({
       className="rounded-2xl p-5 flex flex-col"
       style={{ backgroundColor: c.bg, border: `1px solid ${c.border}`, minHeight: "152px" }}
     >
-      <p className="text-xl font-bold font-mono leading-tight truncate" style={{ color: c.text }}>{value}</p>
+      <p className="font-bold font-mono leading-tight break-all" style={{
+        color: c.text,
+        fontSize: value.length > 14 ? "0.8rem" : value.length > 10 ? "0.95rem" : "1.125rem",
+        lineHeight: 1.2,
+      }}>{value}</p>
       <p className="text-xs font-semibold mt-2" style={{ color: "#9A9490" }}>{label}</p>
       {formula && <p className="text-xs mt-1 font-mono" style={{ color: "#B0AA9A" }}>{formula}</p>}
       <p className="text-xs mt-2" style={{ color: c.text }}>{note}</p>
@@ -260,7 +264,7 @@ function IndicatorCard({
 // ── Main component ─────────────────────────────────────────────────────────
 
 function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
-  const { savedData, saving, lastSaved, save } = useToolSnapshot<T03Form>("cash-flow");
+  const { savedData, save } = useToolSnapshot<T03Form>("cash-flow");
   const [form, setForm] = useState<T03Form>(DEFAULT_FORM);
   const [loaded, setLoaded] = useState(false);
   const [coreData, setCoreData] = useState<FinancialCore | null>(null);
@@ -280,7 +284,7 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
             ? (saved.months as MonthData[])
             : makeDefaultMonths(),
       };
-      setForm(merged);
+      setForm({ ...merged, inputMode: "simple" });
       setLoaded(true);
       return;
     }
@@ -288,6 +292,7 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
       const merged: T03Form = {
         ...DEFAULT_FORM,
         ...savedData,
+        inputMode: "simple",
         months:
           savedData.months && savedData.months.length === 12
             ? savedData.months
@@ -295,7 +300,11 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
       };
       setForm(merged);
       setLoaded(true);
+      return;
     }
+    // Fallback: if no saved data found, enable auto-save after 1.5s
+    const t = setTimeout(() => setLoaded(true), 1500);
+    return () => clearTimeout(t);
   }, [savedData, loaded]);
 
   // ── Auto-save (1.5s debounce) ─────────────────────────────────────────
@@ -303,10 +312,10 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
   useEffect(() => {
     if (!loaded) return;
     if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current);
-    autoSaveTimer.current = setTimeout(() => { handleSave(); }, 1500);
+    autoSaveTimer.current = setTimeout(() => { handleSave(); }, 500);
     return () => { if (autoSaveTimer.current) clearTimeout(autoSaveTimer.current); };
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form]);
+  }, [form, loaded]);
 
 
   // Load FinancialCore + T01/T02 data
@@ -335,55 +344,6 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
     return (v: T03Form[K]) => setForm((p) => ({ ...p, [field]: v }));
   }
 
-  function setMonth(idx: number, key: keyof MonthData) {
-    return (v: string) =>
-      setForm((p) => {
-        const months = [...p.months];
-        months[idx] = { ...months[idx], [key]: v };
-        return { ...p, months };
-      });
-  }
-
-  // ── Mode switch with sync ────────────────────────────────────────────────
-  function switchMode(newMode: "simple" | "detailed") {
-    if (newMode === form.inputMode) return;
-    if (newMode === "detailed") {
-      // Simple → Detailed: distribute annual evenly to 12 months
-      const pf = (v: string) => parseFloat(v) || 0;
-      const opCF = pf(form.operatingInflow) - pf(form.operatingOutflow);
-      const invCF = pf(form.investingInflow) - pf(form.investingOutflow);
-      const finCF = pf(form.financingInflow) - pf(form.financingOutflow);
-      const mOp = Math.round(opCF / 12);
-      const mInv = Math.round(invCF / 12);
-      const mFin = Math.round(finCF / 12);
-      setForm((p) => ({
-        ...p,
-        inputMode: "detailed",
-        months: MONTH_LABELS.map(() => ({
-          operatingCF: String(mOp),
-          investingCF: String(mInv),
-          financingCF: String(mFin),
-        })),
-      }));
-    } else {
-      // Detailed → Simple: aggregate months
-      const pf = (v: string) => parseFloat(v) || 0;
-      const totalOp = form.months.reduce((s, m) => s + pf(m.operatingCF), 0);
-      const totalInv = form.months.reduce((s, m) => s + pf(m.investingCF), 0);
-      const totalFin = form.months.reduce((s, m) => s + pf(m.financingCF), 0);
-      setForm((p) => ({
-        ...p,
-        inputMode: "simple",
-        operatingInflow: totalOp >= 0 ? String(Math.round(totalOp)) : "0",
-        operatingOutflow: totalOp < 0 ? String(Math.round(-totalOp)) : "0",
-        investingInflow: totalInv >= 0 ? String(Math.round(totalInv)) : "0",
-        investingOutflow: totalInv < 0 ? String(Math.round(-totalInv)) : "0",
-        financingInflow: totalFin >= 0 ? String(Math.round(totalFin)) : "0",
-        financingOutflow: totalFin < 0 ? String(Math.round(-totalFin)) : "0",
-      }));
-    }
-  }
-
   // ── Import from T01 (Income Statement) ───────────────────────────────────
   function importFromT01() {
     const cid = getCompanyId();
@@ -393,21 +353,11 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
     const revenue = out.annualRevenue ?? 0;
     const pat = out.pat ?? 0;
     const costs = Math.max(0, revenue - pat);
-    if (form.inputMode === "simple") {
-      setForm((p) => ({
-        ...p,
-        operatingInflow: String(Math.round(revenue)),
-        operatingOutflow: String(Math.round(costs)),
-      }));
-    } else {
-      setForm((p) => ({
-        ...p,
-        months: p.months.map((m) => ({
-          ...m,
-          operatingCF: String(Math.round(pat / 12)),
-        })),
-      }));
-    }
+    setForm((p) => ({
+      ...p,
+      operatingInflow: String(Math.round(revenue)),
+      operatingOutflow: String(Math.round(costs)),
+    }));
   }
 
   // ── Import from T02 (Balance Sheet) ──────────────────────────────────────
@@ -431,7 +381,7 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
     const pf = (v: string) => parseFloat(v) || 0;
     const opening = pf(form.openingCash);
 
-    if (form.inputMode === "simple") {
+    {
       const opIn = pf(form.operatingInflow);
       const opOut = pf(form.operatingOutflow);
       const invIn = pf(form.investingInflow);
@@ -476,63 +426,6 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
         breakEvenMonth: null as number | null,
         lowestCash: closing,
         lowestCashMonth: null as string | null,
-      };
-    } else {
-      // Detailed: 12-month
-      const monthlyData: {
-        label: string;
-        opCF: number;
-        invCF: number;
-        finCF: number;
-        netCF: number;
-        balance: number;
-      }[] = [];
-      let balance = opening;
-      let breakEvenMonth: number | null = null;
-      let lowestCash = opening;
-      let lowestCashMonth: string | null = null;
-
-      form.months.forEach((m, i) => {
-        const opCF = pf(m.operatingCF);
-        const invCF = pf(m.investingCF);
-        const finCF = pf(m.financingCF);
-        const netCF = opCF + invCF + finCF;
-        balance += netCF;
-        if (balance < lowestCash) {
-          lowestCash = balance;
-          lowestCashMonth = MONTH_LABELS[i];
-        }
-        if (breakEvenMonth === null && netCF > 0) {
-          breakEvenMonth = i + 1;
-        }
-        monthlyData.push({ label: MONTH_LABELS[i], opCF, invCF, finCF, netCF, balance });
-      });
-
-      const closing = balance;
-      const netCF = closing - opening;
-      const totalOpCF = monthlyData.reduce((s, m) => s + m.opCF, 0);
-      const negOpMonths = monthlyData.filter((m) => m.opCF < 0);
-      const monthlyBurn =
-        negOpMonths.length > 0
-          ? Math.abs(negOpMonths.reduce((s, m) => s + m.opCF, 0) / negOpMonths.length)
-          : 0;
-      const runway = monthlyBurn > 0 && opening > 0 ? Math.floor(opening / monthlyBurn) : Infinity;
-
-      return {
-        mode: "detailed" as const,
-        opening,
-        opCF: totalOpCF,
-        invCF: monthlyData.reduce((s, m) => s + m.invCF, 0),
-        finCF: monthlyData.reduce((s, m) => s + m.finCF, 0),
-        netCF,
-        closing,
-        monthlyBurn,
-        runway,
-        chartData: [],
-        monthlyData,
-        breakEvenMonth,
-        lowestCash,
-        lowestCashMonth,
       };
     }
   }, [form]);
@@ -662,30 +555,6 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
         {/* ── Settings ──────────────────────────────────────────────────── */}
         <Card>
           <SectionLabel>基础设置</SectionLabel>
-          <div className="flex flex-wrap items-center gap-4 mb-4">
-            {/* Mode toggle */}
-            <div
-              className="flex items-center gap-1 p-1 rounded-xl"
-              style={{ backgroundColor: "#F8F6F1" }}
-            >
-              {(["simple", "detailed"] as const).map((m) => (
-                <button
-                  key={m}
-                  onClick={() => switchMode(m)}
-                  className="px-4 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-                  style={{
-                    backgroundColor: form.inputMode === m ? "#C9A84C" : "transparent",
-                    color: form.inputMode === m ? "#FFFFFF" : "#7A7A7A",
-                  }}
-                >
-                  {m === "simple" ? "简单模式（年度）" : "详细模式（逐月）"}
-                </button>
-              ))}
-            </div>
-
-
-          </div>
-
           {/* Opening cash */}
           <InputRow
             label="期初现金余额"
@@ -722,9 +591,8 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
           </div>
         </Card>
 
-        {/* ── Simple mode inputs ─────────────────────────────────────────── */}
-        {form.inputMode === "simple" && (
-          <div className="grid lg:grid-cols-3 gap-5">
+        {/* ── Annual inputs ─────────────────────────────────────────── */}
+        <div className="grid lg:grid-cols-3 gap-5">
             <Card>
               <SectionLabel>经营活动现金流</SectionLabel>
               <InputRow
@@ -775,75 +643,7 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
               />
               <Subtotal label="融资净现金流" value={calc.finCF} sym={sym} />
             </Card>
-          </div>
-        )}
-
-        {/* ── Detailed mode: 12-month table ─────────────────────────────── */}
-        {form.inputMode === "detailed" && (
-          <Card>
-            <SectionLabel>12 个月现金流明细（正数 = 流入，负数 = 流出）</SectionLabel>
-            <div className="overflow-x-auto">
-              <table className="w-full text-xs" style={{ borderCollapse: "collapse" }}>
-                <thead>
-                  <tr style={{ borderBottom: "1px solid #E8DFCF" }}>
-                    <th className="text-left pb-2 font-mono pr-2" style={{ color: "#7A7A7A", minWidth: 40 }}>月</th>
-                    <th className="text-right pb-2 font-mono px-2" style={{ color: "#7A7A7A", minWidth: 110 }}>经营活动</th>
-                    <th className="text-right pb-2 font-mono px-2" style={{ color: "#7A7A7A", minWidth: 110 }}>投资活动</th>
-                    <th className="text-right pb-2 font-mono px-2" style={{ color: "#7A7A7A", minWidth: 110 }}>融资活动</th>
-                    <th className="text-right pb-2 font-mono px-2" style={{ color: "#7A7A7A", minWidth: 90 }}>净现金流</th>
-                    <th className="text-right pb-2 font-mono px-2" style={{ color: "#7A7A7A", minWidth: 90 }}>累计余额</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {calc.monthlyData.map((row, i) => (
-                    <tr key={i} style={{ borderBottom: "1px solid #E8DFCF" }}>
-                      <td className="py-1.5 font-mono pr-2" style={{ color: "#7A7A7A" }}>
-                        {row.label}
-                      </td>
-                      {(["operatingCF", "investingCF", "financingCF"] as const).map((key) => (
-                        <td key={key} className="py-1 px-2">
-                          <input
-                            type="number"
-                            value={form.months[i][key]}
-                            onChange={(e) => setMonth(i, key)(e.target.value)}
-                            className="w-full text-right rounded-md py-1 px-2 text-xs font-mono outline-none"
-                            style={{
-                              backgroundColor: "#F8F6F1",
-                              border: "1px solid #E8DFCF",
-                              color:
-                                parseFloat(form.months[i][key]) < 0 ? "#B05050" : "#2B2B2B",
-                            }}
-                            onFocus={(e) => { e.target.select(); e.target.style.borderColor = "#C9A84C"; }}
-                            onBlur={(e) => (e.target.style.borderColor = "#E8DFCF")}
-                          />
-                        </td>
-                      ))}
-                      <td
-                        className="py-1.5 px-2 text-right font-mono font-semibold text-xs"
-                        style={{ color: row.netCF < 0 ? "#B05050" : "#3D7A41" }}
-                      >
-                        {fmt(row.netCF, sym)}
-                      </td>
-                      <td
-                        className="py-1.5 px-2 text-right font-mono text-xs"
-                        style={{
-                          color:
-                            row.balance < 0
-                              ? "#B05050"
-                              : row.balance < (parseFloat(form.openingCash) || 0) * 0.3
-                              ? "#C9863A"
-                              : "#A0A09A",
-                        }}
-                      >
-                        {fmt(row.balance, sym)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </Card>
-        )}
+        </div>
 
         {/* ── Summary totals ─────────────────────────────────────────────── */}
         <div className="grid grid-cols-3 gap-4">
@@ -858,13 +658,10 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
 
         {/* ── Chart ──────────────────────────────────────────────────────── */}
         <Card>
-          <SectionLabel>
-            {form.inputMode === "simple" ? "现金流瀑布图" : "月度净现金流 + 累计余额"}
-          </SectionLabel>
+          <SectionLabel>现金流瀑布图</SectionLabel>
           <div style={{ height: 240 }}>
             <ResponsiveContainer width="100%" height="100%">
-              {form.inputMode === "simple" ? (
-                <ComposedChart
+              <ComposedChart
                   data={calc.chartData}
                   margin={{ top: 8, right: 8, left: 8, bottom: 8 }}
                 >
@@ -907,63 +704,6 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
                     ))}
                   </Bar>
                 </ComposedChart>
-              ) : (
-                <ComposedChart
-                  data={calc.monthlyData}
-                  margin={{ top: 8, right: 8, left: 8, bottom: 8 }}
-                >
-                  <XAxis
-                    dataKey="label"
-                    tick={{ fill: "#7A7A7A", fontSize: 11 }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    yAxisId="left"
-                    tick={{ fill: "#7A7A7A", fontSize: 10 }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickFormatter={fmtAxis}
-                  />
-                  <YAxis
-                    yAxisId="right"
-                    orientation="right"
-                    tick={{ fill: "#7A7A7A", fontSize: 10 }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickFormatter={fmtAxis}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#F8F6F1",
-                      border: "1px solid #E8DFCF",
-                      borderRadius: 10,
-                      fontSize: 12,
-                    }}
-                    labelStyle={{ color: "#9A9490" }}
-                    formatter={(v: number, name: string) => [fmt(v, sym), name]}
-                  />
-                  <ReferenceLine yAxisId="left" y={0} stroke="#E8DFCF" />
-                  <Bar yAxisId="left" dataKey="netCF" name="净现金流" radius={[4, 4, 0, 0]}>
-                    {calc.monthlyData.map((entry, i) => (
-                      <Cell
-                        key={i}
-                        fill={entry.netCF >= 0 ? "#4A8A50" : "#B05050"}
-                        fillOpacity={0.8}
-                      />
-                    ))}
-                  </Bar>
-                  <Line
-                    yAxisId="right"
-                    type="monotone"
-                    dataKey="balance"
-                    name="累计余额"
-                    stroke="#C9A84C"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </ComposedChart>
-              )}
             </ResponsiveContainer>
           </div>
         </Card>
@@ -1061,40 +801,6 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
             />
           </div>
 
-          {/* Detailed mode extras */}
-          {form.inputMode === "detailed" && (
-            <div className="mt-4 grid sm:grid-cols-2 gap-4">
-              <div
-                className="rounded-xl px-4 py-3"
-                style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
-              >
-                <p className="text-xs font-semibold mb-1" style={{ color: "#9A9490" }}>
-                  首次月度盈利月份
-                </p>
-                <p
-                  className="text-lg font-bold font-mono"
-                  style={{ color: calc.breakEvenMonth ? "#3D7A41" : "#7A7A7A" }}
-                >
-                  {calc.breakEvenMonth ? `第 ${calc.breakEvenMonth} 个月` : "本年度未出现"}
-                </p>
-              </div>
-              <div
-                className="rounded-xl px-4 py-3"
-                style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}
-              >
-                <p className="text-xs font-semibold mb-1" style={{ color: "#9A9490" }}>
-                  最低现金月
-                  {calc.lowestCashMonth ? `（${calc.lowestCashMonth}）` : ""}
-                </p>
-                <p
-                  className="text-lg font-bold font-mono"
-                  style={{ color: calc.lowestCash < 0 ? "#B05050" : "#C9863A" }}
-                >
-                  {fmt(calc.lowestCash, sym)}
-                </p>
-              </div>
-            </div>
-          )}
         </Card>
 
         {/* ── Fundraising signal ─────────────────────────────────────────── */}
@@ -1138,12 +844,6 @@ function CashFlowToolInner({ locale }: { locale: "zh" | "en" }) {
           </div>
         )}
 
-        {/* ── Save ───────────────────────────────────────────────────────── */}
-        <div className="flex items-center justify-between">
-          <p className="text-xs" style={{ color: "#2B2B2B" }}>
-            {saving ? "正在保存..." : lastSaved ? `已自动保存 ${lastSaved.toLocaleTimeString()}` : "未保存"}
-          </p>
-        </div>
 
       </div>
     </ToolShell>
