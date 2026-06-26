@@ -1041,4 +1041,43 @@ export default function FinancialRoadmapTool() {
                 <p className="text-base font-bold font-mono mb-2" style={{ color: "#C9A84C" }}>{fmt(c.postMoney, sym)}</p>
                 <div className="rounded-lg px-3 py-2" style={{ backgroundColor: "rgba(61,122,65,0.06)", border: "1px solid rgba(61,122,65,0.15)" }}>
                   <p className="text-xs mb-0.5" style={{ color: "#9A9490" }}>目标净利润（PAT）</p>
-  
+                  <p className="text-sm font-bold font-mono" style={{ color: "#3D7A41" }}>{c.patTarget > 0 ? fmt(c.patTarget, sym) : "—"}</p>
+                  <p className="text-xs mt-1" style={{ color: "#B0AA9A" }}>= {fmt(c.postMoney, sym)} ÷ PE {c.pe}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* Section 5: Warnings */}
+        {allWarnings.length > 0 && (
+          <div className="space-y-3">
+            {allWarnings.map((c) => (
+              <div key={c.round.id} className="rounded-xl px-4 py-3"
+                style={{ backgroundColor: "rgba(176,80,80,0.05)", border: "1px solid rgba(176,80,80,0.2)" }}>
+                <p className="text-sm font-semibold mb-1" style={{ color: "#B05050" }}>
+                  估值提醒：{c.round.stageNameZh}
+                </p>
+                <p className="text-xs mb-2" style={{ color: "#9A9490" }}>
+                  本轮融资前估值低于上一轮融资后估值，以下股东账面市值可能下降：
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {c.downRoundIds.map((id) => (
+                    <span key={id} className="text-xs px-2 py-1 rounded-md"
+                      style={{ backgroundColor: "rgba(176,80,80,0.08)", color: "#B05050" }}>
+                      {stakeLabel(id)} 市值下降
+                    </span>
+                  ))}
+                </div>
+                <p className="text-xs mt-2" style={{ color: "#B0AA9A" }}>
+                  建议：提高本轮融资后估值，或减少投资金额，使融资前估值高于上一轮融资后估值。
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+      </div>
+    </ToolShell>
+  );
+}
