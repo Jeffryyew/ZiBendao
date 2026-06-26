@@ -289,7 +289,7 @@ export async function seedDefaultTools(): Promise<ActionResult> {
       { name: "金融路线图方程式", slug: "financial-roadmap", description: "复利增长与长期财富规划", requiredLevel: 1 },
       { name: "产品服务报价系统", slug: "pricing-system", description: "动态报价单生成与PDF导出", requiredLevel: 1 },
       { name: "市值/市盈率计算器", slug: "market-cap", description: "PE/PB/PS估值分析与行业对比", requiredLevel: 2 },
-      { name: "PAT & KPI 计算器", slug: "pat-kpi", description: "税后利润与关键指标追踪", requiredLevel: 2 },
+      { name: "T04 企业经营绩效模拟系统", slug: "pat-kpi", description: "根据当前经营数据与融资阶段目标，模拟经营调整方案，分析企业达到下一阶段 KPI 所需条件", requiredLevel: 2 },
     ];
     for (const tool of defaults) {
       await prisma.tool.upsert({

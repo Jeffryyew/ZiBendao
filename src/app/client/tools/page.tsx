@@ -14,7 +14,7 @@ const TOOL_LABELS: Record<string, string> = {
   "financial-roadmap": "金融路线图方程式",
   "pricing-system": "产品服务报价系统",
   "market-cap": "市值/市盈率计算器",
-  "pat-kpi": "PAT & KPI 计算器",
+  "pat-kpi": "T04 企业经营绩效模拟系统",
 };
 
 export default async function ClientToolsPage() {

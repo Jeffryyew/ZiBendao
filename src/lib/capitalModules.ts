@@ -34,12 +34,12 @@ export const CAPITAL_MODULES: CapitalModule[] = [
   },
   {
     id: "pat-kpi", icon: "", layer: 1, href: "/tools/pat-kpi",
-    zh: { name: "T04 PAT绩效系统", desc: "完整损益分解，计算PAT、ROE、ROA，追踪KPI目标" },
-    en: { name: "T04 PAT & KPI", desc: "Full P&L breakdown, PAT, ROE, ROA and KPI target tracking" },
+    zh: { name: "T04 企业经营绩效模拟系统", desc: "根据当前经营数据与融资阶段目标，模拟经营调整方案，分析企业达到下一阶段 KPI 所需条件。" },
+    en: { name: "T04 Business Performance Simulator", desc: "Simulate operational adjustments based on current data and funding stage KPI targets." },
   },
   {
     id: "valuation", icon: "", layer: 1, href: "/tools/valuation",
-    zh: { name: "T05 企业估值系统", desc: "PE、PB、PS多维度估值分析，目标估值与融资路径规划" },
+    zh: { name: "T05 企业估值系统", desc: "根据企业经营数据，模拟估值成长、融资目标与 IPO 路线规划。" },
     en: { name: "T05 Valuation Engine", desc: "Multi-method valuation: PE, PB, PS with target and fundraising path" },
   },
   {
