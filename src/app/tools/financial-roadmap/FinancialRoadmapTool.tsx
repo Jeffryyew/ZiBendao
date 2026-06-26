@@ -328,8 +328,12 @@ export default function FinancialRoadmapTool() {
   const [loaded, setLoaded] = useState(false);
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [coreData, setCoreData] = useState<FinancialCore | null>(null);
-  const [dragIdx, setDragIdx] = useState<number | null>(null);
-  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+  const [draggingIdx, setDraggingIdx] = useState<number | null>(null);
+  const longPressRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const draggingIdxRef = useRef<number | null>(null);
+  const isDraggingRef = useRef(false);
+  const dragStartY = useRef(0);
+  const roundListRef = useRef<HTMLDivElement | null>(null);
 
   // ── Load from localStorage / DB ──────────────────────────────────────────
   useEffect(() => {
@@ -496,25 +500,57 @@ export default function FinancialRoadmapTool() {
     });
   }
 
-  // ── Drag-and-drop handlers ────────────────────────────────────────────────
-  function onDragStart(e: React.DragEvent, idx: number) {
-    e.dataTransfer.effectAllowed = "move";
-    setDragIdx(idx);
+  // ── Long-press drag handlers ──────────────────────────────────────────────
+  function endDrag() {
+    isDraggingRef.current = false;
+    draggingIdxRef.current = null;
+    setDraggingIdx(null);
+    if (longPressRef.current) { clearTimeout(longPressRef.current); longPressRef.current = null; }
   }
-  function onDragOver(e: React.DragEvent, idx: number) {
-    e.preventDefault();
-    if (idx === 0) return;
-    setDragOverIdx(idx);
+
+  function onCardPointerDown(e: React.PointerEvent, idx: number) {
+    if (form.rounds[idx]?.isFounder) return;
+    dragStartY.current = e.clientY;
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    longPressRef.current = setTimeout(() => {
+      isDraggingRef.current = true;
+      draggingIdxRef.current = idx;
+      setDraggingIdx(idx);
+      try { navigator.vibrate(30); } catch {}
+      longPressRef.current = null;
+    }, 300);
   }
-  function onDrop(e: React.DragEvent, toIdx: number) {
-    e.preventDefault();
-    if (dragIdx !== null && dragIdx !== toIdx && toIdx !== 0) {
-      moveRound(dragIdx, toIdx);
+
+  function onListPointerMove(e: React.PointerEvent) {
+    if (!isDraggingRef.current) {
+      if (longPressRef.current && Math.abs(e.clientY - dragStartY.current) > 10) {
+        clearTimeout(longPressRef.current);
+        longPressRef.current = null;
+      }
+      return;
     }
-    setDragIdx(null);
-    setDragOverIdx(null);
+    e.preventDefault();
+    const curIdx = draggingIdxRef.current;
+    if (curIdx === null || !roundListRef.current) return;
+    const cards = Array.from(roundListRef.current.querySelectorAll<HTMLElement>("[data-di]"));
+    for (const card of cards) {
+      const ti = parseInt(card.getAttribute("data-di")!);
+      if (ti === curIdx || ti === 0) continue;
+      const rect = card.getBoundingClientRect();
+      const mid = rect.top + rect.height / 2;
+      if (ti < curIdx && e.clientY < mid) {
+        setForm(p => { const rounds = [...p.rounds]; const [item] = rounds.splice(curIdx, 1); rounds.splice(ti, 0, item); return { ...p, rounds }; });
+        draggingIdxRef.current = ti;
+        setDraggingIdx(ti);
+        break;
+      } else if (ti > curIdx && e.clientY > mid) {
+        setForm(p => { const rounds = [...p.rounds]; const [item] = rounds.splice(curIdx, 1); rounds.splice(ti, 0, item); return { ...p, rounds }; });
+        draggingIdxRef.current = ti;
+        setDraggingIdx(ti);
+        break;
+      }
+    }
   }
-  function onDragEnd() { setDragIdx(null); setDragOverIdx(null); }
 
   // ── Computation ───────────────────────────────────────────────────────────
   const { computed, stakeholders } = useMemo(() => computeRounds(form), [form]);
@@ -626,27 +662,37 @@ export default function FinancialRoadmapTool() {
 
           <InsertBtn onClick={() => insertRoundAfter(0)} />
 
+          <div
+            ref={roundListRef}
+            onPointerMove={onListPointerMove}
+            onPointerUp={endDrag}
+            onPointerLeave={endDrag}
+            onPointerCancel={endDrag}
+          >
           {form.rounds.map((r, idx) => {
             const c = computed[idx];
-            const isDragging = dragIdx === idx;
-            const isDragOver = dragOverIdx === idx;
+            const isThisDragging = draggingIdx === idx;
             const canDrag = !r.isFounder;
             const preMoney = r.isFounder ? pf(r.initialValuation) : (pf(r.postMoneyValuation) - pf(r.investmentAmount));
 
             return (
               <div key={r.id}>
                 <div
-                  draggable={canDrag}
-                  onDragStart={canDrag ? (e) => onDragStart(e, idx) : undefined}
-                  onDragOver={canDrag ? (e) => onDragOver(e, idx) : undefined}
-                  onDrop={canDrag ? (e) => onDrop(e, idx) : undefined}
-                  onDragEnd={onDragEnd}
-                  className="rounded-xl p-4 transition-opacity"
+                  data-di={idx}
+                  onPointerDown={canDrag ? (e) => onCardPointerDown(e, idx) : undefined}
+                  className="rounded-xl p-4"
                   style={{
                     backgroundColor: r.isFounder ? "rgba(201,168,76,0.04)" : "#FAFAF8",
-                    border: `1px solid ${isDragOver ? "#C9A84C" : "#E8DFCF"}`,
-                    opacity: isDragging ? 0.4 : 1,
-                    cursor: canDrag ? "grab" : "default",
+                    border: `1px solid ${isThisDragging ? "#C9A84C" : "#E8DFCF"}`,
+                    opacity: isThisDragging ? 0.95 : 1,
+                    transform: isThisDragging ? "scale(1.02)" : "scale(1)",
+                    boxShadow: isThisDragging ? "0 8px 24px rgba(0,0,0,0.10)" : "none",
+                    cursor: canDrag ? (isThisDragging ? "grabbing" : "grab") : "default",
+                    transition: "transform 200ms ease, box-shadow 200ms ease, opacity 200ms ease, border-color 200ms ease",
+                    touchAction: "none",
+                    position: "relative",
+                    zIndex: isThisDragging ? 10 : 0,
+                    userSelect: "none",
                   }}
                 >
                   <div className="flex items-center justify-between mb-3">
@@ -658,13 +704,11 @@ export default function FinancialRoadmapTool() {
                       <TextInput value={r.stageNameZh} onChange={(v) => updateRound(r.id, { stageNameZh: v })} width={160} placeholder="阶段名称" />
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      {!r.isFounder && idx > 1 && (
-                        <button onClick={() => moveRound(idx, idx - 1)} className="text-xs px-2 py-1 rounded-md"
-                          style={{ backgroundColor: "#F0EBE0", color: "#9A9490", border: "1px solid #E8DFCF" }}>&#8593;</button>
-                      )}
-                      {!r.isFounder && idx < form.rounds.length - 1 && (
-                        <button onClick={() => moveRound(idx, idx + 1)} className="text-xs px-2 py-1 rounded-md"
-                          style={{ backgroundColor: "#F0EBE0", color: "#9A9490", border: "1px solid #E8DFCF" }}>&#8595;</button>
+                      {canDrag && (
+                        <span className="text-xs px-1.5 py-0.5 rounded select-none pointer-events-none"
+                          style={{ color: "#C9C4BA", fontSize: "0.65rem", letterSpacing: "0.05em" }}>
+                          长按拖曳
+                        </span>
                       )}
                       {!r.isFounder && (
                         <button onClick={() => setDeleteConfirmId(r.id)} className="text-xs px-2 py-1 rounded-lg"
@@ -789,6 +833,7 @@ export default function FinancialRoadmapTool() {
               </div>
             );
           })}
+          </div>
 
           <InsertBtn onClick={() => insertRoundAfter(form.rounds.length - 1)} />
         </Card>
@@ -996,43 +1041,4 @@ export default function FinancialRoadmapTool() {
                 <p className="text-base font-bold font-mono mb-2" style={{ color: "#C9A84C" }}>{fmt(c.postMoney, sym)}</p>
                 <div className="rounded-lg px-3 py-2" style={{ backgroundColor: "rgba(61,122,65,0.06)", border: "1px solid rgba(61,122,65,0.15)" }}>
                   <p className="text-xs mb-0.5" style={{ color: "#9A9490" }}>目标净利润（PAT）</p>
-                  <p className="text-sm font-bold font-mono" style={{ color: "#3D7A41" }}>{c.patTarget > 0 ? fmt(c.patTarget, sym) : "—"}</p>
-                  <p className="text-xs mt-1" style={{ color: "#B0AA9A" }}>= {fmt(c.postMoney, sym)} \xf7 PE {c.pe}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        {/* Section 5: Warnings */}
-        {allWarnings.length > 0 && (
-          <div className="space-y-3">
-            {allWarnings.map((c) => (
-              <div key={c.round.id} className="rounded-xl px-4 py-3"
-                style={{ backgroundColor: "rgba(176,80,80,0.05)", border: "1px solid rgba(176,80,80,0.2)" }}>
-                <p className="text-sm font-semibold mb-1" style={{ color: "#B05050" }}>
-                  估值提醒：{c.round.stageNameZh}
-                </p>
-                <p className="text-xs mb-2" style={{ color: "#9A9490" }}>
-                  本轮融资前估值低于上一轮融资后估值，以下股东账面市值可能下降：
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {c.downRoundIds.map((id) => (
-                    <span key={id} className="text-xs px-2 py-1 rounded-md"
-                      style={{ backgroundColor: "rgba(176,80,80,0.08)", color: "#B05050" }}>
-                      {stakeLabel(id)} 市值下降
-                    </span>
-                  ))}
-                </div>
-                <p className="text-xs mt-2" style={{ color: "#B0AA9A" }}>
-                  建议：提高本轮融资后估值，或减少投资金额，使融资前估值高于上一轮融资后估值。
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-
-      </div>
-    </ToolShell>
-  );
-}
+  
