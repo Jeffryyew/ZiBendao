@@ -1077,7 +1077,7 @@ export default function FinancialRoadmapTool() {
                 </p>
                 <div className="flex flex-wrap gap-2">
                   {c.downRoundIds.map((id) => (
-                  {c.downRoundIds.map((id) => (
+                    <span key={id} className="text-xs px-2 py-1 rounded-md"
                       style={{ backgroundColor: "rgba(176,80,80,0.08)", color: "#B05050" }}>
                       {stakeLabel(id)} 市值下降
                     </span>
@@ -1091,7 +1091,4 @@ export default function FinancialRoadmapTool() {
           </div>
         )}
 
-      </div>
-    </ToolShell>
-  );
-}
+      </d
