@@ -698,7 +698,7 @@ function SingleCompanyView({
         )}
       </div>
 
-      <EnterpriseCoreSummary companyId={`single_${company.id}`} />
+      <EnterpriseDashboard companyId={`single_${company.id}`} />
 
       <AIAnalysisCard
         title="小资分析"
@@ -1281,7 +1281,7 @@ function GroupView({
         <>
           <GrowthStatusBar label="集团成长状态" netProfit={(group.parent?.netProfit ?? 0) + group.subsidiaries.reduce((s, c) => s + (c.netProfit ?? 0), 0)} companyId={group.parent ? `group_${group.parent.id}` : undefined} />
 
-          {group.parent && <EnterpriseCoreSummary companyId={`group_${group.parent.id}`} />}
+          {group.parent && <EnterpriseDashboard companyId={`group_${group.parent.id}`} />}
 
           <AIAnalysisCard
             title="小资分析"
@@ -1353,7 +1353,7 @@ function StatusBadge({ status, small }: { status: "active" | "inactive"; small?:
 }
 
 
-// ─── Enterprise Core Summary ─────────────────────────────────────────────────
+// ─── Enterprise Dashboard helpers ────────────────────────────────────────────
 
 function fmtMoney(n: number | undefined, sym = "RM"): string {
   if (n == null || isNaN(n)) return "—";
@@ -1365,53 +1365,25 @@ function fmtPct(n: number | undefined): string {
   return n.toFixed(1) + "%";
 }
 
-function fmtRatio(n: number | undefined): string {
-  if (n == null || !isFinite(n) || isNaN(n)) return "—";
-  return n.toFixed(2) + "x";
-}
+// ─── Enterprise Dashboard ────────────────────────────────────────────────────
 
-function CoreDataRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-center justify-between py-1.5" style={{ borderBottom: "1px solid #F0EDE8" }}>
-      <span className="text-xs" style={{ color: "#9A9490" }}>{label}</span>
-      <span className="text-xs font-semibold font-mono" style={{ color: "#2B2B2B" }}>{value}</span>
-    </div>
-  );
-}
-
-function CoreSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-0">
-      <p className="text-xs font-semibold mb-1" style={{ color: "#C9A84C" }}>{title}</p>
-      {children}
-    </div>
-  );
-}
-
-function EnterpriseCoreSummary({ companyId }: { companyId: string }) {
+function EnterpriseDashboard({ companyId }: { companyId: string }) {
   const [toolData, setToolData] = useState<AllToolData>({});
   const [dbCore, setDbCore] = useState<FinancialCore | null>(null);
 
   useEffect(() => {
     if (!companyId) return;
-
     function reload() {
       const ld = loadCompanyToolData(companyId);
       setToolData(ld);
     }
-
-    // Step 1: Load all tool data from localStorage immediately
     reload();
-
-    // Step 2: Listen for toolDataUpdated events (fired by saveToolData)
     function onToolDataUpdated(e: Event) {
       const ev = e as CustomEvent<{ companyId: string; toolId: string }>;
       if (ev.detail.companyId !== companyId) return;
       reload();
     }
     window.addEventListener("toolDataUpdated", onToolDataUpdated);
-
-    // Step 3: Fetch _financial_core from DB as supplement for older data
     fetch(`/api/tools/snapshot?toolSlug=_financial_core&companyId=${encodeURIComponent(companyId)}`)
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
@@ -1420,7 +1392,6 @@ function EnterpriseCoreSummary({ companyId }: { companyId: string }) {
         }
       })
       .catch(() => {});
-
     return () => window.removeEventListener("toolDataUpdated", onToolDataUpdated);
   }, [companyId]);
 
@@ -1428,211 +1399,210 @@ function EnterpriseCoreSummary({ companyId }: { companyId: string }) {
   const t02 = toolData.T02?.calculatedOutput;
   const t03 = toolData.T03?.calculatedOutput;
   const t06 = toolData.T06?.calculatedOutput;
-  const t07 = toolData.T07?.calculatedOutput;
   const t08 = toolData.T08?.calculatedOutput;
-  const t09 = toolData.T09?.calculatedOutput;
 
-  const sym =
-    toolData.T01?.currency ??
-    toolData.T02?.currency ??
-    dbCore?.currencySymbol ??
-    "RM";
+  const sym = toolData.T01?.currency ?? toolData.T02?.currency ?? dbCore?.currencySymbol ?? "RM";
 
   const hasLocalData = Object.keys(toolData).length > 0;
   const hasDbData = dbCore && Object.keys(dbCore.updatedBy ?? {}).length > 0;
   if (!hasLocalData && !hasDbData) return null;
 
-  // Merged values: localStorage primary, DB fills gaps
-  const annualRevenue = t01?.annualRevenue ?? dbCore?.annualRevenue;
-  const grossProfit   = t01?.grossProfit   ?? dbCore?.grossProfit;
-  const ebit          = t01?.pbt           ?? dbCore?.ebit;
-  const taxAmt        = t01?.taxAmt        ?? dbCore?.taxAmt;
-  const annualPAT     = t01?.pat           ?? dbCore?.annualPAT;
-  const patMargin     = t01?.patMarginPct  ?? dbCore?.patMargin;
-  const grossMargin   = t01?.grossMarginPct ?? dbCore?.grossMargin;
+  // ── Derived values ──────────────────────────────────────────────────────
+  const annualRevenue  = t01?.annualRevenue  ?? dbCore?.annualRevenue;
+  const grossProfit    = t01?.grossProfit    ?? dbCore?.grossProfit;
+  const annualPAT      = t01?.pat            ?? dbCore?.annualPAT;
+  const patMargin      = t01?.patMarginPct   ?? dbCore?.patMargin;
+  const grossMargin    = t01?.grossMarginPct ?? dbCore?.grossMargin;
 
-  const totalAssets      = t02?.totalAssets      ?? dbCore?.totalAssets;
-  const totalLiabilities = t02?.totalLiabilities ?? dbCore?.totalLiabilities;
-  const totalEquity      = t02?.totalEquity      ?? dbCore?.totalEquity;
-  const currentRatio     = t02?.currentRatio     ?? dbCore?.currentRatio;
-  const t02DebtRatio     = t02?.debtRatio        as number | undefined;
-  const t02DebtToEquity  = t02?.debtToEquity     ?? dbCore?.debtToEquity;
+  const totalAssets  = t02?.totalAssets  ?? dbCore?.totalAssets;
+  const totalEquity  = t02?.totalEquity  ?? dbCore?.totalEquity;
+  const t02DebtRatio = t02?.debtRatio    as number | undefined;
 
   const yearEndCash          = t03?.yearEndCash          ?? dbCore?.yearEndCash;
   const netOperatingCashFlow = t03?.netOperatingCashFlow as number | undefined;
 
-  const currentValuation = dbCore?.currentValuation;
-  const targetValuation  = dbCore?.targetValuation;
-  // T06 融资路线图 computed fields
-  const t06LatestPostMoney   = t06?.latestPostMoney   as number | undefined;
-  const t06FounderFinalPct   = t06?.founderFinalPct   as number | undefined;
-  const t06CofounderFinalPct = t06?.cofounderFinalPct as number | undefined;
-  const t06TotalInvested     = t06?.totalInvested     as number | undefined;
-  const t06IpoTarget         = t06?.ipoTargetValuation as number | undefined;
-  const t06LatestPatTarget   = t06?.latestPatTarget   as number | undefined;
-  const t06LatestPe          = t06?.latestPe          as number | undefined;
-  const t06CurrentStage      = t06?.currentStageName  as string | undefined;
-  const t06ActualStageName   = t06?.currentActualStageName as string | undefined;
-  const t06ActualPostMoney   = t06?.currentActualPostMoney as number | undefined;
-  const t06NextStageName     = t06?.nextStageName     as string | undefined;
-  const t06NextStagePostMoney = t06?.nextStagePostMoney as number | undefined;
-  const t06NextStagePat      = t06?.nextStagePat      as number | undefined;
-  const t06NextStagePe       = t06?.nextStagePe       as number | undefined;
-  const t06IsAtIPO           = !!(t06?.isAtIPO);
+  const currentValuation      = dbCore?.currentValuation;
+  const t06ActualStageName    = t06?.currentActualStageName as string | undefined;
+  const t06ActualPostMoney    = t06?.currentActualPostMoney as number | undefined;
+  const t06NextStageName      = t06?.nextStageName          as string | undefined;
+  const t06NextStagePostMoney = t06?.nextStagePostMoney     as number | undefined;
+  const t06NextStagePat       = t06?.nextStagePat           as number | undefined;
+  const t06NextStagePe        = t06?.nextStagePe            as number | undefined;
+  const t06IsAtIPO            = !!(t06?.isAtIPO);
 
-  const roadmapYear1Revenue = t07?.roadmapYear1Revenue ?? dbCore?.roadmapYear1Revenue;
-  const roadmapYear2Revenue = t07?.roadmapYear2Revenue ?? dbCore?.roadmapYear2Revenue;
-  const roadmapYear3Revenue = t07?.roadmapYear3Revenue ?? dbCore?.roadmapYear3Revenue;
-  const roadmapYear1PAT     = t07?.roadmapYear1PAT     ?? dbCore?.roadmapYear1PAT;
-  const roadmapYear2PAT     = t07?.roadmapYear2PAT     ?? dbCore?.roadmapYear2PAT;
-  const roadmapYear3PAT     = t07?.roadmapYear3PAT     ?? dbCore?.roadmapYear3PAT;
+  const founderPct  = (t08?.founderPct  as number | undefined) ?? dbCore?.founderPct;
+  const esopPct     = t08?.esopPct      as number | undefined;
+  const investorPct = t08?.investorPct  as number | undefined;
 
-  const founderPct  = t08?.founderPct  as number | undefined ?? dbCore?.founderPct;
-  const esopPct     = t08?.esopPct     as number | undefined;
-  const investorPct = t08?.investorPct as number | undefined;
+  // ── Health status ───────────────────────────────────────────────────────
+  type HS = "优秀" | "正常" | "注意" | "风险" | "—";
+  const hColor: Record<HS, string> = {
+    "优秀": "#3D7A41", "正常": "#C9A84C", "注意": "#E07A2A", "风险": "#B05050", "—": "#9A9490",
+  };
+  const hBg: Record<HS, string> = {
+    "优秀": "rgba(61,122,65,0.08)", "正常": "rgba(201,168,76,0.08)",
+    "注意": "rgba(224,122,42,0.08)", "风险": "rgba(176,80,80,0.08)", "—": "rgba(154,148,144,0.08)",
+  };
+  const hBorder: Record<HS, string> = {
+    "优秀": "rgba(61,122,65,0.2)", "正常": "rgba(201,168,76,0.2)",
+    "注意": "rgba(224,122,42,0.2)", "风险": "rgba(176,80,80,0.2)", "—": "rgba(154,148,144,0.2)",
+  };
 
-  const wacc          = t09?.wacc          as number | undefined;
-  const dscrVal       = t09?.dscr          as number | null | undefined;
-  const capitalDeRatio = t09?.debtToEquity as number | undefined;
+  const profitHS: HS = patMargin == null ? "—"
+    : patMargin >= 20 ? "优秀" : patMargin >= 10 ? "正常" : patMargin >= 0 ? "注意" : "风险";
+  const cashHS: HS = yearEndCash == null ? "—"
+    : yearEndCash > 100000 && (netOperatingCashFlow ?? 0) > 0 ? "优秀"
+    : yearEndCash > 0 ? "正常" : "风险";
+  const debtHS: HS = t02DebtRatio == null ? "—"
+    : t02DebtRatio < 40 ? "优秀" : t02DebtRatio < 60 ? "正常" : t02DebtRatio < 80 ? "注意" : "风险";
+  const growthLevel = getGrowthLevel(annualPAT ?? 0);
+  const growthHS: HS = annualPAT == null ? "—"
+    : growthLevel >= 3 ? "优秀" : growthLevel >= 2 ? "正常" : "注意";
 
-  const allTimes = [
-    ...Object.values(toolData).map((d) => d?.updatedAt).filter(Boolean) as string[],
-    ...Object.values(dbCore?.updatedBy ?? {}).filter(Boolean) as string[],
-  ].sort().reverse();
-  const lastUpdated = allTimes[0];
+  const healthCards: { label: string; status: HS; sub: string }[] = [
+    { label: "利润率", status: profitHS, sub: patMargin != null ? fmtPct(patMargin) : "暂无数据" },
+    { label: "现金流", status: cashHS, sub: yearEndCash != null ? fmtMoney(yearEndCash, sym) : "暂无数据" },
+    { label: "负债比率", status: debtHS, sub: t02DebtRatio != null ? `${t02DebtRatio.toFixed(1)}%` : "暂无数据" },
+    { label: "成长阶段", status: growthHS, sub: GROWTH_STAGES[growthLevel] },
+  ];
 
   return (
-    <div className="rounded-2xl p-5 space-y-4" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
-      <p className="text-xs font-semibold" style={{ color: "#1C1814" }}>企业核心数据</p>
+    <div className="space-y-4">
 
-      {(t01 || dbCore?.annualRevenue != null) && (
-        <CoreSection title="损益概览">
-          <CoreDataRow label="年营收" value={fmtMoney(annualRevenue, sym)} />
-          <CoreDataRow label="毛利润" value={fmtMoney(grossProfit, sym)} />
-          <CoreDataRow label="税前利润" value={fmtMoney(ebit, sym)} />
-          <CoreDataRow label="企业所得税" value={fmtMoney(taxAmt, sym)} />
-          <CoreDataRow label="税后净利润（PAT）" value={fmtMoney(annualPAT, sym)} />
-          <CoreDataRow label="净利润率" value={fmtPct(patMargin)} />
-          <CoreDataRow label="毛利率" value={fmtPct(grossMargin)} />
-        </CoreSection>
-      )}
+      {/* ── 企业仪表板：8 KPI Cards ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {[
+          { label: "年营收", value: fmtMoney(annualRevenue, sym), sub: grossMargin != null ? `毛利率 ${fmtPct(grossMargin)}` : "来自利润表" },
+          { label: "毛利润", value: fmtMoney(grossProfit, sym), sub: grossMargin != null ? fmtPct(grossMargin) : "—" },
+          { label: "税后净利润", value: fmtMoney(annualPAT, sym), sub: patMargin != null ? fmtPct(patMargin) : "—" },
+          { label: "企业估值", value: fmtMoney(t06ActualPostMoney ?? currentValuation, sym), sub: t06ActualStageName ?? "—" },
+          { label: "总资产", value: fmtMoney(totalAssets, sym), sub: "资产负债表" },
+          { label: "股东权益", value: fmtMoney(totalEquity, sym), sub: "资产负债表" },
+          { label: "年末现金", value: fmtMoney(yearEndCash, sym), sub: "现金流" },
+          { label: "融资阶段", value: t06ActualStageName ?? "—", sub: t06NextStageName ? `→ ${t06NextStageName}` : "设置融资路线图" },
+        ].map((kpi) => (
+          <div key={kpi.label} className="rounded-2xl p-4" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
+            <div className="text-xs mb-2" style={{ color: "#9A9490" }}>{kpi.label}</div>
+            <div className="text-sm font-bold font-mono leading-tight truncate" style={{ color: "#1C1814" }}>{kpi.value}</div>
+            <div className="text-xs mt-1 truncate" style={{ color: "#C9A84C" }}>{kpi.sub}</div>
+          </div>
+        ))}
+      </div>
 
-      {(t02 || dbCore?.totalAssets != null) && (
-        <CoreSection title="资产负债表">
-          <CoreDataRow label="总资产" value={fmtMoney(totalAssets, sym)} />
-          <CoreDataRow label="总负债" value={fmtMoney(totalLiabilities, sym)} />
-          <CoreDataRow label="股东权益" value={fmtMoney(totalEquity, sym)} />
-          <CoreDataRow label="流动比率" value={fmtRatio(currentRatio)} />
-          {t02DebtRatio != null && <CoreDataRow label="负债率" value={t02DebtRatio.toFixed(1) + "%"} />}
-          <CoreDataRow label="负债权益比" value={fmtRatio(t02DebtToEquity)} />
-        </CoreSection>
-      )}
+      {/* ── 经营健康：4 Status Cards ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        {healthCards.map((h) => (
+          <div
+            key={h.label}
+            className="rounded-2xl p-4"
+            style={{ backgroundColor: hBg[h.status], border: `1px solid ${hBorder[h.status]}` }}
+          >
+            <div className="text-xs mb-1.5" style={{ color: "#9A9490" }}>{h.label}</div>
+            <div className="text-base font-bold" style={{ color: hColor[h.status] }}>{h.status}</div>
+            <div className="text-xs mt-1" style={{ color: "#9A9490" }}>{h.sub}</div>
+          </div>
+        ))}
+      </div>
 
-      {(t03 || dbCore?.yearEndCash != null) && (
-        <CoreSection title="现金流">
-          <CoreDataRow label="年末现金" value={fmtMoney(yearEndCash, sym)} />
-          {netOperatingCashFlow != null && (
-            <CoreDataRow label="净营业现金流" value={fmtMoney(netOperatingCashFlow, sym)} />
-          )}
-        </CoreSection>
-      )}
-
-      {dbCore?.currentValuation != null && (
-        <CoreSection title="企业估值">
-          <CoreDataRow label="当前估值" value={fmtMoney(currentValuation, sym)} />
-          <CoreDataRow label="目标估值" value={fmtMoney(targetValuation, sym)} />
-        </CoreSection>
-      )}
-
-      {t06 ? (
-        <CoreSection title="融资路线图">
-          {t06ActualStageName ? (
-            <>
-              <CoreDataRow label="当前融资阶段" value={t06ActualStageName} />
-              {t06ActualPostMoney != null && t06ActualPostMoney > 0 && (
-                <CoreDataRow label="当前估值" value={fmtMoney(t06ActualPostMoney, sym)} />
-              )}
-              {t06IsAtIPO ? (
-                <div className="py-1.5">
-                  <span className="text-xs px-2 py-1 rounded-md" style={{ backgroundColor: "rgba(61,122,65,0.08)", color: "#3D7A41", border: "1px solid rgba(61,122,65,0.2)" }}>
-                    已达到上市阶段
-                  </span>
-                </div>
-              ) : (
-                <>
-                  {t06NextStageName && <CoreDataRow label="下一目标阶段" value={t06NextStageName} />}
-                  {t06NextStagePostMoney != null && t06NextStagePostMoney > 0 && (
-                    <CoreDataRow label="下一阶段目标估值" value={fmtMoney(t06NextStagePostMoney, sym)} />
-                  )}
-                  {t06NextStagePat != null && t06NextStagePat > 0 && (
-                    <CoreDataRow label="下一阶段目标 PAT" value={fmtMoney(t06NextStagePat, sym)} />
-                  )}
-                  {t06NextStagePe != null && t06NextStagePe > 0 && (
-                    <CoreDataRow label="市盈率（PE）" value={"PE " + t06NextStagePe} />
-                  )}
-                </>
-              )}
-            </>
+      {/* ── 资本成长 ── */}
+      {t06 && (
+        <div className="rounded-2xl p-4" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
+          <div className="text-xs font-semibold mb-3" style={{ color: "#1C1814" }}>资本成长路径</div>
+          {t06IsAtIPO ? (
+            <div
+              className="text-xs px-3 py-2 rounded-xl inline-block"
+              style={{ backgroundColor: "rgba(61,122,65,0.08)", color: "#3D7A41", border: "1px solid rgba(61,122,65,0.2)" }}
+            >
+              已达到 IPO 阶段
+            </div>
           ) : (
-            <>
-              {t06CurrentStage && <CoreDataRow label="最新阶段" value={t06CurrentStage} />}
-              {t06LatestPostMoney != null && t06LatestPostMoney > 0 && (
-                <CoreDataRow label="最新估值" value={fmtMoney(t06LatestPostMoney, sym)} />
-              )}
-              {t06FounderFinalPct != null && t06FounderFinalPct > 0 && (
-                <CoreDataRow label="创办人最终持股" value={(t06FounderFinalPct * 100).toFixed(1) + "%"} />
-              )}
-              {t06TotalInvested != null && t06TotalInvested > 0 && (
-                <CoreDataRow label="累计融资额" value={fmtMoney(t06TotalInvested, sym)} />
-              )}
-            </>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+              {([
+                { label: "当前阶段",     value: t06ActualStageName ?? "—",         mono: false, hi: false },
+                { label: "下一阶段",     value: t06NextStageName ?? "—",            mono: false, hi: true  },
+                { label: "下一目标估值", value: fmtMoney(t06NextStagePostMoney, sym), mono: true,  hi: false },
+                { label: "下一目标 PAT", value: fmtMoney(t06NextStagePat, sym),      mono: true,  hi: false },
+                { label: "PE",          value: t06NextStagePe != null ? `${t06NextStagePe}x` : "—", mono: true, hi: false },
+              ] as { label: string; value: string; mono: boolean; hi: boolean }[]).map((item) => (
+                <div key={item.label}>
+                  <div className="text-xs mb-1" style={{ color: "#9A9490" }}>{item.label}</div>
+                  <div
+                    className={`text-sm font-bold${item.mono ? " font-mono" : ""}`}
+                    style={{ color: item.hi ? "#C9A84C" : "#1C1814" }}
+                  >
+                    {item.value}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
-        </CoreSection>
-      ) : (
-        <div className="py-3 px-4 rounded-xl" style={{ backgroundColor: "#F8F6F1", border: "1px solid #E8DFCF" }}>
-          <p className="text-xs font-semibold mb-1" style={{ color: "#C9A84C" }}>融资路线图</p>
-          <p className="text-xs mb-2" style={{ color: "#9A9490" }}>尚未建立融资路线图</p>
-          <a href="/tools/financial-roadmap" className="text-xs px-3 py-1.5 rounded-lg inline-block"
-            style={{ backgroundColor: "rgba(201,168,76,0.12)", color: "#C9A84C", border: "1px solid rgba(201,168,76,0.3)" }}>
-            前往融资路线图工具
-          </a>
         </div>
       )}
 
-      {(t07 || dbCore?.roadmapYear1Revenue != null) && (
-        <CoreSection title="财务路线图">
-          <CoreDataRow label="第1年营收" value={fmtMoney(roadmapYear1Revenue, sym)} />
-          <CoreDataRow label="第1年税后净利润" value={fmtMoney(roadmapYear1PAT, sym)} />
-          <CoreDataRow label="第2年营收" value={fmtMoney(roadmapYear2Revenue, sym)} />
-          <CoreDataRow label="第2年税后净利润" value={fmtMoney(roadmapYear2PAT, sym)} />
-          <CoreDataRow label="第3年营收" value={fmtMoney(roadmapYear3Revenue, sym)} />
-          <CoreDataRow label="第3年税后净利润" value={fmtMoney(roadmapYear3PAT, sym)} />
-        </CoreSection>
+      {/* ── 股权结构 ── */}
+      {(founderPct != null || esopPct != null || investorPct != null) && (
+        <div className="rounded-2xl p-4" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
+          <div className="text-xs font-semibold mb-3" style={{ color: "#1C1814" }}>股权结构</div>
+          <div className="space-y-2.5">
+            {founderPct != null && (
+              <div className="flex items-center gap-3">
+                <div className="w-14 text-xs flex-shrink-0" style={{ color: "#9A9490" }}>创始人</div>
+                <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ backgroundColor: "#F0EDE8" }}>
+                  <div className="h-full rounded-full" style={{ width: `${Math.min(founderPct, 100)}%`, backgroundColor: "#C9A84C" }} />
+                </div>
+                <div className="w-9 text-xs font-mono text-right flex-shrink-0" style={{ color: "#1C1814" }}>{founderPct.toFixed(0)}%</div>
+              </div>
+            )}
+            {esopPct != null && (
+              <div className="flex items-center gap-3">
+                <div className="w-14 text-xs flex-shrink-0" style={{ color: "#9A9490" }}>ESOP</div>
+                <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ backgroundColor: "#F0EDE8" }}>
+                  <div className="h-full rounded-full" style={{ width: `${Math.min(esopPct, 100)}%`, backgroundColor: "#6B9BD2" }} />
+                </div>
+                <div className="w-9 text-xs font-mono text-right flex-shrink-0" style={{ color: "#1C1814" }}>{esopPct.toFixed(0)}%</div>
+              </div>
+            )}
+            {investorPct != null && (
+              <div className="flex items-center gap-3">
+                <div className="w-14 text-xs flex-shrink-0" style={{ color: "#9A9490" }}>投资人</div>
+                <div className="flex-1 h-5 rounded-full overflow-hidden" style={{ backgroundColor: "#F0EDE8" }}>
+                  <div className="h-full rounded-full" style={{ width: `${Math.min(investorPct, 100)}%`, backgroundColor: "#82C8A0" }} />
+                </div>
+                <div className="w-9 text-xs font-mono text-right flex-shrink-0" style={{ color: "#1C1814" }}>{investorPct.toFixed(0)}%</div>
+              </div>
+            )}
+          </div>
+        </div>
       )}
 
-      {(t08 || dbCore?.founderPct != null) && (
-        <CoreSection title="股权架构">
-          {founderPct != null && <CoreDataRow label="创始人持股" value={fmtPct(founderPct)} />}
-          {esopPct != null && <CoreDataRow label="ESOP 池" value={fmtPct(esopPct)} />}
-          {investorPct != null && <CoreDataRow label="投资人持股" value={fmtPct(investorPct)} />}
-        </CoreSection>
-      )}
+      {/* ── 快速进入工具 ── */}
+      <div className="rounded-2xl p-4" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
+        <div className="text-xs font-semibold mb-3" style={{ color: "#1C1814" }}>快速进入工具</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {([
+            { label: "继续编辑利润表",    href: "/tools/income-statement"  },
+            { label: "继续编辑资产负债表", href: "/tools/balance-sheet"     },
+            { label: "继续编辑现金流",    href: "/tools/cash-flow"          },
+            { label: "继续编辑企业估值",  href: "/tools/valuation"          },
+            { label: "继续编辑融资路线图", href: "/tools/financial-roadmap" },
+          ] as { label: string; href: string }[]).map((tool) => (
+            <Link
+              key={tool.href}
+              href={tool.href}
+              className="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-medium transition-all hover:opacity-80"
+              style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
+            >
+              {tool.label}
+              <span style={{ color: "#C9A84C" }}>→</span>
+            </Link>
+          ))}
+        </div>
+      </div>
 
-      {t09 && (
-        <CoreSection title="资本结构">
-          {wacc != null && <CoreDataRow label="WACC" value={fmtPct(wacc)} />}
-          {capitalDeRatio != null && <CoreDataRow label="D/E 比" value={fmtRatio(capitalDeRatio)} />}
-          {dscrVal != null && <CoreDataRow label="DSCR" value={dscrVal.toFixed(2) + "x"} />}
-        </CoreSection>
-      )}
-
-      <p className="text-xs" style={{ color: "#C0B8AE" }}>
-        数据来源：资本工具自动同步
-        {lastUpdated && ` · 最近更新于 ${new Date(lastUpdated).toLocaleDateString("zh-CN", { month: "short", day: "numeric" })}`}
-      </p>
     </div>
   );
 }
+
 
 function getGrowthLevel(pat: number): number {
   if (pat >= 3_000_000) return 4;
