@@ -1575,30 +1575,6 @@ function EnterpriseDashboard({ companyId }: { companyId: string }) {
         </div>
       )}
 
-      {/* ── 快速进入工具 ── */}
-      <div className="rounded-2xl p-4" style={{ backgroundColor: "#FFFFFF", border: "1px solid #E0D9CE" }}>
-        <div className="text-xs font-semibold mb-3" style={{ color: "#1C1814" }}>快速进入工具</div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-          {([
-            { label: "继续编辑利润表",    href: "/tools/income-statement"  },
-            { label: "继续编辑资产负债表", href: "/tools/balance-sheet"     },
-            { label: "继续编辑现金流",    href: "/tools/cash-flow"          },
-            { label: "继续编辑企业估值",  href: "/tools/valuation"          },
-            { label: "继续编辑融资路线图", href: "/tools/financial-roadmap" },
-          ] as { label: string; href: string }[]).map((tool) => (
-            <Link
-              key={tool.href}
-              href={tool.href}
-              className="flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-medium transition-all hover:opacity-80"
-              style={{ backgroundColor: "#F7F4EF", color: "#68625C", border: "1px solid #E0D9CE" }}
-            >
-              {tool.label}
-              <span style={{ color: "#C9A84C" }}>→</span>
-            </Link>
-          ))}
-        </div>
-      </div>
-
     </div>
   );
 }
